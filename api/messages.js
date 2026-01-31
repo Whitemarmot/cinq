@@ -56,7 +56,12 @@ export default async function handler(req, res) {
 // ===== GET - Fetch messages =====
 
 async function handleGetMessages(req, res, user) {
-    const { contact_id, limit = 50, before } = req.query;
+    const { contact_id, limit = 50, before, since, count } = req.query;
+    
+    // If 'since' is provided, return unread count (for polling)
+    if (since && !contact_id) {
+        return handleGetUnreadCount(req, res, user, since, count === 'true');
+    }
 
     if (!contact_id) {
         return res.status(400).json({ error: 'contact_id requis' });
@@ -117,6 +122,62 @@ async function markMessagesAsRead(userId, senderId) {
         .eq('receiver_id', userId)
         .eq('sender_id', senderId)
         .is('read_at', null);
+}
+
+/**
+ * Get count of unread messages since a timestamp (for polling)
+ */
+async function handleGetUnreadCount(req, res, user, since, includeLatest) {
+    const sinceDate = new Date(parseInt(since));
+    if (isNaN(sinceDate.getTime())) {
+        return res.status(400).json({ error: 'Format since invalide' });
+    }
+
+    // Get count of unread messages
+    const { count, error: countError } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', user.id)
+        .is('read_at', null);
+
+    if (countError) throw countError;
+
+    const response = { 
+        success: true, 
+        newCount: count || 0
+    };
+
+    // Optionally include the latest unread message for notification display
+    if (includeLatest && count > 0) {
+        const { data: latestData, error: latestError } = await supabase
+            .from('messages')
+            .select(`
+                id, 
+                sender_id, 
+                content, 
+                is_ping, 
+                created_at,
+                sender:profiles!sender_id(email)
+            `)
+            .eq('receiver_id', user.id)
+            .is('read_at', null)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (!latestError && latestData) {
+            response.latestMessage = {
+                id: latestData.id,
+                senderId: latestData.sender_id,
+                senderName: latestData.sender?.email?.split('@')[0] || 'Quelqu\'un',
+                content: latestData.content,
+                isPing: latestData.is_ping,
+                createdAt: latestData.created_at
+            };
+        }
+    }
+
+    return res.json(response);
 }
 
 // ===== POST - Send message =====

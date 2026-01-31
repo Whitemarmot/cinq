@@ -23,8 +23,8 @@ window.CinqNotifications = (function() {
   
   const CONFIG = {
     // VAPID public key for push notifications
-    // Replace with your actual key from .env
-    VAPID_PUBLIC_KEY: 'YOUR_VAPID_PUBLIC_KEY_HERE',
+    // Will be loaded from window.CINQ_VAPID_PUBLIC_KEY or meta tag
+    VAPID_PUBLIC_KEY: null,
     
     // Polling intervals (ms)
     POLL_INTERVAL_FOREGROUND: 30000,   // 30 seconds when visible
@@ -35,9 +35,10 @@ window.CinqNotifications = (function() {
     MAX_BACKOFF_MULTIPLIER: 4,
     BACKOFF_RESET_AFTER: 60000,        // Reset backoff after 1 min of success
     
-    // Notification sounds (optional, set path or null)
-    SOUND_MESSAGE: '/assets/sounds/message.mp3',
-    SOUND_PING: '/assets/sounds/ping.mp3',
+    // Notification sounds (optional, set path or null to disable)
+    // Files should exist in /assets/sounds/
+    SOUND_MESSAGE: null, // '/assets/sounds/message.mp3'
+    SOUND_PING: null,    // '/assets/sounds/ping.mp3'
     
     // Storage keys
     STORAGE_KEY_SETTINGS: 'cinq_notification_settings',
@@ -77,14 +78,22 @@ window.CinqNotifications = (function() {
    * Initialize the notification system
    * @param {Object} options - Configuration options
    * @param {string} options.vapidPublicKey - VAPID public key
+   * @param {boolean} options.enableSounds - Enable notification sounds
    * @returns {Promise<void>}
    */
   async function init(options = {}) {
     if (isInitialized) return;
     
-    // Merge options
-    if (options.vapidPublicKey) {
-      CONFIG.VAPID_PUBLIC_KEY = options.vapidPublicKey;
+    // Load VAPID key from multiple sources
+    CONFIG.VAPID_PUBLIC_KEY = options.vapidPublicKey 
+      || window.CINQ_VAPID_PUBLIC_KEY
+      || document.querySelector('meta[name="vapid-public-key"]')?.content
+      || null;
+    
+    // Enable sounds if files exist
+    if (options.enableSounds) {
+      CONFIG.SOUND_MESSAGE = '/assets/sounds/message.mp3';
+      CONFIG.SOUND_PING = '/assets/sounds/ping.mp3';
     }
     
     // Load saved settings

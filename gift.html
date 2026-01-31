@@ -40,27 +40,17 @@
     <link rel="stylesheet" href="/css/a11y.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
+    <!-- Theme CSS for smooth transitions -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
     <!-- Theme initialization -->
     <script>
-        (function() {
-            const saved = localStorage.getItem('cinq_theme');
-            if (saved) {
-                document.documentElement.setAttribute('data-theme', saved);
-            } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-        
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            const next = current === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('cinq_theme', next);
-            
-            const meta = document.getElementById('theme-color-meta');
-            meta.content = next === 'light' ? '#f8f8fc' : '#0e0e12';
-        }
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.getElementById('theme-color-meta');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
     </script>
     <style>
         /* ===== LAYOUT ===== */
