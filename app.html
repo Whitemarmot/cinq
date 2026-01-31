@@ -5323,5 +5323,23 @@
     
     <script src="/pwa-install.min.js" defer></script>
     <script src="/animations.min.js" defer></script>
+    <script src="/js/notifications.js" defer></script>
+    <script>
+        // VAPID Public Key for push notifications
+        window.CINQ_VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';
+        
+        // Initialize notifications when user is authenticated
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.CinqNotifications) {
+                // Check if user is logged in (has session)
+                const hasSession = localStorage.getItem('cinq_session');
+                if (hasSession) {
+                    window.CinqNotifications.init({
+                        vapidPublicKey: window.CINQ_VAPID_PUBLIC_KEY
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
