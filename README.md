@@ -199,8 +199,10 @@ BTCPAY_WEBHOOK_SECRET=your-webhook-secret
 1. Aller dans [Supabase Dashboard](https://supabase.com/dashboard)
 2. Créer un nouveau projet
 3. Aller dans **SQL Editor**
-4. Copier-coller le contenu de `supabase/FULL_SCHEMA.sql`
+4. Copier-coller le contenu de `supabase-schema.sql`
 5. Exécuter
+
+> **⚠️ Migrations additionnelles** : Si tu mets à jour une base existante, exécute aussi les fichiers dans `supabase/migrations/` (ex: `003_posts_table.sql` pour la fonctionnalité Feed).
 
 ### 5. Lancer en développement
 
@@ -373,6 +375,7 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les règles complètes.
 - [x] Profil + 5 contacts max
 - [x] Messagerie basique
 - [x] Ping / Présence
+- [x] **Feed & Posts** — Partage des posts avec tes 5 contacts
 
 ### 🔲 Phase 4 — Polish
 - [ ] Apps mobiles (React Native ou Flutter)

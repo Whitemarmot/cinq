@@ -144,6 +144,7 @@ ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
 -- Users: can read own, update own
 CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid() = id);
@@ -174,6 +175,33 @@ CREATE POLICY "Receiver can respond to proposals" ON proposals FOR UPDATE
 
 -- Push: user can manage their subscriptions
 CREATE POLICY "Users can manage push subs" ON push_subscriptions FOR ALL USING (auth.uid() = user_id);
+
+-- Posts: users can view their own and contacts' posts
+CREATE POLICY "Users can view contacts posts" ON posts FOR SELECT
+    USING (
+        user_id IN (
+            SELECT contact_user_id FROM contacts WHERE user_id = auth.uid()
+        )
+        OR user_id = auth.uid()
+    );
+CREATE POLICY "Users can create own posts" ON posts FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own posts" ON posts FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- ============================================
+-- POSTS (feed)
+-- ============================================
+CREATE TABLE IF NOT EXISTS posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL CHECK (char_length(content) <= 1000),
+    image_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
 
 -- ============================================
 -- ANALYTICS EVENTS
