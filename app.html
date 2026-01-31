@@ -1030,11 +1030,61 @@
             max-height: 400px;
             object-fit: cover;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Lazy loading states */
+        .post-image img.lazy-image {
+            opacity: 0;
+        }
+        
+        .post-image img.lazy-image.loaded {
+            opacity: 1;
         }
         
         .post-image img:hover {
             opacity: 0.9;
+        }
+        
+        /* Lazy image container placeholder */
+        .lazy-image-container {
+            position: relative;
+            min-height: 100px;
+            background: var(--color-bg-tertiary);
+        }
+        
+        .lazy-image-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                var(--color-bg-tertiary) 25%,
+                var(--color-bg-elevated) 50%,
+                var(--color-bg-tertiary) 75%
+            );
+            background-size: 200% 100%;
+            animation: lazy-shimmer 1.5s infinite;
+            border-radius: var(--radius-lg);
+        }
+        
+        .lazy-image-container.loaded::before {
+            display: none;
+        }
+        
+        @keyframes lazy-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Lazy loading for avatars */
+        img.lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        img.lazy-image.loaded {
+            opacity: 1;
         }
         
         .post-menu-btn {
