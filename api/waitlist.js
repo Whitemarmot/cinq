@@ -1,50 +1,71 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-const supabase = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+);
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') return res.status(200).end();
-
-    if (!supabase) {
-        return res.status(500).json({ error: 'Database not configured', count: 0 });
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
 
+    // GET = count
     if (req.method === 'GET') {
-        const { count, error } = await supabase
-            .from('waitlist')
-            .select('*', { count: 'exact', head: true });
-        
-        if (error) return res.status(500).json({ error: error.message });
-        return res.status(200).json({ count });
+        try {
+            const { count, error } = await supabase
+                .from('waitlist')
+                .select('*', { count: 'exact', head: true });
+            
+            if (error) throw error;
+            return res.json({ count: count || 0 });
+        } catch (e) {
+            return res.status(500).json({ error: e.message });
+        }
     }
 
+    // POST = signup
     if (req.method === 'POST') {
-        const { email } = req.body || {};
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!email || !emailRegex.test(email)) {
-            return res.status(400).json({ error: 'Email invalide' });
-        }
-
-        const { error } = await supabase
-            .from('waitlist')
-            .insert({ email: email.toLowerCase().trim() });
-
-        if (error) {
-            if (error.code === '23505') {
-                return res.status(200).json({ success: true, message: 'Déjà inscrit' });
+        try {
+            const { email, utm_source, utm_medium, utm_campaign } = req.body;
+            
+            if (!email) {
+                return res.status(400).json({ error: 'Email requis' });
             }
-            return res.status(500).json({ error: error.message });
-        }
 
-        return res.status(200).json({ success: true });
+            const { data, error } = await supabase
+                .from('waitlist')
+                .insert([{ 
+                    email, 
+                    utm_source, 
+                    utm_medium, 
+                    utm_campaign,
+                    created_at: new Date().toISOString()
+                }])
+                .select();
+
+            if (error) {
+                if (error.code === '23505') {
+                    return res.status(409).json({ error: 'Déjà inscrit !' });
+                }
+                throw error;
+            }
+
+            // Get new count
+            const { count } = await supabase
+                .from('waitlist')
+                .select('*', { count: 'exact', head: true });
+
+            return res.json({ success: true, count: count || 1 });
+        } catch (e) {
+            return res.status(500).json({ error: e.message });
+        }
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
-};
+}
