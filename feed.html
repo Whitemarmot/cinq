@@ -629,7 +629,12 @@
     <div class="feed-container">
         <header class="feed-header">
             <a href="/app.html" class="feed-logo" aria-label="Retour à l'accueil">5</a>
-            <span class="feed-title">📰 Feed</span>
+            <span class="feed-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 4px;">
+                    <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+                </svg>
+                Feed
+            </span>
             <div class="header-actions">
                 <a href="/app.html" class="back-btn">← Retour</a>
             </div>
@@ -678,10 +683,16 @@
             <div class="composer-footer">
                 <div class="composer-actions">
                     <button class="composer-btn" id="upload-image-btn" onclick="triggerFileUpload()">
-                        📷 Photo
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Photo
                     </button>
                     <button class="composer-btn" id="ai-image-btn" onclick="toggleAIPrompt()">
-                        ✨ IA
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                        IA
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
