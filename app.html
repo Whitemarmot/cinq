@@ -1787,7 +1787,7 @@
                         </div>
                         <div style="display:flex;align-items:center;gap:var(--space-4);">
                             <span class="char-count" id="char-count" aria-live="polite" aria-atomic="true">0/1000</span>
-                            <button class="post-btn" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
+                            <button class="post-btn btn-ripple glow-hover" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
                         </div>
                     </div>
                 </div>
@@ -1806,7 +1806,7 @@
                 </h2>
                 <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste de tes 5 contacts"></div>
                 
-                <button class="action-btn" onclick="openGiftModal()" type="button">
+                <button class="action-btn btn-ripple reveal" onclick="openGiftModal()" type="button">
                     <svg class="action-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
                     </svg>
@@ -1851,7 +1851,7 @@
                         <label class="settings-label" for="profile-bio">Bio</label>
                         <textarea id="profile-bio" class="settings-input" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
-                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn" type="button">
+                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn btn-ripple glow-hover" type="button">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
                         </svg>
