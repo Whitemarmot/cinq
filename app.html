@@ -33,8 +33,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Design System (SINGLE SOURCE) -->
-    <link rel="stylesheet" href="/design/styles.min.css">
+    <!-- Critical CSS (inline for fastest FCP) -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    
+    <!-- Design System (async load for non-critical CSS) -->
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
     <link rel="stylesheet" href="/animations.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
@@ -2560,6 +2564,420 @@
             50% { box-shadow: 0 0 12px 2px var(--color-brand-glow); }
         }
         
+        /* ===== ONBOARDING SYSTEM ===== */
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+            z-index: calc(var(--z-modal) + 10);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        .onboarding-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .onboarding-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            transform: scale(0.9) translateY(30px);
+            opacity: 0;
+            transition: transform 0.5s var(--ease-spring), opacity 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .onboarding-overlay.open .onboarding-card {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        
+        .onboarding-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--cinq-gradient);
+        }
+        
+        .onboarding-confetti {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            animation: confetti-fall 1s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            0% { transform: translateX(-50%) translateY(-100%) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateX(-50%) translateY(0) rotate(15deg); opacity: 1; }
+        }
+        
+        .onboarding-emoji {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            animation: emoji-bounce 0.6s var(--ease-spring) 0.3s backwards;
+        }
+        
+        @keyframes emoji-bounce {
+            0% { transform: scale(0) rotate(-20deg); }
+            60% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        
+        .onboarding-title {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--space-2);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .onboarding-subtitle {
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
+        }
+        
+        .onboarding-steps {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+            text-align: left;
+        }
+        
+        .onboarding-step {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            transition: all 0.3s var(--ease-spring);
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: step-appear 0.4s ease-out forwards;
+        }
+        
+        .onboarding-step:nth-child(1) { animation-delay: 0.4s; }
+        .onboarding-step:nth-child(2) { animation-delay: 0.5s; }
+        .onboarding-step:nth-child(3) { animation-delay: 0.6s; }
+        
+        @keyframes step-appear {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .onboarding-step.completed {
+            background: var(--color-success-muted);
+            border-color: var(--color-success);
+        }
+        
+        .onboarding-step-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--color-bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        
+        .onboarding-step.completed .onboarding-step-icon {
+            background: var(--color-success);
+            color: white;
+        }
+        
+        .onboarding-step-text {
+            flex: 1;
+        }
+        
+        .onboarding-step-title {
+            font-weight: 600;
+            font-size: var(--text-sm);
+        }
+        
+        .onboarding-step-subtitle {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .onboarding-btn {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--cinq-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s var(--ease-spring), box-shadow 0.2s;
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .onboarding-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .onboarding-skip {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            margin-top: var(--space-4);
+            padding: var(--space-2);
+            transition: color 0.2s;
+        }
+        
+        .onboarding-skip:hover {
+            color: var(--color-text-primary);
+        }
+        
+        /* ===== TOOLTIPS/HINTS ===== */
+        .tooltip-hint {
+            position: absolute;
+            background: var(--cinq-gradient);
+            color: white;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            box-shadow: var(--shadow-glow);
+            z-index: var(--z-tooltip);
+            max-width: 250px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s var(--ease-spring);
+            pointer-events: none;
+        }
+        
+        .tooltip-hint.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        .tooltip-hint::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--color-brand);
+            transform: rotate(45deg);
+        }
+        
+        .tooltip-hint.top::before {
+            bottom: -6px;
+            left: 50%;
+            margin-left: -6px;
+        }
+        
+        .tooltip-hint.bottom::before {
+            top: -6px;
+            left: 50%;
+            margin-left: -6px;
+        }
+        
+        .tooltip-hint.left::before {
+            right: -6px;
+            top: 50%;
+            margin-top: -6px;
+        }
+        
+        .tooltip-hint-close {
+            position: absolute;
+            top: var(--space-1);
+            right: var(--space-2);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: var(--space-1);
+        }
+        
+        .tooltip-hint-close:hover {
+            color: white;
+        }
+        
+        /* ===== PULSING INDICATOR ===== */
+        .pulse-indicator {
+            position: relative;
+        }
+        
+        .pulse-indicator::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: var(--color-brand);
+            border-radius: 50%;
+            animation: pulse-ring 1.5s ease-out infinite;
+            z-index: 10;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 var(--color-brand-glow); }
+            70% { transform: scale(1.3); opacity: 0.7; box-shadow: 0 0 0 10px transparent; }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 transparent; }
+        }
+        
+        /* ===== ONBOARDING CHECKLIST (FLOATING) ===== */
+        .onboarding-checklist {
+            position: fixed;
+            bottom: 100px;
+            right: var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            box-shadow: var(--shadow-xl);
+            z-index: var(--z-sticky);
+            max-width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s var(--ease-spring);
+        }
+        
+        .onboarding-checklist.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .onboarding-checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+        
+        .onboarding-checklist-title {
+            font-weight: 600;
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .onboarding-checklist-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: var(--space-1);
+            line-height: 1;
+        }
+        
+        .onboarding-checklist-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            padding: var(--space-2);
+            border-radius: var(--radius-md);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .checklist-item:hover {
+            background: var(--color-bg-tertiary);
+        }
+        
+        .checklist-item.completed {
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+        
+        .checklist-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        
+        .checklist-item.completed .checklist-icon {
+            background: var(--color-success);
+            border-color: var(--color-success);
+            color: white;
+        }
+        
+        .onboarding-checklist-progress {
+            margin-top: var(--space-3);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .progress-bar-mini {
+            height: 4px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--space-1);
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--cinq-gradient);
+            border-radius: inherit;
+            transition: width 0.5s var(--ease-out-expo);
+        }
+        
+        .progress-text {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            text-align: center;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .app-content {
@@ -2583,6 +3001,73 @@
     
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+    
+    <!-- Onboarding Welcome Overlay -->
+    <div class="onboarding-overlay" id="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+        <div class="onboarding-card">
+            <div class="onboarding-confetti" aria-hidden="true">🎉</div>
+            <div class="onboarding-emoji" aria-hidden="true">👋</div>
+            <h2 class="onboarding-title" id="onboarding-title">Bienvenue sur Cinq !</h2>
+            <p class="onboarding-subtitle">Ton espace intime avec tes 5 proches est prêt.<br>Voici comment bien démarrer :</p>
+            
+            <div class="onboarding-steps" role="list">
+                <div class="onboarding-step" role="listitem">
+                    <div class="onboarding-step-icon">📸</div>
+                    <div class="onboarding-step-text">
+                        <div class="onboarding-step-title">Ajoute ta photo</div>
+                        <div class="onboarding-step-subtitle">Pour que tes proches te reconnaissent</div>
+                    </div>
+                </div>
+                <div class="onboarding-step" role="listitem">
+                    <div class="onboarding-step-icon">👥</div>
+                    <div class="onboarding-step-text">
+                        <div class="onboarding-step-title">Invite tes 5 proches</div>
+                        <div class="onboarding-step-subtitle">Les personnes qui comptent vraiment</div>
+                    </div>
+                </div>
+                <div class="onboarding-step" role="listitem">
+                    <div class="onboarding-step-icon">✍️</div>
+                    <div class="onboarding-step-text">
+                        <div class="onboarding-step-title">Partage ton premier moment</div>
+                        <div class="onboarding-step-subtitle">Un message, une photo, un ressenti</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="onboarding-btn" onclick="startOnboarding()" type="button">C'est parti ! 🚀</button>
+            <button class="onboarding-skip" onclick="skipOnboarding()" type="button">Je connais déjà, passer</button>
+        </div>
+    </div>
+    
+    <!-- Floating Onboarding Checklist -->
+    <div class="onboarding-checklist" id="onboarding-checklist" role="complementary" aria-label="Progression d'onboarding">
+        <div class="onboarding-checklist-header">
+            <div class="onboarding-checklist-title">
+                <span>🎯</span> Premiers pas
+            </div>
+            <button class="onboarding-checklist-close" onclick="hideOnboardingChecklist()" aria-label="Fermer" type="button">×</button>
+        </div>
+        <div class="onboarding-checklist-items">
+            <div class="checklist-item" id="checklist-photo" onclick="goToProfileForPhoto()">
+                <div class="checklist-icon">✓</div>
+                <span>Ajouter une photo de profil</span>
+            </div>
+            <div class="checklist-item" id="checklist-contact" onclick="goToContactsForAdd()">
+                <div class="checklist-icon">✓</div>
+                <span>Ajouter un premier contact</span>
+            </div>
+            <div class="checklist-item" id="checklist-post" onclick="goToFeedForPost()">
+                <div class="checklist-icon">✓</div>
+                <span>Créer ton premier post</span>
+            </div>
+        </div>
+        <div class="onboarding-checklist-progress">
+            <div class="progress-bar-mini">
+                <div class="progress-bar-fill" id="onboarding-progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="onboarding-progress-text">0/3 complétés</div>
+        </div>
+    </div>
     
     <!-- Image Modal -->
     <div class="image-modal" id="image-modal" role="dialog" aria-modal="true" aria-label="Image en plein écran" onclick="closeImageModal()">
