@@ -74,10 +74,10 @@ async function handleGetMessages(req, res, user) {
 
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || 50), MAX_FETCH_LIMIT);
 
-    // Build query
+    // Build query - include read_at for read receipts
     let query = supabase
         .from('messages')
-        .select('*')
+        .select('id, sender_id, receiver_id, content, is_ping, created_at, read_at')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
         .limit(safeLimit);

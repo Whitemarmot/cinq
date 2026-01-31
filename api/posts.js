@@ -63,22 +63,41 @@ export default async function handler(req, res) {
 // ===== GET - List posts =====
 
 async function handleGetPosts(req, res, user) {
-    const { limit, offset, user_id } = req.query;
+    const { limit, offset, user_id, cursor } = req.query;
     
     // Parse and validate pagination params
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || DEFAULT_FETCH_LIMIT), MAX_FETCH_LIMIT);
     const safeOffset = Math.max(0, parseInt(offset) || 0);
     
+    // Parse cursor (ISO date string for cursor-based pagination)
+    const parsedCursor = cursor ? parseCursor(cursor) : null;
+    
     // Specific user's posts
     if (user_id) {
-        return getSpecificUserPosts(res, user, user_id, safeLimit, safeOffset);
+        return getSpecificUserPosts(res, user, user_id, safeLimit, safeOffset, parsedCursor);
     }
     
     // Default: feed (self + contacts)
-    return getFeed(res, user, safeLimit, safeOffset);
+    return getFeed(res, user, safeLimit, safeOffset, parsedCursor);
 }
 
-async function getSpecificUserPosts(res, user, userId, limit, offset) {
+/**
+ * Parse cursor string (ISO date) for pagination
+ */
+function parseCursor(cursorStr) {
+    if (!cursorStr) return null;
+    
+    try {
+        // Cursor is the created_at of the last post
+        const date = new Date(cursorStr);
+        if (isNaN(date.getTime())) return null;
+        return date.toISOString();
+    } catch {
+        return null;
+    }
+}
+
+async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = null) {
     if (!isValidUUID(userId)) {
         return res.status(400).json({ error: 'Format user_id invalide' });
     }
@@ -97,19 +116,41 @@ async function getSpecificUserPosts(res, user, userId, limit, offset) {
         }
     }
     
-    const { data: posts, error } = await supabase
+    // Build query
+    let query = supabase
         .from('posts')
         .select('*')
         .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
+        .order('created_at', { ascending: false });
+    
+    // Cursor-based pagination (preferred) or offset-based
+    if (cursor) {
+        query = query.lt('created_at', cursor);
+    } else if (offset > 0) {
+        query = query.range(offset, offset + limit - 1);
+    }
+    
+    // Always limit results
+    query = query.limit(limit);
+    
+    const { data: posts, error } = await query;
     
     if (error) throw error;
     
     const authorInfo = await getUserInfo(userId);
     const enriched = posts.map(post => ({ ...post, author: authorInfo }));
     
-    return res.json({ posts: enriched, count: posts.length });
+    // Generate next cursor (created_at of last post)
+    const nextCursor = posts.length === limit && posts.length > 0 
+        ? posts[posts.length - 1].created_at 
+        : null;
+    
+    return res.json({ 
+        posts: enriched, 
+        count: posts.length,
+        nextCursor,
+        hasMore: posts.length === limit
+    });
 }
 
 async function getFeed(res, user, limit, offset) {
