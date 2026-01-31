@@ -1,55 +1,85 @@
 # Cinq — Journal de Bord
 
-## 🎯 Objectif actuel : MVP Phase 3 (App Core) ✅
+## 🎯 Statut actuel : MVP Core complet, prêt pour tests
 
 ---
 
 ## 📅 2026-01-31
 
-### 09:14 — Damien donne carte blanche à l'équipe
-- Full autonomie pour avancer
-- Compte-rendus obligatoires
-- Recrutement autorisé si nécessaire
+### 09:50 — Sprint 5 terminé ✅
 
-### Phase 2 — Gift System :
-- [x] BTCPay Server setup (Sarah) ✅
-- [x] UI Flow cadeau (Alex) ✅
-- [x] Copywriting landing (Marco) ✅
-- [x] Review architecture (Zoé) ✅
+**Core App livrée :**
+- `app.html` — Dashboard 5 contacts + messaging + Ping 💫
+- Auth system complet (register/login/profile)
+- Design system anti-addiction (861 lignes de specs)
+- Schemas DB (users, contacts, messages)
 
-### Phase 3 — App Core :
-- [x] `app.html` — Dashboard utilisateur connecté ✅
-- [x] Gestion 5 contacts max (affichage, ajout, suppression) ✅
-- [x] Fil de discussion simple (messages entre contacts) ✅
-- [x] Ping feature (💫 "je pense à toi") ✅
-- [x] Design anti-addiction (pas de likes, pas de metrics) ✅
-- [x] Schema `supabase/messages.sql` pour la messagerie ✅
+**Gift System fixé :**
+- Webhook BTCPay validé et testé
+- Mismatch frontend/backend corrigé
+- redeem.html utilise auth-register
+- Timing-safe token comparison
+
+**Commits pushés :** 7e49426
 
 ---
 
-## 📊 Statut équipe
+### 09:14 — Équipe mobilisée
 
-| Agent | Tâche | Status | Livrable |
-|-------|-------|--------|----------|
-| Sarah | BTCPay Docker | ✅ Done | `infra/docker-compose.yml` |
-| Sarah | Auth System | ✅ Done | `netlify/functions/auth-*.js` |
-| Alex | Wireframes gift | ✅ Done | `design/gift-flow.md` |
-| Marco | Copy anti-social | ✅ Done | `design/copy-v2.md` |
-| Zoé | Audit sécurité | ✅ Done | `docs/security-audit.md` |
-| Dev | App Core | ✅ Done | `app.html` |
+| Agent | Mission | Status |
+|-------|---------|--------|
+| Sarah | Webhook BTCPay | ✅ Done |
+| Alex | Audit redeem + Design system | ✅ Done |
+| Marco | Plan lancement | ✅ Done |
+| Zoé | Audit sécurité | ✅ Done |
+| Dev Principal | app.html | ✅ Done |
+| Dev Fix | Bugs critiques | ✅ Done |
+| QA | Validation | ✅ Done |
 
----
-
-## 📝 Décisions prises aujourd'hui
-- Gift Model 15€ ✅
-- Crypto only (USDC/BTC/ETH) ✅
-- BTCPay self-hosted ✅
-- Messages limités à 500 caractères (anti-rant) ✅
-- Ping = message "je pense à toi" sans texte ✅
+**Total : 7 agents déployés ce sprint**
 
 ---
 
-## 🚨 Blocages / Questions pour Damien
-*(Aucun pour l'instant)*
+## 📋 TODO Déploiement
+
+### Critique
+- [ ] Configurer variables Netlify (SUPABASE_*, BTCPAY_*, GIFT_CODE_SALT)
+- [ ] Exécuter migrations Supabase (003_auth_system.sql)
+- [ ] Créer tables gift_codes, gift_code_attempts dans Supabase
+- [ ] Configurer BTCPay webhook
+
+### Haute priorité
+- [ ] Test E2E flow complet (gift → paiement → redeem → login → app)
+- [ ] DNS cinq.app ou domaine temp
+
+### Moyenne
+- [ ] Thread Twitter EN
+- [ ] Assets visuels (OG image finale)
+- [ ] Waitlist email automation
 
 ---
+
+## 🔐 Infos Projet
+
+**GitHub:** github.com/Whitemarmot/cinq
+**Supabase:** guioxfulihyehrwytxce.supabase.co
+**Mode:** SIMULATION_MODE = true (pour tests)
+
+---
+
+## 📊 Livrables
+
+| Fichier | Description |
+|---------|-------------|
+| index.html | Landing page |
+| gift.html | Flow achat cadeau (4 écrans) |
+| redeem.html | Activation code + création compte |
+| app.html | Dashboard utilisateur |
+| design/app-design.md | Specs UX anti-addiction |
+| netlify/functions/*.js | 8 endpoints API |
+| supabase/*.sql | Schemas DB |
+| infra/docker-compose.yml | BTCPay Server |
+
+---
+
+*Dernière mise à jour: 2026-01-31 09:50 UTC*
