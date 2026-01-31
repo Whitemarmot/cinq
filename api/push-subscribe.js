@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -22,6 +23,11 @@ export default async function handler(req, res) {
     const user = await getUser(req);
     if (!user) return res.status(401).json({ error: 'Non authentifié' });
 
+    // Rate limiting
+    if (!checkRateLimit(req, res, { ...RATE_LIMITS.CREATE, keyPrefix: 'push', userId: user.id })) {
+        return;
+    }
+
     try {
         // ============ POST - Subscribe to push ============
         if (req.method === 'POST') {
@@ -29,6 +35,23 @@ export default async function handler(req, res) {
 
             if (!subscription?.endpoint) {
                 return res.status(400).json({ error: 'subscription requis' });
+            }
+
+            // Validate endpoint is a valid URL
+            try {
+                const url = new URL(subscription.endpoint);
+                if (!['https:', 'http:'].includes(url.protocol)) {
+                    return res.status(400).json({ error: 'endpoint invalide' });
+                }
+            } catch {
+                return res.status(400).json({ error: 'Format endpoint invalide' });
+            }
+
+            // Validate keys if provided
+            if (subscription.keys) {
+                if (typeof subscription.keys !== 'object') {
+                    return res.status(400).json({ error: 'Format keys invalide' });
+                }
             }
 
             // Upsert subscription
@@ -48,6 +71,10 @@ export default async function handler(req, res) {
         // ============ DELETE - Unsubscribe ============
         if (req.method === 'DELETE') {
             const { endpoint } = req.body;
+
+            if (!endpoint) {
+                return res.status(400).json({ error: 'endpoint requis' });
+            }
 
             const { error } = await supabase
                 .from('push_subscriptions')

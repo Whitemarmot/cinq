@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
+import { isValidUUID, isValidEmail } from './_validation.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -6,8 +8,6 @@ const supabase = createClient(
 );
 
 const MAX_CONTACTS = 5;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function getUser(req) {
     const auth = req.headers.authorization;
@@ -40,6 +40,12 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Non authentifié' });
     }
 
+    // Rate limiting
+    const rateLimitConfig = req.method === 'GET' ? RATE_LIMITS.READ : RATE_LIMITS.CREATE;
+    if (!checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'contacts', userId: user.id })) {
+        return;
+    }
+
     try {
         // ============ GET ============
         if (req.method === 'GET') {
@@ -52,7 +58,7 @@ export default async function handler(req, res) {
                 }
 
                 const email = search.toLowerCase().trim();
-                if (!EMAIL_REGEX.test(email)) {
+                if (!isValidEmail(email)) {
                     return res.status(400).json({ error: 'Format email invalide' });
                 }
 
@@ -61,7 +67,8 @@ export default async function handler(req, res) {
                 }
 
                 // Search in auth.users via admin API
-                const { data: { users }, error } = await supabase.auth.admin.listUsers();
+                // Note: In production, consider using a more efficient indexed search
+                const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 });
                 const foundUser = users?.find(u => u.email?.toLowerCase() === email);
 
                 if (!foundUser) {
@@ -162,7 +169,7 @@ export default async function handler(req, res) {
             // If email provided, look up the user
             if (email) {
                 const cleanEmail = email.toLowerCase().trim();
-                if (!EMAIL_REGEX.test(cleanEmail)) {
+                if (!isValidEmail(cleanEmail)) {
                     return res.status(400).json({ error: 'Format email invalide' });
                 }
 
@@ -170,7 +177,7 @@ export default async function handler(req, res) {
                     return res.status(400).json({ error: 'Tu ne peux pas t\'ajouter toi-même !' });
                 }
 
-                const { data: { users } } = await supabase.auth.admin.listUsers();
+                const { data: { users } } = await supabase.auth.admin.listUsers({ perPage: 1000 });
                 const foundUser = users?.find(u => u.email?.toLowerCase() === cleanEmail);
 
                 if (!foundUser) {
@@ -181,8 +188,8 @@ export default async function handler(req, res) {
                 targetEmail = foundUser.email;
             }
 
-            // Validate UUID
-            if (!UUID_REGEX.test(targetUserId)) {
+            // SECURITY FIX: Validate UUID format
+            if (!isValidUUID(targetUserId)) {
                 return res.status(400).json({ error: 'Format contactId invalide' });
             }
 
@@ -242,6 +249,11 @@ export default async function handler(req, res) {
             const contactId = req.query.id;
             if (!contactId) {
                 return res.status(400).json({ error: 'id requis' });
+            }
+
+            // SECURITY FIX: Validate UUID format
+            if (!isValidUUID(contactId)) {
+                return res.status(400).json({ error: 'Format id invalide' });
             }
 
             const { error } = await supabase

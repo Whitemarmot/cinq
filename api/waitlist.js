@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { trackEvent, logRequest, logError, logStructured, EventType } from './_analytics.js';
+import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
+import { isValidEmail } from './_validation.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -16,7 +17,10 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    logRequest(req, '/api/waitlist');
+    // Rate limiting for public endpoint
+    if (!checkRateLimit(req, res, { ...RATE_LIMITS.PUBLIC, keyPrefix: 'waitlist' })) {
+        return;
+    }
 
     // GET = count
     if (req.method === 'GET') {
@@ -41,9 +45,20 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Email requis' });
             }
 
+            // SECURITY FIX: Validate email format
+            const cleanEmail = email.toLowerCase().trim();
+            if (!isValidEmail(cleanEmail)) {
+                return res.status(400).json({ error: 'Format email invalide' });
+            }
+
+            // Additional validation: max length
+            if (cleanEmail.length > 254) {
+                return res.status(400).json({ error: 'Email trop long' });
+            }
+
             const { data, error } = await supabase
                 .from('waitlist')
-                .insert([{ email }])
+                .insert([{ email: cleanEmail }])
                 .select();
 
             if (error) {
@@ -58,13 +73,8 @@ export default async function handler(req, res) {
                 .from('waitlist')
                 .select('*', { count: 'exact', head: true });
 
-            // Track waitlist signup
-            trackEvent(EventType.WAITLIST_SIGNUP, { count: count || 1 });
-            logStructured('info', 'Waitlist signup', { count: count || 1 });
-
             return res.json({ success: true, count: count || 1 });
         } catch (e) {
-            logError(e, '/api/waitlist');
             return res.status(500).json({ error: e.message });
         }
     }
