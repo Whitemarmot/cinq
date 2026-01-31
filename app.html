@@ -35,6 +35,7 @@
     
     <!-- Design System (SINGLE SOURCE) -->
     <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/animations.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
@@ -3263,10 +3264,53 @@
         // Initialize theme ASAP (before page renders)
         initTheme();
         
+        // ===== MOBILE KEYBOARD HANDLING =====
+        function initMobileKeyboard() {
+            // Use Visual Viewport API for better keyboard handling
+            if ('visualViewport' in window) {
+                const viewport = window.visualViewport;
+                let keyboardOpen = false;
+                
+                viewport.addEventListener('resize', () => {
+                    // Keyboard is considered open if viewport height shrinks significantly
+                    const heightDiff = window.innerHeight - viewport.height;
+                    const isKeyboardNowOpen = heightDiff > 150;
+                    
+                    if (isKeyboardNowOpen !== keyboardOpen) {
+                        keyboardOpen = isKeyboardNowOpen;
+                        document.body.classList.toggle('keyboard-open', keyboardOpen);
+                        
+                        // Scroll active input into view
+                        if (keyboardOpen && document.activeElement) {
+                            setTimeout(() => {
+                                document.activeElement.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'center' 
+                                });
+                            }, 100);
+                        }
+                    }
+                });
+            }
+            
+            // Ensure chat input stays visible when keyboard opens
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('focus', () => {
+                    setTimeout(() => {
+                        chatInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 300);
+                });
+            }
+        }
+        
+        initMobileKeyboard();
+        
         // ===== INIT =====
         init();
     </script>
     
     <script src="/pwa-install.js" defer></script>
+    <script src="/animations.js" defer></script>
 </body>
 </html>

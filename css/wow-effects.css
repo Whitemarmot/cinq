@@ -484,6 +484,35 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* ============================================
+   ANIMATED COUNTER
+   ============================================ */
+.animated-number {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+}
+
+/* ============================================
+   TEXT REVEAL CHARS
+   ============================================ */
+.char {
+  display: inline-block;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.word {
+  overflow: hidden;
+}
+
+/* ============================================
+   SMOOTH SCROLL BEHAVIOR
+   ============================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================================
    RESPECT USER PREFERENCES
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
