@@ -1,0 +1,18 @@
+# Cinq - L'anti-réseau social
+# https://cinq.app
+
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /app.html
+Disallow: /.netlify/
+
+# Pages publiques indexables
+Allow: /index.html
+Allow: /gift
+Allow: /gift.html
+Allow: /redeem
+Allow: /redeem.html
+
+# Sitemap
+Sitemap: https://cinq.app/sitemap.xml

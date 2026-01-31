@@ -10,7 +10,10 @@
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>5️⃣</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#1a1a2e">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -502,23 +505,56 @@
         }
         
         // ============================================
+        // API HELPER
+        // ============================================
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const session = await db.auth.getSession();
+            const token = session.data?.session?.access_token;
+            
+            if (!token) {
+                throw new Error('Not authenticated');
+            }
+            
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            
+            if (body && method !== 'GET') {
+                options.body = JSON.stringify(body);
+            }
+            
+            const res = await fetch(`/api/${endpoint}`, options);
+            const data = await res.json();
+            
+            if (!res.ok || !data.success) {
+                const err = new Error(data.error || 'API error');
+                err.code = data.details?.code;
+                err.status = res.status;
+                throw err;
+            }
+            
+            return data;
+        }
+        
+        // ============================================
         // CONTACTS
         // ============================================
         async function loadContacts() {
             try {
-                const { data, error } = await db
-                    .from('contacts')
-                    .select(`
-                        id,
-                        contact_user_id,
-                        created_at,
-                        contact:users!contacts_contact_user_id_fkey(id, email)
-                    `)
-                    .eq('user_id', currentUser.id);
+                const data = await apiCall('contacts');
                 
-                if (error) throw error;
+                // Transform API response to match expected format
+                contacts = (data.contacts || []).map(c => ({
+                    id: c.id,
+                    contact_user_id: c.user_id,
+                    created_at: c.added_at,
+                    contact: { id: c.user_id, email: c.email }
+                }));
                 
-                contacts = data || [];
                 renderContacts();
             } catch (err) {
                 console.error('Error loading contacts:', err);
@@ -612,52 +648,37 @@
             const email = $('contact-email').value.trim().toLowerCase();
             hideError('add-contact-error');
             
-            // Check if not self
-            if (email === currentUser.email) {
-                showError('add-contact-error', 'Tu ne peux pas t'ajouter toi-même 😅');
-                return;
-            }
-            
-            // Check if already in contacts
-            if (contacts.some(c => c.contact?.email === email)) {
-                showError('add-contact-error', 'Cette personne est déjà dans ton cercle');
-                return;
-            }
+            // Disable button while loading
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
             
             try {
-                // Find user by email
-                const { data: targetUser, error: findError } = await db
-                    .from('users')
-                    .select('id')
-                    .eq('email', email)
-                    .single();
-                
-                if (findError || !targetUser) {
-                    showError('add-contact-error', 'Cette personne n'est pas encore sur Cinq. Offre-lui un accès !');
-                    return;
-                }
-                
-                // Add contact
-                const { error: insertError } = await db
-                    .from('contacts')
-                    .insert({
-                        user_id: currentUser.id,
-                        contact_user_id: targetUser.id
-                    });
-                
-                if (insertError) {
-                    if (insertError.message.includes('CINQ limit')) {
-                        showError('add-contact-error', '5 contacts max. C'est le concept !');
-                    } else {
-                        showError('add-contact-error', insertError.message);
-                    }
-                    return;
-                }
+                await apiCall('contacts', 'POST', { email });
                 
                 closeAddContactModal();
                 await loadContacts();
             } catch (err) {
-                showError('add-contact-error', 'Erreur lors de l'ajout');
+                console.error('Add contact error:', err);
+                
+                // User-friendly error messages based on error code
+                let message = err.message || 'Erreur lors de l\'ajout';
+                
+                if (err.code === 'SELF_ADD') {
+                    message = 'Tu ne peux pas t\'ajouter toi-même 😅';
+                } else if (err.code === 'USER_NOT_FOUND') {
+                    message = 'Cette personne n\'est pas encore sur Cinq. Offre-lui un accès !';
+                } else if (err.code === 'ALREADY_CONTACT') {
+                    message = 'Cette personne est déjà dans ton cercle';
+                } else if (err.code === 'LIMIT_REACHED') {
+                    message = '5 contacts max. C\'est le concept !';
+                }
+                
+                showError('add-contact-error', message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
         });
         
@@ -680,14 +701,14 @@
         $('btn-confirm-remove').addEventListener('click', async () => {
             if (!contactToRemove) return;
             
+            // Disable button while loading
+            const btn = $('btn-confirm-remove');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '...';
+            
             try {
-                const { error } = await db
-                    .from('contacts')
-                    .delete()
-                    .eq('id', contactToRemove)
-                    .eq('user_id', currentUser.id);
-                
-                if (error) throw error;
+                await apiCall(`contacts?id=${contactToRemove}`, 'DELETE');
                 
                 closeRemoveContactModal();
                 
@@ -700,12 +721,25 @@
             } catch (err) {
                 console.error('Error removing contact:', err);
                 alert('Erreur lors de la suppression');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
             }
         });
         
         // ============================================
-        // CHAT / MESSAGES
+        // CHAT / MESSAGES (via API)
         // ============================================
+        
+        // Get auth token for API calls
+        async function getAccessToken() {
+            const { data: { session } } = await db.auth.getSession();
+            return session?.access_token || null;
+        }
+        
+        // API base URL
+        const API_BASE = '/.netlify/functions';
+        
         function openChat(contact) {
             selectedContact = contact;
             const name = getEmailPrefix(contact.contact?.email || 'Contact');
@@ -732,24 +766,25 @@
             const contactUserId = selectedContact.contact_user_id;
             
             try {
-                // Get messages between current user and contact (both directions)
-                const { data, error } = await db
-                    .from('messages')
-                    .select('*')
-                    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${contactUserId}),and(sender_id.eq.${contactUserId},receiver_id.eq.${currentUser.id})`)
-                    .order('created_at', { ascending: true })
-                    .limit(50);
+                const token = await getAccessToken();
+                if (!token) {
+                    console.error('No auth token');
+                    return;
+                }
                 
-                if (error) {
-                    // Table might not exist yet - that's ok
-                    if (error.code === '42P01') {
-                        console.log('Messages table not created yet');
-                        messages = [];
-                    } else {
-                        throw error;
+                const response = await fetch(`${API_BASE}/messages?contact_id=${contactUserId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
                     }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messages = result.messages || [];
                 } else {
-                    messages = data || [];
+                    console.error('Error loading messages:', result.error);
+                    messages = [];
                 }
                 
                 renderMessages();
@@ -772,7 +807,7 @@
             
             empty.classList.add('hidden');
             list.innerHTML = messages.map(msg => {
-                const isMine = msg.sender_id === currentUser.id;
+                const isMine = msg.is_mine || msg.sender_id === currentUser.id;
                 const isPing = msg.is_ping;
                 
                 if (isPing) {
@@ -796,9 +831,19 @@
                 `;
             }).join('');
             
-            // Scroll to bottom
+            // Scroll to bottom avec animation smooth
+            scrollToBottom();
+        }
+        
+        function scrollToBottom() {
             const container = $('messages-container');
-            container.scrollTop = container.scrollHeight;
+            // Use requestAnimationFrame for smooth scroll after DOM update
+            requestAnimationFrame(() => {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
         }
         
         function escapeHtml(text) {
@@ -807,7 +852,7 @@
             return div.innerHTML;
         }
         
-        // Send message
+        // Send message via API
         $('message-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = $('message-input');
@@ -815,56 +860,93 @@
             
             if (!content || !selectedContact) return;
             
+            // Disable input while sending
+            input.disabled = true;
+            
             try {
-                const { error } = await db
-                    .from('messages')
-                    .insert({
-                        sender_id: currentUser.id,
-                        receiver_id: selectedContact.contact_user_id,
-                        content: content,
-                        is_ping: false
-                    });
+                const token = await getAccessToken();
+                if (!token) {
+                    alert('Session expirée. Reconnecte-toi.');
+                    return;
+                }
                 
-                if (error) {
-                    if (error.code === '42P01') {
-                        alert('La messagerie sera bientôt disponible !');
-                    } else {
-                        throw error;
-                    }
-                } else {
+                const response = await fetch(`${API_BASE}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contact_id: selectedContact.contact_user_id,
+                        content: content
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
                     input.value = '';
-                    await loadMessages();
+                    // Add message locally for instant feedback
+                    messages.push(result.message);
+                    renderMessages();
+                } else {
+                    console.error('Error sending message:', result.error);
+                    if (result.error.includes('not available')) {
+                        alert('La messagerie sera bientôt disponible !');
+                    }
                 }
             } catch (err) {
                 console.error('Error sending message:', err);
+            } finally {
+                input.disabled = false;
+                input.focus();
             }
         });
         
-        // Send ping
+        // Send ping via API 💫
         $('btn-ping').addEventListener('click', async () => {
             if (!selectedContact) return;
             
             const btn = $('btn-ping');
+            btn.disabled = true;
             btn.classList.add('ping-sent');
             
             try {
-                const { error } = await db
-                    .from('messages')
-                    .insert({
-                        sender_id: currentUser.id,
-                        receiver_id: selectedContact.contact_user_id,
-                        content: '💫',
-                        is_ping: true
-                    });
+                const token = await getAccessToken();
+                if (!token) {
+                    alert('Session expirée. Reconnecte-toi.');
+                    return;
+                }
                 
-                if (!error) {
-                    await loadMessages();
+                const response = await fetch(`${API_BASE}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contact_id: selectedContact.contact_user_id,
+                        is_ping: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Add ping locally for instant feedback
+                    messages.push(result.message);
+                    renderMessages();
+                } else {
+                    console.error('Error sending ping:', result.error);
                 }
             } catch (err) {
                 console.error('Error sending ping:', err);
             }
             
-            setTimeout(() => btn.classList.remove('ping-sent'), 500);
+            setTimeout(() => {
+                btn.classList.remove('ping-sent');
+                btn.disabled = false;
+            }, 500);
         });
         
         // ============================================
