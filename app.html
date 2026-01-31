@@ -3,58 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cinq — Tes 5</title>
+    <title>Cinq — Ton espace intime</title>
     
     <!-- SEO -->
     <meta name="description" content="Cinq — Ton espace intime avec tes 5 proches.">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Cinq — Tes 5">
+    <meta property="og:title" content="Cinq — Ton espace intime">
     <meta property="og:description" content="L'anti-réseau social. 5 proches, pas de likes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cinq.app/app.html">
     <meta property="og:image" content="https://cinq.app/og-image.png">
-    <meta property="og:site_name" content="Cinq">
     
-    <!-- Favicon -->
+    <!-- Favicon & PWA -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
     <meta name="theme-color" content="#0c0c0f">
-    
-    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cinq">
     
-    <!-- Design System -->
+    <!-- Design System (SINGLE SOURCE) -->
     <link rel="stylesheet" href="/design/styles.css">
-    <link rel="stylesheet" href="/css/a11y.css">
-    <link rel="stylesheet" href="/css/mobile-responsive.css">
     
     <style>
-        /* ===== APP LAYOUT ===== */
-        .app-container {
+        /* ===== APP SHELL ===== */
+        .app-shell {
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 1.25rem;
-            max-width: 520px;
-            margin: 0 auto;
-            padding-bottom: env(safe-area-inset-bottom, 1.25rem);
+            display: flex;
+            flex-direction: column;
         }
         
+        /* ===== HEADER ===== */
         .app-header {
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.25rem 0;
-            margin-bottom: 2rem;
+            padding: var(--space-4) var(--space-5);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
         }
         
-        .app-logo {
-            font-size: 2rem;
+        .header-logo {
+            font-size: 1.75rem;
             font-weight: 700;
             background: var(--cinq-gradient);
             -webkit-background-clip: text;
@@ -63,56 +63,455 @@
             filter: drop-shadow(0 2px 8px var(--color-brand-glow));
         }
         
-        .user-menu {
+        .header-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s;
+            overflow: hidden;
         }
         
-        .user-name {
-            font-size: 0.875rem;
-            color: var(--color-text-tertiary);
+        .header-avatar:hover {
+            transform: scale(1.08);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        .app-content {
+            flex: 1;
+            padding: var(--space-5);
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, var(--space-5)));
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* ===== TAB PANELS ===== */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s var(--ease-out-expo);
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: var(--space-3) var(--space-4);
+            padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--color-border);
+            z-index: var(--z-sticky);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            color: var(--color-text-muted);
+            background: transparent;
+            border: none;
+            font-family: inherit;
+        }
+        
+        .nav-item:hover {
+            color: var(--color-text-secondary);
+            background: var(--color-bg-hover);
+        }
+        
+        .nav-item.active {
+            color: var(--color-brand);
+            background: var(--color-brand-muted);
+        }
+        
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+        
+        .nav-label {
+            font-size: var(--text-xs);
             font-weight: 500;
         }
         
-        .logout-btn {
+        /* ===== FEED TAB ===== */
+        .composer {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-5);
+        }
+        
+        .composer-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+        }
+        
+        .composer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .composer-user {
+            font-weight: 600;
+            font-size: var(--text-sm);
+        }
+        
+        .composer-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .composer-textarea:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .composer-textarea::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .composer-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-3);
+        }
+        
+        .composer-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .composer-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            transition: all 0.2s;
+        }
+        
+        .composer-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .composer-btn.active {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .char-count {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .char-count.warning { color: var(--color-warning); }
+        .char-count.error { color: var(--color-error); }
+        
+        .post-btn {
+            padding: var(--space-2) var(--space-5);
+            background: var(--cinq-gradient);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .post-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .post-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Image Preview */
+        .image-preview {
+            position: relative;
+            margin-top: var(--space-3);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: none;
+        }
+        
+        .image-preview.visible {
+            display: block;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        
+        .image-preview-remove {
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-2);
+            width: 28px;
+            height: 28px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-preview-remove:hover {
+            background: var(--color-error);
+        }
+        
+        /* Posts */
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+        
+        .post-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            transition: border-color 0.2s;
+        }
+        
+        .post-card:hover {
+            border-color: var(--color-border-active);
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-3);
+            position: relative;
+        }
+        
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        
+        .post-avatar.own {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .post-author-name {
+            font-weight: 600;
+            font-size: var(--text-sm);
+        }
+        
+        .post-author-name .you-badge {
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-success);
+            margin-left: var(--space-2);
+        }
+        
+        .post-time {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .post-content {
+            font-size: var(--text-base);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .post-image {
+            margin-top: var(--space-3);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .post-image img:hover {
+            opacity: 0.9;
+        }
+        
+        .post-menu-btn {
             background: none;
             border: none;
             color: var(--color-text-muted);
             cursor: pointer;
-            font-size: 0.8125rem;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-md);
-            transition: all 0.15s;
+            padding: var(--space-1);
+            font-size: 1.25rem;
         }
         
-        .logout-btn:hover { 
+        .post-menu-btn:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .post-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-1);
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+            display: none;
+        }
+        
+        .post-menu.open {
+            display: block;
+        }
+        
+        .post-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: none;
+            border: none;
             color: var(--color-error);
-            background: var(--color-error-muted);
-        }
-
-        /* ===== CONTACTS GRID ===== */
-        .contacts-section {
-            margin-bottom: 2.5rem;
+            cursor: pointer;
+            font-size: var(--text-sm);
+            border-radius: var(--radius-md);
+            width: 100%;
         }
         
-        .section-title {
-            font-size: 1.125rem;
+        .post-menu-item:hover {
+            background: var(--color-bg-hover);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-4);
+            color: var(--color-text-muted);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            opacity: 0.5;
+        }
+        
+        .empty-state-title {
+            font-size: var(--text-xl);
             font-weight: 600;
-            margin-bottom: 1.25rem;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        /* ===== TES 5 TAB ===== */
+        .section-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-5);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            letter-spacing: -0.01em;
         }
         
         .contact-count {
-            font-size: 0.8125rem;
+            font-size: var(--text-sm);
             color: var(--color-text-muted);
             font-weight: 500;
             background: var(--color-bg-secondary);
-            padding: 0.25rem 0.75rem;
+            padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-full);
             border: 1px solid var(--color-border);
         }
@@ -120,12 +519,13 @@
         .contacts-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 0.875rem;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
         }
         
         @media (max-width: 400px) {
             .contacts-grid {
-                gap: 0.625rem;
+                gap: var(--space-2);
             }
         }
         
@@ -137,10 +537,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 
-                transform 0.25s var(--ease-out-expo),
-                box-shadow 0.25s var(--ease-out-expo),
-                border-color 0.15s;
+            transition: transform 0.25s var(--ease-out-expo), box-shadow 0.25s, border-color 0.15s;
             position: relative;
         }
         
@@ -173,7 +570,7 @@
             background: var(--color-brand-muted);
         }
         
-        .contact-avatar {
+        .contact-avatar-slot {
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -186,30 +583,30 @@
             font-weight: 600;
             transition: transform 0.2s var(--ease-out-expo);
             box-shadow: 0 2px 8px var(--color-brand-glow);
+            overflow: hidden;
         }
         
-        .contact-avatar img {
+        .contact-avatar-slot img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 50%;
         }
         
         @media (max-width: 400px) {
-            .contact-avatar {
+            .contact-avatar-slot {
                 width: 36px;
                 height: 36px;
                 font-size: 1rem;
             }
         }
         
-        .contact-slot:hover .contact-avatar {
+        .contact-slot:hover .contact-avatar-slot {
             transform: scale(1.08);
         }
         
         .contact-name {
-            font-size: 0.6875rem;
-            margin-top: 0.375rem;
+            font-size: var(--text-xs);
+            margin-top: var(--space-1);
             color: var(--color-text-muted);
             text-align: center;
             max-width: 100%;
@@ -231,8 +628,7 @@
             color: var(--color-brand);
             transform: rotate(90deg) scale(1.1);
         }
-
-        /* ===== UNREAD BADGE ===== */
+        
         .unread-badge {
             position: absolute;
             top: -4px;
@@ -244,7 +640,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6875rem;
+            font-size: var(--text-xs);
             font-weight: 700;
             color: white;
             padding: 0 5px;
@@ -256,34 +652,22 @@
             0% { transform: scale(0); }
             100% { transform: scale(1); }
         }
-
-        /* ===== ACTIONS ===== */
-        .actions-section {
-            display: flex;
-            flex-direction: column;
-            gap: 0.875rem;
-        }
         
         .action-btn {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1.125rem 1.25rem;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             cursor: pointer;
             transition: all 0.2s var(--ease-out-expo);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
-            pointer-events: none;
+            width: 100%;
+            text-align: left;
+            color: inherit;
+            text-decoration: none;
+            font-family: inherit;
         }
         
         .action-btn:hover {
@@ -292,30 +676,232 @@
             transform: translateX(4px);
         }
         
-        .action-btn:active {
-            transform: translateX(2px) scale(0.99);
-        }
-        
         .action-icon {
             font-size: 1.5rem;
         }
         
-        .action-text {
-            flex: 1;
-        }
-        
         .action-title {
             font-weight: 600;
-            margin-bottom: 0.125rem;
-            font-size: 0.9375rem;
+            margin-bottom: 2px;
         }
         
         .action-subtitle {
-            font-size: 0.75rem;
+            font-size: var(--text-xs);
             color: var(--color-text-muted);
         }
-
+        
+        /* ===== PROFIL TAB ===== */
+        .profile-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 600;
+            margin: 0 auto var(--space-4);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-avatar-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 1.5rem;
+        }
+        
+        .profile-avatar:hover .profile-avatar-overlay {
+            opacity: 1;
+        }
+        
+        .profile-name {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            margin-bottom: var(--space-1);
+        }
+        
+        .profile-bio {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+        
+        .settings-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            margin-bottom: var(--space-4);
+        }
+        
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+            font-weight: 600;
+        }
+        
+        .settings-card-header span:first-child {
+            font-size: 1.25rem;
+        }
+        
+        .settings-field {
+            margin-bottom: var(--space-4);
+        }
+        
+        .settings-field:last-child {
+            margin-bottom: 0;
+        }
+        
+        .settings-label {
+            display: block;
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+            font-weight: 500;
+        }
+        
+        .settings-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            transition: all 0.15s;
+        }
+        
+        .settings-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .settings-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: var(--space-3) var(--space-5);
+            background: var(--cinq-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .settings-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            transition: all 0.15s;
+            width: 100%;
+            text-align: left;
+            margin-bottom: var(--space-3);
+        }
+        
+        .settings-btn:last-child {
+            margin-bottom: 0;
+        }
+        
+        .settings-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+        }
+        
+        .settings-btn-danger {
+            background: var(--color-error-muted);
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .settings-btn-danger:hover {
+            background: rgba(248, 113, 113, 0.18);
+        }
+        
+        .settings-btn-info {
+            flex: 1;
+        }
+        
+        .settings-btn-title {
+            font-weight: 600;
+            display: block;
+        }
+        
+        .settings-btn-subtitle {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+        
+        .settings-btn-danger .settings-btn-subtitle {
+            color: inherit;
+            opacity: 0.8;
+        }
+        
         /* ===== CHAT PANEL ===== */
+        .chat-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+            z-index: calc(var(--z-modal) - 1);
+        }
+        
+        .chat-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
         .chat-panel {
             position: fixed;
             bottom: 0;
@@ -342,7 +928,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.25rem;
+            padding: var(--space-5);
             border-bottom: 1px solid var(--color-border);
             background: var(--color-bg-secondary);
             border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
@@ -351,7 +937,7 @@
         .chat-contact-info {
             display: flex;
             align-items: center;
-            gap: 0.875rem;
+            gap: var(--space-3);
         }
         
         .chat-contact-avatar {
@@ -362,15 +948,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9375rem;
+            font-size: var(--text-base);
             color: white;
             font-weight: 600;
             box-shadow: 0 2px 8px var(--color-brand-glow);
+            overflow: hidden;
+        }
+        
+        .chat-contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .chat-contact-name {
             font-weight: 600;
-            font-size: 1rem;
         }
         
         .chat-close {
@@ -380,7 +972,7 @@
             cursor: pointer;
             color: var(--color-text-muted);
             transition: all 0.2s;
-            padding: 0.5rem;
+            padding: var(--space-2);
             border-radius: var(--radius-lg);
             width: 36px;
             height: 36px;
@@ -398,11 +990,11 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1.25rem;
+            padding: var(--space-5);
             min-height: 280px;
             display: flex;
             flex-direction: column;
-            gap: 0.625rem;
+            gap: var(--space-2);
             scroll-behavior: smooth;
         }
         
@@ -411,28 +1003,21 @@
             text-align: center;
             color: var(--color-text-muted);
             margin: auto;
-            font-size: 0.9375rem;
         }
         
         .chat-message {
             max-width: 75%;
-            padding: 0.875rem 1.125rem;
+            padding: var(--space-3) var(--space-4);
             border-radius: var(--radius-xl);
             animation: message-in 0.25s var(--ease-out-expo);
             word-wrap: break-word;
-            font-size: 0.9375rem;
+            font-size: var(--text-base);
             line-height: 1.5;
         }
         
         @keyframes message-in {
-            0% { 
-                opacity: 0; 
-                transform: translateY(12px) scale(0.96);
-            }
-            100% { 
-                opacity: 1; 
-                transform: translateY(0) scale(1);
-            }
+            0% { opacity: 0; transform: translateY(12px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         .chat-message.sent {
@@ -462,29 +1047,23 @@
             50% { transform: scale(1.25); }
         }
         
-        .chat-message-time {
-            font-size: 0.6875rem;
-            opacity: 0.7;
-            margin-top: 0.25rem;
-        }
-        
         .chat-input-area {
             display: flex;
-            gap: 0.625rem;
-            padding: 1.25rem;
+            gap: var(--space-2);
+            padding: var(--space-5);
             border-top: 1px solid var(--color-border);
-            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+            padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
             background: var(--color-bg-secondary);
         }
         
         .chat-input {
             flex: 1;
-            padding: 0.875rem 1.125rem;
+            padding: var(--space-3) var(--space-4);
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-full);
             color: var(--color-text-primary);
-            font-size: 1rem;
+            font-size: var(--text-base);
             transition: all 0.15s;
         }
         
@@ -495,7 +1074,7 @@
         }
         
         .chat-send {
-            padding: 0.875rem 1.125rem;
+            padding: var(--space-3) var(--space-4);
             background: var(--cinq-gradient);
             border: none;
             border-radius: var(--radius-full);
@@ -508,21 +1087,15 @@
         
         .chat-send:hover:not(:disabled) {
             transform: scale(1.05);
-            box-shadow: var(--shadow-glow-sm);
-        }
-        
-        .chat-send:active:not(:disabled) {
-            transform: scale(0.95);
         }
         
         .chat-send:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
         }
         
         .ping-btn {
-            padding: 0.875rem;
+            padding: var(--space-3);
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-full);
@@ -537,29 +1110,7 @@
             transform: scale(1.08);
         }
         
-        .ping-btn:active {
-            transform: scale(0.92);
-        }
-
-        /* ===== CHAT OVERLAY ===== */
-        .chat-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.25s;
-            z-index: calc(var(--z-modal) - 1);
-        }
-        
-        .chat-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* ===== MODAL ===== */
+        /* ===== MODALS ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -569,14 +1120,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: var(--space-4);
             z-index: var(--z-modal);
             opacity: 0;
             visibility: hidden;
             transition: all 0.25s;
         }
         
-        .modal-overlay.open { 
+        .modal-overlay.open {
             opacity: 1;
             visibility: visible;
         }
@@ -585,7 +1136,7 @@
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-2xl);
-            padding: 2rem;
+            padding: var(--space-8);
             width: 100%;
             max-width: 420px;
             transform: scale(0.94) translateY(16px);
@@ -594,50 +1145,32 @@
             box-shadow: var(--shadow-2xl);
         }
         
-        .modal::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 30%);
-            pointer-events: none;
-        }
-        
         .modal-overlay.open .modal {
             transform: scale(1) translateY(0);
         }
         
         .modal-title {
-            font-size: 1.25rem;
+            font-size: var(--text-xl);
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: var(--space-4);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-2);
         }
         
         .gift-code-display {
             background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-elevated) 100%);
             border: 2px dashed var(--color-brand);
             border-radius: var(--radius-xl);
-            padding: 1.75rem;
+            padding: var(--space-6);
             text-align: center;
-            margin: 1.25rem 0;
+            margin: var(--space-5) 0;
             position: relative;
-        }
-        
-        .gift-code-display::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--cinq-gradient-subtle);
-            border-radius: inherit;
-            opacity: 0.5;
         }
         
         .gift-code {
             position: relative;
-            font-size: 1.625rem;
+            font-size: var(--text-2xl);
             font-weight: 700;
             font-family: var(--font-mono);
             background: var(--cinq-gradient);
@@ -647,39 +1180,16 @@
             letter-spacing: 0.08em;
         }
         
-        .copy-btn {
-            margin-top: 1rem;
-            padding: 0.875rem 1.5rem;
-            background: var(--cinq-gradient);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            transition: all 0.15s;
-            box-shadow: 0 2px 8px var(--color-brand-glow);
-        }
-        
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-sm);
-        }
-        
-        .copy-btn:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        /* ===== TOAST NOTIFICATIONS ===== */
+        /* ===== TOASTS ===== */
         .toast-container {
             position: fixed;
-            top: 1rem;
+            top: var(--space-4);
             left: 50%;
             transform: translateX(-50%);
             z-index: var(--z-toast);
             display: flex;
             flex-direction: column;
-            gap: 0.625rem;
+            gap: var(--space-2);
             pointer-events: none;
             width: 90%;
             max-width: 400px;
@@ -689,10 +1199,10 @@
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
-            padding: 1rem 1.25rem;
+            padding: var(--space-4);
             display: flex;
             align-items: center;
-            gap: 0.875rem;
+            gap: var(--space-3);
             box-shadow: var(--shadow-xl);
             animation: toast-in 0.35s var(--ease-spring);
             pointer-events: auto;
@@ -705,67 +1215,73 @@
         }
         
         @keyframes toast-in {
-            0% { 
-                opacity: 0; 
-                transform: translateY(-16px) scale(0.96);
-            }
-            100% { 
-                opacity: 1; 
-                transform: translateY(0) scale(1);
-            }
+            0% { opacity: 0; transform: translateY(-16px) scale(0.96); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         @keyframes toast-out {
-            0% { 
-                opacity: 1; 
-                transform: translateY(0) scale(1);
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateY(-16px) scale(0.96);
-            }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-16px) scale(0.96); }
         }
         
-        .toast-icon {
-            font-size: 1.25rem;
+        .toast-icon { font-size: 1.25rem; }
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; font-size: var(--text-base); }
+        .toast-message { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 2px; }
+        
+        .toast.success { border-color: var(--color-success); background: var(--color-success-muted); }
+        .toast.error { border-color: var(--color-error); background: var(--color-error-muted); }
+        .toast.notification { border-color: var(--color-brand); background: var(--color-brand-muted); cursor: pointer; }
+        
+        /* ===== IMAGE MODAL ===== */
+        .image-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: calc(var(--z-modal) + 1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            cursor: zoom-out;
         }
         
-        .toast-content {
-            flex: 1;
+        .image-modal.open {
+            opacity: 1;
+            visibility: visible;
         }
         
-        .toast-title {
-            font-weight: 600;
-            font-size: 0.9375rem;
+        .image-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: var(--radius-lg);
         }
         
-        .toast-message {
-            font-size: 0.8125rem;
-            color: var(--color-text-muted);
-            margin-top: 0.125rem;
-        }
-        
-        .toast.success {
-            border-color: var(--color-success);
-            background: var(--color-success-muted);
-        }
-        
-        .toast.error {
-            border-color: var(--color-error);
-            background: var(--color-error-muted);
-        }
-        
-        .toast.notification {
-            border-color: var(--color-brand);
-            background: var(--color-brand-muted);
+        .image-modal-close {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
             cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .toast.notification:hover {
-            background: rgba(255, 107, 74, 0.18);
+        .image-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-
-        /* ===== LOADING STATES ===== */
+        
+        /* ===== LOADING ===== */
         .loading-spinner {
             width: 24px;
             height: 24px;
@@ -779,803 +1295,247 @@
             to { transform: rotate(360deg); }
         }
         
-        .skeleton {
-            background: linear-gradient(
-                90deg,
-                var(--color-bg-secondary) 25%,
-                var(--color-bg-tertiary) 50%,
-                var(--color-bg-secondary) 75%
-            );
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s ease-in-out infinite;
-            border-radius: var(--radius-lg);
-        }
-        
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* ===== SETTINGS LINK ===== */
-        .settings-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--color-text-muted);
-            text-decoration: none;
-            font-size: 0.875rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-md);
-            transition: all 0.15s;
-        }
-        
-        .settings-link:hover {
-            color: var(--color-text-primary);
-            background: var(--color-bg-hover);
-        }
-
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 380px) {
-            .app-container {
-                padding: 1rem;
+        @media (max-width: 480px) {
+            .app-content {
+                padding: var(--space-4);
+                padding-bottom: calc(80px + env(safe-area-inset-bottom, var(--space-4)));
             }
             
             .modal {
-                padding: 1.5rem;
+                padding: var(--space-6);
             }
-        }
-
-        /* ===== ONBOARDING ===== */
-        .onboarding-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--color-bg-primary);
-            z-index: calc(var(--z-modal) + 10);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .onboarding-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .onboarding-container {
-            width: 100%;
-            max-width: 460px;
-            padding: 2rem;
-            text-align: center;
-        }
-        
-        .onboarding-step {
-            display: none;
-            animation: step-in 0.45s var(--ease-out-expo);
-        }
-        
-        .onboarding-step.active {
-            display: block;
-        }
-        
-        @keyframes step-in {
-            0% { 
-                opacity: 0; 
-                transform: translateX(24px);
-            }
-            100% { 
-                opacity: 1; 
-                transform: translateX(0);
-            }
-        }
-        
-        .onboarding-logo {
-            font-size: 4.5rem;
-            font-weight: 700;
-            background: var(--cinq-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1.25rem;
-            filter: drop-shadow(0 4px 16px var(--color-brand-glow));
-            animation: logo-float 3s ease-in-out infinite;
-        }
-        
-        @keyframes logo-float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        
-        .onboarding-emoji {
-            font-size: 4.5rem;
-            margin-bottom: 1.5rem;
-            animation: emoji-bounce 0.6s var(--ease-spring);
-        }
-        
-        @keyframes emoji-bounce {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-        
-        .onboarding-title {
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-bottom: 0.875rem;
-            background: var(--cinq-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
-        }
-        
-        .onboarding-text {
-            color: var(--color-text-secondary);
-            font-size: 1.0625rem;
-            line-height: 1.65;
-            margin-bottom: 2rem;
-        }
-        
-        .onboarding-highlight {
-            color: var(--color-text-primary);
-            font-weight: 600;
-        }
-        
-        .onboarding-feature {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: 1.125rem;
-            margin-bottom: 0.875rem;
-            text-align: left;
-            transition: all 0.15s;
-        }
-        
-        .onboarding-feature:hover {
-            border-color: var(--color-border-active);
-            transform: translateX(4px);
-        }
-        
-        .onboarding-feature-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-        
-        .onboarding-feature-text {
-            font-size: 0.9375rem;
-        }
-        
-        .onboarding-feature-text strong {
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-        
-        .onboarding-feature-text span {
-            color: var(--color-text-muted);
-            font-size: 0.8125rem;
-        }
-        
-        .onboarding-demo {
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-2xl);
-            padding: 1.75rem;
-            margin: 1.75rem 0;
-        }
-        
-        .onboarding-demo-slots {
-            display: flex;
-            justify-content: center;
-            gap: 0.625rem;
-            margin-bottom: 1rem;
-        }
-        
-        .onboarding-demo-slot {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 600;
-            transition: all 0.3s var(--ease-spring);
-        }
-        
-        .onboarding-demo-slot.filled {
-            background: var(--cinq-gradient);
-            color: white;
-            box-shadow: 0 2px 8px var(--color-brand-glow);
-        }
-        
-        .onboarding-demo-slot.empty {
-            background: var(--color-bg-tertiary);
-            border: 2px dashed var(--color-border);
-            color: var(--color-text-muted);
-        }
-        
-        .onboarding-demo-slot.highlight {
-            transform: scale(1.12);
-            box-shadow: var(--shadow-glow);
-        }
-        
-        .onboarding-btn {
-            width: 100%;
-            padding: 1.125rem;
-            background: var(--cinq-gradient);
-            color: white;
-            border: none;
-            border-radius: var(--radius-xl);
-            font-size: 1.0625rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            margin-top: 1.25rem;
-            box-shadow: 0 4px 12px var(--color-brand-glow);
-        }
-        
-        .onboarding-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-glow);
-        }
-        
-        .onboarding-btn:active {
-            transform: translateY(0) scale(0.98);
-        }
-        
-        .onboarding-btn-secondary {
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            color: var(--color-text-primary);
-            box-shadow: none;
-        }
-        
-        .onboarding-btn-secondary:hover {
-            background: var(--color-bg-tertiary);
-            box-shadow: none;
-        }
-        
-        .onboarding-progress {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
-        
-        .onboarding-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--color-bg-elevated);
-            transition: all 0.3s var(--ease-out-expo);
-        }
-        
-        .onboarding-dot.active {
-            background: var(--cinq-gradient);
-            width: 28px;
-            border-radius: 4px;
-        }
-        
-        .onboarding-skip {
-            margin-top: 1.5rem;
-            background: none;
-            border: none;
-            color: var(--color-text-muted);
-            cursor: pointer;
-            font-size: 0.875rem;
-            padding: 0.5rem;
-            transition: color 0.15s;
-        }
-        
-        .onboarding-skip:hover {
-            color: var(--color-text-primary);
-        }
-
-        /* ===== ACCOUNT SECTION ===== */
-        .account-section {
-            margin-top: 2.5rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--color-border-subtle);
-        }
-        
-        .account-card {
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
-        .account-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        .account-card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .account-card-header span:first-child {
-            font-size: 1.25rem;
-        }
-        
-        .account-card-header span:last-child {
-            font-weight: 600;
-        }
-        
-        .account-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--color-bg-tertiary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            color: var(--color-text-primary);
-            font-size: 0.9375rem;
-            transition: all 0.15s;
-        }
-        
-        .account-input:focus {
-            outline: none;
-            border-color: var(--color-brand);
-            box-shadow: 0 0 0 3px var(--color-brand-muted);
-        }
-        
-        .account-input::placeholder {
-            color: var(--color-text-muted);
-        }
-        
-        .account-label {
-            font-size: 0.75rem;
-            color: var(--color-text-muted);
-            display: block;
-            margin-bottom: 0.375rem;
-            font-weight: 500;
-        }
-        
-        .account-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.875rem 1rem;
-            background: var(--color-bg-tertiary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            color: var(--color-text-primary);
-            font-size: 0.9375rem;
-            transition: all 0.15s;
-            width: 100%;
-            text-align: left;
-        }
-        
-        .account-btn:hover {
-            background: var(--color-bg-elevated);
-            border-color: var(--color-border-active);
-        }
-        
-        .account-btn-danger {
-            background: var(--color-error-muted);
-            border-color: var(--color-error);
-            color: var(--color-error);
-        }
-        
-        .account-btn-danger:hover {
-            background: rgba(248, 113, 113, 0.18);
-        }
-        
-        .account-btn-info {
-            flex: 1;
-            text-align: left;
-        }
-        
-        .account-btn-title {
-            font-weight: 600;
-            display: block;
-        }
-        
-        .account-btn-subtitle {
-            font-size: 0.75rem;
-            color: var(--color-text-muted);
-            margin-top: 0.125rem;
-        }
-        
-        .account-btn-danger .account-btn-subtitle {
-            color: inherit;
-            opacity: 0.8;
-        }
-        
-        .save-btn {
-            padding: 0.75rem 1.25rem;
-            background: var(--cinq-gradient);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9375rem;
-            transition: all 0.15s;
-            box-shadow: 0 2px 8px var(--color-brand-glow);
-        }
-        
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-sm);
-        }
-        
-        .save-btn:active {
-            transform: translateY(0) scale(0.98);
         }
     </style>
 </head>
 <body>
-    <!-- Skip to content link -->
-    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
-    
     <div class="noise-overlay" aria-hidden="true"></div>
-    
-    <!-- Ambient orbs -->
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
-
+    
     <!-- Toast Container -->
-    <div class="toast-container" id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
-
-    <!-- Onboarding Overlay -->
-    <div class="onboarding-overlay" id="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
-        <div class="onboarding-container">
-            <!-- Step 1: Welcome -->
-            <div class="onboarding-step active" id="onboarding-step-1">
-                <div class="onboarding-logo">5</div>
-                <h1 class="onboarding-title">Bienvenue sur Cinq !</h1>
-                <p class="onboarding-text">
-                    Tu viens de rejoindre un réseau <span class="onboarding-highlight">intime et intentionnel</span>.
-                    <br><br>
-                    Ici, pas de scroll infini ni de likes. Juste toi et <span class="onboarding-highlight">5 personnes</span> qui comptent vraiment.
-                </p>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Découvrir Cinq - étape suivante">
-                    Découvrir →
-                </button>
-                <div class="onboarding-progress" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 1 sur 4">
-                    <div class="onboarding-dot active"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer l'intro</button>
-            </div>
-
-            <!-- Step 2: The Concept -->
-            <div class="onboarding-step" id="onboarding-step-2">
-                <div class="onboarding-emoji">✨</div>
-                <h1 class="onboarding-title">Le concept</h1>
-                <p class="onboarding-text">
-                    <span class="onboarding-highlight">5 contacts maximum.</span>
-                    <br>
-                    C'est tout. C'est le but.
-                </p>
-                <div class="onboarding-demo">
-                    <div class="onboarding-demo-slots" id="demo-slots">
-                        <div class="onboarding-demo-slot filled">A</div>
-                        <div class="onboarding-demo-slot filled">M</div>
-                        <div class="onboarding-demo-slot filled">J</div>
-                        <div class="onboarding-demo-slot empty">+</div>
-                        <div class="onboarding-demo-slot empty">+</div>
-                    </div>
-                    <p style="color: var(--color-text-muted); font-size: 0.9rem;">
-                        Choisis avec soin. Chaque place compte.
-                    </p>
-                </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Continuer - étape suivante">
-                    Continuer →
-                </button>
-                <div class="onboarding-progress" role="progressbar" aria-valuenow="2" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 2 sur 4">
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot active"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer</button>
-            </div>
-
-            <!-- Step 3: The Ping -->
-            <div class="onboarding-step" id="onboarding-step-3">
-                <div class="onboarding-emoji">👋</div>
-                <h1 class="onboarding-title">Le Ping</h1>
-                <p class="onboarding-text">
-                    Un ping, c'est simple : <span class="onboarding-highlight">"Je pense à toi"</span>.
-                    <br><br>
-                    Pas de pression de répondre. Juste un petit signe pour dire que tu es là.
-                </p>
-                <div class="onboarding-feature">
-                    <span class="onboarding-feature-icon">💬</span>
-                    <div class="onboarding-feature-text">
-                        <strong>Messages courts</strong>
-                        <span>Tu peux aussi écrire, mais l'essentiel tient en un geste</span>
-                    </div>
-                </div>
-                <div class="onboarding-feature">
-                    <span class="onboarding-feature-icon">🔔</span>
-                    <div class="onboarding-feature-text">
-                        <strong>Notifications douces</strong>
-                        <span>Pas de spam. Juste ce qui compte.</span>
-                    </div>
-                </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Presque fini - étape suivante">
-                    Presque fini →
-                </button>
-                <div class="onboarding-progress" role="progressbar" aria-valuenow="3" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 3 sur 4">
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot active"></div>
-                    <div class="onboarding-dot"></div>
-                </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer</button>
-            </div>
-
-            <!-- Step 4: Getting Started -->
-            <div class="onboarding-step" id="onboarding-step-4">
-                <div class="onboarding-emoji">🚀</div>
-                <h1 class="onboarding-title">C'est parti !</h1>
-                <p class="onboarding-text">
-                    Voilà comment commencer :
-                </p>
-                <div class="onboarding-feature">
-                    <span class="onboarding-feature-icon">➕</span>
-                    <div class="onboarding-feature-text">
-                        <strong>Ajoute un contact</strong>
-                        <span>Clique sur un slot vide et entre l'ID de ton ami</span>
-                    </div>
-                </div>
-                <div class="onboarding-feature">
-                    <span class="onboarding-feature-icon">🎁</span>
-                    <div class="onboarding-feature-text">
-                        <strong>Invite des amis</strong>
-                        <span>Génère un code cadeau pour inviter quelqu'un sur Cinq</span>
-                    </div>
-                </div>
-                <div class="onboarding-feature">
-                    <span class="onboarding-feature-icon">📋</span>
-                    <div class="onboarding-feature-text">
-                        <strong>Partage ton ID</strong>
-                        <span>Pour que tes amis puissent t'ajouter</span>
-                    </div>
-                </div>
-                <button class="onboarding-btn" onclick="finishOnboarding()" aria-label="Commencer à utiliser Cinq">
-                    Commencer 🎉
-                </button>
-                <div class="onboarding-progress" role="progressbar" aria-valuenow="4" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 4 sur 4">
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot"></div>
-                    <div class="onboarding-dot active"></div>
-                </div>
-            </div>
-        </div>
+    <div class="toast-container" id="toast-container" role="region" aria-live="polite"></div>
+    
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal" onclick="closeImageModal()">
+        <button class="image-modal-close" onclick="closeImageModal()">×</button>
+        <img id="modal-image" src="" alt="Image agrandie">
     </div>
-
-    <div class="app-container" id="main-content">
-        <header class="app-header" role="banner">
-            <div class="app-logo" aria-label="Cinq logo">5</div>
-            <div class="user-menu">
-                <span class="user-name" id="user-name" aria-label="Utilisateur connecté"></span>
-                <a href="#mon-compte" class="settings-link" aria-label="Paramètres du compte">
-                    <span aria-hidden="true">⚙️</span>
-                </a>
-                <button class="logout-btn" onclick="logout()" aria-label="Se déconnecter">Déconnexion</button>
+    
+    <div class="app-shell">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-logo">5</div>
+            <div class="header-avatar" id="header-avatar" onclick="switchTab('profil')" title="Mon profil">
+                <span id="header-avatar-initial">?</span>
             </div>
         </header>
-
-        <section class="contacts-section" role="region" aria-label="Vos contacts">
-            <h2 class="section-title">
-                Tes 5
-                <span class="contact-count" id="contact-count" aria-label="Nombre de contacts">0/5</span>
-            </h2>
-            <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste des contacts">
-                <!-- Filled by JS -->
-            </div>
-        </section>
-
-        <section class="actions-section">
-            <a href="/feed.html" class="action-btn" style="text-decoration: none; color: inherit;">
-                <span class="action-icon">📰</span>
-                <div class="action-text">
-                    <div class="action-title">Feed</div>
-                    <div class="action-subtitle">Voir les posts de tes 5</div>
+        
+        <!-- MAIN CONTENT -->
+        <main class="app-content">
+            <!-- TAB: FEED (DEFAULT) -->
+            <section class="tab-panel active" id="tab-feed">
+                <!-- Composer -->
+                <div class="composer">
+                    <div class="composer-header">
+                        <div class="composer-avatar" id="composer-avatar">?</div>
+                        <span class="composer-user" id="composer-user">Chargement...</span>
+                    </div>
+                    <textarea 
+                        class="composer-textarea" 
+                        id="post-content" 
+                        placeholder="Quoi de neuf ? Partage quelque chose avec tes 5..."
+                        maxlength="1000"
+                    ></textarea>
+                    <div class="image-preview" id="image-preview">
+                        <img id="preview-img" src="" alt="Aperçu">
+                        <button class="image-preview-remove" onclick="removeImage()">×</button>
+                        <div id="upload-progress" style="display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:var(--space-2);text-align:center;font-size:var(--text-xs);">
+                            ⏳ Upload en cours...
+                        </div>
+                    </div>
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleFileSelect(event)">
+                    <div class="composer-footer">
+                        <div class="composer-actions">
+                            <button class="composer-btn" onclick="triggerFileUpload()">📷 Photo</button>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:var(--space-4);">
+                            <span class="char-count" id="char-count">0/1000</span>
+                            <button class="post-btn" id="post-btn" onclick="submitPost()" disabled>Poster</button>
+                        </div>
+                    </div>
                 </div>
-            </a>
-            <button class="action-btn" onclick="openGiftModal()">
-                <span class="action-icon">🎁</span>
-                <div class="action-text">
-                    <div class="action-title">Offrir Cinq</div>
-                    <div class="action-subtitle">Génère un code pour inviter quelqu'un</div>
+                
+                <!-- Posts List -->
+                <div class="posts-list" id="posts-list">
+                    <div class="loading-spinner" style="margin:var(--space-8) auto;"></div>
                 </div>
-            </button>
-        </section>
-
-        <!-- Mon Compte Section -->
-        <section id="mon-compte" class="account-section">
-            <div class="section-title" style="margin-bottom: 1.25rem;">
-                Mon compte
-            </div>
+            </section>
             
-            <!-- Profile Edit -->
-            <div class="account-card">
-                <div class="account-card-header">
-                    <span>👤</span>
-                    <span>Mon profil</span>
+            <!-- TAB: TES 5 -->
+            <section class="tab-panel" id="tab-contacts">
+                <h2 class="section-title">
+                    Tes 5
+                    <span class="contact-count" id="contact-count">0/5</span>
+                </h2>
+                <div class="contacts-grid" id="contacts-grid"></div>
+                
+                <button class="action-btn" onclick="openGiftModal()">
+                    <span class="action-icon">🎁</span>
+                    <div>
+                        <div class="action-title">Offrir Cinq</div>
+                        <div class="action-subtitle">Génère un code pour inviter quelqu'un</div>
+                    </div>
+                </button>
+            </section>
+            
+            <!-- TAB: PROFIL -->
+            <section class="tab-panel" id="tab-profil">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()">
+                        <span id="profile-avatar-initial">?</span>
+                        <div class="profile-avatar-overlay">📷</div>
+                    </div>
+                    <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="uploadAvatar(this)">
+                    <div class="profile-name" id="profile-name">Chargement...</div>
+                    <div class="profile-bio" id="profile-bio-display"></div>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-                    <!-- Photo de profil -->
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-                        <div id="avatar-preview" style="width: 72px; height: 72px; border-radius: 50%; background: var(--cinq-gradient); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white; font-weight: 600; overflow: hidden; cursor: pointer; position: relative;" onclick="document.getElementById('avatar-input').click()">
-                            <span id="avatar-initial">?</span>
-                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>
-                        </div>
-                        <div style="flex: 1;">
-                            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="uploadAvatar(this)">
-                            <button onclick="document.getElementById('avatar-input').click()" class="account-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
-                                📷 Changer la photo
-                            </button>
-                            <button id="remove-avatar-btn" onclick="removeAvatar()" class="account-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; display: none; color: var(--color-error);">
-                                ✕ Supprimer
-                            </button>
-                            <p style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">JPG, PNG, GIF, WebP • Max 2Mo</p>
-                        </div>
+                <!-- Edit Profile -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span>✏️</span>
+                        <span>Modifier mon profil</span>
                     </div>
-                    <div>
-                        <label class="account-label" for="profile-display-name">Pseudo</label>
-                        <input type="text" id="profile-display-name" class="account-input" placeholder="Ton pseudo..." maxlength="50">
+                    <div class="settings-field">
+                        <label class="settings-label" for="profile-display-name">Pseudo</label>
+                        <input type="text" id="profile-display-name" class="settings-input" placeholder="Ton pseudo..." maxlength="50">
                     </div>
-                    <div>
-                        <label class="account-label" for="profile-bio">Bio</label>
-                        <textarea id="profile-bio" class="account-input" placeholder="Quelques mots sur toi..." maxlength="500" rows="2" style="resize: vertical; min-height: 60px;"></textarea>
+                    <div class="settings-field">
+                        <label class="settings-label" for="profile-bio">Bio</label>
+                        <textarea id="profile-bio" class="settings-input" placeholder="Quelques mots sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
-                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn">
-                        💾 Enregistrer
-                    </button>
-                </div>
-            </div>
-
-            <!-- Data & Account Actions -->
-            <div class="account-card">
-                <div class="account-card-header">
-                    <span>📦</span>
-                    <span>Mes données</span>
+                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn">💾 Enregistrer</button>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-                    <button onclick="exportData()" id="export-data-btn" class="account-btn">
+                <!-- Data & Actions -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span>📦</span>
+                        <span>Mes données</span>
+                    </div>
+                    <button onclick="exportData()" id="export-data-btn" class="settings-btn">
                         <span>📥</span>
-                        <div class="account-btn-info">
-                            <span class="account-btn-title">Exporter mes données</span>
-                            <span class="account-btn-subtitle">Télécharge toutes tes données (RGPD)</span>
+                        <div class="settings-btn-info">
+                            <span class="settings-btn-title">Exporter mes données</span>
+                            <span class="settings-btn-subtitle">Télécharge toutes tes données (RGPD)</span>
                         </div>
                     </button>
-                    
-                    <button onclick="openDeleteAccountModal()" class="account-btn account-btn-danger">
+                    <button onclick="logout()" class="settings-btn">
+                        <span>🚪</span>
+                        <div class="settings-btn-info">
+                            <span class="settings-btn-title">Déconnexion</span>
+                            <span class="settings-btn-subtitle">Se déconnecter de Cinq</span>
+                        </div>
+                    </button>
+                    <button onclick="openDeleteAccountModal()" class="settings-btn settings-btn-danger">
                         <span>🗑️</span>
-                        <div class="account-btn-info">
-                            <span class="account-btn-title">Supprimer mon compte</span>
-                            <span class="account-btn-subtitle">Action définitive et irréversible</span>
+                        <div class="settings-btn-info">
+                            <span class="settings-btn-title">Supprimer mon compte</span>
+                            <span class="settings-btn-subtitle">Action définitive et irréversible</span>
                         </div>
                     </button>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
+        
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="feed" onclick="switchTab('feed')">
+                <span class="nav-icon">📰</span>
+                <span class="nav-label">Feed</span>
+            </button>
+            <button class="nav-item" data-tab="contacts" onclick="switchTab('contacts')">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">Tes 5</span>
+            </button>
+            <button class="nav-item" data-tab="profil" onclick="switchTab('profil')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profil</span>
+            </button>
+        </nav>
     </div>
-
+    
     <!-- Chat Overlay -->
     <div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
-
+    
     <!-- Chat Panel -->
-    <div class="chat-panel" id="chat-panel" role="dialog" aria-labelledby="chat-contact-name" aria-modal="true">
+    <div class="chat-panel" id="chat-panel">
         <div class="chat-header">
             <div class="chat-contact-info">
-                <div class="chat-contact-avatar" id="chat-contact-avatar" aria-hidden="true">?</div>
+                <div class="chat-contact-avatar" id="chat-contact-avatar">?</div>
                 <span class="chat-contact-name" id="chat-contact-name"></span>
             </div>
-            <button class="chat-close" onclick="closeChat()" aria-label="Fermer la conversation">×</button>
+            <button class="chat-close" onclick="closeChat()">×</button>
         </div>
-        <div class="chat-messages" id="chat-messages" role="log" aria-label="Messages de la conversation" aria-live="polite"></div>
+        <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input-area">
-            <button class="ping-btn" onclick="sendPing()" aria-label="Envoyer un ping pour dire que tu penses à cette personne">
-                <span aria-hidden="true">👋</span>
-            </button>
-            <label for="chat-input" class="sr-only">Écrire un message</label>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500" aria-label="Écrire un message">
-            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled aria-label="Envoyer le message">
-                <span aria-hidden="true">→</span>
-            </button>
+            <button class="ping-btn" onclick="sendPing()">👋</button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500">
+            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled>→</button>
         </div>
     </div>
-
+    
     <!-- Gift Modal -->
-    <div class="modal-overlay" id="gift-modal" role="dialog" aria-labelledby="gift-modal-title" aria-modal="true">
+    <div class="modal-overlay" id="gift-modal">
         <div class="modal">
-            <h2 class="modal-title" id="gift-modal-title"><span aria-hidden="true">🎁</span> Offrir Cinq</h2>
-            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
-                Génère un code unique pour inviter quelqu'un sur Cinq.
-            </p>
+            <h2 class="modal-title">🎁 Offrir Cinq</h2>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Génère un code unique pour inviter quelqu'un sur Cinq.</p>
             <div id="gift-content">
-                <button class="copy-btn" style="width: 100%;" onclick="createGift()" aria-label="Générer un code cadeau">
-                    Générer un code
-                </button>
+                <button class="save-btn" style="width:100%;" onclick="createGift()">Générer un code</button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeGiftModal()" aria-label="Fermer la fenêtre">
-                Fermer
-            </button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeGiftModal()">Fermer</button>
         </div>
     </div>
-
+    
     <!-- Add Contact Modal -->
-    <div class="modal-overlay" id="add-contact-modal" role="dialog" aria-labelledby="add-contact-modal-title" aria-modal="true">
+    <div class="modal-overlay" id="add-contact-modal">
         <div class="modal">
-            <h2 class="modal-title" id="add-contact-modal-title"><span aria-hidden="true">➕</span> Ajouter un contact</h2>
-            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
-                Entre l'ID de la personne à ajouter
-            </p>
-            <label for="contact-id-input" class="sr-only">ID du contact à ajouter</label>
-            <input type="text" id="contact-id-input" class="account-input" placeholder="ID (ex: abc123-...)" aria-describedby="add-contact-error" aria-label="Identifiant du contact" style="margin-bottom: 1rem;">
-            <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;" role="alert" aria-live="polite"></div>
-            <button class="copy-btn" style="width: 100%;" onclick="addContact()" id="add-contact-btn" aria-label="Ajouter ce contact">
-                Ajouter
-            </button>
-            <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border);">
-                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Ton ID (à partager) :</p>
-                <code id="my-id" style="font-size: 0.6875rem; background: var(--cinq-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; word-break: break-all; display: block; background-color: var(--color-bg-tertiary); padding: 0.75rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border);"></code>
-                <button onclick="copyMyId()" style="margin-top: 0.625rem; padding: 0.625rem 1rem; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.15s;" aria-label="Copier mon identifiant dans le presse-papiers">
-                    <span aria-hidden="true">📋</span> <span id="copy-id-text">Copier mon ID</span>
+            <h2 class="modal-title">➕ Ajouter un contact</h2>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Entre l'ID de la personne à ajouter</p>
+            <input type="text" id="contact-id-input" class="settings-input" placeholder="ID (ex: abc123-...)" style="margin-bottom:var(--space-4);">
+            <div id="add-contact-error" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
+            <button class="save-btn" style="width:100%;" onclick="addContact()" id="add-contact-btn">Ajouter</button>
+            <div style="margin-top:var(--space-5);padding-top:var(--space-5);border-top:1px solid var(--color-border);">
+                <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">Ton ID (à partager) :</p>
+                <code id="my-id" style="font-size:var(--text-xs);word-break:break-all;display:block;background:var(--color-bg-tertiary);padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);"></code>
+                <button onclick="copyMyId()" style="margin-top:var(--space-2);padding:var(--space-2) var(--space-4);background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:var(--radius-lg);color:var(--color-text-primary);cursor:pointer;font-size:var(--text-sm);display:flex;align-items:center;gap:var(--space-2);">
+                    📋 <span id="copy-id-text">Copier mon ID</span>
                 </button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeAddContactModal()" aria-label="Fermer la fenêtre">
-                Fermer
-            </button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeAddContactModal()">Fermer</button>
         </div>
     </div>
-
+    
     <!-- Delete Account Modal -->
     <div class="modal-overlay" id="delete-account-modal">
         <div class="modal">
-            <h2 class="modal-title" style="color: var(--color-error);"><span>🗑️</span> Supprimer mon compte</h2>
-            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
-                Cette action est <strong style="color: var(--color-error);">définitive et irréversible</strong>.
-            </p>
-            <div style="background: var(--color-error-muted); border: 1px solid var(--color-error); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem;">
-                <p style="font-size: 0.875rem; color: var(--color-text-primary); margin-bottom: 0.5rem;">
-                    <strong>Seront supprimés :</strong>
-                </p>
-                <ul style="font-size: 0.8rem; color: var(--color-text-secondary); margin: 0; padding-left: 1.25rem;">
+            <h2 class="modal-title" style="color:var(--color-error);">🗑️ Supprimer mon compte</h2>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Cette action est <strong style="color:var(--color-error);">définitive et irréversible</strong>.</p>
+            <div style="background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);">
+                <p style="font-size:var(--text-sm);color:var(--color-text-primary);margin-bottom:var(--space-2);"><strong>Seront supprimés :</strong></p>
+                <ul style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;padding-left:var(--space-5);">
                     <li>Ton profil et toutes tes infos</li>
                     <li>Tes 5 contacts</li>
                     <li>Tous tes messages envoyés et reçus</li>
-                    <li>Tes propositions de rendez-vous</li>
+                    <li>Tous tes posts</li>
                 </ul>
             </div>
-            <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">
-                Pour confirmer, tape <strong style="color: var(--color-error);">SUPPRIMER</strong> :
-            </p>
-            <input type="text" id="delete-confirmation-input" class="account-input" placeholder="SUPPRIMER" autocomplete="off" style="text-align: center; letter-spacing: 0.1em; margin-bottom: 1rem;">
-            <div id="delete-account-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;"></div>
-            <button onclick="deleteAccount()" id="delete-account-btn" class="copy-btn" style="width: 100%; background: var(--color-error); box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);">
-                Supprimer définitivement
-            </button>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeDeleteAccountModal()">
-                Annuler
-            </button>
+            <p style="font-size:var(--text-sm);margin-bottom:var(--space-3);">Pour confirmer, tape <strong style="color:var(--color-error);">SUPPRIMER</strong> :</p>
+            <input type="text" id="delete-confirmation-input" class="settings-input" placeholder="SUPPRIMER" autocomplete="off" style="text-align:center;letter-spacing:0.1em;margin-bottom:var(--space-4);">
+            <div id="delete-account-error" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
+            <button onclick="deleteAccount()" id="delete-account-btn" class="save-btn" style="width:100%;background:var(--color-error);box-shadow:0 2px 8px rgba(248,113,113,0.3);">Supprimer définitivement</button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeDeleteAccountModal()">Annuler</button>
         </div>
     </div>
 
@@ -1584,29 +1544,39 @@
         let session = null;
         let user = null;
         let contacts = [];
+        let posts = [];
         let currentChatContact = null;
         let messagePollingInterval = null;
         let contactPollingInterval = null;
         let lastMessageIds = {};
         let unreadCounts = {};
-        let currentOnboardingStep = 1;
-        const totalOnboardingSteps = 4;
+        let currentImageUrl = null;
 
-        // ===== TOAST SYSTEM =====
+        // ===== TAB SWITCHING =====
+        function switchTab(tabName) {
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tab === tabName);
+            });
+            
+            // Update panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === `tab-${tabName}`);
+            });
+            
+            // Load data if needed
+            if (tabName === 'contacts') loadContacts();
+            if (tabName === 'feed') loadPosts();
+        }
+
+        // ===== TOAST =====
         function showToast(options) {
             const { type = 'info', title, message, duration = 4000, onClick } = options;
             const container = document.getElementById('toast-container');
+            const icons = { success: '✓', error: '✕', notification: '💬', info: 'ℹ' };
             
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: '✓',
-                error: '✕',
-                notification: '💬',
-                info: 'ℹ'
-            };
-            
             toast.innerHTML = `
                 <span class="toast-icon">${icons[type] || icons.info}</span>
                 <div class="toast-content">
@@ -1617,15 +1587,11 @@
             
             if (onClick) {
                 toast.style.cursor = 'pointer';
-                toast.onclick = () => {
-                    onClick();
-                    removeToast(toast);
-                };
+                toast.onclick = () => { onClick(); removeToast(toast); };
             }
             
             container.appendChild(toast);
             setTimeout(() => removeToast(toast), duration);
-            return toast;
         }
         
         function removeToast(toast) {
@@ -1637,12 +1603,10 @@
         // ===== AUTH =====
         function getToken() { return session?.access_token; }
         function authHeaders() {
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            };
+            return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` };
         }
 
+        // ===== INIT =====
         async function init() {
             try {
                 const sessionStr = localStorage.getItem('cinq_session');
@@ -1656,87 +1620,580 @@
                 session = JSON.parse(sessionStr);
                 user = JSON.parse(userStr);
 
-                const userNameEl = document.getElementById('user-name');
-                if (userNameEl) {
-                    userNameEl.textContent = user.email?.split('@')[0] || 'User';
-                }
+                // Setup UI
+                const initial = (user.email || '?')[0].toUpperCase();
+                document.getElementById('header-avatar-initial').textContent = initial;
+                document.getElementById('composer-avatar').textContent = initial;
+                document.getElementById('composer-user').textContent = user.email?.split('@')[0] || 'Toi';
+                document.getElementById('profile-avatar-initial').textContent = initial;
+                document.getElementById('profile-name').textContent = user.email?.split('@')[0] || 'Utilisateur';
 
-                const isNewUser = localStorage.getItem('cinq_new_user');
-                if (isNewUser === 'true') showOnboarding();
-
-                await loadContacts();
-                await loadProfile();
+                setupComposer();
+                setupChatInput();
+                
+                // Load data
+                await Promise.all([loadProfile(), loadContacts(), loadPosts()]);
                 startPolling();
+                initPushNotifications();
+                
             } catch (e) {
                 console.error('Init error:', e);
-                alert('Erreur de chargement: ' + e.message);
+                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger l\'app' });
             }
         }
 
-        // ===== ONBOARDING =====
-        function showOnboarding() {
-            document.getElementById('onboarding-overlay').classList.add('open');
-            currentOnboardingStep = 1;
-            showOnboardingStep(1);
-            animateDemoSlots();
-        }
-
-        function showOnboardingStep(step) {
-            for (let i = 1; i <= totalOnboardingSteps; i++) {
-                const stepEl = document.getElementById(`onboarding-step-${i}`);
-                if (stepEl) stepEl.classList.remove('active');
+        // ===== PROFILE =====
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (data.profile) {
+                    const name = data.profile.display_name || user?.email?.split('@')[0] || 'Utilisateur';
+                    const initial = name.charAt(0).toUpperCase();
+                    
+                    document.getElementById('profile-display-name').value = data.profile.display_name || '';
+                    document.getElementById('profile-bio').value = data.profile.bio || '';
+                    document.getElementById('profile-name').textContent = name;
+                    document.getElementById('profile-bio-display').textContent = data.profile.bio || '';
+                    
+                    // Update all avatars
+                    updateAllAvatars(data.profile.avatar_url, initial);
+                }
+            } catch (e) {
+                console.error('Load profile error:', e);
             }
-            const currentStepEl = document.getElementById(`onboarding-step-${step}`);
-            if (currentStepEl) currentStepEl.classList.add('active');
         }
-
-        function nextOnboardingStep() {
-            if (currentOnboardingStep < totalOnboardingSteps) {
-                currentOnboardingStep++;
-                showOnboardingStep(currentOnboardingStep);
-            }
-        }
-
-        function skipOnboarding() { finishOnboarding(); }
-
-        function finishOnboarding() {
-            localStorage.removeItem('cinq_new_user');
-            const overlay = document.getElementById('onboarding-overlay');
-            overlay.style.transition = 'opacity 0.5s';
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.classList.remove('open');
-                overlay.style.opacity = '';
-                overlay.style.transition = '';
-                showToast({
-                    type: 'success',
-                    title: 'Bienvenue ! 🎉',
-                    message: 'Commence par ajouter ton premier contact'
-                });
-            }, 500);
-        }
-
-        function animateDemoSlots() {
-            const slots = document.querySelectorAll('#demo-slots .onboarding-demo-slot');
-            if (slots.length === 0) return;
+        
+        function updateAllAvatars(avatarUrl, initial) {
+            const avatarEls = [
+                { el: document.getElementById('header-avatar'), initEl: document.getElementById('header-avatar-initial') },
+                { el: document.getElementById('profile-avatar'), initEl: document.getElementById('profile-avatar-initial') },
+                { el: document.getElementById('composer-avatar'), initEl: null }
+            ];
             
-            let i = 0;
-            const interval = setInterval(() => {
-                slots.forEach(s => s.classList.remove('highlight'));
-                if (slots[i]) slots[i].classList.add('highlight');
-                i = (i + 1) % slots.length;
-            }, 800);
-            
-            const overlay = document.getElementById('onboarding-overlay');
-            const observer = new MutationObserver(() => {
-                if (!overlay.classList.contains('open')) {
-                    clearInterval(interval);
-                    observer.disconnect();
+            avatarEls.forEach(({ el, initEl }) => {
+                if (!el) return;
+                if (avatarUrl) {
+                    if (initEl) initEl.style.display = 'none';
+                    let img = el.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        el.appendChild(img);
+                    }
+                    img.src = avatarUrl;
+                    img.alt = 'Avatar';
+                } else {
+                    const img = el.querySelector('img');
+                    if (img) img.remove();
+                    if (initEl) {
+                        initEl.style.display = '';
+                        initEl.textContent = initial;
+                    } else {
+                        el.textContent = initial;
+                    }
                 }
             });
-            observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+        }
+        
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                showToast({ type: 'error', title: 'Fichier trop gros', message: 'Max 2Mo' });
+                return;
+            }
+            
+            showToast({ type: 'info', title: 'Upload en cours...' });
+            
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                const res = await fetch(`${API_URL}/upload-avatar`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ image: base64, contentType: file.type })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur upload');
+                
+                const name = document.getElementById('profile-display-name').value || user?.email?.split('@')[0] || 'U';
+                updateAllAvatars(data.avatarUrl, name.charAt(0).toUpperCase());
+                showToast({ type: 'success', title: 'Photo mise à jour !' });
+            } catch (e) {
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            }
+            
+            input.value = '';
         }
 
+        async function saveProfile() {
+            const btn = document.getElementById('save-profile-btn');
+            const displayName = document.getElementById('profile-display-name').value.trim();
+            const bio = document.getElementById('profile-bio').value.trim();
+            
+            btn.disabled = true;
+            btn.textContent = 'Enregistrement...';
+            
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ display_name: displayName || null, bio: bio || null })
+                });
+                
+                if (!res.ok) throw new Error((await res.json()).error || 'Erreur');
+                
+                document.getElementById('profile-name').textContent = displayName || user?.email?.split('@')[0] || 'Utilisateur';
+                document.getElementById('profile-bio-display').textContent = bio || '';
+                showToast({ type: 'success', title: 'Profil mis à jour !' });
+            } catch (e) {
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Enregistrer';
+            }
+        }
+
+        // ===== POSTS (FEED) =====
+        function setupComposer() {
+            const textarea = document.getElementById('post-content');
+            const charCount = document.getElementById('char-count');
+            const postBtn = document.getElementById('post-btn');
+            
+            textarea.addEventListener('input', () => {
+                const len = textarea.value.length;
+                charCount.textContent = `${len}/1000`;
+                charCount.classList.remove('warning', 'error');
+                if (len > 900) charCount.classList.add('error');
+                else if (len > 700) charCount.classList.add('warning');
+                postBtn.disabled = len === 0 || len > 1000;
+            });
+            
+            textarea.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!postBtn.disabled) submitPost();
+                }
+            });
+        }
+        
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showToast({ type: 'error', message: 'Format non supporté' });
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showToast({ type: 'error', message: 'Image trop grande (max 5 Mo)' });
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                showImagePreview(e.target.result);
+                await uploadImage(e.target.result, file.type);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function uploadImage(base64Data, contentType) {
+            const progress = document.getElementById('upload-progress');
+            progress.style.display = 'block';
+            
+            try {
+                const res = await fetch(`${API_URL}/upload-image`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ image: base64Data, contentType })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur upload');
+                
+                currentImageUrl = data.url;
+                showToast({ type: 'success', message: '📷 Image prête !' });
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+                removeImage();
+            } finally {
+                progress.style.display = 'none';
+            }
+        }
+        
+        function showImagePreview(url) {
+            const preview = document.getElementById('image-preview');
+            const img = document.getElementById('preview-img');
+            img.src = url;
+            img.onload = () => preview.classList.add('visible');
+            img.onerror = () => preview.classList.remove('visible');
+        }
+        
+        function removeImage() {
+            document.getElementById('image-preview').classList.remove('visible');
+            document.getElementById('preview-img').src = '';
+            document.getElementById('file-input').value = '';
+            currentImageUrl = null;
+        }
+
+        async function submitPost() {
+            const content = document.getElementById('post-content').value.trim();
+            if (!content) return;
+            
+            const postBtn = document.getElementById('post-btn');
+            postBtn.disabled = true;
+            postBtn.textContent = '...';
+            
+            try {
+                const body = { content };
+                if (currentImageUrl) body.image_url = currentImageUrl;
+                
+                const res = await fetch(`${API_URL}/posts`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur');
+                
+                posts.unshift(data.post);
+                renderPosts();
+                
+                document.getElementById('post-content').value = '';
+                document.getElementById('char-count').textContent = '0/1000';
+                removeImage();
+                
+                showToast({ type: 'success', message: 'Posté ! 🎉' });
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            } finally {
+                postBtn.disabled = false;
+                postBtn.textContent = 'Poster';
+            }
+        }
+
+        async function loadPosts() {
+            try {
+                const res = await fetch(`${API_URL}/posts`, { headers: authHeaders() });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur');
+                posts = data.posts || [];
+                renderPosts();
+            } catch (e) {
+                document.getElementById('posts-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😢</div>
+                        <div class="empty-state-title">Erreur de chargement</div>
+                        <div style="color:var(--color-text-muted)">${e.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('posts-list');
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-title">Rien ici pour l'instant</div>
+                        <div style="color:var(--color-text-muted);max-width:300px;margin:0 auto;">
+                            Sois le premier à poster quelque chose, ou ajoute des contacts pour voir leur feed !
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = posts.map(post => {
+                const author = post.author || {};
+                const isOwn = post.user_id === user.id;
+                const avatarUrl = author.avatar_url;
+                const initial = (author.display_name || author.email || '?')[0].toUpperCase();
+                const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
+                const time = formatTime(post.created_at);
+                
+                const avatarHtml = avatarUrl 
+                    ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(displayName)}">`
+                    : initial;
+                
+                const imageHtml = post.image_url ? `
+                    <div class="post-image">
+                        <img src="${escapeHtml(post.image_url)}" alt="Image" onclick="openImageModal('${escapeHtml(post.image_url)}')">
+                    </div>
+                ` : '';
+                
+                const menuHtml = isOwn ? `
+                    <button class="post-menu-btn" onclick="togglePostMenu('${post.id}')">⋮</button>
+                    <div class="post-menu" id="menu-${post.id}">
+                        <button class="post-menu-item" onclick="deletePost('${post.id}')">🗑️ Supprimer</button>
+                    </div>
+                ` : '';
+                
+                return `
+                    <article class="post-card">
+                        <div class="post-header">
+                            <div class="post-author">
+                                <div class="post-avatar ${isOwn ? 'own' : ''}">${avatarHtml}</div>
+                                <div>
+                                    <span class="post-author-name">
+                                        ${escapeHtml(displayName)}
+                                        ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
+                                    </span>
+                                    <div class="post-time">${time}</div>
+                                </div>
+                            </div>
+                            ${menuHtml}
+                        </div>
+                        <div class="post-content">${escapeHtml(post.content)}</div>
+                        ${imageHtml}
+                    </article>
+                `;
+            }).join('');
+        }
+        
+        function togglePostMenu(postId) {
+            document.querySelectorAll('.post-menu.open').forEach(m => {
+                if (m.id !== `menu-${postId}`) m.classList.remove('open');
+            });
+            document.getElementById(`menu-${postId}`).classList.toggle('open');
+        }
+        
+        async function deletePost(postId) {
+            if (!confirm('Supprimer ce post ?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/posts?id=${postId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                if (!res.ok) throw new Error((await res.json()).error || 'Erreur');
+                posts = posts.filter(p => p.id !== postId);
+                renderPosts();
+                showToast({ type: 'success', message: 'Post supprimé' });
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        function openImageModal(url) {
+            event.stopPropagation();
+            document.getElementById('modal-image').src = url;
+            document.getElementById('image-modal').classList.add('open');
+        }
+        
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('open');
+        }
+
+        // ===== CONTACTS =====
+        async function loadContacts() {
+            try {
+                const res = await fetch(`${API_URL}/contacts`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (res.status === 401) { logout(); return; }
+                
+                contacts = data.contacts || [];
+                
+                for (const contact of contacts) {
+                    if (!lastMessageIds[contact.contact_user_id]) {
+                        try {
+                            const msgRes = await fetch(`${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`, { headers: authHeaders() });
+                            const msgData = await msgRes.json();
+                            if (msgData.messages?.length > 0) {
+                                lastMessageIds[contact.contact_user_id] = msgData.messages[msgData.messages.length - 1].id;
+                            }
+                        } catch (e) {}
+                    }
+                }
+                
+                renderContacts();
+            } catch (e) {
+                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger les contacts' });
+            }
+        }
+
+        function renderContacts() {
+            const grid = document.getElementById('contacts-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const contact = contacts[i];
+                const slot = document.createElement('div');
+                slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
+                slot.tabIndex = 0;
+                
+                if (contact) {
+                    const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                    const initial = name.charAt(0).toUpperCase();
+                    const avatarUrl = contact.contact?.avatar_url;
+                    const unread = unreadCounts[contact.contact_user_id] || 0;
+                    
+                    const avatarContent = avatarUrl 
+                        ? `<img src="${avatarUrl}" alt="${name}">` 
+                        : initial;
+                    
+                    slot.innerHTML = `
+                        <div class="contact-avatar-slot">${avatarContent}</div>
+                        <div class="contact-name">${name}</div>
+                        ${unread > 0 ? `<div class="unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
+                    `;
+                    slot.onclick = () => openChat(contact);
+                } else {
+                    slot.innerHTML = `<span class="empty-plus">+</span>`;
+                    slot.onclick = () => openAddContactModal();
+                }
+                
+                grid.appendChild(slot);
+            }
+
+            document.getElementById('contact-count').textContent = `${contacts.length}/5`;
+        }
+
+        // ===== CHAT =====
+        function setupChatInput() {
+            const input = document.getElementById('chat-input');
+            const btn = document.getElementById('send-btn');
+            
+            input.addEventListener('input', () => {
+                btn.disabled = !input.value.trim();
+            });
+            
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+        
+        function openChat(contact) {
+            currentChatContact = contact;
+            unreadCounts[contact.contact_user_id] = 0;
+            renderContacts();
+            
+            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
+            const avatarUrl = contact.contact?.avatar_url;
+            const initial = name.charAt(0).toUpperCase();
+            
+            document.getElementById('chat-contact-name').textContent = name;
+            
+            const chatAvatar = document.getElementById('chat-contact-avatar');
+            chatAvatar.innerHTML = avatarUrl 
+                ? `<img src="${avatarUrl}" alt="${name}">`
+                : initial;
+            
+            document.getElementById('chat-panel').classList.add('open');
+            document.getElementById('chat-overlay').classList.add('open');
+            document.getElementById('chat-input').focus();
+            
+            loadMessages();
+            messagePollingInterval = setInterval(loadMessages, 3000);
+        }
+
+        function closeChat() {
+            document.getElementById('chat-panel').classList.remove('open');
+            document.getElementById('chat-overlay').classList.remove('open');
+            currentChatContact = null;
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+                messagePollingInterval = null;
+            }
+        }
+
+        async function loadMessages() {
+            if (!currentChatContact) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/messages?contact_id=${currentChatContact.contact_user_id}`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                const messages = data.messages || [];
+                if (messages.length > 0) {
+                    lastMessageIds[currentChatContact.contact_user_id] = messages[messages.length - 1].id;
+                }
+                
+                renderMessages(messages);
+            } catch (e) {}
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('chat-messages');
+            const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+            
+            container.innerHTML = messages.map(msg => {
+                const isSent = msg.sender_id === user.id;
+                if (msg.is_ping) {
+                    return `<div class="chat-message ping">👋</div>`;
+                }
+                return `<div class="chat-message ${isSent ? 'sent' : 'received'}">${escapeHtml(msg.content)}</div>`;
+            }).join('');
+
+            if (wasAtBottom) container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const content = input.value.trim();
+            if (!content || !currentChatContact) return;
+
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+
+            try {
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ contact_id: currentChatContact.contact_user_id, content })
+                });
+                input.value = '';
+                loadMessages();
+            } catch (e) {
+                showToast({ type: 'error', message: 'Message non envoyé' });
+            } finally {
+                btn.disabled = !input.value.trim();
+            }
+        }
+
+        async function sendPing() {
+            if (!currentChatContact) return;
+            
+            const btn = document.querySelector('.ping-btn');
+            btn.style.transform = 'scale(0.8)';
+            
+            try {
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ contact_id: currentChatContact.contact_user_id, is_ping: true })
+                });
+                loadMessages();
+            } catch (e) {
+                showToast({ type: 'error', message: 'Ping non envoyé' });
+            } finally {
+                setTimeout(() => btn.style.transform = '', 200);
+            }
+        }
+
+        // ===== POLLING =====
         function startPolling() {
             contactPollingInterval = setInterval(checkForNewMessages, 10000);
         }
@@ -1749,13 +2206,10 @@
         async function checkForNewMessages() {
             for (const contact of contacts) {
                 try {
-                    const res = await fetch(
-                        `${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`,
-                        { headers: authHeaders() }
-                    );
+                    const res = await fetch(`${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`, { headers: authHeaders() });
                     const data = await res.json();
                     
-                    if (data.messages && data.messages.length > 0) {
+                    if (data.messages?.length > 0) {
                         const latestMsg = data.messages[data.messages.length - 1];
                         const lastKnown = lastMessageIds[contact.contact_user_id];
                         
@@ -1773,305 +2227,43 @@
                                     message: latestMsg.is_ping ? '👋' : latestMsg.content.substring(0, 50),
                                     onClick: () => openChat(contact)
                                 });
-                                
-                                playNotificationSound();
                             }
                         }
                     }
-                } catch (e) {
-                    console.error('Poll error:', e);
-                }
-            }
-        }
-        
-        function playNotificationSound() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = 800;
-                osc.type = 'sine';
-                gain.gain.value = 0.1;
-                osc.start();
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                osc.stop(ctx.currentTime + 0.2);
-            } catch (e) {}
-        }
-
-        // ===== CONTACTS =====
-        async function loadContacts() {
-            try {
-                const res = await fetch(`${API_URL}/contacts`, { headers: authHeaders() });
-                const data = await res.json();
-                
-                if (res.status === 401) { logout(); return; }
-
-                contacts = data.contacts || [];
-                
-                for (const contact of contacts) {
-                    if (!lastMessageIds[contact.contact_user_id]) {
-                        try {
-                            const msgRes = await fetch(
-                                `${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`,
-                                { headers: authHeaders() }
-                            );
-                            const msgData = await msgRes.json();
-                            if (msgData.messages && msgData.messages.length > 0) {
-                                lastMessageIds[contact.contact_user_id] = msgData.messages[msgData.messages.length - 1].id;
-                            }
-                        } catch (e) {}
-                    }
-                }
-                
-                renderContacts();
-            } catch (e) {
-                console.error('Load contacts error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger les contacts' });
+                } catch (e) {}
             }
         }
 
-        function renderContacts() {
-            const grid = document.getElementById('contacts-grid');
-            grid.innerHTML = '';
-
-            for (let i = 0; i < 5; i++) {
-                const contact = contacts[i];
-                const slot = document.createElement('div');
-                slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
-                slot.setAttribute('role', 'listitem');
-                slot.setAttribute('tabindex', '0');
-                
-                if (contact) {
-                    const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
-                    const initial = name.charAt(0).toUpperCase();
-                    const avatarUrl = contact.contact?.avatar_url;
-                    const unread = unreadCounts[contact.contact_user_id] || 0;
-                    
-                    const avatarContent = avatarUrl 
-                        ? `<img src="${avatarUrl}" alt="${name}" onerror="this.parentElement.innerHTML='${initial}'">`
-                        : initial;
-                    
-                    slot.setAttribute('aria-label', `Contact ${name}${unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : ''}. Cliquer pour ouvrir la conversation.`);
-                    slot.innerHTML = `
-                        <div class="contact-avatar" aria-hidden="true">${avatarContent}</div>
-                        <div class="contact-name">${name}</div>
-                        ${unread > 0 ? `<div class="unread-badge" aria-label="${unread} messages non lus">${unread > 9 ? '9+' : unread}</div>` : ''}
-                    `;
-                    slot.onclick = () => openChat(contact);
-                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(contact); } };
-                } else {
-                    slot.setAttribute('aria-label', `Emplacement ${i + 1} vide. Cliquer pour ajouter un contact.`);
-                    slot.innerHTML = `<span class="empty-plus" aria-hidden="true">+</span>`;
-                    slot.addEventListener('click', (e) => { e.stopPropagation(); openAddContactModal(); });
-                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAddContactModal(); } };
-                }
-                
-                grid.appendChild(slot);
-            }
-
-            document.getElementById('contact-count').textContent = `${contacts.length}/5`;
-        }
-
-        // ===== CHAT =====
-        function openChat(contact) {
-            currentChatContact = contact;
-            unreadCounts[contact.contact_user_id] = 0;
-            renderContacts();
-            
-            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
-            const avatarUrl = contact.contact?.avatar_url;
-            const initial = name.charAt(0).toUpperCase();
-            
-            document.getElementById('chat-contact-name').textContent = name;
-            
-            const chatAvatar = document.getElementById('chat-contact-avatar');
-            if (avatarUrl) {
-                chatAvatar.innerHTML = `<img src="${avatarUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='${initial}'">`;
-            } else {
-                chatAvatar.innerHTML = initial;
-            }
-            
-            document.getElementById('chat-panel').classList.add('open');
-            document.getElementById('chat-overlay').classList.add('open');
-            document.getElementById('chat-input').focus();
-            
-            loadMessages();
-            messagePollingInterval = setInterval(loadMessages, 3000);
-        }
-
-        function closeChat() {
-            document.getElementById('chat-panel').classList.remove('open');
-            document.getElementById('chat-overlay').classList.remove('open');
-            currentChatContact = null;
-            
-            if (messagePollingInterval) {
-                clearInterval(messagePollingInterval);
-                messagePollingInterval = null;
-            }
-        }
-
-        async function loadMessages() {
-            if (!currentChatContact) return;
-            
-            try {
-                const res = await fetch(
-                    `${API_URL}/messages?contact_id=${currentChatContact.contact_user_id}`,
-                    { headers: authHeaders() }
-                );
-                const data = await res.json();
-                
-                const messages = data.messages || [];
-                if (messages.length > 0) {
-                    lastMessageIds[currentChatContact.contact_user_id] = messages[messages.length - 1].id;
-                }
-                
-                renderMessages(messages);
-            } catch (e) {
-                console.error('Load messages error:', e);
-            }
-        }
-
-        function renderMessages(messages) {
-            const container = document.getElementById('chat-messages');
-            const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
-            const previousCount = container.children.length;
-            
-            container.innerHTML = '';
-
-            messages.forEach((msg, i) => {
-                const div = document.createElement('div');
-                const isSent = msg.sender_id === user.id;
-                div.className = `chat-message ${isSent ? 'sent' : 'received'} ${msg.is_ping ? 'ping' : ''}`;
-                
-                if (msg.is_ping) {
-                    div.textContent = '👋';
-                } else {
-                    div.textContent = msg.content;
-                }
-                
-                if (i < previousCount) div.style.animation = 'none';
-                container.appendChild(div);
-            });
-
-            if (wasAtBottom) container.scrollTop = container.scrollHeight;
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const content = input.value.trim();
-            if (!content || !currentChatContact) return;
-
-            const btn = document.getElementById('send-btn');
-            btn.disabled = true;
-
-            try {
-                const res = await fetch(`${API_URL}/messages`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        contact_id: currentChatContact.contact_user_id,
-                        content
-                    })
-                });
-                
-                if (!res.ok) throw new Error('Failed to send');
-                
-                input.value = '';
-                updateSendButton();
-                loadMessages();
-            } catch (e) {
-                console.error('Send error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: 'Message non envoyé' });
-            } finally {
-                btn.disabled = !input.value.trim();
-            }
-        }
-
-        async function sendPing() {
-            if (!currentChatContact) return;
-            
-            const btn = document.querySelector('.ping-btn');
-            btn.style.transform = 'scale(0.8)';
-            
-            try {
-                await fetch(`${API_URL}/messages`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        contact_id: currentChatContact.contact_user_id,
-                        is_ping: true
-                    })
-                });
-                loadMessages();
-            } catch (e) {
-                console.error('Ping error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: 'Ping non envoyé' });
-            } finally {
-                setTimeout(() => btn.style.transform = '', 200);
-            }
-        }
-        
-        function updateSendButton() {
-            const input = document.getElementById('chat-input');
-            const btn = document.getElementById('send-btn');
-            btn.disabled = !input.value.trim();
-        }
-
-        const chatInput = document.getElementById('chat-input');
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-        chatInput.addEventListener('input', updateSendButton);
-
-        // ===== GIFT MODAL =====
+        // ===== MODALS =====
         function openGiftModal() {
             document.getElementById('gift-modal').classList.add('open');
-            document.getElementById('gift-content').innerHTML = `
-                <button class="copy-btn" style="width: 100%;" onclick="createGift()">
-                    Générer un code
-                </button>
-            `;
+            document.getElementById('gift-content').innerHTML = `<button class="save-btn" style="width:100%;" onclick="createGift()">Générer un code</button>`;
         }
-
+        
         function closeGiftModal() {
             document.getElementById('gift-modal').classList.remove('open');
         }
 
         async function createGift() {
             const contentEl = document.getElementById('gift-content');
-            contentEl.innerHTML = '<div class="loading-spinner" style="margin: 2rem auto;"></div>';
+            contentEl.innerHTML = '<div class="loading-spinner" style="margin:var(--space-8) auto;"></div>';
             
             try {
-                const res = await fetch(`${API_URL}/gift?action=create`, {
-                    method: 'POST',
-                    headers: authHeaders()
-                });
+                const res = await fetch(`${API_URL}/gift?action=create`, { method: 'POST', headers: authHeaders() });
                 const data = await res.json();
-
                 if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 contentEl.innerHTML = `
                     <div class="gift-code-display">
                         <div class="gift-code">${data.gift.code}</div>
                     </div>
-                    <button class="copy-btn" style="width: 100%;" onclick="copyGift('${data.gift.shareUrl}')">
-                        📋 Copier le lien
-                    </button>
-                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; text-align: center;">
-                        Valable 30 jours
-                    </p>
+                    <button class="save-btn" style="width:100%;" onclick="copyGift('${data.gift.shareUrl}')">📋 Copier le lien</button>
+                    <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-4);text-align:center;">Valable 30 jours</p>
                 `;
             } catch (e) {
                 contentEl.innerHTML = `
-                    <p style="color: var(--color-error); text-align: center;">${e.message}</p>
-                    <button class="copy-btn" style="width: 100%; margin-top: 1rem;" onclick="createGift()">
-                        Réessayer
-                    </button>
+                    <p style="color:var(--color-error);text-align:center;">${e.message}</p>
+                    <button class="save-btn" style="width:100%;margin-top:var(--space-4);" onclick="createGift()">Réessayer</button>
                 `;
             }
         }
@@ -2079,22 +2271,19 @@
         async function copyGift(url) {
             try {
                 await navigator.clipboard.writeText(url);
-                showToast({ type: 'success', title: 'Copié !', message: 'Lien copié dans le presse-papier' });
+                showToast({ type: 'success', title: 'Copié !', message: 'Lien copié' });
             } catch (e) {
-                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de copier' });
+                showToast({ type: 'error', message: 'Impossible de copier' });
             }
         }
 
-        // ===== ADD CONTACT MODAL =====
         function openAddContactModal() {
-            const modal = document.getElementById('add-contact-modal');
-            if (!modal) { alert('Erreur: modal non trouvé'); return; }
-            modal.classList.add('open');
+            document.getElementById('add-contact-modal').classList.add('open');
             document.getElementById('contact-id-input').value = '';
             document.getElementById('add-contact-error').style.display = 'none';
             document.getElementById('my-id').textContent = user?.id || 'Non disponible';
         }
-
+        
         function closeAddContactModal() {
             document.getElementById('add-contact-modal').classList.remove('open');
         }
@@ -2128,7 +2317,6 @@
                     body: JSON.stringify({ contactId })
                 });
                 const data = await res.json();
-
                 if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 closeAddContactModal();
@@ -2150,206 +2338,16 @@
                 textEl.textContent = 'Copié !';
                 setTimeout(() => textEl.textContent = 'Copier mon ID', 2000);
             } catch (e) {
-                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de copier' });
+                showToast({ type: 'error', message: 'Impossible de copier' });
             }
         }
 
-        // ===== LOGOUT =====
-        function logout() {
-            stopPolling();
-            localStorage.removeItem('cinq_session');
-            localStorage.removeItem('cinq_user');
-            window.location.href = '/login.html';
-        }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (currentChatContact) closeChat();
-                else if (document.getElementById('gift-modal').classList.contains('open')) closeGiftModal();
-                else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
-                else if (document.getElementById('delete-account-modal').classList.contains('open')) closeDeleteAccountModal();
-            }
-        });
-
-        // ===== PROFILE MANAGEMENT =====
-        async function loadProfile() {
-            try {
-                const res = await fetch(`${API_URL}/user-profile`, { headers: authHeaders() });
-                const data = await res.json();
-                
-                if (data.profile) {
-                    document.getElementById('profile-display-name').value = data.profile.display_name || '';
-                    document.getElementById('profile-bio').value = data.profile.bio || '';
-                    if (data.profile.display_name) {
-                        document.getElementById('user-name').textContent = data.profile.display_name;
-                    }
-                    // Avatar
-                    updateAvatarPreview(data.profile.avatar_url, data.profile.display_name || user?.email);
-                }
-            } catch (e) {
-                console.error('Load profile error:', e);
-            }
-        }
-        
-        function updateAvatarPreview(avatarUrl, name) {
-            const preview = document.getElementById('avatar-preview');
-            const initial = document.getElementById('avatar-initial');
-            const removeBtn = document.getElementById('remove-avatar-btn');
-            const firstChar = (name || '?').charAt(0).toUpperCase();
-            
-            if (avatarUrl) {
-                preview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>`;
-                removeBtn.style.display = 'inline-block';
-            } else {
-                preview.innerHTML = `<span id="avatar-initial">${firstChar}</span><div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>`;
-                removeBtn.style.display = 'none';
-            }
-        }
-        
-        async function uploadAvatar(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            if (file.size > 2 * 1024 * 1024) {
-                showToast({ type: 'error', title: 'Fichier trop gros', message: 'Max 2Mo' });
-                return;
-            }
-            
-            if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
-                showToast({ type: 'error', title: 'Format non supporté', message: 'JPG, PNG, GIF ou WebP' });
-                return;
-            }
-            
-            showToast({ type: 'info', title: 'Upload en cours...' });
-            
-            try {
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                
-                const res = await fetch(`${API_URL}/upload-avatar`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        image: base64,
-                        contentType: file.type
-                    })
-                });
-                
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Erreur upload');
-                
-                updateAvatarPreview(data.avatarUrl, document.getElementById('profile-display-name').value || user?.email);
-                showToast({ type: 'success', title: 'Photo mise à jour !' });
-            } catch (e) {
-                console.error('Upload error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
-            }
-            
-            input.value = '';
-        }
-        
-        async function removeAvatar() {
-            if (!confirm('Supprimer ta photo de profil ?')) return;
-            
-            try {
-                const res = await fetch(`${API_URL}/upload-avatar`, {
-                    method: 'DELETE',
-                    headers: authHeaders()
-                });
-                
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Erreur');
-                }
-                
-                updateAvatarPreview(null, document.getElementById('profile-display-name').value || user?.email);
-                showToast({ type: 'success', title: 'Photo supprimée' });
-            } catch (e) {
-                console.error('Remove avatar error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
-            }
-        }
-
-        async function saveProfile() {
-            const btn = document.getElementById('save-profile-btn');
-            const displayName = document.getElementById('profile-display-name').value.trim();
-            const bio = document.getElementById('profile-bio').value.trim();
-            
-            btn.disabled = true;
-            btn.textContent = 'Enregistrement...';
-            
-            try {
-                const res = await fetch(`${API_URL}/user-profile`, {
-                    method: 'PUT',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        display_name: displayName || null,
-                        bio: bio || null
-                    })
-                });
-                
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Erreur');
-                
-                showToast({ type: 'success', title: 'Profil mis à jour !', message: 'Tes modifications ont été enregistrées' });
-                
-                if (displayName) {
-                    document.getElementById('user-name').textContent = displayName;
-                }
-            } catch (e) {
-                console.error('Save profile error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '💾 Enregistrer';
-            }
-        }
-
-        // ===== DATA EXPORT (GDPR) =====
-        async function exportData() {
-            const btn = document.getElementById('export-data-btn');
-            const titleEl = btn.querySelector('.account-btn-title');
-            btn.disabled = true;
-            titleEl.textContent = 'Export en cours...';
-            
-            try {
-                const res = await fetch(`${API_URL}/user-profile?action=export`, { headers: authHeaders() });
-                if (!res.ok) throw new Error('Erreur lors de l\'export');
-                
-                const data = await res.json();
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cinq-data-export-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showToast({ type: 'success', title: 'Export terminé !', message: 'Tes données ont été téléchargées' });
-            } catch (e) {
-                console.error('Export error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
-            } finally {
-                btn.disabled = false;
-                titleEl.textContent = 'Exporter mes données';
-            }
-        }
-
-        // ===== DELETE ACCOUNT =====
         function openDeleteAccountModal() {
             document.getElementById('delete-account-modal').classList.add('open');
             document.getElementById('delete-confirmation-input').value = '';
             document.getElementById('delete-account-error').style.display = 'none';
         }
-
+        
         function closeDeleteAccountModal() {
             document.getElementById('delete-account-modal').classList.remove('open');
         }
@@ -2376,24 +2374,96 @@
                     body: JSON.stringify({ confirmation: 'SUPPRIMER' })
                 });
                 
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Erreur');
+                if (!res.ok) throw new Error((await res.json()).error || 'Erreur');
                 
                 stopPolling();
                 localStorage.removeItem('cinq_session');
                 localStorage.removeItem('cinq_user');
                 
                 showToast({ type: 'success', title: 'Compte supprimé', message: 'Adieu ! 👋', duration: 3000 });
-                
                 setTimeout(() => { window.location.href = '/'; }, 2000);
             } catch (e) {
-                console.error('Delete account error:', e);
                 errorEl.textContent = e.message;
                 errorEl.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Supprimer définitivement';
             }
         }
+
+        async function exportData() {
+            const btn = document.getElementById('export-data-btn');
+            const titleEl = btn.querySelector('.settings-btn-title');
+            btn.disabled = true;
+            titleEl.textContent = 'Export en cours...';
+            
+            try {
+                const res = await fetch(`${API_URL}/user-profile?action=export`, { headers: authHeaders() });
+                if (!res.ok) throw new Error('Erreur lors de l\'export');
+                
+                const data = await res.json();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cinq-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast({ type: 'success', title: 'Export terminé !' });
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            } finally {
+                btn.disabled = false;
+                titleEl.textContent = 'Exporter mes données';
+            }
+        }
+
+        function logout() {
+            stopPolling();
+            localStorage.removeItem('cinq_session');
+            localStorage.removeItem('cinq_user');
+            window.location.href = '/login.html';
+        }
+
+        // ===== UTILS =====
+        function formatTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            
+            if (diff < 60) return 'À l\'instant';
+            if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
+            if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`;
+            if (diff < 604800) return `il y a ${Math.floor(diff / 86400)}j`;
+            
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // ===== KEYBOARD =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageModal();
+                if (currentChatContact) closeChat();
+                else if (document.getElementById('gift-modal').classList.contains('open')) closeGiftModal();
+                else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
+                else if (document.getElementById('delete-account-modal').classList.contains('open')) closeDeleteAccountModal();
+                document.querySelectorAll('.post-menu.open').forEach(m => m.classList.remove('open'));
+            }
+        });
+        
+        // Close menus on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
+                document.querySelectorAll('.post-menu.open').forEach(m => m.classList.remove('open'));
+            }
+        });
 
         // ===== PUSH NOTIFICATIONS =====
         const VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';
@@ -2406,9 +2476,7 @@
                 const existingSubscription = await registration.pushManager.getSubscription();
                 if (existingSubscription) return;
                 setTimeout(() => askForNotificationPermission(registration), 3000);
-            } catch (err) {
-                console.error('[Push] SW registration failed:', err);
-            }
+            } catch (err) {}
         }
 
         async function askForNotificationPermission(registration) {
@@ -2439,17 +2507,12 @@
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
-
-                const res = await fetch(`${API_URL}/push-subscribe`, {
+                await fetch(`${API_URL}/push-subscribe`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify({ subscription: subscription.toJSON() })
                 });
-
-                if (!res.ok) throw new Error('Subscribe failed');
-            } catch (err) {
-                console.error('[Push] Subscribe error:', err);
-            }
+            } catch (err) {}
         }
 
         function urlBase64ToUint8Array(base64String) {
@@ -2463,15 +2526,8 @@
             return outputArray;
         }
 
-        navigator.serviceWorker?.addEventListener('message', (event) => {
-            if (event.data?.type === 'NOTIFICATION_CLICKED') {
-                console.log('[Push] Notification clicked:', event.data);
-            }
-        });
-
         // ===== INIT =====
         init();
-        initPushNotifications();
     </script>
     
     <script src="/pwa-install.js" defer></script>
