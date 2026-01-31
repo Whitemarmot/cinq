@@ -1,0 +1,508 @@
+/**
+ * CINQ — WOW Effects
+ * ==================
+ * Signature visual identity
+ * Making Cinq MEMORABLE, not just "clean"
+ */
+
+/* ============================================
+   CSS CUSTOM PROPERTIES - WOW PALETTE
+   ============================================ */
+:root {
+  /* Signature Cinq Colors - More distinctive than generic coral */
+  --cinq-coral: #FF6B5B;
+  --cinq-coral-light: #FF8A7D;
+  --cinq-coral-glow: rgba(255, 107, 91, 0.5);
+  --cinq-coral-subtle: rgba(255, 107, 91, 0.08);
+  
+  /* Pentagon geometry */
+  --pentagon-angle: 72deg; /* 360/5 */
+  
+  /* Cursor */
+  --cursor-size: 20px;
+  --cursor-trail-size: 8px;
+}
+
+/* ============================================
+   CUSTOM CURSOR - Pentagon Trace
+   ============================================ */
+body {
+  cursor: none !important;
+}
+
+.cursor-dot,
+.cursor-outline {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--cinq-coral);
+  transition: transform 0.1s ease;
+}
+
+.cursor-outline {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--cinq-coral);
+  transition: all 0.15s ease-out;
+  opacity: 0.6;
+}
+
+/* Pentagon shape on hover */
+.cursor-outline.hovering {
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: cursorSpin 2s linear infinite;
+  width: 50px;
+  height: 50px;
+  opacity: 1;
+}
+
+@keyframes cursorSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Hide on touch devices */
+@media (hover: none) {
+  body { cursor: auto !important; }
+  .cursor-dot, .cursor-outline { display: none; }
+}
+
+/* ============================================
+   PENTAGON PATTERN BACKGROUND
+   ============================================ */
+.pentagon-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.pentagon-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23FF6B5B' stroke-width='0.5' opacity='0.08'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+  animation: patternFloat 20s linear infinite;
+}
+
+@keyframes patternFloat {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(60px, 60px); }
+}
+
+/* Light theme pentagon pattern */
+[data-theme="light"] .pentagon-bg::before,
+body:not([data-theme="dark"]) .pentagon-bg::before {
+  opacity: 1;
+}
+
+/* Dark theme - brighter pentagons */
+[data-theme="dark"] .pentagon-bg::before {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23FF6B5B' stroke-width='0.5' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   FLOATING PENTAGONS - Hero Decoration
+   ============================================ */
+.floating-pentagons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-pentagon {
+  position: absolute;
+  opacity: 0.15;
+  animation: float 15s ease-in-out infinite;
+}
+
+.floating-pentagon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.floating-pentagon:nth-child(1) {
+  width: 120px;
+  height: 120px;
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+  animation-duration: 18s;
+}
+
+.floating-pentagon:nth-child(2) {
+  width: 80px;
+  height: 80px;
+  top: 60%;
+  left: 10%;
+  animation-delay: -3s;
+  animation-duration: 15s;
+}
+
+.floating-pentagon:nth-child(3) {
+  width: 60px;
+  height: 60px;
+  top: 20%;
+  right: 10%;
+  animation-delay: -6s;
+  animation-duration: 20s;
+}
+
+.floating-pentagon:nth-child(4) {
+  width: 100px;
+  height: 100px;
+  top: 70%;
+  right: 5%;
+  animation-delay: -9s;
+  animation-duration: 17s;
+}
+
+.floating-pentagon:nth-child(5) {
+  width: 50px;
+  height: 50px;
+  top: 40%;
+  left: 50%;
+  animation-delay: -12s;
+  animation-duration: 22s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-20px) rotate(18deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(36deg);
+  }
+  75% {
+    transform: translateY(-30px) rotate(54deg);
+  }
+}
+
+/* ============================================
+   HERO "5" - GLOW EFFECT DRAMATIC
+   ============================================ */
+.hero-number-container {
+  position: relative;
+}
+
+.hero-number-container::before {
+  content: '5';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--cinq-coral);
+  filter: blur(30px);
+  opacity: 0.6;
+  animation: glowPulse 3s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    filter: blur(30px);
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    filter: blur(50px);
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* Ring glow animation */
+.hero-ring {
+  animation: ringPulse 4s ease-in-out infinite;
+}
+
+.hero-ring:nth-child(2) {
+  animation-delay: -1s;
+}
+
+.hero-ring:nth-child(3) {
+  animation-delay: -2s;
+}
+
+@keyframes ringPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.6;
+  }
+}
+
+/* ============================================
+   MICRO-INTERACTIONS - Satisfying Clicks
+   ============================================ */
+
+/* Button press effect */
+.btn, button, [role="button"], a.cta {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.btn::after, 
+button::after,
+[role="button"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+}
+
+.btn:active::after,
+button:active::after,
+[role="button"]:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 0;
+  transition: 0s;
+}
+
+/* Hover lift effect */
+.btn:hover,
+button:hover:not(:disabled),
+[role="button"]:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(255, 107, 91, 0.3);
+}
+
+.btn:active,
+button:active,
+[role="button"]:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* Card hover - 3D tilt effect */
+.card, .feature-card, [class*="card"] {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.card:hover, .feature-card:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 30px var(--cinq-coral-subtle);
+}
+
+/* Input focus glow */
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  box-shadow: 
+    0 0 0 3px var(--cinq-coral-subtle),
+    0 0 20px var(--cinq-coral-subtle) !important;
+  border-color: var(--cinq-coral) !important;
+}
+
+/* ============================================
+   PARALLAX HERO ELEMENTS
+   ============================================ */
+[data-parallax] {
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+[data-parallax="slow"] {
+  --parallax-speed: 0.3;
+}
+
+[data-parallax="medium"] {
+  --parallax-speed: 0.5;
+}
+
+[data-parallax="fast"] {
+  --parallax-speed: 0.8;
+}
+
+/* ============================================
+   TEXT REVEAL ANIMATION
+   ============================================ */
+.text-reveal {
+  overflow: hidden;
+}
+
+.text-reveal span {
+  display: inline-block;
+  transform: translateY(100%);
+  animation: textReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes textReveal {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Staggered text reveal */
+.text-reveal-stagger span:nth-child(1) { animation-delay: 0.1s; }
+.text-reveal-stagger span:nth-child(2) { animation-delay: 0.15s; }
+.text-reveal-stagger span:nth-child(3) { animation-delay: 0.2s; }
+.text-reveal-stagger span:nth-child(4) { animation-delay: 0.25s; }
+.text-reveal-stagger span:nth-child(5) { animation-delay: 0.3s; }
+
+/* ============================================
+   GRADIENT BORDER - Signature Element
+   ============================================ */
+.gradient-border {
+  position: relative;
+  background: transparent;
+  border: none !important;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--cinq-coral), var(--cinq-coral-light), #FFB199);
+  border-radius: inherit;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ============================================
+   NOISE TEXTURE OVERLAY
+   ============================================ */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* ============================================
+   MAGNETIC BUTTONS
+   ============================================ */
+.magnetic {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   SCROLL INDICATOR - Bouncing
+   ============================================ */
+.scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+/* ============================================
+   LOADING PENTAGON SPINNER
+   ============================================ */
+.pentagon-spinner {
+  width: 50px;
+  height: 50px;
+  animation: pentagonSpin 1.5s linear infinite;
+}
+
+.pentagon-spinner svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes pentagonSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   EASTER EGG: Konami Code Effect
+   ============================================ */
+.konami-active {
+  animation: rainbowBg 2s linear infinite;
+}
+
+@keyframes rainbowBg {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* ============================================
+   RESPECT USER PREFERENCES
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  body {
+    cursor: auto !important;
+  }
+  
+  .cursor-dot,
+  .cursor-outline,
+  .floating-pentagon,
+  .pentagon-bg::before {
+    display: none !important;
+  }
+}
