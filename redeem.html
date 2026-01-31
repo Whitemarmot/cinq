@@ -31,9 +31,8 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
-    <meta name="theme-color" content="#0a0a0b">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
     
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -42,14 +41,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cinq">
     
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.cinq.app https://*.netlify.app https://plausible.io; img-src 'self' data: https:;">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    <link rel="stylesheet" href="/css/a11y.min.css">
     
-    <!-- Theme initialization (before body to prevent flash) -->
+    <!-- Theme initialization -->
     <script>
         (function() {
             const saved = localStorage.getItem('cinq_theme');
@@ -66,193 +68,717 @@
             const next = current === 'light' ? 'dark' : 'light';
             html.setAttribute('data-theme', next);
             localStorage.setItem('cinq_theme', next);
+            
+            const meta = document.getElementById('theme-color-meta');
+            meta.content = next === 'light' ? '#f8f8fc' : '#0e0e12';
         }
     </script>
     
-    <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
+    <!-- Analytics -->
     <script defer src="/analytics.js"></script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Space Grotesk', sans-serif; }
-        
-        /* Background gradient - cohérent avec gift.html */
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        /* ===== LAYOUT ===== */
+        .redeem-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-5);
         }
         
-        /* Effet glow pour les éléments importants */
-        .glow {
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
-        }
-        .glow-success {
-            box-shadow: 0 0 60px rgba(34, 197, 94, 0.4);
+        @media (max-width: 380px) {
+            .redeem-container {
+                padding: var(--space-4);
+            }
         }
         
-        /* Animation des cercles décoratifs */
-        .circle {
-            animation: pulse 4s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-        }
-        
-        /* Animation de fade pour les transitions d'écran */
+        /* ===== SCREENS ===== */
         .screen {
-            animation: fadeIn 0.3s ease-out;
+            width: 100%;
+            max-width: 450px;
+            animation: screen-enter 0.35s var(--ease-out-expo);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        
+        @keyframes screen-enter {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Animation loader */
-        .loader-dot {
-            animation: loaderPulse 1.4s ease-in-out infinite;
+        .screen.hidden {
+            display: none;
         }
-        .loader-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loader-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes loaderPulse {
+        
+        /* ===== LOGO ===== */
+        .redeem-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-secondary);
+            box-shadow: var(--shadow-glow-sm);
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        .logo-circle:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-circle svg {
+            width: 44px;
+            height: 44px;
+            stroke: var(--color-brand);
+        }
+        
+        /* Success state */
+        .logo-circle.success {
+            border-color: var(--color-success);
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.3);
+            animation: success-pop 0.5s var(--ease-spring);
+        }
+        
+        @keyframes success-pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* ===== TITLES ===== */
+        .redeem-title {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: var(--space-3);
+            letter-spacing: -0.02em;
+        }
+        
+        .redeem-subtitle {
+            font-size: var(--text-base);
+            color: var(--color-text-muted);
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: var(--space-5);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            color: var(--color-text-primary);
+            font-size: var(--text-lg);
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 4px var(--color-brand-muted);
+        }
+        
+        .form-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .form-input.error {
+            border-color: var(--color-error);
+            box-shadow: 0 0 0 4px var(--color-error-muted);
+        }
+        
+        .form-input.valid {
+            border-color: var(--color-success);
+        }
+        
+        /* Code input specifics */
+        .code-input {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+        }
+        
+        .code-input::placeholder {
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        
+        /* Password input */
+        .password-field {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: var(--space-1);
+            transition: color 0.2s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .password-field .form-input {
+            padding-right: var(--space-12);
+        }
+        
+        /* Form hint */
+        .form-hint {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: var(--space-2);
+            text-align: center;
+        }
+        
+        /* Field error */
+        .field-error {
+            font-size: var(--text-xs);
+            color: var(--color-error);
+            margin-top: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-1);
+            animation: error-shake 0.4s ease-out;
+        }
+        
+        @keyframes error-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+        
+        .field-error.hidden {
+            display: none;
+        }
+        
+        /* Password strength */
+        .password-strength {
+            margin-top: var(--space-3);
+        }
+        
+        .strength-bar {
+            height: 4px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--space-1);
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+            border-radius: inherit;
+        }
+        
+        .strength-fill.weak { width: 25%; background: var(--color-error); }
+        .strength-fill.fair { width: 50%; background: var(--color-warning); }
+        .strength-fill.good { width: 75%; background: #22c55e; }
+        .strength-fill.strong { width: 100%; background: var(--color-success); }
+        
+        .strength-text {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            text-align: right;
+        }
+        
+        .strength-text.weak { color: var(--color-error); }
+        .strength-text.fair { color: var(--color-warning); }
+        .strength-text.good { color: #22c55e; }
+        .strength-text.strong { color: var(--color-success); }
+        
+        /* Terms checkbox */
+        .terms-group {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+        }
+        
+        .terms-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: var(--color-brand);
+            cursor: pointer;
+        }
+        
+        .terms-label {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            line-height: 1.5;
+        }
+        
+        .terms-label a {
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .terms-label a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== SUBMIT BUTTON ===== */
+        .submit-btn {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--cinq-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-xl);
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s var(--ease-spring);
+            box-shadow: var(--shadow-glow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .submit-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Loading state */
+        .loading-dots {
+            display: flex;
+            gap: var(--space-1);
+        }
+        
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: loading-pulse 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes loading-pulse {
             0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
             40% { transform: scale(1); opacity: 1; }
         }
         
-        /* Animation celebration */
-        @keyframes celebrate {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .celebrate {
-            animation: celebrate 0.5s ease-out;
-        }
-        
-        /* Input styling */
-        .code-input {
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-        .code-input::placeholder {
-            text-transform: none;
-            letter-spacing: normal;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .code-input:focus {
-            outline: none;
-            border-color: rgba(99, 102, 241, 0.8);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        .code-input.valid {
-            border-color: rgba(34, 197, 94, 0.8);
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
-        }
-        .code-input.invalid {
-            border-color: rgba(239, 68, 68, 0.8);
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        /* ===== CODE INFO BOX ===== */
+        .code-info {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        /* Email input styling */
-        .email-input:focus {
-            outline: none;
-            border-color: rgba(99, 102, 241, 0.8);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        .code-info-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
         }
         
-        /* Accessibilité: Focus visible */
-        button:focus-visible,
-        a:focus-visible,
-        input:focus-visible {
-            outline: 2px solid rgba(99, 102, 241, 0.8);
-            outline-offset: 2px;
-            border-radius: 0.5rem;
+        .code-info-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: var(--color-brand);
+            font-weight: 500;
         }
         
-        /* Accessibilité: Reduced motion */
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-6);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: var(--space-2);
+            margin-left: calc(-1 * var(--space-2));
+            border-radius: var(--radius-lg);
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            color: var(--color-text-primary);
+            background: var(--color-bg-tertiary);
+        }
+        
+        /* ===== SECONDARY LINKS ===== */
+        .secondary-link {
+            text-align: center;
+            margin-top: var(--space-6);
+        }
+        
+        .secondary-link a {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .secondary-link a:hover {
+            color: var(--color-brand);
+        }
+        
+        .secondary-link a span {
+            text-decoration: underline;
+        }
+        
+        /* ===== SUCCESS SCREEN ===== */
+        .success-title {
+            color: var(--color-success);
+        }
+        
+        .success-info {
+            background: var(--color-bg-tertiary);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+        
+        .success-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-2) 0;
+        }
+        
+        .success-info-row:not(:last-child) {
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .success-info-label {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+        
+        .success-info-value {
+            font-weight: 500;
+        }
+        
+        .success-info-value.highlight {
+            color: var(--color-success);
+        }
+        
+        /* Redirect notice */
+        .redirect-notice {
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-5);
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+        }
+        
+        .redirect-timer {
+            font-weight: 600;
+            color: var(--color-brand);
+        }
+        
+        /* Login prompt */
+        .login-prompt {
+            background: var(--color-brand-muted);
+            border: 1px solid rgba(255, 107, 74, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+            display: flex;
+            gap: var(--space-3);
+            align-items: flex-start;
+        }
+        
+        .login-prompt-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .login-prompt-title {
+            font-weight: 500;
+            margin-bottom: var(--space-1);
+        }
+        
+        .login-prompt-text {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        /* ===== ERROR SCREEN ===== */
+        .error-title {
+            color: var(--color-error);
+        }
+        
+        .error-detail {
+            background: var(--color-error-muted);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+            color: var(--color-error);
+            font-size: var(--text-sm);
+        }
+        
+        .retry-btn {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            color: var(--color-text-primary);
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            transition: all 0.15s var(--ease-spring);
+        }
+        
+        .retry-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+        }
+        
+        .support-link {
+            text-align: center;
+            margin-top: var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        .support-link a {
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .support-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--color-bg-elevated);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s var(--ease-spring);
+            color: var(--color-text-secondary);
+        }
+        
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+        
+        /* ===== BACKGROUND ===== */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: orb-float 6s ease-in-out infinite;
+        }
+        
+        @keyframes orb-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .bg-orb-1 {
+            width: 350px;
+            height: 350px;
+            background: var(--color-brand);
+            top: -100px;
+            left: -100px;
+        }
+        
+        .bg-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #a78bfa;
+            top: 50%;
+            right: -100px;
+            animation-delay: -2s;
+        }
+        
+        .bg-orb-3 {
+            width: 250px;
+            height: 250px;
+            background: #3b82f6;
+            bottom: -80px;
+            left: 30%;
+            animation-delay: -4s;
+        }
+        
+        /* ===== SR ONLY ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* ===== REDUCED MOTION ===== */
         @media (prefers-reduced-motion: reduce) {
-            .circle,
-            .loader-dot,
-            .celebrate,
-            .screen {
+            .screen,
+            .logo-circle.success,
+            .bg-orb,
+            .loading-dots span {
                 animation: none !important;
             }
-        }
-        
-        /* États d'erreur */
-        .error-state {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.5);
-        }
-        
-        /* Bouton disabled */
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            
+            .submit-btn::before {
+                display: none;
+            }
         }
     </style>
     <script src="/fun.js"></script>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
     <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: 1rem; right: 1rem; z-index: 100;">
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
         <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
     
-    <!-- Cercles décoratifs -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
-        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
-        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
+    <!-- Background orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
     </div>
 
-    <!-- Container principal -->
-    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8" role="main">
-        
-        <!-- Zone d'annonces pour lecteurs d'écran -->
-        <div id="sr-announcements" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+    <main class="redeem-container" role="main">
         
         <!-- ==========================================
-             ÉCRAN 1: Saisie du code
+             SCREEN 1: Code Entry
              ========================================== -->
-        <section id="screen-code" class="screen w-full max-w-md" aria-labelledby="code-title">
-            
-            <!-- Logo -->
-            <div class="flex justify-center mb-8">
-                <div class="w-24 h-24 rounded-full border-4 border-white/20 flex items-center justify-center glow bg-white/5 backdrop-blur" aria-hidden="true">
-                    <svg class="text-4xl" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/></svg>
+        <section id="screen-code" class="screen" aria-labelledby="code-title">
+            <div class="redeem-logo">
+                <div class="logo-circle" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    </svg>
                 </div>
             </div>
             
-            <!-- Titre -->
-            <h1 id="code-title" class="text-2xl md:text-3xl font-bold mb-4 text-center leading-tight">
-                Tu as reçu un cadeau
-            </h1>
+            <h1 id="code-title" class="redeem-title">Tu as reçu un cadeau</h1>
+            <p class="redeem-subtitle">Entre ton code pour activer ton accès à <strong>Cinq</strong></p>
             
-            <!-- Sous-titre -->
-            <p class="text-lg text-center text-white/80 mb-8">
-                Entre ton code pour activer ton accès à <span class="font-semibold text-white">Cinq</span>
-            </p>
-            
-            <!-- Formulaire code -->
-            <form id="code-form" onsubmit="CinqRedeem.verifyCode(event)" class="space-y-6">
-                
-                <!-- Input code -->
-                <div>
-                    <label for="gift-code" class="block text-sm font-medium text-white/90 mb-2">
-                        Code cadeau
-                    </label>
+            <form id="code-form" onsubmit="CinqRedeem.verifyCode(event)">
+                <div class="form-group">
+                    <label for="gift-code" class="form-label">Code cadeau</label>
                     <input 
                         type="text" 
                         id="gift-code"
                         name="code"
-                        class="code-input w-full px-4 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-xl text-center placeholder-white/40 transition-all"
+                        class="form-input code-input"
                         placeholder="CINQ-XXXX-XXXX-XXXX"
                         maxlength="19"
                         autocomplete="off"
@@ -262,292 +788,202 @@
                         aria-describedby="code-hint code-error"
                         required
                     >
-                    <p id="code-hint" class="mt-2 text-sm text-white/60">
-                        Format: CINQ-XXXX-XXXX-XXXX
-                    </p>
-                    <p id="code-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
+                    <p id="code-hint" class="form-hint">Format: CINQ-XXXX-XXXX-XXXX</p>
+                    <p id="code-error" class="field-error hidden" role="alert"></p>
                 </div>
                 
-                <!-- Bouton -->
-                <button 
-                    type="submit"
-                    id="verify-btn"
-                    class="w-full py-4 px-6 bg-indigo-500 hover:bg-indigo-400 disabled:hover:bg-indigo-500 rounded-xl font-semibold text-lg transition transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
-                >
-                    <span id="verify-btn-icon" aria-hidden="true">🔓</span>
+                <button type="submit" id="verify-btn" class="submit-btn">
+                    <span aria-hidden="true">🔓</span>
                     <span id="verify-btn-text">Activer mon accès</span>
                 </button>
-                
             </form>
             
-            <!-- Lien acheter -->
-            <div class="mt-8 text-center">
-                <a href="/gift" class="text-white/60 hover:text-white/80 text-sm transition">
-                    Pas encore de code ? <span class="underline">Acheter un accès →</span>
-                </a>
+            <div class="secondary-link">
+                <a href="/gift.html">Pas encore de code ? <span>Acheter un accès →</span></a>
             </div>
-            
         </section>
 
         <!-- ==========================================
-             ÉCRAN 2: Création de compte (email + password)
+             SCREEN 2: Account Creation
              ========================================== -->
-        <section id="screen-email" class="screen w-full max-w-md hidden" aria-labelledby="email-title">
-            
-            <!-- Header avec retour -->
-            <button onclick="CinqRedeem.showScreen('code')" aria-label="Retour" class="flex items-center gap-2 text-white/60 hover:text-white mb-8 transition">
-                <span aria-hidden="true">←</span>
-                <span>Retour</span>
+        <section id="screen-email" class="screen hidden" aria-labelledby="email-title">
+            <button onclick="CinqRedeem.showScreen('code')" class="back-btn" aria-label="Retour">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Retour
             </button>
             
-            <!-- Icône -->
-            <div class="flex justify-center mb-6">
-                <div class="w-16 h-16 rounded-full bg-indigo-500/20 border-2 border-indigo-400/50 flex items-center justify-center" aria-hidden="true">
-                    <span class="text-2xl">🔐</span>
+            <div class="redeem-logo">
+                <div class="logo-circle" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
                 </div>
             </div>
             
-            <!-- Titre -->
-            <h2 id="email-title" class="text-2xl font-bold text-center mb-2">
-                Crée ton compte
-            </h2>
-            <p class="text-center text-white/80 mb-8">
-                Une dernière étape pour activer ton accès
-            </p>
+            <h2 id="email-title" class="redeem-title">Crée ton compte</h2>
+            <p class="redeem-subtitle">Une dernière étape pour activer ton accès</p>
             
-            <!-- Info code -->
-            <div id="code-info" class="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 mb-6">
-                <div class="flex items-center justify-between">
-                    <span class="text-white/70 text-sm">Code cadeau</span>
-                    <span id="verified-code" class="font-mono text-indigo-400"></span>
-                </div>
+            <div class="code-info" id="code-info">
+                <span class="code-info-label">Code cadeau</span>
+                <span class="code-info-value" id="verified-code"></span>
             </div>
             
-            <!-- Formulaire email + password -->
-            <form id="email-form" onsubmit="CinqRedeem.createAccount(event)" class="space-y-5">
-                
-                <!-- Input email -->
-                <div>
-                    <label for="user-email" class="block text-sm font-medium text-white/90 mb-2">
-                        Ton adresse email
-                    </label>
+            <form id="email-form" onsubmit="CinqRedeem.createAccount(event)">
+                <div class="form-group">
+                    <label for="user-email" class="form-label">Ton adresse email</label>
                     <input 
                         type="email" 
                         id="user-email"
                         name="email"
-                        class="email-input w-full px-4 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-lg placeholder-white/40 transition-all"
+                        class="form-input"
                         placeholder="ton@email.com"
                         autocomplete="email"
                         aria-describedby="email-error"
                         required
                     >
-                    <p id="email-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
+                    <p id="email-error" class="field-error hidden" role="alert"></p>
                 </div>
                 
-                <!-- Input password -->
-                <div>
-                    <label for="user-password" class="block text-sm font-medium text-white/90 mb-2">
-                        Choisis un mot de passe
+                <div class="form-group">
+                    <label for="user-password" class="form-label">Choisis un mot de passe</label>
+                    <div class="password-field">
+                        <input 
+                            type="password" 
+                            id="user-password"
+                            name="password"
+                            class="form-input"
+                            placeholder="••••••••"
+                            autocomplete="new-password"
+                            minlength="8"
+                            aria-describedby="password-hint password-error"
+                            required
+                        >
+                        <button type="button" class="password-toggle" onclick="CinqRedeem.togglePassword()" aria-label="Afficher le mot de passe" id="password-toggle-btn">
+                            <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="password-strength" id="password-strength" style="display: none;">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <div class="strength-text" id="strength-text">Faible</div>
+                    </div>
+                    
+                    <p id="password-hint" class="form-hint">Minimum 8 caractères, avec 1 lettre et 1 chiffre</p>
+                    <p id="password-error" class="field-error hidden" role="alert"></p>
+                </div>
+                
+                <div class="terms-group">
+                    <input type="checkbox" id="accept-terms" name="terms" class="terms-checkbox" required>
+                    <label for="accept-terms" class="terms-label">
+                        J'accepte les <a href="/terms.html" target="_blank">conditions d'utilisation</a> 
+                        et la <a href="/privacy.html" target="_blank">politique de confidentialité</a>
                     </label>
-                    <input 
-                        type="password" 
-                        id="user-password"
-                        name="password"
-                        class="email-input w-full px-4 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-lg placeholder-white/40 transition-all"
-                        placeholder="••••••••"
-                        autocomplete="new-password"
-                        minlength="8"
-                        aria-describedby="password-hint password-error"
-                        required
-                    >
-                    <p id="password-hint" class="mt-2 text-sm text-white/60">
-                        Minimum 8 caractères, avec au moins une lettre et un chiffre
-                    </p>
-                    <p id="password-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
                 </div>
                 
-                <!-- Checkbox acceptation -->
-                <div class="flex items-start gap-3">
-                    <input 
-                        type="checkbox" 
-                        id="accept-terms"
-                        name="terms"
-                        class="mt-1 w-5 h-5 rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-0"
-                        required
-                    >
-                    <label for="accept-terms" class="text-sm text-white/80">
-                        J'accepte les <a href="/terms" class="text-indigo-400 hover:underline">conditions d'utilisation</a> 
-                        et la <a href="/privacy" class="text-indigo-400 hover:underline">politique de confidentialité</a>
-                    </label>
-                </div>
-                
-                <!-- Bouton -->
-                <button 
-                    type="submit"
-                    id="create-btn"
-                    class="w-full py-4 px-6 bg-indigo-500 hover:bg-indigo-400 disabled:hover:bg-indigo-500 rounded-xl font-semibold text-lg transition transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
-                >
-                    <span id="create-btn-icon" aria-hidden="true">🚀</span>
+                <button type="submit" id="create-btn" class="submit-btn">
+                    <span aria-hidden="true">🚀</span>
                     <span id="create-btn-text">Créer mon compte</span>
                 </button>
-                
             </form>
             
-            <!-- Note -->
-            <p class="text-center mt-6 text-white/60 text-xs">
-                Tu as déjà un compte ? <a href="/login" class="text-indigo-400 hover:underline">Connecte-toi</a>
-            </p>
-            
+            <div class="secondary-link">
+                Tu as déjà un compte ? <a href="/login.html">Connecte-toi</a>
+            </div>
         </section>
 
         <!-- ==========================================
-             ÉCRAN 3: Succès
+             SCREEN 3: Success
              ========================================== -->
-        <section id="screen-success" class="screen w-full max-w-md hidden" aria-labelledby="success-title">
-            
-            <!-- Animation de succès -->
-            <div class="flex justify-center mb-6">
-                <div class="celebrate w-24 h-24 rounded-full border-4 border-emerald-400/50 flex items-center justify-center glow-success bg-emerald-500/10 backdrop-blur" aria-hidden="true">
-                    <svg class="text-5xl" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <section id="screen-success" class="screen hidden" aria-labelledby="success-title">
+            <div class="redeem-logo">
+                <div class="logo-circle success" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
                 </div>
             </div>
             
-            <!-- Titre -->
-            <h2 id="success-title" class="text-2xl font-bold text-center mb-2 text-emerald-400">
-                Bienvenue dans le cercle ! 💜
-            </h2>
-            <p class="text-center text-white/80 mb-8">
-                Ton compte est prêt. Maintenant, choisis bien tes 5.<br>
-                <span class="text-white/60 text-sm">(Pas de pression. Ou un peu.)</span>
-            </p>
+            <h2 id="success-title" class="redeem-title success-title">Bienvenue dans le cercle ! 💜</h2>
+            <p class="redeem-subtitle">Ton compte est prêt. Maintenant, choisis bien tes 5.<br><small style="opacity: 0.7;">(Pas de pression. Ou un peu.)</small></p>
             
-            <!-- Récap -->
-            <div class="bg-white/5 backdrop-blur border border-emerald-400/30 rounded-2xl p-6 mb-8">
-                <div class="space-y-3 text-sm">
-                    <div class="flex items-center justify-between">
-                        <span class="text-white/70">Email</span>
-                        <span id="success-email" class="text-white font-medium"></span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-white/70">Accès</span>
-                        <span class="text-emerald-400 font-medium">✓ Activé à vie</span>
-                    </div>
+            <div class="success-info">
+                <div class="success-info-row">
+                    <span class="success-info-label">Email</span>
+                    <span class="success-info-value" id="success-email"></span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Accès</span>
+                    <span class="success-info-value highlight">✓ Activé à vie</span>
                 </div>
             </div>
             
-            <!-- Message connexion -->
-            <div class="bg-indigo-500/10 border border-indigo-400/30 rounded-xl p-4 mb-8">
-                <div class="flex gap-3">
-                    <span class="text-xl" aria-hidden="true">🔐</span>
-                    <div>
-                        <p class="text-white/90 font-medium">Ton compte est prêt</p>
-                        <p class="text-white/70 text-sm mt-1">
-                            Tu peux maintenant te connecter avec ton email et mot de passe.
-                        </p>
-                    </div>
+            <div class="login-prompt">
+                <span class="login-prompt-icon">🔐</span>
+                <div>
+                    <p class="login-prompt-title">Ton compte est prêt</p>
+                    <p class="login-prompt-text">Tu peux maintenant te connecter avec ton email et mot de passe.</p>
                 </div>
             </div>
             
-            <!-- Timer redirect -->
-            <p id="redirect-notice" class="text-center text-white/60 text-sm mb-6">
-                Redirection automatique dans <span id="redirect-timer">5</span>s...
-            </p>
+            <div class="redirect-notice" id="redirect-notice">
+                Redirection automatique dans <span class="redirect-timer" id="redirect-timer">5</span>s...
+            </div>
             
-            <!-- CTA -->
-            <a 
-                href="/login"
-                id="go-app-btn"
-                class="block w-full py-4 px-6 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold text-lg text-center transition transform hover:scale-[1.02] active:scale-[0.98]"
-            >
+            <a href="/login.html" id="go-app-btn" class="submit-btn">
                 Se connecter →
             </a>
             
-            <!-- Lien secondaire -->
-            <div class="mt-6 text-center">
-                <a href="/" class="text-white/60 hover:text-white/80 text-sm transition">
-                    ← Retour à l'accueil
-                </a>
+            <div class="secondary-link">
+                <a href="/">← Retour à l'accueil</a>
             </div>
-            
         </section>
 
         <!-- ==========================================
-             ÉCRAN 4: Erreur
+             SCREEN 4: Error
              ========================================== -->
-        <section id="screen-error" class="screen w-full max-w-md hidden" aria-labelledby="error-title">
-            
-            <!-- Icône erreur -->
-            <div class="flex justify-center mb-6">
-                <div class="w-24 h-24 rounded-full border-4 border-red-400/50 flex items-center justify-center bg-red-500/10 backdrop-blur" aria-hidden="true">
-                    <span class="text-5xl">😕</span>
+        <section id="screen-error" class="screen hidden" aria-labelledby="error-title">
+            <div class="redeem-logo">
+                <div class="logo-circle" aria-hidden="true" style="border-color: var(--color-error);">
+                    <span style="font-size: 2.5rem;">😕</span>
                 </div>
             </div>
             
-            <!-- Titre -->
-            <h2 id="error-title" class="text-2xl font-bold text-center mb-2 text-red-400">
-                Oups, un problème
-            </h2>
-            <p id="error-message" class="text-center text-white/80 mb-8">
-                Une erreur s'est produite
-            </p>
+            <h2 id="error-title" class="redeem-title error-title">Oups, un problème</h2>
+            <p id="error-message" class="redeem-subtitle">Une erreur s'est produite</p>
             
-            <!-- Détail erreur -->
-            <div id="error-detail" class="bg-red-500/10 border border-red-400/30 rounded-xl p-4 mb-8 text-red-300 text-sm">
-            </div>
+            <div id="error-detail" class="error-detail"></div>
             
-            <!-- Bouton réessayer -->
-            <button 
-                onclick="CinqRedeem.showScreen('code')"
-                class="w-full py-4 px-6 bg-white/10 hover:bg-white/15 border border-white/20 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3"
-            >
-                <span aria-hidden="true">↻</span>
+            <button onclick="CinqRedeem.showScreen('code')" class="retry-btn">
+                <span>↻</span>
                 <span>Réessayer</span>
             </button>
             
-            <!-- Contact support -->
-            <div class="mt-8 text-center">
-                <p class="text-white/60 text-sm">
-                    Besoin d'aide ? <a href="mailto:support@cinq.app" class="text-indigo-400 hover:underline">Contacte le support</a>
-                </p>
-            </div>
-            
+            <p class="support-link">
+                Besoin d'aide ? <a href="mailto:support@cinq.app">Contacte le support</a>
+            </p>
         </section>
 
     </main>
 
     <!-- JavaScript -->
     <script>
-        /**
-         * CinqRedeem - Module d'activation de codes cadeaux
-         */
         const CinqRedeem = (function() {
             'use strict';
             
-            // ========================================
-            // Configuration
-            // ========================================
             const API_BASE = '/.netlify/functions';
             const CODE_PATTERN = /^CINQ-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
-            const REDIRECT_DELAY = 5; // secondes
+            const REDIRECT_DELAY = 5;
             
-            // État interne
             let _state = {
                 verifiedCode: null,
-                giftData: null,
-                redirectTimer: null
+                redirectTimer: null,
+                isPasswordVisible: false
             };
             
-            // ========================================
-            // Utilitaires
-            // ========================================
-            
-            function escapeHtml(str) {
-                if (typeof str !== 'string') return '';
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-            
+            // Utilities
             function announce(message) {
                 const el = document.getElementById('sr-announcements');
                 if (el) el.textContent = message;
@@ -556,7 +992,7 @@
             function showError(elementId, message) {
                 const el = document.getElementById(elementId);
                 if (el) {
-                    el.textContent = escapeHtml(message);
+                    el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${message}`;
                     el.classList.remove('hidden');
                 }
             }
@@ -566,129 +1002,107 @@
                 if (el) el.classList.add('hidden');
             }
             
-            function setButtonLoading(btnId, iconId, textId, loading, loadingText = 'Chargement...') {
-                const btn = document.getElementById(btnId);
-                const icon = document.getElementById(iconId);
-                const text = document.getElementById(textId);
-                
-                if (loading) {
-                    btn.disabled = true;
-                    icon.innerHTML = '<div class="flex gap-1"><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div></div>';
-                    text.dataset.originalText = text.textContent;
-                    text.textContent = loadingText;
-                } else {
-                    btn.disabled = false;
-                    icon.textContent = icon.dataset.originalIcon || '🔓';
-                    text.textContent = text.dataset.originalText || 'Activer mon accès';
-                }
-            }
-            
-            // ========================================
             // Navigation
-            // ========================================
             function showScreen(screenName) {
-                // Cacher tous les écrans
                 document.querySelectorAll('.screen').forEach(screen => {
                     screen.classList.add('hidden');
                     screen.setAttribute('aria-hidden', 'true');
                 });
                 
-                // Afficher l'écran demandé
                 const targetScreen = document.getElementById(`screen-${screenName}`);
                 if (targetScreen) {
                     targetScreen.classList.remove('hidden');
                     targetScreen.setAttribute('aria-hidden', 'false');
                     
-                    // Focus sur premier élément interactif
                     setTimeout(() => {
                         const focusable = targetScreen.querySelector('input, button, a');
                         if (focusable) focusable.focus();
                     }, 100);
                 }
                 
-                // Arrêter le timer de redirect si on change d'écran
                 if (screenName !== 'success' && _state.redirectTimer) {
                     clearInterval(_state.redirectTimer);
                     _state.redirectTimer = null;
                 }
             }
             
-            // ========================================
-            // Formatage du code
-            // ========================================
+            // Code formatting
             function formatCode(input) {
                 let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                 
-                // Ajouter le préfixe CINQ si pas présent
-                if (value.length > 0 && !value.startsWith('CINQ')) {
-                    // Si l'utilisateur tape autre chose, on laisse faire
-                }
-                
-                // Formater avec les tirets
                 let formatted = '';
                 if (value.length > 0) {
-                    // CINQ
                     formatted = value.slice(0, 4);
-                    if (value.length > 4) {
-                        formatted += '-' + value.slice(4, 8);
-                    }
-                    if (value.length > 8) {
-                        formatted += '-' + value.slice(8, 12);
-                    }
-                    if (value.length > 12) {
-                        formatted += '-' + value.slice(12, 16);
-                    }
+                    if (value.length > 4) formatted += '-' + value.slice(4, 8);
+                    if (value.length > 8) formatted += '-' + value.slice(8, 12);
+                    if (value.length > 12) formatted += '-' + value.slice(12, 16);
                 }
                 
                 input.value = formatted;
                 
-                // Validation visuelle
                 const isComplete = formatted.length === 19;
                 const isValid = CODE_PATTERN.test(formatted);
                 
-                input.classList.remove('valid', 'invalid');
+                input.classList.remove('valid', 'error');
                 if (isComplete) {
-                    input.classList.add(isValid ? 'valid' : 'invalid');
+                    input.classList.add(isValid ? 'valid' : 'error');
                 }
                 
                 hideError('code-error');
             }
             
-            // ========================================
-            // Validation du code (Étape 1) - Format only
-            // La vérification complète se fait à la création du compte
-            // ========================================
+            // Toggle password visibility
+            function togglePassword() {
+                const passwordInput = document.getElementById('user-password');
+                const eyeIcon = document.getElementById('eye-icon');
+                const eyeOffIcon = document.getElementById('eye-off-icon');
+                const toggleBtn = document.getElementById('password-toggle-btn');
+                
+                _state.isPasswordVisible = !_state.isPasswordVisible;
+                passwordInput.type = _state.isPasswordVisible ? 'text' : 'password';
+                eyeIcon.style.display = _state.isPasswordVisible ? 'none' : 'block';
+                eyeOffIcon.style.display = _state.isPasswordVisible ? 'block' : 'none';
+                toggleBtn.setAttribute('aria-label', _state.isPasswordVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+            }
+            
+            // Password strength
+            function checkPasswordStrength(password) {
+                let score = 0;
+                
+                if (password.length >= 8) score++;
+                if (password.length >= 12) score++;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+                if (/\d/.test(password)) score++;
+                if (/[^a-zA-Z0-9]/.test(password)) score++;
+                
+                if (score <= 1) return { class: 'weak', text: 'Faible' };
+                if (score === 2) return { class: 'fair', text: 'Moyen' };
+                if (score === 3) return { class: 'good', text: 'Bon' };
+                return { class: 'strong', text: 'Fort' };
+            }
+            
+            // Verify code
             async function verifyCode(event) {
                 event.preventDefault();
                 
                 const codeInput = document.getElementById('gift-code');
                 const code = codeInput.value.trim().toUpperCase();
                 
-                // Validation format uniquement
                 if (!CODE_PATTERN.test(code)) {
-                    codeInput.classList.add('invalid');
+                    codeInput.classList.add('error');
                     showError('code-error', 'Format invalide. Le code doit être au format CINQ-XXXX-XXXX-XXXX');
                     announce('Format de code invalide');
                     return;
                 }
                 
                 hideError('code-error');
-                
-                // Stocker le code pour l'étape suivante
                 _state.verifiedCode = code;
-                
-                // Afficher le code dans l'écran suivant
                 document.getElementById('verified-code').textContent = code;
-                
-                // Passer directement à l'écran de création de compte
                 showScreen('email');
                 announce('Entrez votre email et mot de passe pour créer votre compte.');
             }
             
-            // ========================================
-            // Création de compte (Étape 2)
-            // Appelle auth-register qui vérifie le code + crée le compte
-            // ========================================
+            // Create account
             async function createAccount(event) {
                 event.preventDefault();
                 
@@ -698,11 +1112,10 @@
                 const email = emailInput.value.trim().toLowerCase();
                 const password = passwordInput.value;
                 
-                // Clear previous errors
                 hideError('email-error');
                 hideError('password-error');
                 
-                // Validation email basique
+                // Validation
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
                     showError('email-error', 'Adresse email invalide');
@@ -710,19 +1123,18 @@
                     return;
                 }
                 
-                // Validation password
                 if (password.length < 8) {
                     showError('password-error', 'Le mot de passe doit contenir au moins 8 caractères');
                     passwordInput.focus();
                     return;
                 }
+                
                 if (!/\d/.test(password) || !/[a-zA-Z]/.test(password)) {
                     showError('password-error', 'Le mot de passe doit contenir au moins une lettre et un chiffre');
                     passwordInput.focus();
                     return;
                 }
                 
-                // Validation terms
                 if (!termsCheckbox.checked) {
                     showError('email-error', 'Tu dois accepter les conditions d\'utilisation');
                     return;
@@ -730,15 +1142,12 @@
                 
                 // UI loading
                 const btn = document.getElementById('create-btn');
-                const icon = document.getElementById('create-btn-icon');
-                const text = document.getElementById('create-btn-text');
+                const btnText = document.getElementById('create-btn-text');
                 
                 btn.disabled = true;
-                icon.innerHTML = '<div class="flex gap-1"><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div></div>';
-                text.textContent = 'Création en cours...';
+                btnText.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span> Création...';
                 
                 try {
-                    // Appel API auth-register (vérifie code + crée compte en un seul appel)
                     const response = await fetch(`${API_BASE}/auth-register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -755,36 +1164,22 @@
                         throw new Error(data.error || 'Erreur lors de la création du compte');
                     }
                     
-                    // Succès !
                     document.getElementById('success-email').textContent = email;
-                    
-                    // Afficher écran succès
                     showScreen('success');
                     announce('Compte créé avec succès ! Tu peux maintenant te connecter.');
                     
-                    // Track gift redeemed
-                    if (window.CinqAnalytics) {
-                        CinqAnalytics.trackGiftRedeemed({ source: 'web' });
-                    }
-                    
-                    // 🎉 Celebrate!
                     if (typeof launchConfetti === 'function') {
                         launchConfetti({ particleCount: 150, spread: 100 });
                     }
                     
-                    // Démarrer le countdown de redirection
                     startRedirectCountdown();
                     
                 } catch (error) {
-                    // Remettre le bouton en état normal
                     btn.disabled = false;
-                    icon.textContent = '🚀';
-                    text.textContent = 'Créer mon compte';
+                    btnText.innerHTML = '🚀 Créer mon compte';
                     
-                    // Afficher l'erreur inline si c'est lié au code ou à l'email
                     const errorMsg = error.message.toLowerCase();
                     if (errorMsg.includes('code') || errorMsg.includes('gift')) {
-                        // Retourner à l'écran du code avec l'erreur
                         showScreen('code');
                         showError('code-error', error.message);
                     } else if (errorMsg.includes('email') || errorMsg.includes('account')) {
@@ -792,7 +1187,6 @@
                     } else if (errorMsg.includes('password')) {
                         showError('password-error', error.message);
                     } else {
-                        // Erreur générique → écran d'erreur
                         document.getElementById('error-message').textContent = 'Impossible de créer ton compte';
                         document.getElementById('error-detail').textContent = error.message;
                         showScreen('error');
@@ -801,9 +1195,7 @@
                 }
             }
             
-            // ========================================
-            // Redirection automatique
-            // ========================================
+            // Redirect countdown
             function startRedirectCountdown() {
                 let seconds = REDIRECT_DELAY;
                 const timerEl = document.getElementById('redirect-timer');
@@ -814,16 +1206,13 @@
                     
                     if (seconds <= 0) {
                         clearInterval(_state.redirectTimer);
-                        window.location.href = '/login';
+                        window.location.href = '/login.html';
                     }
                 }, 1000);
             }
             
-            // ========================================
-            // Initialisation
-            // ========================================
+            // Initialize
             function init() {
-                // Vérifier si un code est dans l'URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const codeParam = urlParams.get('code');
                 
@@ -833,37 +1222,52 @@
                     formatCode(codeInput);
                 }
                 
-                // Focus sur l'input
+                // Password strength listener
+                document.getElementById('user-password').addEventListener('input', function() {
+                    hideError('password-error');
+                    
+                    const strengthMeter = document.getElementById('password-strength');
+                    const strengthFill = document.getElementById('strength-fill');
+                    const strengthText = document.getElementById('strength-text');
+                    
+                    if (this.value.length > 0) {
+                        strengthMeter.style.display = 'block';
+                        const strength = checkPasswordStrength(this.value);
+                        
+                        strengthFill.className = 'strength-fill ' + strength.class;
+                        strengthText.className = 'strength-text ' + strength.class;
+                        strengthText.textContent = strength.text;
+                    } else {
+                        strengthMeter.style.display = 'none';
+                    }
+                });
+                
                 document.getElementById('gift-code').focus();
             }
             
-            // Lancer l'init au chargement
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
                 init();
             }
             
-            // ========================================
-            // API publique
-            // ========================================
             return {
                 showScreen,
                 formatCode,
                 verifyCode,
-                createAccount
+                createAccount,
+                togglePassword
             };
             
         })();
     </script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-                    .catch(err => console.log('[PWA] Service Worker registration failed:', err));
+                    .catch(err => console.log('[PWA] SW registration failed:', err));
             });
         }
     </script>
