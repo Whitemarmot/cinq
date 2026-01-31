@@ -1,0 +1,572 @@
+/**
+ * ==========================================================================
+ * CINQ - Mobile & Responsive Fixes
+ * ==========================================================================
+ * 
+ * Touch targets: 44px minimum (Apple HIG / Material Design guidelines)
+ * Safe areas: iPhone notch/home indicator support
+ * Viewport fixes: prevent horizontal overflow on mobile
+ * 
+ * @author Cinq Team
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   GLOBAL MOBILE FIXES
+   ========================================================================== */
+
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure tap highlight is visible but subtle */
+* {
+  -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+}
+
+/* ==========================================================================
+   TOUCH TARGETS - Minimum 44px
+   ========================================================================== */
+
+/* Generic button minimum size */
+button, 
+[role="button"],
+a.btn,
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Small buttons should still be tappable */
+.btn-sm {
+  min-height: 40px;
+  padding: 0.5rem 1rem;
+}
+
+/* Icon-only buttons */
+.btn-icon,
+.chat-close,
+.ping-btn,
+.chat-send {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   APP.HTML - Mobile Fixes
+   ========================================================================== */
+
+/* Chat close button - ensure 44px minimum */
+.chat-close {
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ping and send buttons in chat */
+.ping-btn,
+.chat-send {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.75rem;
+}
+
+/* Logout button - make tappable */
+.logout-btn {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg, 12px);
+}
+
+/* Settings link */
+.settings-link {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+/* Contact slots on small screens */
+@media (max-width: 380px) {
+  .contacts-grid {
+    gap: 0.375rem;
+  }
+  
+  .contact-slot {
+    min-width: 56px;
+    min-height: 56px;
+  }
+  
+  .contact-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .contact-name {
+    font-size: 0.5625rem;
+  }
+}
+
+/* Very small screens - 5 columns might overflow */
+@media (max-width: 320px) {
+  .contacts-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+  
+  .contact-slot {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0.25rem;
+  }
+  
+  .contact-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Onboarding buttons */
+.onboarding-skip {
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+}
+
+.onboarding-btn {
+  min-height: 48px;
+}
+
+/* Action buttons */
+.action-btn {
+  min-height: 56px;
+}
+
+/* Modal close area - easier to dismiss */
+.modal-overlay {
+  cursor: pointer;
+}
+
+.modal {
+  cursor: default;
+}
+
+/* Chat input improvements for mobile */
+.chat-input {
+  font-size: 16px; /* Prevents iOS zoom on focus */
+  min-height: 48px;
+}
+
+/* Chat messages container */
+.chat-messages {
+  /* Momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================================================
+   INDEX.HTML - Mobile Fixes
+   ========================================================================== */
+
+/* Feature pills - larger touch targets on mobile */
+@media (max-width: 640px) {
+  .feature-pill {
+    min-height: 40px;
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  /* Ensure features wrap nicely */
+  .features {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Waitlist form */
+.waitlist-input {
+  font-size: 16px; /* Prevent iOS zoom */
+  min-height: 48px;
+}
+
+.waitlist-submit {
+  min-height: 48px;
+  min-width: 100px;
+}
+
+/* CTA button on mobile */
+@media (max-width: 480px) {
+  .cta-button {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 2rem;
+    min-height: 56px;
+  }
+  
+  .cta-note {
+    padding: 0 1rem;
+  }
+}
+
+/* Hero text sizing for small screens */
+@media (max-width: 380px) {
+  .hero-headline {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+  }
+  
+  .hero-sub {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   LOGIN.HTML - Mobile Fixes
+   ========================================================================== */
+
+.form-input {
+  font-size: 16px; /* Prevent iOS zoom */
+  min-height: 48px;
+}
+
+.submit-btn {
+  min-height: 52px;
+}
+
+/* ==========================================================================
+   GIFT.HTML - Mobile Fixes
+   ========================================================================== */
+
+.generate-btn {
+  min-height: 52px;
+}
+
+.copy-btn {
+  min-height: 48px;
+  padding: 0.875rem 1.5rem;
+}
+
+/* ==========================================================================
+   SETTINGS.HTML - Mobile Fixes (Tailwind overrides)
+   ========================================================================== */
+
+/* Toggle switch - larger hit area */
+.toggle-switch {
+  min-width: 52px;
+  min-height: 32px;
+  /* Add invisible padding for easier tapping */
+  position: relative;
+}
+
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+}
+
+/* Settings cards buttons */
+.settings-card button,
+.settings-card a {
+  min-height: 48px;
+}
+
+/* ==========================================================================
+   SAFE AREA INSETS - iPhone Support
+   ========================================================================== */
+
+/* Apply safe area to fixed footers */
+footer[style*="fixed"],
+footer[style*="position: fixed"] {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+/* Generic fixed bottom elements */
+.fixed-bottom,
+[class*="fixed"][class*="bottom"] {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Chat panel already has this, but ensure it's applied */
+.chat-panel {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.chat-input-area {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Modal with safe areas */
+.modal,
+.modal-overlay .modal {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Onboarding overlay safe areas */
+.onboarding-overlay {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* App container safe areas */
+.app-container {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+/* Toast container - stay visible above notch */
+.toast-container {
+  top: max(1rem, env(safe-area-inset-top, 1rem));
+}
+
+/* ==========================================================================
+   CHAT PANEL - Mobile Optimizations
+   ========================================================================== */
+
+/* Ensure chat panel works well on mobile */
+@media (max-width: 640px) {
+  .chat-panel {
+    max-height: 85dvh;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+  
+  .chat-header {
+    padding: 1rem;
+    /* Handle to indicate draggable */
+    position: relative;
+  }
+  
+  .chat-header::before {
+    content: '';
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+  
+  .chat-messages {
+    min-height: 200px;
+    padding: 1rem;
+  }
+  
+  .chat-input-area {
+    padding: 0.75rem 1rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+    gap: 0.5rem;
+  }
+  
+  /* Larger input area on mobile for easier typing */
+  .chat-input {
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* Full-screen chat on very small screens */
+@media (max-height: 600px) {
+  .chat-panel {
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+}
+
+/* ==========================================================================
+   FOOTER LINKS - Mobile Touch Targets
+   ========================================================================== */
+
+/* Make footer links tappable on mobile */
+footer a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.25rem;
+}
+
+@media (max-width: 480px) {
+  /* Stack footer links on very small screens */
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem !important;
+  }
+  
+  footer span[style*="opacity"] {
+    display: none; /* Hide dot separators */
+  }
+  
+  footer a {
+    min-width: 44px;
+  }
+}
+
+/* ==========================================================================
+   FORM INPUTS - iOS Zoom Prevention
+   ========================================================================== */
+
+/* iOS zooms on inputs with font-size < 16px */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+@media (min-width: 641px) {
+  /* Allow smaller font on desktop */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: inherit !important;
+  }
+}
+
+/* ==========================================================================
+   VIEWPORT FIXES
+   ========================================================================== */
+
+/* Use dvh for better mobile viewport handling */
+@supports (height: 100dvh) {
+  .min-h-screen,
+  .h-screen {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+  
+  .hero,
+  .login-container,
+  .gift-container {
+    min-height: 100dvh;
+  }
+}
+
+/* ==========================================================================
+   LANDSCAPE MODE FIXES
+   ========================================================================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  /* Reduce vertical spacing in landscape */
+  .hero {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .hero-logo {
+    margin-bottom: 1rem;
+  }
+  
+  .five {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .five-number {
+    font-size: 40px;
+  }
+  
+  .hero-headline {
+    margin-bottom: 0.5rem;
+  }
+  
+  .features {
+    margin-bottom: 1rem;
+  }
+  
+  /* Hide some elements in landscape on small screens */
+  .counter-section,
+  .footer-quote {
+    display: none;
+  }
+  
+  /* Smaller chat panel in landscape */
+  .chat-panel {
+    max-height: 70dvh;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY - Focus States for Touch
+   ========================================================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* On touch devices, make focus states more visible */
+  :focus {
+    outline: 3px solid var(--color-brand, #6366f1);
+    outline-offset: 2px;
+  }
+  
+  /* Remove hover effects that don't make sense on touch */
+  .btn:hover,
+  .card:hover,
+  .contact-slot:hover {
+    transform: none;
+  }
+  
+  /* Keep active states for feedback */
+  .btn:active,
+  .card:active,
+  .contact-slot:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE KEYBOARD SUPPORT
+   ========================================================================== */
+
+/* Style the keyboard area to match dark theme on iOS */
+@media (prefers-color-scheme: dark) {
+  input, textarea, select {
+    color-scheme: dark;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES - Hide interactive elements
+   ========================================================================== */
+
+@media print {
+  .chat-panel,
+  .modal-overlay,
+  .onboarding-overlay,
+  .toast-container,
+  footer {
+    display: none !important;
+  }
+}

@@ -41,28 +41,27 @@ export default async function handler(req, res) {
     const action = req.query.action || req.body?.action;
 
     try {
-        // ============ CREATE (auth REQUIRED) ============
+        // ============ CREATE (auth optional for MVP) ============
         if (action === 'create') {
-            // Rate limit - very strict for gift creation
+            // Rate limit - very strict for gift creation (IP-based)
             if (!checkRateLimit(req, res, { ...RATE_LIMITS.GIFT_CREATE, keyPrefix: 'gift:create' })) {
                 return;
             }
 
-            // SECURITY FIX: Auth is now REQUIRED
+            // Auth is optional - if logged in, track who created it
             const user = await getUser(req);
-            if (!user) {
-                return res.status(401).json({ error: 'Authentification requise pour créer un code cadeau' });
-            }
 
-            // Check limit per user
-            const { count } = await supabase
-                .from('gift_codes')
-                .select('*', { count: 'exact', head: true })
-                .eq('created_by', user.id)
-                .eq('status', 'active');
+            // If logged in, check limit per user
+            if (user) {
+                const { count } = await supabase
+                    .from('gift_codes')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('created_by', user.id)
+                    .eq('status', 'active');
 
-            if (count >= 5) {
-                return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
+                if (count >= 5) {
+                    return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
+                }
             }
 
             // Create gift code
@@ -74,7 +73,7 @@ export default async function handler(req, res) {
                 .from('gift_codes')
                 .insert({
                     code,
-                    created_by: user.id,
+                    created_by: user?.id || null,
                     status: 'active',
                     expires_at: expiresAt.toISOString()
                 })

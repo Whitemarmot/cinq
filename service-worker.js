@@ -3,10 +3,10 @@
  * Optimized caching strategies for performance
  */
 
-const SW_VERSION = '2.0.0';
+const SW_VERSION = '2.1.0';
 const CACHE_PREFIX = 'cinq';
-const STATIC_CACHE = `${CACHE_PREFIX}-static-v2`;
-const DYNAMIC_CACHE = `${CACHE_PREFIX}-dynamic-v2`;
+const STATIC_CACHE = `${CACHE_PREFIX}-static-v3`;
+const DYNAMIC_CACHE = `${CACHE_PREFIX}-dynamic-v3`;
 const IMAGE_CACHE = `${CACHE_PREFIX}-images-v1`;
 const FONT_CACHE = `${CACHE_PREFIX}-fonts-v1`;
 
@@ -25,6 +25,7 @@ const PRECACHE_ASSETS = [
   '/redeem.html',
   '/404.html',
   '/error.html',
+  '/offline.html',
   '/favicon.svg',
   '/manifest.json',
   '/styles.css',
@@ -145,7 +146,7 @@ async function cacheFirst(request, cacheName, maxItems = null) {
   } catch (error) {
     // Return offline fallback for HTML
     if (request.headers.get('accept')?.includes('text/html')) {
-      return caches.match('/404.html');
+      return caches.match('/offline.html');
     }
     throw error;
   }

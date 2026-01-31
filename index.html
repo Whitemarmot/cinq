@@ -47,6 +47,7 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    <link rel="stylesheet" href="/css/a11y.css">
     
     <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
     <script defer src="/analytics.js"></script>
@@ -396,6 +397,9 @@
     </style>
 </head>
 <body>
+    <!-- Skip to content link for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <!-- Noise overlay for texture -->
     <div class="noise-overlay" aria-hidden="true"></div>
     
@@ -404,7 +408,8 @@
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-3" aria-hidden="true"></div>
 
-    <section class="hero">
+    <main id="main-content">
+    <section class="hero" role="region" aria-label="Présentation de Cinq">
         <div class="hero-content">
             
             <!-- The iconic 5 logo - AWWWARDS LEVEL -->
@@ -453,8 +458,8 @@
 
             <!-- CTA - Magnetic + Glow -->
             <div class="cta-section animate-fade-in-up animate-delay-4">
-                <a href="gift.html" class="cta-button btn-ripple btn-glow btn-magnetic">
-                    <span>🎁</span>
+                <a href="gift.html" class="cta-button btn-ripple btn-glow btn-magnetic" aria-label="Offrir Cinq à un proche">
+                    <span aria-hidden="true">🎁</span>
                     <span>Offrir Cinq</span>
                 </a>
                 <p class="cta-note">
@@ -465,8 +470,9 @@
 
             <!-- Waitlist - Enhanced interactions -->
             <div class="waitlist-section animate-fade-in-up animate-delay-5">
-                <p class="waitlist-label">Ou rejoins la waitlist</p>
-                <form id="waitlist-form" class="waitlist-form">
+                <p class="waitlist-label" id="waitlist-label">Ou rejoins la waitlist</p>
+                <form id="waitlist-form" class="waitlist-form" aria-labelledby="waitlist-label">
+                    <label for="email" class="sr-only">Adresse email</label>
                     <input 
                         type="email" 
                         id="email"
@@ -475,8 +481,9 @@
                         required
                         autocomplete="email"
                         class="waitlist-input input"
+                        aria-describedby="form-message"
                     >
-                    <button type="submit" class="waitlist-submit btn-ripple btn-magnetic">
+                    <button type="submit" class="waitlist-submit btn-ripple btn-magnetic" aria-label="Rejoindre la liste d'attente">
                         Rejoindre
                     </button>
                 </form>
@@ -500,13 +507,16 @@
 
         </div>
     </section>
+    </main>
 
     <!-- Legal Footer -->
-    <footer style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted);">
-        <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">Confidentialité</a>
-        <span style="opacity: 0.5;">·</span>
-        <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">CGU</a>
-        <span style="opacity: 0.5;">·</span>
+    <footer role="contentinfo" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted);">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">Confidentialité</a>
+            <span aria-hidden="true" style="opacity: 0.5;">·</span>
+            <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">CGU</a>
+            <span aria-hidden="true" style="opacity: 0.5;">·</span>
+        </nav>
         <span style="margin: 0 0.75rem;">© 2025 Cinq</span>
     </footer>
 
