@@ -15,7 +15,15 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
     <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +32,9 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    
+    <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
+    <script defer src="/analytics.js"></script>
     
     <style>
         /* Gift flow layout */
@@ -805,6 +816,11 @@
                         badge.style.display = 'inline-flex';
                     }
                     
+                    // Track gift initiated
+                    if (window.CinqAnalytics) {
+                        CinqAnalytics.trackGiftInitiated({ price: 50, currency: 'EUR' });
+                    }
+                    
                     showScreen('qr');
                     
                 } catch (error) {
@@ -896,6 +912,14 @@
                     if (data.code) {
                         _state.generatedCode = data.code;
                         document.getElementById('gift-code').textContent = escapeHtml(data.code);
+                        // Track gift purchased
+                        if (window.CinqAnalytics) {
+                            CinqAnalytics.trackGiftPurchased({ 
+                                price: 50, 
+                                currency: 'EUR',
+                                payment_method: _state.selectedPayment 
+                            });
+                        }
                         showScreen('success');
                     } else {
                         throw new Error(data.error || 'Erreur de génération');
@@ -998,6 +1022,17 @@ Utilise ce code : ${code}
                 shareGift
             };
         })();
+    </script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+                    .catch(err => console.log('[PWA] Service Worker registration failed:', err));
+            });
+        }
     </script>
 </body>
 </html>

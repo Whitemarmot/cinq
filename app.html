@@ -12,12 +12,22 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <meta name="theme-color" content="#1a1a2e">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
+    <script defer src="/analytics.js"></script>
     
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -194,12 +204,14 @@
                         <p class="text-xs text-white/60" id="contacts-count">0/5 contacts</p>
                     </div>
                 </div>
-                <button 
-                    id="btn-logout"
-                    class="px-3 py-1.5 text-xs text-white/60 hover:text-white/80 transition"
+                <a 
+                    href="/settings"
+                    class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white/80 transition"
+                    title="Paramètres"
+                    aria-label="Paramètres"
                 >
-                    Déconnexion
-                </button>
+                    ⚙️
+                </a>
             </div>
         </header>
         
@@ -984,6 +996,16 @@
         initAuth();
         subscribeToMessages();
     </script>
-
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+                    .catch(err => console.log('[PWA] Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>
