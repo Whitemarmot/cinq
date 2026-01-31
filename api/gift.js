@@ -10,7 +10,7 @@
 import crypto from 'crypto';
 import { supabase, getUser, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const MAX_ACTIVE_CODES_PER_USER = 5;
 const CODE_VALIDITY_DAYS = 30;
@@ -112,6 +112,12 @@ async function handleCreateGift(req, res) {
         .single();
 
     if (error) throw error;
+
+    logInfo('Gift code created', { 
+        codeId: data.id, 
+        createdBy: user?.id || 'anonymous',
+        expiresAt: data.expires_at
+    });
 
     return res.json({
         success: true,

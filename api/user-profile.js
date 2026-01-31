@@ -11,7 +11,7 @@
 import { supabase, requireAuth, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { validateDisplayName, validateBio, validateURL } from './_validation.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { logError, logInfo, logWarn, createErrorResponse } from './_error-logger.js';
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['GET', 'PUT', 'DELETE', 'OPTIONS'])) return;
@@ -210,6 +210,8 @@ async function handleDeleteAccount(req, res, user) {
         });
     }
 
+    logWarn('Account deletion initiated', { userId: user.id, email: user.email });
+
     // Delete in order (respecting foreign key constraints)
     const deleteOps = [
         supabase.from('push_subscriptions').delete().eq('user_id', user.id),
@@ -226,6 +228,8 @@ async function handleDeleteAccount(req, res, user) {
 
     // Delete auth user
     await supabase.auth.admin.deleteUser(user.id);
+
+    logInfo('Account deleted successfully', { userId: user.id });
 
     return res.json({ 
         success: true, 

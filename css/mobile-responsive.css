@@ -21,9 +21,35 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Smooth scrolling for navigation (respect user preferences) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Prevent pull-to-refresh when not at top (improves UX) */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Allow normal pull-to-refresh only on main scrollable areas */
+.main-content,
+.feed-container,
+.chat-messages {
+  overscroll-behavior-y: auto;
+}
+
 /* Ensure tap highlight is visible but subtle */
 * {
   -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Improve text rendering on mobile */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================================================
@@ -674,5 +700,310 @@ select {
   .toast-container,
   footer {
     display: none !important;
+  }
+}
+
+/* ==========================================================================
+   SCROLL SNAP - For Carousels and Horizontal Lists
+   ========================================================================== */
+
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-snap-x::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.scroll-snap-item {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Scroll snap for contact carousel if implemented */
+.contacts-carousel {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 1rem;
+}
+
+.contacts-carousel > * {
+  scroll-snap-align: center;
+}
+
+/* ==========================================================================
+   MOMENTUM SCROLLING - iOS Optimization
+   ========================================================================== */
+
+.scrollable,
+.chat-messages,
+.feed-container,
+.settings-content {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Hide scrollbars on mobile while keeping functionality */
+@media (max-width: 640px) {
+  .scrollable,
+  .chat-messages,
+  .feed-container,
+  .settings-content {
+    scrollbar-width: none;
+  }
+  
+  .scrollable::-webkit-scrollbar,
+  .chat-messages::-webkit-scrollbar,
+  .feed-container::-webkit-scrollbar,
+  .settings-content::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   STICKY HEADERS - With Safe Area Support
+   ========================================================================== */
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: inherit;
+}
+
+/* Support safe area insets for sticky headers on iPhone */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .sticky-header {
+    top: env(safe-area-inset-top, 0px);
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
+}
+
+/* ==========================================================================
+   BOTTOM SHEET - Mobile Pattern
+   ========================================================================== */
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 90dvh;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: var(--color-surface, #1a1a2e);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 50;
+}
+
+.bottom-sheet.active {
+  transform: translateY(0);
+}
+
+/* Bottom sheet drag handle */
+.bottom-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 0.75rem auto 1rem;
+}
+
+/* ==========================================================================
+   PULL TO REFRESH - Custom Indicator Position
+   ========================================================================== */
+
+.ptr-indicator {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+/* ==========================================================================
+   FIXED BOTTOM BAR - Navigation / Actions
+   ========================================================================== */
+
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-surface, rgba(26, 26, 46, 0.95));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  padding: 0.5rem 1rem;
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+}
+
+/* ==========================================================================
+   TOUCH ACTION HINTS - Prevent Unwanted Gestures
+   ========================================================================== */
+
+/* Prevent horizontal swipe on elements that shouldn't scroll horizontally */
+.no-swipe-x {
+  touch-action: pan-y;
+}
+
+/* Prevent all touch actions (useful for custom gesture handling) */
+.no-touch-action {
+  touch-action: none;
+}
+
+/* Allow pinch-zoom on images */
+.pinch-zoom {
+  touch-action: pinch-zoom;
+}
+
+/* ==========================================================================
+   IMAGE OPTIMIZATIONS - Mobile Performance
+   ========================================================================== */
+
+/* Lazy loading hint for browsers */
+img[loading="lazy"] {
+  background: var(--color-surface, #1a1a2e);
+}
+
+/* Prevent layout shift with aspect ratio */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-portrait {
+  aspect-ratio: 3 / 4;
+}
+
+/* ==========================================================================
+   LOADING STATES - Mobile Skeleton Screens
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md, 0.75rem);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ==========================================================================
+   HAPTIC FEEDBACK HINTS - Visual Cues for Touch
+   ========================================================================== */
+
+/* Elements that provide haptic feedback should have visual cues */
+.haptic-feedback:active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease-out;
+}
+
+/* Long-press indicator */
+.long-press-target {
+  position: relative;
+}
+
+.long-press-target::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: box-shadow 0.3s ease-out;
+}
+
+.long-press-target:active::after {
+  box-shadow: inset 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* ==========================================================================
+   iOS SPECIFIC - PWA Optimizations
+   ========================================================================== */
+
+/* Disable callout on long press for images in PWA */
+@supports (-webkit-touch-callout: none) {
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Re-enable for images that should be saveable */
+  img.saveable {
+    -webkit-touch-callout: default;
+  }
+}
+
+/* Status bar style for iOS PWA */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  
+  /* Ensure header doesn't overlap with status bar */
+  .site-header,
+  .app-header {
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  }
+}
+
+/* ==========================================================================
+   ANDROID SPECIFIC - PWA Optimizations
+   ========================================================================== */
+
+/* Navigation bar color matching (Android Chrome) */
+@media (display-mode: standalone) {
+  :root {
+    color-scheme: dark;
+  }
+  
+  [data-theme="light"] {
+    color-scheme: light;
+  }
+}
+
+/* ==========================================================================
+   ORIENTATION CHANGE HANDLING
+   ========================================================================== */
+
+/* Smooth transitions during orientation change */
+@media (orientation: portrait) {
+  body {
+    transition: none; /* Prevent jarring animations during rotation */
+  }
+}
+
+@media (orientation: landscape) {
+  /* Adjust layout for landscape */
+  .mobile-only {
+    display: none !important;
+  }
+  
+  .landscape-friendly {
+    flex-direction: row !important;
   }
 }

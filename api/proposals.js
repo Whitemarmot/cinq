@@ -149,6 +149,13 @@ async function handleCreateProposal(req, res, user) {
 
     if (error) throw error;
 
+    logInfo('Proposal created', { 
+        proposalId: data.id, 
+        senderId: user.id, 
+        receiverId: contact_id,
+        proposedAt: proposedDate.toISOString()
+    });
+
     // Send push notification
     const senderName = user.email?.split('@')[0] || 'Quelqu\'un';
     const date = proposedDate.toLocaleDateString('fr-FR', { 
