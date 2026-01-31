@@ -153,7 +153,7 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
     });
 }
 
-async function getFeed(res, user, limit, offset) {
+async function getFeed(res, user, limit, offset, cursor = null) {
     // Get contact IDs
     const { data: contacts } = await supabase
         .from('contacts')
@@ -163,13 +163,26 @@ async function getFeed(res, user, limit, offset) {
     const contactIds = contacts?.map(c => c.contact_user_id) || [];
     const allUserIds = [user.id, ...contactIds];
     
-    // Get posts
-    const { data: posts, error } = await supabase
+    // Build query
+    let query = supabase
         .from('posts')
         .select('*')
         .in('user_id', allUserIds)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + limit - 1);
+        .order('created_at', { ascending: false });
+    
+    // Cursor-based pagination (preferred) or offset-based fallback
+    if (cursor) {
+        // Get posts older than cursor
+        query = query.lt('created_at', cursor);
+    } else if (offset > 0) {
+        // Fallback to offset for backwards compat
+        query = query.range(offset, offset + limit - 1);
+    }
+    
+    // Always limit results
+    query = query.limit(limit);
+    
+    const { data: posts, error } = await query;
     
     if (error) throw error;
     
@@ -182,10 +195,17 @@ async function getFeed(res, user, limit, offset) {
         return { ...post, author: authorCache[post.user_id] };
     }));
     
+    // Generate next cursor (created_at of last post)
+    const nextCursor = posts.length === limit && posts.length > 0 
+        ? posts[posts.length - 1].created_at 
+        : null;
+    
     return res.json({ 
         posts: enriched, 
         count: posts.length,
-        contactCount: contactIds.length
+        contactCount: contactIds.length,
+        nextCursor,
+        hasMore: posts.length === limit
     });
 }
 

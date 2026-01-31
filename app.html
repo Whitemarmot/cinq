@@ -3269,12 +3269,12 @@
                 const time = formatTime(post.created_at);
                 
                 const avatarHtml = avatarUrl 
-                    ? `<img src="${escapeHtml(avatarUrl)}" alt="">`
+                    ? `<img data-src="${escapeHtml(avatarUrl)}" alt="" loading="lazy" class="lazy-image">`
                     : `<span aria-hidden="true">${initial}</span>`;
                 
                 const imageHtml = post.image_url ? `
-                    <div class="post-image">
-                        <img src="${escapeHtml(post.image_url)}" alt="Image partagée par ${escapeHtml(displayName)}" onclick="openImageModal('${escapeHtml(post.image_url)}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openImageModal('${escapeHtml(post.image_url)}')">
+                    <div class="post-image lazy-image-container">
+                        <img data-src="${escapeHtml(post.image_url)}" alt="Image partagée par ${escapeHtml(displayName)}" onclick="openImageModal('${escapeHtml(post.image_url)}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openImageModal('${escapeHtml(post.image_url)}')" loading="lazy" class="lazy-image">
                     </div>
                 ` : '';
                 
@@ -3404,8 +3404,10 @@
                     avatarSlot.setAttribute('aria-hidden', 'true');
                     if (avatarUrl) {
                         const img = document.createElement('img');
-                        img.src = avatarUrl;
+                        img.dataset.src = avatarUrl;
                         img.alt = '';
+                        img.loading = 'lazy';
+                        img.className = 'lazy-image';
                         avatarSlot.appendChild(img);
                     } else {
                         const span = document.createElement('span');
@@ -3450,12 +3452,32 @@
         }
 
         // ===== CHAT =====
+        let typingTimeout = null;
+        let isTyping = false;
+        
         function setupChatInput() {
             const input = document.getElementById('chat-input');
             const btn = document.getElementById('send-btn');
             
             input.addEventListener('input', () => {
                 btn.disabled = !input.value.trim();
+                
+                // Typing indicator logic - broadcast typing state
+                if (input.value.trim() && !isTyping) {
+                    isTyping = true;
+                    broadcastTypingState(true);
+                }
+                
+                // Clear existing timeout
+                if (typingTimeout) clearTimeout(typingTimeout);
+                
+                // Set timeout to stop typing indicator after 2 seconds of inactivity
+                typingTimeout = setTimeout(() => {
+                    if (isTyping) {
+                        isTyping = false;
+                        broadcastTypingState(false);
+                    }
+                }, 2000);
             });
             
             input.addEventListener('keypress', (e) => {
@@ -3464,6 +3486,39 @@
                     sendMessage();
                 }
             });
+            
+            // Stop typing when input loses focus
+            input.addEventListener('blur', () => {
+                if (isTyping) {
+                    isTyping = false;
+                    if (typingTimeout) clearTimeout(typingTimeout);
+                    broadcastTypingState(false);
+                }
+            });
+        }
+        
+        // Broadcast typing state (can be connected to real-time later)
+        function broadcastTypingState(typing) {
+            // For now, this is a placeholder for future WebSocket implementation
+            // When implemented, it would send typing state to the server
+            console.debug('Typing state:', typing);
+        }
+        
+        // Show/hide typing indicator from contact
+        function showTypingIndicator(show = true) {
+            const indicator = document.getElementById('typing-indicator');
+            const container = document.getElementById('chat-messages');
+            
+            if (show) {
+                indicator.classList.add('visible');
+                // Scroll to show typing indicator
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                indicator.classList.remove('visible');
+            }
         }
         
         let lastFocusedElement = null;
@@ -3623,25 +3678,90 @@
             const btn = document.getElementById('send-btn');
             btn.disabled = true;
             
+            // Stop typing indicator
+            if (isTyping) {
+                isTyping = false;
+                if (typingTimeout) clearTimeout(typingTimeout);
+                broadcastTypingState(false);
+            }
+            
             // Add sending animation
             btn.classList.add('sending');
             triggerHaptic('tap');
+            
+            // Optimistic update - show message immediately
+            const optimisticMsg = {
+                id: 'temp-' + Date.now(),
+                sender_id: user.id,
+                content: content,
+                created_at: new Date().toISOString(),
+                is_ping: false,
+                read_at: null,
+                _sending: true
+            };
+            
+            addOptimisticMessage(optimisticMsg);
+            input.value = '';
 
             try {
-                await fetch(`${API_URL}/messages`, {
+                const res = await fetch(`${API_URL}/messages`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify({ contact_id: currentChatContact.contact_user_id, content })
                 });
-                input.value = '';
+                
+                if (!res.ok) throw new Error('Échec envoi');
+                
                 triggerHaptic('success');
+                // Refresh to get the real message with proper ID
                 loadMessages();
             } catch (e) {
                 triggerHaptic('error');
                 showToast({ type: 'error', message: 'Message pas parti. Réessaie ?' });
+                // Remove optimistic message on error
+                removeOptimisticMessage(optimisticMsg.id);
             } finally {
                 setTimeout(() => btn.classList.remove('sending'), 500);
                 btn.disabled = !input.value.trim();
+            }
+        }
+        
+        // Add a message optimistically before server confirms
+        function addOptimisticMessage(msg) {
+            const container = document.getElementById('chat-messages');
+            
+            const msgEl = document.createElement('div');
+            msgEl.className = 'chat-message sent';
+            msgEl.id = `msg-${msg.id}`;
+            msgEl.setAttribute('role', 'article');
+            msgEl.setAttribute('aria-label', 'Toi dit');
+            
+            const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+            
+            msgEl.innerHTML = `
+                <div class="chat-message-content">${escapeHtml(msg.content)}</div>
+                <div class="chat-message-meta">
+                    <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
+                    <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
+                </div>
+            `;
+            
+            container.appendChild(msgEl);
+            
+            // Smooth scroll to the new message
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Remove an optimistic message (on error)
+        function removeOptimisticMessage(msgId) {
+            const msgEl = document.getElementById(`msg-${msgId}`);
+            if (msgEl) {
+                msgEl.style.opacity = '0';
+                msgEl.style.transform = 'translateX(20px)';
+                setTimeout(() => msgEl.remove(), 300);
             }
         }
 
@@ -3652,16 +3772,37 @@
             btn.classList.add('pinged');
             triggerHaptic('ping');
             
+            // Optimistic ping
+            const optimisticPing = {
+                id: 'temp-ping-' + Date.now(),
+                sender_id: user.id,
+                content: '👋',
+                created_at: new Date().toISOString(),
+                is_ping: true
+            };
+            
+            const container = document.getElementById('chat-messages');
+            const pingEl = document.createElement('div');
+            pingEl.className = 'chat-message ping';
+            pingEl.id = `msg-${optimisticPing.id}`;
+            pingEl.setAttribute('role', 'article');
+            pingEl.setAttribute('aria-label', 'Tu as envoyé un coucou');
+            pingEl.innerHTML = '<span aria-hidden="true">👋</span>';
+            container.appendChild(pingEl);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            
             try {
                 await fetch(`${API_URL}/messages`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify({ contact_id: currentChatContact.contact_user_id, is_ping: true })
                 });
+                // Refresh to sync with server
                 loadMessages();
             } catch (e) {
                 triggerHaptic('error');
                 showToast({ type: 'error', message: 'Le ping n\'est pas passé 😕' });
+                removeOptimisticMessage(optimisticPing.id);
             } finally {
                 setTimeout(() => btn.classList.remove('pinged'), 600);
             }

@@ -640,6 +640,147 @@
             40% { transform: scale(1); opacity: 1; }
         }
         
+        /* ===== PROGRESS STEPS ===== */
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            padding: var(--space-3) 0;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            opacity: 0.4;
+            transition: opacity 0.3s, transform 0.3s var(--ease-spring);
+        }
+        
+        .progress-step.active {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        .progress-step.completed {
+            opacity: 1;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--text-sm);
+            transition: all 0.3s var(--ease-spring);
+        }
+        
+        .progress-step.active .step-number {
+            background: var(--cinq-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 2px 12px var(--color-brand-glow);
+        }
+        
+        .progress-step.completed .step-number {
+            background: var(--color-success);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number::after {
+            content: '✓';
+        }
+        
+        .step-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+        
+        .progress-step.active .step-label {
+            color: var(--color-brand);
+        }
+        
+        .progress-line {
+            width: 60px;
+            height: 2px;
+            background: var(--color-border);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin: 0 var(--space-1);
+            margin-bottom: var(--space-4);
+        }
+        
+        .progress-line-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--cinq-gradient);
+            border-radius: inherit;
+            transition: width 0.5s var(--ease-out-expo);
+        }
+        
+        .progress-steps.step-2 .progress-line-fill {
+            width: 100%;
+        }
+        
+        .progress-steps.step-2 .progress-step:first-child {
+            opacity: 1;
+        }
+        
+        .progress-steps.step-2 .progress-step:first-child .step-number {
+            background: var(--color-success);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .progress-steps.step-2 .progress-step:last-child {
+            opacity: 1;
+        }
+        
+        .progress-steps.step-2 .progress-step:last-child .step-number {
+            background: var(--cinq-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 2px 12px var(--color-brand-glow);
+        }
+        
+        /* ===== ENCOURAGEMENT MESSAGES ===== */
+        .encouragement {
+            text-align: center;
+            padding: var(--space-3);
+            margin-bottom: var(--space-4);
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--color-brand-muted) 0%, var(--color-bg-elevated) 100%);
+            border: 1px solid var(--color-brand);
+            font-size: var(--text-sm);
+            color: var(--color-text-primary);
+            animation: encouragement-in 0.4s var(--ease-out-expo);
+            display: none;
+        }
+        
+        .encouragement.visible {
+            display: block;
+        }
+        
+        @keyframes encouragement-in {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .encouragement .emoji {
+            font-size: 1.2rem;
+            margin-right: var(--space-2);
+        }
+        
         /* ===== REDUCED MOTION ===== */
         @media (prefers-reduced-motion: reduce) {
             .register-card,
@@ -699,8 +840,23 @@
                 </div>
 
                 <div id="register-form-container" style="display: none;">
+                    <!-- Progress Indicator -->
+                    <div class="progress-steps" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="2" aria-label="Étape 1 sur 2: Informations de compte">
+                        <div class="progress-step active">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Compte</div>
+                        </div>
+                        <div class="progress-line">
+                            <div class="progress-line-fill"></div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number">2</div>
+                            <div class="step-label">C'est parti !</div>
+                        </div>
+                    </div>
+                    
                     <h1 class="register-title">Bienvenue sur Cinq</h1>
-                    <p class="register-subtitle">Tu as reçu une invitation</p>
+                    <p class="register-subtitle">Tu as reçu une invitation — c'est rare et précieux ✨</p>
 
                     <div class="gifter-info" id="gifter-info">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

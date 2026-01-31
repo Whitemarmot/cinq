@@ -1051,12 +1051,13 @@
         let posts = [];
         let openMenuPostId = null;
         
-        // ===== PAGINATION STATE =====
-        let currentPage = 0;
+        // ===== PAGINATION STATE (CURSOR-BASED) =====
+        let nextCursor = null;  // ISO date string of last post
         let pageSize = 10;
         let hasMorePosts = true;
         let isLoadingMore = false;
         let infiniteScrollObserver = null;
+        let isInitialLoad = true;
         
         // ===== PULL TO REFRESH STATE =====
         let ptrStartY = 0;
