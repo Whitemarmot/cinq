@@ -8,13 +8,15 @@
  * - Chat/messaging with contacts
  * - Ping feature
  * - Real-time message updates
+ * - Push notifications integration
  * 
  * Dependencies:
  * - Supabase client (loaded via CDN)
  * - /js/common.js (Cinq namespace)
+ * - /js/notifications.js (CinqNotifications)
  * 
  * @author Cinq Team
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 'use strict';
