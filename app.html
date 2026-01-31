@@ -1557,49 +1557,55 @@
         </div>
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
         <div class="chat-input-area">
-            <button class="ping-btn" onclick="sendPing()">👋</button>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500">
-            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled>→</button>
+            <button class="ping-btn" onclick="sendPing()" type="button" aria-label="Envoyer un coucou">
+                <span aria-hidden="true">👋</span>
+            </button>
+            <label for="chat-input" class="sr-only">Écrire un message</label>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500" autocomplete="off">
+            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled type="button" aria-label="Envoyer le message">
+                <span aria-hidden="true">→</span>
+            </button>
         </div>
     </div>
     
     <!-- Gift Modal -->
-    <div class="modal-overlay" id="gift-modal">
+    <div class="modal-overlay" id="gift-modal" role="dialog" aria-modal="true" aria-labelledby="gift-modal-title" aria-hidden="true">
         <div class="modal">
-            <h2 class="modal-title">🎁 Offrir Cinq</h2>
+            <h2 class="modal-title" id="gift-modal-title"><span aria-hidden="true">🎁</span> Offrir Cinq</h2>
             <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Choisis bien. Cinq n'est pas pour tout le monde.</p>
             <div id="gift-content">
-                <button class="save-btn" style="width:100%;" onclick="createGift()">Générer un code</button>
+                <button class="save-btn" style="width:100%;" onclick="createGift()" type="button">Générer un code</button>
             </div>
-            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeGiftModal()">Fermer</button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeGiftModal()" type="button">Fermer</button>
         </div>
     </div>
     
     <!-- Add Contact Modal -->
-    <div class="modal-overlay" id="add-contact-modal">
+    <div class="modal-overlay" id="add-contact-modal" role="dialog" aria-modal="true" aria-labelledby="add-contact-modal-title" aria-hidden="true">
         <div class="modal">
-            <h2 class="modal-title">➕ Ajouter un·e proche</h2>
+            <h2 class="modal-title" id="add-contact-modal-title"><span aria-hidden="true">➕</span> Ajouter un·e proche</h2>
             <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Demande-lui son ID (il l'a dans son profil)</p>
-            <input type="text" id="contact-id-input" class="settings-input" placeholder="Colle l'ID ici" style="margin-bottom:var(--space-4);">
-            <div id="add-contact-error" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
-            <button class="save-btn" style="width:100%;" onclick="addContact()" id="add-contact-btn">Ajouter</button>
+            <label for="contact-id-input" class="sr-only">ID du contact à ajouter</label>
+            <input type="text" id="contact-id-input" class="settings-input" placeholder="Colle l'ID ici" style="margin-bottom:var(--space-4);" autocomplete="off" aria-describedby="add-contact-error">
+            <div id="add-contact-error" role="alert" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
+            <button class="save-btn" style="width:100%;" onclick="addContact()" id="add-contact-btn" type="button">Ajouter</button>
             <div style="margin-top:var(--space-5);padding-top:var(--space-5);border-top:1px solid var(--color-border);">
-                <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">Ton ID (à partager) :</p>
-                <code id="my-id" style="font-size:var(--text-xs);word-break:break-all;display:block;background:var(--color-bg-tertiary);padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);"></code>
-                <button onclick="copyMyId()" style="margin-top:var(--space-2);padding:var(--space-2) var(--space-4);background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:var(--radius-lg);color:var(--color-text-primary);cursor:pointer;font-size:var(--text-sm);display:flex;align-items:center;gap:var(--space-2);">
-                    📋 <span id="copy-id-text">Copier mon ID</span>
+                <p id="my-id-label" style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">Ton ID (à partager) :</p>
+                <code id="my-id" aria-labelledby="my-id-label" style="font-size:var(--text-xs);word-break:break-all;display:block;background:var(--color-bg-tertiary);padding:var(--space-3);border-radius:var(--radius-lg);border:1px solid var(--color-border);"></code>
+                <button onclick="copyMyId()" type="button" aria-label="Copier mon ID dans le presse-papier" style="margin-top:var(--space-2);padding:var(--space-2) var(--space-4);background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:var(--radius-lg);color:var(--color-text-primary);cursor:pointer;font-size:var(--text-sm);display:flex;align-items:center;gap:var(--space-2);">
+                    <span aria-hidden="true">📋</span> <span id="copy-id-text">Copier mon ID</span>
                 </button>
             </div>
-            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeAddContactModal()">Fermer</button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeAddContactModal()" type="button">Fermer</button>
         </div>
     </div>
     
     <!-- Delete Account Modal -->
-    <div class="modal-overlay" id="delete-account-modal">
+    <div class="modal-overlay" id="delete-account-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-desc" aria-hidden="true">
         <div class="modal">
-            <h2 class="modal-title" style="color:var(--color-error);">🗑️ Supprimer mon compte</h2>
-            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Cette action est <strong style="color:var(--color-error);">définitive et irréversible</strong>.</p>
-            <div style="background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);">
+            <h2 class="modal-title" id="delete-modal-title" style="color:var(--color-error);"><span aria-hidden="true">🗑️</span> Supprimer mon compte</h2>
+            <p id="delete-modal-desc" style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Cette action est <strong style="color:var(--color-error);">définitive et irréversible</strong>.</p>
+            <div style="background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);" role="alert">
                 <p style="font-size:var(--text-sm);color:var(--color-text-primary);margin-bottom:var(--space-2);"><strong>Seront supprimés :</strong></p>
                 <ul style="font-size:var(--text-xs);color:var(--color-text-secondary);margin:0;padding-left:var(--space-5);">
                     <li>Ton profil et toutes tes infos</li>
@@ -1608,11 +1614,11 @@
                     <li>Tous tes posts</li>
                 </ul>
             </div>
-            <p style="font-size:var(--text-sm);margin-bottom:var(--space-3);">Pour confirmer, tape <strong style="color:var(--color-error);">SUPPRIMER</strong> :</p>
-            <input type="text" id="delete-confirmation-input" class="settings-input" placeholder="SUPPRIMER" autocomplete="off" style="text-align:center;letter-spacing:0.1em;margin-bottom:var(--space-4);">
-            <div id="delete-account-error" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
-            <button onclick="deleteAccount()" id="delete-account-btn" class="save-btn" style="width:100%;background:var(--color-error);box-shadow:0 2px 8px rgba(248,113,113,0.3);">Supprimer définitivement</button>
-            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeDeleteAccountModal()">Annuler</button>
+            <label for="delete-confirmation-input" style="font-size:var(--text-sm);margin-bottom:var(--space-3);display:block;">Pour confirmer, tape <strong style="color:var(--color-error);">SUPPRIMER</strong> :</label>
+            <input type="text" id="delete-confirmation-input" class="settings-input" placeholder="SUPPRIMER" autocomplete="off" style="text-align:center;letter-spacing:0.1em;margin-bottom:var(--space-4);" aria-describedby="delete-account-error">
+            <div id="delete-account-error" role="alert" aria-live="assertive" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
+            <button onclick="deleteAccount()" id="delete-account-btn" class="save-btn" type="button" style="width:100%;background:var(--color-error);box-shadow:0 2px 8px rgba(248,113,113,0.3);">Supprimer définitivement</button>
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeDeleteAccountModal()" type="button">Annuler</button>
         </div>
     </div>
 
@@ -2488,7 +2494,7 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                showToast({ type: 'success', title: 'Export terminé !' });
+                showToast({ type: 'success', title: 'C\'est téléchargé ! 📦' });
             } catch (e) {
                 showToast({ type: 'error', message: e.message });
             } finally {
@@ -2566,7 +2572,7 @@
             showToast({
                 type: 'info',
                 title: '🔔 Notifications',
-                message: 'Active les notifs pour ne rien manquer',
+                message: 'Active-les pour savoir quand tes 5 t\'écrivent',
                 duration: 6000,
                 onClick: async () => {
                     const permission = await Notification.requestPermission();
