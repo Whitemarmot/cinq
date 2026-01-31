@@ -242,6 +242,9 @@ netlify deploy --prod
 
 | Document | Description |
 |----------|-------------|
+| [FLOW.md](FLOW.md) | 🆕 Parcours utilisateurs détaillés |
+| [docs/ENV.md](docs/ENV.md) | 🆕 Guide des variables d'environnement |
+| [FAQ.html](FAQ.html) | 🆕 Questions fréquentes (utilisateurs) |
 | [docs/API.md](docs/API.md) | Documentation complète de l'API |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Guide de déploiement Netlify + Supabase |
 | [docs/AUTH-SYSTEM.md](docs/AUTH-SYSTEM.md) | Système d'authentification |

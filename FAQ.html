@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Questions fréquentes sur Cinq, l'anti-réseau social. Pourquoi 5 contacts ? Comment ça marche ? Tout ce que tu dois savoir.">
+    <meta name="keywords" content="cinq, faq, aide, questions, réseau social">
+    <meta name="author" content="Cinq">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/faq">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="FAQ — Cinq">
+    <meta property="og:description" content="Questions fréquentes sur Cinq, l'anti-réseau social.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/faq">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.css">
+    
+    <style>
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+        
+        .faq-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+        }
+        
+        .faq-logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .faq-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+        
+        .faq-subtitle {
+            color: var(--color-text-muted);
+            font-size: 1.125rem;
+        }
+        
+        .faq-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .faq-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-brand);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .faq-item {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        
+        .faq-item:hover {
+            border-color: var(--color-brand);
+        }
+        
+        .faq-question {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--color-text);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .faq-question:hover {
+            background: var(--color-bg-elevated);
+        }
+        
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            transition: transform 0.2s;
+        }
+        
+        .faq-item.open .faq-question::after {
+            transform: rotate(45deg);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-answer-content {
+            padding: 0 1.5rem 1.25rem 1.5rem;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+        }
+        
+        .faq-answer-content a {
+            color: var(--color-brand);
+            text-decoration: underline;
+        }
+        
+        .faq-answer-content ul {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .faq-answer-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-cta {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            margin-top: 2rem;
+        }
+        
+        .faq-cta-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-cta-text {
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .faq-cta-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-brand);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        .faq-cta-email:hover {
+            opacity: 0.9;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover {
+            color: var(--color-text);
+        }
+        
+        .highlight-box {
+            background: var(--color-bg-elevated);
+            border-left: 3px solid var(--color-brand);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+        
+        @media (max-width: 600px) {
+            .faq-title {
+                font-size: 1.5rem;
+            }
+            
+            .faq-question {
+                padding: 1rem 1.25rem;
+                font-size: 0.9375rem;
+            }
+            
+            .faq-answer-content {
+                padding: 0 1.25rem 1rem 1.25rem;
+                font-size: 0.9375rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <a href="/" class="back-link">
+            ← Retour à l'accueil
+        </a>
+        
+        <header class="faq-header">
+            <div class="faq-logo">🔵</div>
+            <h1 class="faq-title">Questions fréquentes</h1>
+            <p class="faq-subtitle">Tout ce que tu dois savoir sur Cinq</p>
+        </header>
+        
+        <!-- Section : Le concept -->
+        <section class="faq-section">
+            <h2 class="faq-section-title">🎯 Le concept</h2>
+            
+            <div class="faq-item">
+                <button class="faq-question">C'est quoi Cinq, exactement ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Cinq est un <strong>anti-réseau social</strong>. Tu ne peux avoir que <strong>5 contacts</strong> — les personnes qui comptent vraiment pour toi.</p>
+                        <p>Pas de likes, pas de followers, pas d'algorithme qui te pousse à scroller. Juste toi et tes proches.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Pourquoi seulement 5 contacts ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Parce que la qualité > la quantité.</p>
+                        <p>Les études montrent que nous ne pouvons maintenir que ~5 relations vraiment intimes (le "cercle de soutien" de Robin Dunbar). Cinq t'oblige à choisir — et ce choix a du sens.</p>
+                        <div class="highlight-box">
+                            💡 Pense aux 5 personnes que tu appellerais à 3h du matin. C'est ça, Cinq.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Pourquoi je ne peux pas m'inscrire seul ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p><strong>Tu ne t'inscris pas. On t'offre Cinq.</strong></p>
+                        <p>Quelqu'un doit payer 15€ pour t'offrir l'accès. C'est un filtre intentionnel :</p>
+                        <ul>
+                            <li>Chaque utilisateur existe parce qu'il compte pour quelqu'un</li>
+                            <li>Pas de bots, pas de spam, pas de faux profils</li>
+                            <li>Une communauté qui se construit par les liens réels</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Et si je veux plus de 5 contacts ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Tu ne peux pas. Et c'est le but.</p>
+                        <p>Si tu veux ajouter quelqu'un de nouveau, tu dois libérer une place. Ça te force à réfléchir : est-ce que cette nouvelle personne compte plus que l'une de tes 5 actuelles ?</p>
+                        <p>Ce n'est pas une prison, c'est une invitation à l'intentionnalité.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section : Comment ça marche -->
+        <section class="faq-section">
+            <h2 class="faq-section-title">⚙️ Comment ça marche</h2>
+            
+            <div class="faq-item">
+                <button class="faq-question">Comment offrir Cinq à quelqu'un ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <ol style="padding-left: 1.5rem; margin: 0.5rem 0;">
+                            <li>Va sur <a href="/gift">cinq.app/gift</a></li>
+                            <li>Paie 15€ en crypto (USDC, BTC Lightning, ou ETH)</li>
+                            <li>Tu reçois un code cadeau unique</li>
+                            <li>Envoie ce code à la personne de ton choix</li>
+                        </ol>
+                        <p>Le destinataire utilisera ce code pour créer son compte.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">J'ai reçu un code, comment l'activer ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <ol style="padding-left: 1.5rem; margin: 0.5rem 0;">
+                            <li>Va sur <a href="/redeem">cinq.app/redeem</a></li>
+                            <li>Entre ton code cadeau (format : CINQ-XXXX-YYYY)</li>
+                            <li>Crée ton compte avec email + mot de passe</li>
+                            <li>C'est tout ! Tu peux ajouter tes 5 contacts</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Pourquoi payer en crypto ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Cohérence avec notre philosophie :</p>
+                        <ul>
+                            <li><strong>Pas de KYC</strong> — On ne veut pas de ton passeport</li>
+                            <li><strong>Décentralisé</strong> — Pas de dépendance à un processeur de paiement</li>
+                            <li><strong>Instantané</strong> — Surtout avec Lightning Network</li>
+                        </ul>
+                        <p>On accepte USDC (stablecoin, pas de volatilité), BTC via Lightning, et ETH sur Base.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">C'est quoi le "Ping" ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Un Ping, c'est juste dire <strong>"Je pense à toi"</strong> — sans texte, sans pression.</p>
+                        <p>Un clic. Ton contact reçoit une notification. C'est tout.</p>
+                        <p>Pas besoin de trouver les mots. Parfois, savoir que quelqu'un pense à nous suffit.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section : Vie privée -->
+        <section class="faq-section">
+            <h2 class="faq-section-title">🔒 Vie privée & sécurité</h2>
+            
+            <div class="faq-item">
+                <button class="faq-question">Quelles données collectez-vous ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Le minimum vital :</p>
+                        <ul>
+                            <li><strong>Email</strong> — pour te connecter et te contacter si besoin</li>
+                            <li><strong>Prénom/pseudo</strong> — affiché à tes contacts</li>
+                            <li><strong>Tes contacts</strong> — stockés de façon chiffrée</li>
+                            <li><strong>Tes messages</strong> — entre toi et tes contacts</li>
+                        </ul>
+                        <p>Ce qu'on ne fait <strong>PAS</strong> :</p>
+                        <ul>
+                            <li>Pas de tracking publicitaire</li>
+                            <li>Pas de vente de données</li>
+                            <li>Pas d'analyse comportementale</li>
+                            <li>Pas de cookies tiers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Mes messages sont-ils chiffrés ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Actuellement, les messages sont chiffrés au repos dans notre base de données.</p>
+                        <p>Le chiffrement de bout en bout (E2E) avec le protocole Signal est sur notre roadmap — c'est une priorité.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Comment supprimer mon compte ?</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Dans les paramètres de l'app, tu trouveras l'option "Supprimer mon compte".</p>
+                        <p>Cette action est <strong>irréversible</strong> :</p>
+                        <ul>
+                            <li>Ton profil est supprimé</li>
+                            <li>Tes messages sont effacés</li>
+                            <li>Tu disparais des listes de contacts de tes proches</li>
+                        </ul>
+                        <p>On ne garde rien. Promis.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section : Problèmes courants -->
+        <section class="faq-section">
+            <h2 class="faq-section-title">🆘 Problèmes courants</h2>
+            
+            <div class="faq-item">
+                <button class="faq-question">Mon code cadeau ne fonctionne pas</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Vérifie les points suivants :</p>
+                        <ul>
+                            <li><strong>Format</strong> — Le code doit être au format CINQ-XXXX-YYYY</li>
+                            <li><strong>Tirets</strong> — Assure-toi d'inclure les tirets</li>
+                            <li><strong>Casse</strong> — Le code est en MAJUSCULES</li>
+                            <li><strong>Expiration</strong> — Les codes expirent après 30 jours</li>
+                            <li><strong>Déjà utilisé</strong> — Chaque code ne peut être utilisé qu'une fois</li>
+                        </ul>
+                        <p>Si le problème persiste, contacte la personne qui t'a offert le code.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">J'ai oublié mon mot de passe</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <ol style="padding-left: 1.5rem; margin: 0.5rem 0;">
+                            <li>Va sur <a href="/login">la page de connexion</a></li>
+                            <li>Clique sur "Mot de passe oublié"</li>
+                            <li>Entre ton email</li>
+                            <li>Check ta boîte mail (et les spams !)</li>
+                            <li>Clique sur le lien reçu (valide 1h)</li>
+                            <li>Choisis un nouveau mot de passe</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">Je ne reçois pas les notifications</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p><strong>Sur navigateur :</strong></p>
+                        <ul>
+                            <li>Vérifie que tu as autorisé les notifications</li>
+                            <li>Chrome : Paramètres → Confidentialité → Notifications</li>
+                        </ul>
+                        <p><strong>Sur mobile (PWA) :</strong></p>
+                        <ul>
+                            <li>iOS : Les notifications push ne sont pas encore supportées</li>
+                            <li>Android : Vérifie les paramètres de l'app Cinq</li>
+                        </ul>
+                        <p><strong>Note :</strong> On limite volontairement les notifications pour ne pas être anxiogène. C'est un choix.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question">L'app ne s'affiche pas correctement</button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Essaie ces solutions :</p>
+                        <ul>
+                            <li><strong>Vide le cache</strong> — Ctrl+Shift+R (ou Cmd+Shift+R sur Mac)</li>
+                            <li><strong>Mets à jour ton navigateur</strong> — On supporte les versions récentes</li>
+                            <li><strong>Désactive les extensions</strong> — Certains bloqueurs peuvent interférer</li>
+                        </ul>
+                        <p>Navigateurs supportés : Chrome, Firefox, Safari, Edge (versions récentes).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Contact -->
+        <div class="faq-cta">
+            <h3 class="faq-cta-title">Tu n'as pas trouvé ta réponse ?</h3>
+            <p class="faq-cta-text">Écris-nous, on répond vraiment.</p>
+            <a href="mailto:hello@cinq.app" class="faq-cta-email">
+                ✉️ hello@cinq.app
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Toggle FAQ items
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const wasOpen = item.classList.contains('open');
+                
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                
+                // Open clicked item (if it wasn't already open)
+                if (!wasOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+        
+        // Open first item by default
+        document.querySelector('.faq-item')?.classList.add('open');
+    </script>
+</body>
+</html>

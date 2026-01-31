@@ -419,6 +419,25 @@ GET /api/user-profile
 Authorization: Bearer <token>
 ```
 
+**Réponse (200):**
+```json
+{
+  "profile": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "display_name": "Mon Nom",
+    "bio": "Ma bio",
+    "avatar_url": null,
+    "created_at": "2024-01-31T10:00:00Z",
+    "updated_at": "2024-01-31T12:00:00Z"
+  },
+  "stats": {
+    "contactCount": 3,
+    "maxContacts": 5
+  }
+}
+```
+
 ---
 
 ### Mettre à jour son profil
@@ -433,6 +452,78 @@ Content-Type: application/json
   "bio": "Ma bio"
 }
 ```
+
+**Réponse (200):**
+```json
+{
+  "success": true,
+  "profile": { ... }
+}
+```
+
+**Champs modifiables:**
+- `display_name`: Pseudo (2-50 caractères)
+- `bio`: Biographie (max 500 caractères)
+- `avatar_url`: URL HTTPS d'avatar (max 500 caractères)
+
+---
+
+### 🆕 Exporter ses données (RGPD)
+
+```http
+GET /api/user-profile?action=export
+Authorization: Bearer <token>
+```
+
+**Réponse (200):** Fichier JSON téléchargeable contenant :
+```json
+{
+  "exportDate": "2024-01-31T15:00:00Z",
+  "user": { "id": "...", "email": "...", "display_name": "...", "bio": "...", ... },
+  "contacts": [ ... ],
+  "messages": [ ... ],
+  "proposals": [ ... ],
+  "giftCodesCreated": [ ... ],
+  "pushSubscriptions": [ ... ]
+}
+```
+
+---
+
+### 🆕 Supprimer son compte
+
+```http
+DELETE /api/user-profile
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "confirmation": "SUPPRIMER"
+}
+```
+
+**⚠️ Action définitive et irréversible !**
+
+**Réponse (200):**
+```json
+{
+  "success": true,
+  "message": "Compte supprimé définitivement. Adieu ! 👋"
+}
+```
+
+**Données supprimées :**
+- Profil utilisateur
+- Tous les contacts
+- Tous les messages (envoyés et reçus)
+- Toutes les propositions
+- Abonnements push
+- Les gift codes créés sont anonymisés (non supprimés)
+
+**Erreurs possibles:**
+| Code | Erreur | Cause |
+|------|--------|-------|
+| 400 | Confirmation requise | Missing `{ "confirmation": "SUPPRIMER" }` |
 
 ---
 
@@ -585,6 +676,13 @@ X-Admin-Secret: <ADMIN_SECRET>
 ---
 
 ## Changelog
+
+### v1.3.0 (2024-01-31)
+- 🆕 `GET /api/user-profile?action=export` - Export RGPD de toutes les données
+- 🆕 `DELETE /api/user-profile` - Suppression de compte définitive
+- 🆕 `PUT /api/user-profile` - Modification du display_name et bio
+- ✨ Section "Mon compte" dans app.html avec gestion du profil
+- ✨ Modal de confirmation pour la suppression de compte
 
 ### v1.2.0 (2024-01-31)
 - 🆕 `GET /api/stats` - Endpoint admin pour les métriques

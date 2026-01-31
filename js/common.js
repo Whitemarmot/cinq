@@ -162,6 +162,136 @@ window.Cinq = window.Cinq || {};
   // ============================================
   
   /**
+   * User-friendly error messages for common API errors
+   * @constant {Object}
+   */
+  const USER_FRIENDLY_MESSAGES = {
+    'Failed to fetch': 'Problème de connexion. Vérifie ton internet.',
+    'Network request failed': 'Problème de connexion. Vérifie ton internet.',
+    'NetworkError': 'Problème de connexion. Vérifie ton internet.',
+    'TypeError': 'Problème de connexion. Vérifie ton internet.',
+    'TimeoutError': 'La requête a pris trop de temps. Réessaie.',
+    'AbortError': 'Requête annulée.',
+    401: 'Session expirée. Reconnecte-toi.',
+    403: 'Accès refusé.',
+    404: 'Ressource non trouvée.',
+    409: 'Cette ressource existe déjà.',
+    429: 'Trop de requêtes. Attends un moment.',
+    500: 'Erreur serveur. Réessaie dans quelques instants.',
+    502: 'Service temporairement indisponible.',
+    503: 'Service temporairement indisponible.',
+  };
+  
+  /**
+   * Get a user-friendly error message from an error object or status
+   * 
+   * @param {Error|Object} error - The error object
+   * @returns {string} - User-friendly message in French
+   */
+  function getFriendlyErrorMessage(error) {
+    // If error has a user-friendly message from server, use it
+    if (error.error && typeof error.error === 'string') {
+      return error.error;
+    }
+    
+    // If error has a message, check our mapping
+    if (error.message) {
+      // Check for known error messages
+      for (const [key, msg] of Object.entries(USER_FRIENDLY_MESSAGES)) {
+        if (error.message.includes(key) || error.name === key) {
+          return msg;
+        }
+      }
+    }
+    
+    // Check for HTTP status codes
+    if (error.status && USER_FRIENDLY_MESSAGES[error.status]) {
+      return USER_FRIENDLY_MESSAGES[error.status];
+    }
+    
+    // Check if offline
+    if (!navigator.onLine) {
+      return 'Tu es hors ligne. Vérifie ta connexion.';
+    }
+    
+    // Default fallback
+    return 'Une erreur est survenue. Réessaie.';
+  }
+  
+  /**
+   * Show a toast notification for errors (or success)
+   * 
+   * @param {string} message - Message to display
+   * @param {Object} [options={}] - Options
+   * @param {string} [options.type='error'] - Type: 'error', 'success', 'warning', 'info'
+   * @param {number} [options.duration=4000] - Duration in ms
+   * @param {string} [options.icon] - Custom icon emoji
+   */
+  function showToast(message, options = {}) {
+    const { 
+      type = 'error', 
+      duration = 4000,
+      icon
+    } = options;
+    
+    // Remove existing toast
+    const existing = document.getElementById('cinq-toast');
+    if (existing) existing.remove();
+    
+    // Determine icon and colors
+    const icons = {
+      error: '😕',
+      success: '✅',
+      warning: '⚠️',
+      info: 'ℹ️'
+    };
+    const colors = {
+      error: 'bg-red-500/90',
+      success: 'bg-green-500/90',
+      warning: 'bg-amber-500/90',
+      info: 'bg-indigo-500/90'
+    };
+    
+    // Create toast
+    const toast = document.createElement('div');
+    toast.id = 'cinq-toast';
+    toast.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 ${colors[type] || colors.error} text-white rounded-xl text-sm font-medium shadow-lg z-50 flex items-center gap-2 transition-all`;
+    toast.style.animation = 'slideUp 0.3s ease-out';
+    toast.innerHTML = `
+      <span>${icon || icons[type] || icons.error}</span>
+      <span>${escapeHtml(message)}</span>
+    `;
+    
+    // Add animation keyframes if not present
+    if (!document.getElementById('toast-styles')) {
+      const style = document.createElement('style');
+      style.id = 'toast-styles';
+      style.textContent = `
+        @keyframes slideUp {
+          from { transform: translate(-50%, 100%); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        @keyframes slideDown {
+          from { transform: translate(-50%, 0); opacity: 1; }
+          to { transform: translate(-50%, 100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(toast);
+    
+    // Also announce for accessibility
+    announce(message);
+    
+    // Auto-remove
+    setTimeout(() => {
+      toast.style.animation = 'slideDown 0.3s ease-in forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+  
+  /**
    * Show error message in a designated element
    * 
    * @param {string} elementId - ID of the error element
@@ -210,6 +340,8 @@ window.Cinq = window.Cinq || {};
   Cinq.showError = showError;
   Cinq.hideError = hideError;
   Cinq.hideAllErrors = hideAllErrors;
+  Cinq.getFriendlyErrorMessage = getFriendlyErrorMessage;
+  Cinq.showToast = showToast;
   
   // ============================================
   // Clipboard Operations
@@ -303,6 +435,7 @@ window.Cinq = window.Cinq || {};
    * @param {string} [options.method='GET'] - HTTP method
    * @param {Object} [options.body] - Request body (will be JSON stringified)
    * @param {boolean} [options.auth=true] - Whether to include auth header
+   * @param {boolean} [options.showToastOnError=false] - Whether to show toast on error
    * @returns {Promise<Object>} - Parsed JSON response
    * @throws {Error} - If request fails or returns error
    * 
@@ -317,7 +450,17 @@ window.Cinq = window.Cinq || {};
    * });
    */
   async function apiCall(endpoint, options = {}) {
-    const { method = 'GET', body, auth = true } = options;
+    const { method = 'GET', body, auth = true, showToastOnError = false } = options;
+    
+    // Check if online first
+    if (!navigator.onLine) {
+      const err = new Error('Tu es hors ligne. Vérifie ta connexion.');
+      err.offline = true;
+      if (showToastOnError) {
+        showToast(err.message, { type: 'warning', icon: '📡' });
+      }
+      throw err;
+    }
     
     const headers = {
       'Content-Type': 'application/json'
@@ -340,17 +483,52 @@ window.Cinq = window.Cinq || {};
       fetchOptions.body = JSON.stringify(body);
     }
     
-    const res = await fetch(`${API_BASE}/${endpoint}`, fetchOptions);
-    const data = await res.json();
-    
-    if (!res.ok || data.success === false) {
-      const err = new Error(data.error || 'API error');
-      err.code = data.details?.code || data.code;
-      err.status = res.status;
+    try {
+      const res = await fetch(`${API_BASE}/${endpoint}`, fetchOptions);
+      
+      // Try to parse JSON, but handle non-JSON responses
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        data = { error: 'Réponse serveur invalide' };
+      }
+      
+      if (!res.ok || data.success === false) {
+        const err = new Error(data.error || getFriendlyErrorMessage({ status: res.status }));
+        err.code = data.code || data.details?.code;
+        err.status = res.status;
+        err.hint = data.hint;
+        err.field = data.field;
+        
+        if (showToastOnError) {
+          showToast(err.message);
+        }
+        throw err;
+      }
+      
+      // Update last sync timestamp
+      localStorage.setItem('cinq_last_sync', Date.now().toString());
+      
+      return data;
+      
+    } catch (fetchError) {
+      // Network or other fetch errors
+      if (fetchError.status) {
+        // Already processed above
+        throw fetchError;
+      }
+      
+      // Network error
+      const err = new Error(getFriendlyErrorMessage(fetchError));
+      err.originalError = fetchError;
+      err.status = 0;
+      
+      if (showToastOnError) {
+        showToast(err.message, { type: 'warning' });
+      }
       throw err;
     }
-    
-    return data;
   }
   
   // Export API helpers

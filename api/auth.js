@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS, getClientIP } from './_rate-limit.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -261,10 +262,13 @@ export default async function handler(req, res) {
         });
 
     } catch (e) {
-        console.error('Auth error:', e);
-        return res.status(500).json({ 
-            error: 'Erreur serveur',
-            details: process.env.NODE_ENV === 'development' ? e.message : undefined
+        logError(e, { 
+            endpoint: '/api/auth',
+            action,
+            method: req.method 
         });
+        return res.status(500).json(
+            createErrorResponse(e, { includeDebug: process.env.NODE_ENV === 'development' })
+        );
     }
 }

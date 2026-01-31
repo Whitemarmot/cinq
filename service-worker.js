@@ -176,7 +176,7 @@ async function networkFirst(request, cacheName, timeout = 3000) {
     
     // Return offline fallback for HTML
     if (request.headers.get('accept')?.includes('text/html')) {
-      return caches.match('/404.html');
+      return caches.match('/offline.html');
     }
     throw error;
   }

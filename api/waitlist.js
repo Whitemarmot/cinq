@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidEmail } from './_validation.js';
+import { logError, createErrorResponse } from './_error-logger.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -32,7 +33,8 @@ export default async function handler(req, res) {
             if (error) throw error;
             return res.json({ count: count || 0 });
         } catch (e) {
-            return res.status(500).json({ error: e.message });
+            logError(e, { endpoint: '/api/waitlist', method: 'GET' });
+            return res.status(500).json(createErrorResponse(e));
         }
     }
 
@@ -75,7 +77,10 @@ export default async function handler(req, res) {
 
             return res.json({ success: true, count: count || 1 });
         } catch (e) {
-            return res.status(500).json({ error: e.message });
+            logError(e, { endpoint: '/api/waitlist', method: 'POST' });
+            return res.status(500).json(
+                createErrorResponse(e, { hint: 'Inscription impossible. Réessaie plus tard.' })
+            );
         }
     }
 

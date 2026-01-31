@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { sendPushNotification } from './_push-helper.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, validateMessageContent, validateLocation } from './_validation.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -183,7 +184,16 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
 
     } catch (e) {
-        console.error('Proposals error:', e);
-        return res.status(500).json({ error: e.message });
+        logError(e, { 
+            endpoint: '/api/proposals',
+            method: req.method,
+            userId: user?.id 
+        });
+        return res.status(500).json(
+            createErrorResponse(e, { 
+                includeDebug: process.env.NODE_ENV === 'development',
+                hint: 'Ta proposition n\'a pas pu être créée. Réessaie.'
+            })
+        );
     }
 }

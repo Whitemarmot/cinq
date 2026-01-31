@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -89,7 +90,16 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
 
     } catch (e) {
-        console.error('Push error:', e);
-        return res.status(500).json({ error: e.message });
+        logError(e, { 
+            endpoint: '/api/push-subscribe',
+            method: req.method,
+            userId: user?.id 
+        });
+        return res.status(500).json(
+            createErrorResponse(e, { 
+                includeDebug: process.env.NODE_ENV === 'development',
+                hint: 'Impossible d\'activer les notifications. Réessaie.'
+            })
+        );
     }
 }

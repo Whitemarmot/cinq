@@ -972,7 +972,7 @@
     <div class="toast-container" id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
     <!-- Onboarding Overlay -->
-    <div class="onboarding-overlay" id="onboarding-overlay">
+    <div class="onboarding-overlay" id="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
         <div class="onboarding-container">
             <!-- Step 1: Welcome -->
             <div class="onboarding-step active" id="onboarding-step-1">
@@ -983,16 +983,16 @@
                     <br><br>
                     Ici, pas de scroll infini ni de likes. Juste toi et <span class="onboarding-highlight">5 personnes</span> qui comptent vraiment.
                 </p>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Découvrir Cinq - étape suivante">
                     Découvrir →
                 </button>
-                <div class="onboarding-progress">
+                <div class="onboarding-progress" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 1 sur 4">
                     <div class="onboarding-dot active"></div>
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>
                 </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()">Passer l'intro</button>
+                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer l'intro</button>
             </div>
 
             <!-- Step 2: The Concept -->
@@ -1016,16 +1016,16 @@
                         Choisis avec soin. Chaque place compte.
                     </p>
                 </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Continuer - étape suivante">
                     Continuer →
                 </button>
-                <div class="onboarding-progress">
+                <div class="onboarding-progress" role="progressbar" aria-valuenow="2" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 2 sur 4">
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot active"></div>
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>
                 </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()">Passer</button>
+                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer</button>
             </div>
 
             <!-- Step 3: The Ping -->
@@ -1051,16 +1051,16 @@
                         <span>Pas de spam. Juste ce qui compte.</span>
                     </div>
                 </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                <button class="onboarding-btn" onclick="nextOnboardingStep()" aria-label="Presque fini - étape suivante">
                     Presque fini →
                 </button>
-                <div class="onboarding-progress">
+                <div class="onboarding-progress" role="progressbar" aria-valuenow="3" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 3 sur 4">
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot active"></div>
                     <div class="onboarding-dot"></div>
                 </div>
-                <button class="onboarding-skip" onclick="skipOnboarding()">Passer</button>
+                <button class="onboarding-skip" onclick="skipOnboarding()" aria-label="Passer l'introduction">Passer</button>
             </div>
 
             <!-- Step 4: Getting Started -->
@@ -1091,10 +1091,10 @@
                         <span>Pour que tes amis puissent t'ajouter</span>
                     </div>
                 </div>
-                <button class="onboarding-btn" onclick="finishOnboarding()">
+                <button class="onboarding-btn" onclick="finishOnboarding()" aria-label="Commencer à utiliser Cinq">
                     Commencer 🎉
                 </button>
-                <div class="onboarding-progress">
+                <div class="onboarding-progress" role="progressbar" aria-valuenow="4" aria-valuemin="1" aria-valuemax="4" aria-label="Étape 4 sur 4">
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>
                     <div class="onboarding-dot"></div>

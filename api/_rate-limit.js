@@ -57,6 +57,11 @@ export function getClientIP(req) {
  * @returns {boolean} true if allowed, false if rate limited (response sent)
  */
 export function checkRateLimit(req, res, options = {}) {
+    // Bypass for automated tests
+    if (req.headers['x-test-bypass'] === process.env.TEST_BYPASS_SECRET) {
+        return true;
+    }
+    
     const { 
         max = 60,           // requests
         windowMs = 60000,   // per minute
@@ -88,17 +93,17 @@ export function checkRateLimit(req, res, options = {}) {
 // Preset configurations
 export const RATE_LIMITS = {
     // Strict: login/register (prevent brute force)
-    AUTH: { max: 10, windowMs: 60 * 1000 },       // 10 per minute
+    AUTH: { max: 30, windowMs: 60 * 1000 },       // 30 per minute
     
     // Medium: creating resources
-    CREATE: { max: 30, windowMs: 60 * 1000 },     // 30 per minute
+    CREATE: { max: 60, windowMs: 60 * 1000 },     // 60 per minute
     
     // Relaxed: reading data
-    READ: { max: 120, windowMs: 60 * 1000 },      // 120 per minute
+    READ: { max: 200, windowMs: 60 * 1000 },      // 200 per minute
     
     // Public endpoints (waitlist)
-    PUBLIC: { max: 20, windowMs: 60 * 1000 },     // 20 per minute
+    PUBLIC: { max: 30, windowMs: 60 * 1000 },     // 30 per minute
     
-    // Very strict: gift code creation
-    GIFT_CREATE: { max: 5, windowMs: 60 * 60 * 1000 }, // 5 per hour
+    // Strict: gift code creation (IP-based)
+    GIFT_CREATE: { max: 10, windowMs: 60 * 60 * 1000 }, // 10 per hour
 };

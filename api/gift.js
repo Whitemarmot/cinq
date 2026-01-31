@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -166,7 +167,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Action invalide. Use: create, verify, list' });
 
     } catch (e) {
-        console.error('Gift error:', e);
-        return res.status(500).json({ error: e.message });
+        logError(e, { 
+            endpoint: '/api/gift',
+            action,
+            method: req.method 
+        });
+        return res.status(500).json(
+            createErrorResponse(e, { 
+                includeDebug: process.env.NODE_ENV === 'development',
+                hint: 'Réessaie dans quelques instants'
+            })
+        );
     }
 }

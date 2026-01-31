@@ -1,14 +1,16 @@
 /**
  * CINQ User Profile - Netlify Function
- * SARAH Backend - Profile & Contacts Management
+ * Profile & Account Management
  * 
  * GET /api/user-profile
- *   - Returns user profile with contacts
+ *   - Returns user profile with stats
+ *   - ?action=export - GDPR data export
  * 
- * POST /api/user-profile
- *   - action: "add_contact" - Add a contact (max 5)
- *   - action: "remove_contact" - Remove a contact
- *   - action: "update_profile" - Update profile settings
+ * PUT /api/user-profile
+ *   - Update display_name, bio, avatar_url
+ * 
+ * DELETE /api/user-profile
+ *   - Delete account (requires { confirmation: "SUPPRIMER" })
  * 
  * Requires: Authorization: Bearer <access_token>
  */
@@ -55,14 +57,61 @@ function getAuthToken(event) {
     return authHeader.slice(7);
 }
 
+// Validation helpers
+function sanitizeText(str, maxLength = 1000, allowNewlines = false) {
+    if (typeof str !== 'string') return '';
+    let clean = str
+        .replace(/\0/g, '')
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+        .trim();
+    if (!allowNewlines) {
+        clean = clean.replace(/[\r\n]+/g, ' ');
+    }
+    return clean.substring(0, maxLength);
+}
+
+function validateDisplayName(name) {
+    if (!name) return { valid: true, name: null };
+    const sanitized = sanitizeText(name, 50, false);
+    if (sanitized.length < 2) {
+        return { valid: false, error: 'Nom trop court (min 2 caractères)' };
+    }
+    return { valid: true, name: sanitized };
+}
+
+function validateBio(bio) {
+    if (!bio) return { valid: true, bio: null };
+    return { valid: true, bio: sanitizeText(bio, 500, true) };
+}
+
+function validateURL(url) {
+    if (!url) return { valid: true, url: null };
+    try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') {
+            return { valid: false, error: 'URL doit être HTTPS' };
+        }
+        if (url.length > 500) {
+            return { valid: false, error: 'URL trop longue' };
+        }
+        return { valid: true, url };
+    } catch {
+        return { valid: false, error: 'Format URL invalide' };
+    }
+}
+
 exports.handler = async (event, context) => {
     // CORS preflight
     if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 204, headers, body: '' };
+        return { 
+            statusCode: 204, 
+            headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS' }, 
+            body: '' 
+        };
     }
 
     // ========================================
-    // 1. Authentication Check
+    // Authentication Check
     // ========================================
     
     const token = getAuthToken(event);
@@ -80,16 +129,88 @@ exports.handler = async (event, context) => {
         return error('Invalid or expired token', 401);
     }
 
+    // Parse query params
+    const params = event.queryStringParameters || {};
+    const action = params.action;
+
     // ========================================
-    // GET - Fetch Profile
+    // GET - Fetch Profile or Export Data
     // ========================================
     
     if (event.httpMethod === 'GET') {
         try {
-            // Get user profile
+            // ===== GDPR DATA EXPORT =====
+            if (action === 'export') {
+                const exportData = {
+                    exportDate: new Date().toISOString(),
+                    user: null,
+                    contacts: [],
+                    messages: [],
+                    proposals: [],
+                    giftCodesCreated: [],
+                    pushSubscriptions: []
+                };
+
+                // User profile
+                const { data: profile } = await supabaseAdmin
+                    .from('users')
+                    .select('id, email, display_name, bio, avatar_url, created_at, updated_at, gift_code_used')
+                    .eq('id', user.id)
+                    .single();
+                exportData.user = profile;
+
+                // Contacts
+                const { data: contacts } = await supabaseAdmin
+                    .from('contacts')
+                    .select('id, contact_user_id, nickname, created_at')
+                    .eq('user_id', user.id);
+                exportData.contacts = contacts || [];
+
+                // Messages
+                const { data: messages } = await supabaseAdmin
+                    .from('messages')
+                    .select('id, sender_id, receiver_id, content, is_ping, read_at, created_at')
+                    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+                    .order('created_at', { ascending: true });
+                exportData.messages = messages || [];
+
+                // Proposals
+                const { data: proposals } = await supabaseAdmin
+                    .from('proposals')
+                    .select('id, sender_id, receiver_id, proposed_at, location, message, status, responded_at, created_at')
+                    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+                    .order('created_at', { ascending: true });
+                exportData.proposals = proposals || [];
+
+                // Gift codes
+                const { data: giftCodes } = await supabaseAdmin
+                    .from('gift_codes')
+                    .select('id, code, status, redeemed_at, expires_at, created_at')
+                    .eq('created_by', user.id);
+                exportData.giftCodesCreated = giftCodes || [];
+
+                // Push subscriptions
+                const { data: pushSubs } = await supabaseAdmin
+                    .from('push_subscriptions')
+                    .select('id, endpoint, created_at')
+                    .eq('user_id', user.id);
+                exportData.pushSubscriptions = pushSubs || [];
+
+                return {
+                    statusCode: 200,
+                    headers: {
+                        ...headers,
+                        'Content-Type': 'application/json',
+                        'Content-Disposition': `attachment; filename="cinq-data-export-${new Date().toISOString().split('T')[0]}.json"`
+                    },
+                    body: JSON.stringify(exportData, null, 2)
+                };
+            }
+
+            // ===== Regular profile fetch =====
             const { data: profile, error: profileError } = await supabaseAdmin
                 .from('users')
-                .select('id, email, created_at, gift_code_used')
+                .select('*')
                 .eq('id', user.id)
                 .single();
 
@@ -97,47 +218,17 @@ exports.handler = async (event, context) => {
                 return error('Profile not found', 404);
             }
 
-            // Get contacts with user info
-            const { data: contacts, error: contactsError } = await supabaseAdmin
+            // Get contact count
+            const { count } = await supabaseAdmin
                 .from('contacts')
-                .select(`
-                    id,
-                    contact_user_id,
-                    created_at,
-                    contact:users!contacts_contact_user_id_fkey (
-                        id,
-                        email,
-                        created_at
-                    )
-                `)
+                .select('*', { count: 'exact', head: true })
                 .eq('user_id', user.id);
 
-            // Get recent messages count (simple version - no read tracking yet)
-            const { count: messageCount } = await supabaseAdmin
-                .from('messages')
-                .select('*', { count: 'exact', head: true })
-                .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
-
             return success({
-                profile: {
-                    id: profile.id,
-                    email: profile.email,
-                    created_at: profile.created_at,
-                    member_since: profile.created_at
-                },
-                contacts: {
-                    count: contacts?.length || 0,
-                    limit: 5,
-                    remaining: 5 - (contacts?.length || 0),
-                    list: (contacts || []).map(c => ({
-                        id: c.id,
-                        user_id: c.contact_user_id,
-                        email: c.contact?.email,
-                        added_at: c.created_at
-                    }))
-                },
-                messages: {
-                    total: messageCount || 0
+                profile,
+                stats: {
+                    contactCount: count || 0,
+                    maxContacts: 5
                 }
             });
 
@@ -148,157 +239,128 @@ exports.handler = async (event, context) => {
     }
 
     // ========================================
-    // POST - Profile Actions
+    // PUT - Update Profile
     // ========================================
     
-    if (event.httpMethod === 'POST') {
+    if (event.httpMethod === 'PUT') {
         try {
             const body = JSON.parse(event.body || '{}');
-            const { action } = body;
+            const { display_name, avatar_url, bio } = body;
 
-            if (!action) {
-                return error('Action is required', 400);
+            const updates = {};
+            
+            if (display_name !== undefined) {
+                const result = validateDisplayName(display_name);
+                if (!result.valid) {
+                    return error(result.error, 400);
+                }
+                updates.display_name = result.name;
+            }
+            
+            if (avatar_url !== undefined) {
+                const result = validateURL(avatar_url);
+                if (!result.valid) {
+                    return error(result.error, 400);
+                }
+                updates.avatar_url = result.url;
+            }
+            
+            if (bio !== undefined) {
+                const result = validateBio(bio);
+                if (!result.valid) {
+                    return error(result.error, 400);
+                }
+                updates.bio = result.bio;
             }
 
-            // -----------------------------------
-            // ADD CONTACT
-            // -----------------------------------
-            if (action === 'add_contact') {
-                const { email: contactEmail } = body;
-
-                if (!contactEmail) {
-                    return error('Contact email is required', 400);
-                }
-
-                // Find user by email
-                const { data: contactUser, error: findError } = await supabaseAdmin
-                    .from('users')
-                    .select('id, email')
-                    .eq('email', contactEmail.toLowerCase().trim())
-                    .single();
-
-                if (findError || !contactUser) {
-                    return error('User not found. They must have a CINQ account.', 404);
-                }
-
-                // Can't add yourself
-                if (contactUser.id === user.id) {
-                    return error('You cannot add yourself as a contact', 400);
-                }
-
-                // Check if already a contact
-                const { data: existing } = await supabaseAdmin
-                    .from('contacts')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('contact_user_id', contactUser.id)
-                    .single();
-
-                if (existing) {
-                    return error('This user is already in your contacts', 409);
-                }
-
-                // Check current contact count (should be handled by trigger, but double-check)
-                const { count: currentCount } = await supabaseAdmin
-                    .from('contacts')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', user.id);
-
-                if (currentCount >= 5) {
-                    return error('CINQ limit reached: you can only have 5 contacts. Remove someone first.', 400, {
-                        code: 'LIMIT_REACHED',
-                        current: currentCount,
-                        limit: 5
-                    });
-                }
-
-                // Add contact
-                const { data: newContact, error: addError } = await supabaseAdmin
-                    .from('contacts')
-                    .insert({
-                        user_id: user.id,
-                        contact_user_id: contactUser.id
-                    })
-                    .select()
-                    .single();
-
-                if (addError) {
-                    // Trigger might have caught the limit
-                    if (addError.message.includes('CINQ limit')) {
-                        return error('CINQ limit reached: maximum 5 contacts', 400);
-                    }
-                    console.error('Add contact error:', addError);
-                    return error('Failed to add contact', 500);
-                }
-
-                return success({
-                    message: 'Contact added successfully',
-                    contact: {
-                        id: newContact.id,
-                        user_id: contactUser.id,
-                        email: contactUser.email,
-                        added_at: newContact.created_at
-                    },
-                    contacts_remaining: 4 - currentCount
-                }, 201);
+            if (Object.keys(updates).length === 0) {
+                return error('Aucun champ à mettre à jour', 400);
             }
 
-            // -----------------------------------
-            // REMOVE CONTACT
-            // -----------------------------------
-            if (action === 'remove_contact') {
-                const { contact_id, contact_user_id } = body;
+            updates.updated_at = new Date().toISOString();
 
-                if (!contact_id && !contact_user_id) {
-                    return error('contact_id or contact_user_id is required', 400);
-                }
+            const { data, error: updateError } = await supabaseAdmin
+                .from('users')
+                .update(updates)
+                .eq('id', user.id)
+                .select()
+                .single();
 
-                let query = supabaseAdmin
-                    .from('contacts')
-                    .delete()
-                    .eq('user_id', user.id);
-
-                if (contact_id) {
-                    query = query.eq('id', contact_id);
-                } else {
-                    query = query.eq('contact_user_id', contact_user_id);
-                }
-
-                const { data: deleted, error: deleteError } = await query.select().single();
-
-                if (deleteError) {
-                    return error('Contact not found or already removed', 404);
-                }
-
-                // Get updated count
-                const { count: newCount } = await supabaseAdmin
-                    .from('contacts')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', user.id);
-
-                return success({
-                    message: 'Contact removed',
-                    contacts_remaining: 5 - (newCount || 0)
-                });
-            }
-
-            // -----------------------------------
-            // UPDATE PROFILE
-            // -----------------------------------
-            if (action === 'update_profile') {
-                // Future: encrypted profile data for E2E
-                // For now, limited profile updates
-                
-                return success({
-                    message: 'Profile update not yet implemented'
-                });
-            }
-
-            return error('Unknown action', 400);
+            if (updateError) throw updateError;
+            
+            return success({ success: true, profile: data });
 
         } catch (err) {
-            console.error('Profile action error:', err);
-            return error('Failed to process action', 500);
+            console.error('Profile update error:', err);
+            return error('Failed to update profile', 500);
+        }
+    }
+
+    // ========================================
+    // DELETE - Delete Account
+    // ========================================
+    
+    if (event.httpMethod === 'DELETE') {
+        try {
+            const body = JSON.parse(event.body || '{}');
+            const { confirmation } = body;
+
+            if (confirmation !== 'SUPPRIMER') {
+                return error('Confirmation requise. Envoie { "confirmation": "SUPPRIMER" }', 400);
+            }
+
+            // Delete in order to respect foreign key constraints
+            // 1. Push subscriptions
+            await supabaseAdmin
+                .from('push_subscriptions')
+                .delete()
+                .eq('user_id', user.id);
+
+            // 2. Proposals
+            await supabaseAdmin
+                .from('proposals')
+                .delete()
+                .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
+
+            // 3. Messages
+            await supabaseAdmin
+                .from('messages')
+                .delete()
+                .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
+
+            // 4. Contacts
+            await supabaseAdmin
+                .from('contacts')
+                .delete()
+                .or(`user_id.eq.${user.id},contact_user_id.eq.${user.id}`);
+
+            // 5. Nullify gift codes
+            await supabaseAdmin
+                .from('gift_codes')
+                .update({ created_by: null })
+                .eq('created_by', user.id);
+
+            // 6. Delete user profile
+            await supabaseAdmin
+                .from('users')
+                .delete()
+                .eq('id', user.id);
+
+            // 7. Delete auth user
+            const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+            
+            if (authDeleteError) {
+                console.error('Error deleting auth user:', authDeleteError);
+            }
+
+            return success({ 
+                success: true, 
+                message: 'Compte supprimé définitivement. Adieu ! 👋'
+            });
+
+        } catch (err) {
+            console.error('Delete account error:', err);
+            return error('Failed to delete account', 500);
         }
     }
 
