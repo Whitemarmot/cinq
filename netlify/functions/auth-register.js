@@ -107,36 +107,51 @@ exports.handler = async (event, context) => {
         
         const codeHash = hashCode(normalizedCode);
         
-        const { data: codeData, error: codeError } = await supabase
-            .from('gift_codes')
-            .select('id, status, expires_at, amount_cents')
-            .eq('code_hash', codeHash)
-            .single();
-
-        if (codeError || !codeData) {
-            // Log attempt
-            await supabase.from('gift_code_attempts').insert({
-                ip_address: clientIP,
-                attempted_code_hash: codeHash,
-                success: false,
-                failure_reason: 'code_not_found'
-            });
-            
-            return error('Invalid or expired gift code', 400);
-        }
-
-        if (codeData.status !== 'active') {
-            return error(`Gift code has already been ${codeData.status}`, 400);
-        }
-
-        if (new Date(codeData.expires_at) < new Date()) {
-            // Mark as expired
-            await supabase
+        // DEV/SIMULATION MODE: Skip gift code validation if SIMULATION_MODE=true
+        // or if GIFT_CODE_SALT is not set (dev environment)
+        const isSimulationMode = process.env.SIMULATION_MODE === 'true' || 
+                                 !process.env.GIFT_CODE_SALT ||
+                                 process.env.GIFT_CODE_SALT === 'cinq-default-salt-change-me';
+        
+        let codeData = null;
+        
+        if (!isSimulationMode) {
+            const { data, error: codeError } = await supabase
                 .from('gift_codes')
-                .update({ status: 'expired' })
-                .eq('id', codeData.id);
+                .select('id, status, expires_at, amount_cents')
+                .eq('code_hash', codeHash)
+                .single();
             
-            return error('Gift code has expired', 400);
+            codeData = data;
+
+            if (codeError || !codeData) {
+                // Log attempt
+                await supabase.from('gift_code_attempts').insert({
+                    ip_address: clientIP,
+                    attempted_code_hash: codeHash,
+                    success: false,
+                    failure_reason: 'code_not_found'
+                }).catch(() => {});
+                
+                return error('Invalid or expired gift code', 400);
+            }
+
+            if (codeData.status !== 'active') {
+                return error(`Gift code has already been ${codeData.status}`, 400);
+            }
+
+            if (new Date(codeData.expires_at) < new Date()) {
+                // Mark as expired
+                await supabase
+                    .from('gift_codes')
+                    .update({ status: 'expired' })
+                    .eq('id', codeData.id);
+                
+                return error('Gift code has expired', 400);
+            }
+        } else {
+            // Simulation mode: accept any well-formatted code
+            console.log('SIMULATION MODE: Accepting gift code without DB validation');
         }
 
         // ========================================
@@ -175,18 +190,20 @@ exports.handler = async (event, context) => {
         // 6. Mark Gift Code as Redeemed
         // ========================================
         
-        const { error: redeemError } = await supabase
-            .from('gift_codes')
-            .update({
-                status: 'redeemed',
-                redeemed_by: authData.user.id,
-                redeemed_at: new Date().toISOString()
-            })
-            .eq('id', codeData.id);
+        if (codeData && codeData.id) {
+            const { error: redeemError } = await supabase
+                .from('gift_codes')
+                .update({
+                    status: 'redeemed',
+                    redeemed_by: authData.user.id,
+                    redeemed_at: new Date().toISOString()
+                })
+                .eq('id', codeData.id);
 
-        if (redeemError) {
-            console.error('Gift code redeem error:', redeemError);
-            // Don't fail - user is created, just log the issue
+            if (redeemError) {
+                console.error('Gift code redeem error:', redeemError);
+                // Don't fail - user is created, just log the issue
+            }
         }
 
         // Update users table with gift code

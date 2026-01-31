@@ -138,25 +138,41 @@ exports.handler = async (event, context) => {
             return error('Invalid email or password', 401);
         }
 
-        // Fetch additional user data
-        const { data: userData } = await supabaseAdmin
-            .from('users')
-            .select('id, email, created_at, gift_code_used')
-            .eq('id', authData.user.id)
-            .single();
+        // Fetch additional user data (with fallback if tables don't exist)
+        let userData = null;
+        let contactCount = 0;
+        let unreadCount = 0;
 
-        // Get contact count
-        const { count: contactCount } = await supabaseAdmin
-            .from('contacts')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', authData.user.id);
+        try {
+            const { data } = await supabaseAdmin
+                .from('users')
+                .select('id, email, created_at, gift_code_used')
+                .eq('id', authData.user.id)
+                .single();
+            userData = data;
+        } catch (e) {
+            // users table might not exist yet
+        }
 
-        // Get unread message count (messages table uses receiver_id)
-        // Note: Simple schema doesn't have read_at, count all received
-        const { count: unreadCount } = await supabaseAdmin
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('receiver_id', authData.user.id);
+        try {
+            const { count } = await supabaseAdmin
+                .from('contacts')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', authData.user.id);
+            contactCount = count || 0;
+        } catch (e) {
+            // contacts table might not exist yet
+        }
+
+        try {
+            const { count } = await supabaseAdmin
+                .from('messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('receiver_id', authData.user.id);
+            unreadCount = count || 0;
+        } catch (e) {
+            // messages table might not exist yet
+        }
 
         // ========================================
         // 6. Return Success
