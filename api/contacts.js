@@ -91,11 +91,14 @@ async function searchUser(req, res, user, search) {
         return res.status(400).json({ error: 'Tu ne peux pas t\'ajouter toi-même !' });
     }
 
-    // Search in auth.users
-    const { data: { users }, error } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const foundUser = users?.find(u => u.email?.toLowerCase() === email);
+    // Search in users table (much faster than listUsers)
+    const { data: foundUser, error } = await supabase
+        .from('users')
+        .select('id, email, display_name, avatar_url')
+        .eq('email', email)
+        .single();
 
-    if (!foundUser) {
+    if (error || !foundUser) {
         return res.status(404).json({ 
             error: 'Utilisateur non trouvé',
             hint: 'Cet email n\'est pas inscrit sur Cinq. Invite-le avec un code cadeau !'
@@ -111,7 +114,12 @@ async function searchUser(req, res, user, search) {
         .single();
 
     return res.json({ 
-        user: { id: foundUser.id, email: foundUser.email },
+        user: { 
+            id: foundUser.id, 
+            email: foundUser.email,
+            display_name: foundUser.display_name,
+            avatar_url: foundUser.avatar_url
+        },
         alreadyContact: !!existing
     });
 }
@@ -124,18 +132,38 @@ async function getFollowers(res, user) {
         .order('created_at', { ascending: false });
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+        return res.json({ followers: [], count: 0 });
+    }
 
-    const followers = await Promise.all(data.map(async (f) => {
-        const email = await getUserEmail(f.user_id);
-        
-        const { data: reverse } = await supabase
-            .from('contacts')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('contact_user_id', f.user_id)
-            .single();
+    const followerIds = data.map(f => f.user_id);
+    
+    // Batch fetch user profiles (avoid N+1)
+    const { data: profiles } = await supabase
+        .from('users')
+        .select('id, email, display_name, avatar_url')
+        .in('id', followerIds);
+    
+    const profileMap = (profiles || []).reduce((acc, p) => {
+        acc[p.id] = p;
+        return acc;
+    }, {});
 
-        return { ...f, email, youFollowBack: !!reverse };
+    // Batch check reverse contacts (who you follow back)
+    const { data: reverseContacts } = await supabase
+        .from('contacts')
+        .select('contact_user_id')
+        .eq('user_id', user.id)
+        .in('contact_user_id', followerIds);
+    
+    const followBackSet = new Set((reverseContacts || []).map(c => c.contact_user_id));
+
+    const followers = data.map(f => ({
+        ...f,
+        email: profileMap[f.user_id]?.email || null,
+        display_name: profileMap[f.user_id]?.display_name || null,
+        avatar_url: profileMap[f.user_id]?.avatar_url || null,
+        youFollowBack: followBackSet.has(f.user_id)
     }));
 
     return res.json({ followers, count: data.length });
@@ -149,28 +177,41 @@ async function listContacts(res, user) {
         .order('created_at', { ascending: true });
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+        return res.json({ contacts: [], count: 0, max: MAX_CONTACTS });
+    }
 
-    const contacts = await Promise.all(data.map(async (c) => {
-        const email = await getUserEmail(c.contact_user_id);
-        const profile = await getUserProfile(c.contact_user_id);
-        
-        const { data: reverse } = await supabase
-            .from('contacts')
-            .select('id')
-            .eq('user_id', c.contact_user_id)
-            .eq('contact_user_id', user.id)
-            .single();
+    const contactIds = data.map(c => c.contact_user_id);
+    
+    // Batch fetch user profiles (avoid N+1 queries)
+    const { data: profiles } = await supabase
+        .from('users')
+        .select('id, email, display_name, avatar_url')
+        .in('id', contactIds);
+    
+    const profileMap = (profiles || []).reduce((acc, p) => {
+        acc[p.id] = p;
+        return acc;
+    }, {});
 
-        return {
-            ...c,
-            contact: { 
-                id: c.contact_user_id, 
-                email,
-                display_name: profile.display_name || null,
-                avatar_url: profile.avatar_url || null
-            },
-            mutual: !!reverse
-        };
+    // Batch check mutual contacts
+    const { data: mutualContacts } = await supabase
+        .from('contacts')
+        .select('user_id')
+        .in('user_id', contactIds)
+        .eq('contact_user_id', user.id);
+    
+    const mutualSet = new Set((mutualContacts || []).map(c => c.user_id));
+
+    const contacts = data.map(c => ({
+        ...c,
+        contact: { 
+            id: c.contact_user_id, 
+            email: profileMap[c.contact_user_id]?.email || null,
+            display_name: profileMap[c.contact_user_id]?.display_name || null,
+            avatar_url: profileMap[c.contact_user_id]?.avatar_url || null
+        },
+        mutual: mutualSet.has(c.contact_user_id)
     }));
 
     return res.json({ contacts, count: data.length, max: MAX_CONTACTS });
@@ -265,10 +306,14 @@ async function resolveEmailToUserId(email, currentUser) {
         return { error: 'Tu ne peux pas t\'ajouter toi-même !', status: 400 };
     }
 
-    const { data: { users } } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const foundUser = users?.find(u => u.email?.toLowerCase() === cleanEmail);
+    // Use users table instead of listUsers (much faster)
+    const { data: foundUser, error } = await supabase
+        .from('users')
+        .select('id, email')
+        .eq('email', cleanEmail)
+        .single();
 
-    if (!foundUser) {
+    if (error || !foundUser) {
         return { error: 'Utilisateur non trouvé', status: 404 };
     }
 

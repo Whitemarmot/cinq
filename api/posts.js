@@ -10,11 +10,13 @@
 
 import { supabase, requireAuth, getUserInfo, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
-import { isValidUUID } from './_validation.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { isValidUUID, sanitizeText } from './_validation.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const MAX_CONTENT_LENGTH = 1000;
 const MAX_IMAGE_URL_LENGTH = 2000;
+const MAX_FETCH_LIMIT = 100;
+const DEFAULT_FETCH_LIMIT = 50;
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['GET', 'POST', 'DELETE', 'OPTIONS'])) return;
@@ -152,15 +154,14 @@ async function handleCreatePost(req, res, user) {
         return res.status(400).json({ error: 'Contenu requis' });
     }
     
-    const trimmedContent = content.trim();
-    if (trimmedContent.length === 0) {
-        return res.status(400).json({ error: 'Le contenu ne peut pas être vide' });
-    }
+    // Sanitize content - removes dangerous characters and trims
+    const sanitizedContent = sanitizeText(content, { 
+        maxLength: MAX_CONTENT_LENGTH, 
+        allowNewlines: true 
+    });
     
-    if (trimmedContent.length > MAX_CONTENT_LENGTH) {
-        return res.status(400).json({ 
-            error: `Le contenu est trop long (max ${MAX_CONTENT_LENGTH} caractères)` 
-        });
+    if (sanitizedContent.length === 0) {
+        return res.status(400).json({ error: 'Le contenu ne peut pas être vide' });
     }
     
     // Validate image URL
@@ -174,7 +175,7 @@ async function handleCreatePost(req, res, user) {
         .from('posts')
         .insert({
             user_id: user.id,
-            content: trimmedContent,
+            content: sanitizedContent,
             image_url: validatedImageUrl.url
         })
         .select()
@@ -183,6 +184,8 @@ async function handleCreatePost(req, res, user) {
     if (error) throw error;
     
     const authorInfo = await getUserInfo(user.id);
+    
+    logInfo('Post created', { postId: post.id, userId: user.id });
     
     return res.status(201).json({
         success: true,

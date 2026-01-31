@@ -24,10 +24,10 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Strict rate limiting for uploads
+    // Strict rate limiting for uploads (5 per minute)
     if (!checkRateLimit(req, res, { 
+        max: 5,
         windowMs: 60000, 
-        maxRequests: 5, 
         keyPrefix: 'avatar-upload', 
         userId: user.id 
     })) {

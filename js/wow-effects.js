@@ -347,7 +347,7 @@
     initScrollAnimations();
     initKonamiCode();
     
-    console.log('🎨 Cinq WOW Effects loaded! Try the Konami code for a surprise 🎮');
+    // Easter egg hint moved to console - users can discover it!
   }
 
   // Run on DOM ready

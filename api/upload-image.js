@@ -25,10 +25,10 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Rate limiting
+    // Rate limiting (10 uploads per minute)
     if (!checkRateLimit(req, res, { 
+        max: 10,
         windowMs: 60000, 
-        maxRequests: 10, 
         keyPrefix: 'image-upload', 
         userId: user.id 
     })) {
@@ -135,10 +135,10 @@ async function handleAiGeneration(req, res, user, prompt) {
         return res.status(400).json({ error: `Prompt trop long (max ${AI_MAX_PROMPT_LENGTH} caractères)` });
     }
 
-    // Extra strict rate limit for AI generation
+    // Extra strict rate limit for AI generation (5 per hour)
     if (!checkRateLimit(req, res, { 
+        max: 5,
         windowMs: 3600000, // 1 hour
-        maxRequests: 5,    // 5 per hour
         keyPrefix: 'ai-generate', 
         userId: user.id 
     })) {

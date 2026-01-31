@@ -9,7 +9,7 @@
 
 import { supabase, getUser, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 // Validation patterns
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -70,8 +70,18 @@ function validateEmail(email) {
 
 function validatePassword(password) {
     if (!password) return { valid: false, error: 'Mot de passe requis' };
+    if (typeof password !== 'string') {
+        return { valid: false, error: 'Format mot de passe invalide' };
+    }
     if (password.length < PASSWORD_MIN_LENGTH) {
         return { valid: false, error: `Mot de passe trop court (min ${PASSWORD_MIN_LENGTH} caractères)` };
+    }
+    if (password.length > 128) {
+        return { valid: false, error: 'Mot de passe trop long (max 128 caractères)' };
+    }
+    // Check for at least one letter and one number
+    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+        return { valid: false, error: 'Le mot de passe doit contenir au moins une lettre et un chiffre' };
     }
     return { valid: true };
 }
@@ -176,6 +186,11 @@ async function handleRegister(req, res) {
     const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
         email: emailResult.email,
         password
+    });
+
+    logInfo('User registered successfully', { 
+        userId: authData.user.id, 
+        giftCode: giftResult.code 
     });
 
     if (loginErr) {

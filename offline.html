@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Hors ligne | Cinq</title>
     
     <!-- SEO -->
@@ -20,15 +20,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cinq">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Design System -->
-    <link rel="stylesheet" href="/design/styles.min.css">
-    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
     <script>
@@ -50,23 +41,156 @@
         }
     </script>
     
+    <!-- 
+        OFFLINE-READY STYLES
+        NO external dependencies (Tailwind CDN, Google Fonts) - must work offline!
+    -->
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
-        .glow {
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        :root {
+            --color-bg-start: #1a1a2e;
+            --color-bg-mid: #16213e;
+            --color-bg-end: #0f3460;
+            --color-text: #ffffff;
+            --color-text-muted: rgba(255, 255, 255, 0.7);
+            --color-text-subtle: rgba(255, 255, 255, 0.4);
+            --color-warning: #fbbf24;
+            --color-warning-light: rgba(251, 191, 36, 0.1);
+            --color-success: #22c55e;
+            --color-error: #ef4444;
+            --color-brand: #6366f1;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-overlay: rgba(255, 255, 255, 0.05);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
         }
         
-        .glow-warning {
-            box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+        [data-theme="light"] {
+            --color-bg-start: #f8f9fa;
+            --color-bg-mid: #e9ecef;
+            --color-bg-end: #dee2e6;
+            --color-text: #1a1a2e;
+            --color-text-muted: rgba(26, 26, 46, 0.7);
+            --color-text-subtle: rgba(26, 26, 46, 0.4);
+            --color-border: rgba(26, 26, 46, 0.1);
+            --color-overlay: rgba(26, 26, 46, 0.05);
+        }
+        
+        html {
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            color: var(--color-text);
+            line-height: 1.5;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            padding-top: var(--safe-area-top);
+            padding-bottom: var(--safe-area-bottom);
+        }
+        
+        /* ============================================
+           THEME TOGGLE
+           ============================================ */
+        .theme-toggle {
+            position: fixed;
+            top: max(1rem, var(--safe-area-top));
+            right: 1rem;
+            z-index: 100;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-overlay);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text);
+        }
+        
+        .icon-sun { display: block; }
+        .icon-moon { display: none; }
+        
+        [data-theme="light"] .icon-sun { display: none; }
+        [data-theme="light"] .icon-moon { display: block; }
+        
+        /* ============================================
+           DECORATIVE CIRCLES
+           ============================================ */
+        .bg-decoration {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
         }
         
         .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
             animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .circle-1 {
+            top: -80px;
+            left: -80px;
+            width: 320px;
+            height: 320px;
+            background: rgba(251, 191, 36, 0.1);
+        }
+        
+        .circle-2 {
+            top: 50%;
+            right: -100px;
+            width: 280px;
+            height: 280px;
+            background: rgba(249, 115, 22, 0.1);
+            animation-delay: -2s;
+        }
+        
+        .circle-3 {
+            bottom: -80px;
+            left: 33%;
+            width: 240px;
+            height: 240px;
+            background: rgba(99, 102, 241, 0.15);
+            animation-delay: -1s;
         }
         
         @keyframes pulse {
@@ -74,25 +198,80 @@
             50% { transform: scale(1.05); opacity: 0.8; }
         }
         
+        /* ============================================
+           MAIN LAYOUT
+           ============================================ */
+        main {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        /* ============================================
+           OFFLINE ICON
+           ============================================ */
+        .offline-icon {
+            margin-bottom: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .offline-icon-inner {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 4px solid rgba(251, 191, 36, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-warning-light);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+        }
+        
+        .offline-icon svg {
+            width: 48px;
+            height: 48px;
+            color: var(--color-warning);
+        }
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
         }
         
-        .float {
-            animation: float 3s ease-in-out infinite;
+        /* ============================================
+           STATUS INDICATOR
+           ============================================ */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-overlay);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
         }
         
-        @keyframes wave {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(20deg); }
-            75% { transform: rotate(-20deg); }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--color-error);
+            animation: blink 2s ease-in-out infinite;
         }
         
-        .wave {
-            animation: wave 1.5s ease-in-out infinite;
-            display: inline-block;
-            transform-origin: 70% 70%;
+        .status-dot.online {
+            background: var(--color-success);
+            animation: none;
         }
         
         @keyframes blink {
@@ -100,116 +279,343 @@
             50% { opacity: 0.3; }
         }
         
-        .blink {
-            animation: blink 2s ease-in-out infinite;
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
         }
         
-        .online-dot {
-            width: 12px;
-            height: 12px;
-            background: #22c55e;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            max-width: 28rem;
         }
         
-        .offline-dot {
-            width: 12px;
-            height: 12px;
-            background: #ef4444;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
+        .subtitle .highlight {
+            color: var(--color-warning);
         }
         
+        .hint {
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hint span {
+            opacity: 0.7;
+        }
+        
+        /* ============================================
+           SUGGESTIONS BOX
+           ============================================ */
+        .suggestions {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--color-overlay);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            max-width: 28rem;
+            width: 100%;
+        }
+        
+        .suggestions-title {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .suggestions-list {
+            list-style: none;
+            text-align: left;
+        }
+        
+        .suggestions-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+            padding: 0.375rem 0;
+        }
+        
+        .suggestions-list svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+        }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 24rem;
+        }
+        
+        @media (min-width: 480px) {
+            .buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 52px;
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--radius-lg);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+        
+        .btn:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-primary {
+            background: var(--color-warning);
+            color: #000;
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #fcd34d;
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--color-overlay);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* ============================================
+           LAST SYNC
+           ============================================ */
+        .last-sync {
+            margin-top: 2rem;
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+        }
+        
+        .last-sync.hidden {
+            display: none;
+        }
+        
+        /* ============================================
+           EASTER EGG
+           ============================================ */
+        .easter-egg {
+            margin-top: 3rem;
+            color: var(--color-text-subtle);
+            font-size: 0.875rem;
+            font-style: italic;
+            opacity: 0.5;
+        }
+        
+        /* ============================================
+           TOAST NOTIFICATION
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: max(1.5rem, var(--safe-area-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            background: rgba(239, 68, 68, 0.95);
+            color: white;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        /* ============================================
+           REDUCED MOTION
+           ============================================ */
         @media (prefers-reduced-motion: reduce) {
-            .circle, .float, .wave, .blink {
+            .circle,
+            .offline-icon,
+            .status-dot {
                 animation: none !important;
             }
         }
+        
+        /* ============================================
+           WAVE EMOJI ANIMATION
+           ============================================ */
+        .wave {
+            display: inline-block;
+            animation: wave 1.5s ease-in-out infinite;
+            transform-origin: 70% 70%;
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-20deg); }
+        }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body>
     <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: 1rem; right: 1rem; z-index: 100;">
-        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
     </button>
     
-    <!-- Cercles décoratifs - teinte jaune/orange pour warning -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
-        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
+    <!-- Decorative circles -->
+    <div class="bg-decoration" aria-hidden="true">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
     </div>
 
-    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center">
-        
-        <!-- Icône offline -->
-        <div class="float mb-8">
-            <div class="w-24 h-24 rounded-full border-4 border-amber-400/30 flex items-center justify-center glow-warning bg-amber-500/10 backdrop-blur">
-                <svg class="text-5xl" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning, #fbbf24)" stroke-width="2"><path d="M2 8.5c5.523-5.523 14.477-5.523 20 0"/><path d="M5.5 12c3.523-3.523 9.477-3.523 13 0"/><path d="M9 15.5c1.523-1.523 4.477-1.523 6 0"/><circle cx="12" cy="19" r="1"/></svg>
+    <main>
+        <!-- Offline Icon -->
+        <div class="offline-icon">
+            <div class="offline-icon-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 8.5c5.523-5.523 14.477-5.523 20 0"/>
+                    <path d="M5.5 12c3.523-3.523 9.477-3.523 13 0"/>
+                    <path d="M9 15.5c1.523-1.523 4.477-1.523 6 0"/>
+                    <circle cx="12" cy="19" r="1"/>
+                </svg>
             </div>
         </div>
 
         <!-- Status indicator -->
-        <div id="status-indicator" class="mb-6 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-sm">
-            <span class="offline-dot blink"></span>
-            <span class="text-white/70">Hors ligne</span>
+        <div id="status-indicator" class="status-indicator">
+            <span class="status-dot"></span>
+            <span>Hors ligne</span>
         </div>
 
         <!-- Message principal -->
-        <h1 class="text-2xl md:text-4xl font-bold mb-4">
-            Pas de réseau, pas de problème. <span class="wave"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-        </h1>
+        <h1>Pas de réseau, pas de problème. <span class="wave">🌙</span></h1>
         
-        <p class="text-lg md:text-xl text-white/70 mb-4 max-w-md">
+        <p class="subtitle">
             Tu es temporairement déconnecté.<br>
-            <span class="text-amber-400">Tes 5 attendent toujours.</span>
+            <span class="highlight">Tes 5 attendent toujours.</span>
         </p>
         
-        <p class="text-white/40 mb-8 max-w-sm">
+        <p class="hint">
             Profite de ce moment sans notifs.<br>
-            <span class="text-white/30">(C'est rare, savoure.)</span>
+            <span>(C'est rare, savoure.)</span>
         </p>
 
-        <!-- What you can do -->
-        <div class="mb-8 p-6 bg-white/5 rounded-xl border border-white/10 max-w-md">
-            <p class="text-white/60 text-sm mb-3">En attendant, tu peux :</p>
-            <ul class="text-white/40 text-sm space-y-2 text-left">
-                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> Appeler un de tes 5 (le réseau téléphonique marche peut-être)</li>
-                <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Écrire un message à envoyer plus tard (dans ta tête)</li>
-                <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="5" r="3"/><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg> Aller les voir en vrai (oui, ça existe encore)</li>
-                <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg> Prendre un café et réessayer</li>
+        <!-- Suggestions -->
+        <div class="suggestions">
+            <p class="suggestions-title">En attendant, tu peux :</p>
+            <ul class="suggestions-list">
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                        <line x1="12" y1="18" x2="12.01" y2="18"/>
+                    </svg>
+                    <span>Appeler un de tes 5 (le réseau téléphonique marche peut-être)</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    <span>Écrire un message à envoyer plus tard (dans ta tête)</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="3"/>
+                        <path d="M12 22V8"/>
+                        <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
+                    </svg>
+                    <span>Aller les voir en vrai (oui, ça existe encore)</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                        <line x1="6" y1="1" x2="6" y2="4"/>
+                        <line x1="10" y1="1" x2="10" y2="4"/>
+                        <line x1="14" y1="1" x2="14" y2="4"/>
+                    </svg>
+                    <span>Prendre un café et réessayer</span>
+                </li>
             </ul>
         </div>
 
-        <!-- CTA -->
-        <div class="flex flex-col sm:flex-row gap-4">
-            <button 
-                onclick="checkConnection()"
-                class="px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black rounded-xl font-semibold text-lg transition transform hover:scale-105 active:scale-95 glow-warning"
-            >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Vérifier la connexion
+        <!-- CTAs -->
+        <div class="buttons">
+            <button onclick="checkConnection()" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"/>
+                    <path d="M1 20v-6h6"/>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                Vérifier la connexion
             </button>
-            <a 
-                href="/"
-                class="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold text-lg transition transform hover:scale-105 active:scale-95"
-            >
+            <a href="/" class="btn btn-secondary">
                 ← Retour à l'accueil
             </a>
         </div>
 
         <!-- Last sync info -->
-        <div id="last-sync" class="mt-8 text-white/30 text-sm hidden">
+        <div id="last-sync" class="last-sync hidden">
             Dernière synchronisation : <span id="sync-time">-</span>
         </div>
 
         <!-- Easter egg -->
-        <p class="mt-12 text-white/20 text-sm italic">
+        <p class="easter-egg">
             "L'anti-réseau ultime : pas de réseau du tout." — Philosophie Cinq
         </p>
-
     </main>
 
     <script>
@@ -234,7 +640,8 @@
         }
 
         function checkConnection() {
-            const button = event.target;
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
             button.disabled = true;
             button.innerHTML = '⏳ Vérification...';
             
@@ -259,19 +666,21 @@
             })
             .finally(() => {
                 button.disabled = false;
-                button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Vérifier la connexion';
+                button.innerHTML = originalHTML;
             });
         }
 
         function showOnlineStatus() {
             const indicator = document.getElementById('status-indicator');
-            indicator.innerHTML = '<span class="online-dot"></span><span class="text-green-400">Connecté ! Rechargement...</span>';
+            indicator.querySelector('.status-dot').classList.add('online');
+            indicator.querySelector('span:last-child').textContent = 'Connecté ! Rechargement...';
+            indicator.querySelector('span:last-child').style.color = 'var(--color-success)';
         }
 
         function showStillOffline() {
             // Show a toast-like message
             const toast = document.createElement('div');
-            toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-red-500/90 text-white rounded-xl text-sm font-medium shadow-lg z-50';
+            toast.className = 'toast';
             toast.textContent = '😔 Toujours hors ligne...';
             document.body.appendChild(toast);
             
