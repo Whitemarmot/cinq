@@ -26,7 +26,10 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
     
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.cinq.app; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.cinq.app https://*.netlify.app; img-src 'self' data: https:;">
+    
+    <!-- API Key pour gift-create (injectée côté serveur ou via env) -->
+    <!-- <meta name="gift-api-key" content="YOUR_API_KEY_HERE"> -->
     
     <!-- 
         ⚠️ WARNING SÉCURITÉ: Tailwind CDN ne supporte pas SRI (integrity hash)
@@ -426,6 +429,14 @@
                 </div>
             </div>
             
+            <!-- Badge mode simulation (dev only) -->
+            <div id="simulation-badge" class="hidden mt-4 text-center">
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full">
+                    <span>⚠️</span>
+                    <span>Mode simulation — Confirmation auto dans 5s</span>
+                </span>
+            </div>
+            
             <!-- Erreur -->
             <div id="qr-error" class="hidden mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm" role="alert">
                 <span id="qr-error-message"></span>
@@ -520,8 +531,13 @@
             // ========================================
             // Configuration
             // ========================================
-            const API_BASE = '/api';
+            const API_BASE = '/.netlify/functions';
             const PAYMENT_TIMEOUT = 15 * 60; // 15 minutes en secondes
+            
+            // Mode simulation pour le développement (pas d'API de paiement encore)
+            // En production, mettre à false et implémenter les endpoints de paiement
+            const SIMULATION_MODE = true;
+            const SIMULATION_DELAY_MS = 5000; // 5 secondes avant "paiement confirmé"
             
             // État interne (encapsulé)
             let _state = {
@@ -530,7 +546,8 @@
                 timerInterval: null,
                 timeRemaining: PAYMENT_TIMEOUT,
                 pollingInterval: null,
-                sessionStartTime: null
+                sessionStartTime: null,
+                simulationTimeout: null
             };
             
             // ========================================
@@ -635,11 +652,44 @@
             // ========================================
             
             /**
+             * Génère des données de simulation pour le développement
+             */
+            function generateSimulationData(paymentType) {
+                const sessionId = 'sim_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                const wallets = {
+                    usdc: { address: '0x742d35Cc6634C0532925a3b844Bc9e7595f8dE71', amount: '50.00 USDC' },
+                    btc: { address: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', amount: '0.00052 BTC' },
+                    eth: { address: '0x742d35Cc6634C0532925a3b844Bc9e7595f8dE71', amount: '0.014 ETH' }
+                };
+                
+                const wallet = wallets[paymentType] || wallets.usdc;
+                
+                return {
+                    session_id: sessionId,
+                    address: wallet.address,
+                    amount_display: wallet.amount,
+                    amount_eur: 50,
+                    payment_type: paymentType,
+                    qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(wallet.address)}`,
+                    status: 'pending',
+                    expires_at: new Date(Date.now() + PAYMENT_TIMEOUT * 1000).toISOString()
+                };
+            }
+            
+            /**
              * Crée une session de paiement côté serveur
              * Retourne l'adresse wallet et les détails de paiement
              */
             async function createPaymentSession(paymentType) {
-                const response = await fetch(`${API_BASE}/payment/create`, {
+                // Mode simulation pour le développement
+                if (SIMULATION_MODE) {
+                    console.log('[SIMULATION] Création session paiement:', paymentType);
+                    return generateSimulationData(paymentType);
+                }
+                
+                // Mode production - appel à l'API de paiement crypto
+                const response = await fetch(`${API_BASE}/payment-create`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -652,8 +702,8 @@
                 });
                 
                 if (!response.ok) {
-                    const error = await response.json().catch(() => ({}));
-                    throw new Error(error.message || 'Erreur lors de la création du paiement');
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Erreur lors de la création du paiement');
                 }
                 
                 return response.json();
@@ -663,7 +713,13 @@
              * Vérifie le statut du paiement
              */
             async function checkPaymentStatus(sessionId) {
-                const response = await fetch(`${API_BASE}/payment/status/${sessionId}`);
+                // Mode simulation - retourne toujours "pending" (la confirmation vient du timeout)
+                if (SIMULATION_MODE) {
+                    return { status: 'pending' };
+                }
+                
+                // Mode production
+                const response = await fetch(`${API_BASE}/payment-status?session_id=${encodeURIComponent(sessionId)}`);
                 
                 if (!response.ok) {
                     throw new Error('Erreur lors de la vérification du paiement');
@@ -674,25 +730,44 @@
             
             /**
              * Génère le code cadeau APRÈS confirmation du paiement
-             * C'est le serveur qui génère le code sécurisé
+             * Appelle la fonction Netlify gift-create
              */
-            async function createGiftCode(sessionId) {
-                const response = await fetch(`${API_BASE}/gift/create`, {
+            async function createGiftCode(paymentSession) {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                // Ajouter l'API key si configurée (via meta tag ou env)
+                const apiKeyMeta = document.querySelector('meta[name="gift-api-key"]');
+                if (apiKeyMeta && apiKeyMeta.content) {
+                    headers['X-Api-Key'] = apiKeyMeta.content;
+                }
+                
+                const response = await fetch('/.netlify/functions/gift-create', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers,
                     body: JSON.stringify({
-                        payment_session_id: sessionId
+                        amount_cents: 5000, // 50€
+                        currency: 'EUR',
+                        purchaser_email: paymentSession?.email || null,
+                        purchase_order_id: paymentSession?.session_id || null,
+                        expires_days: 365
                     })
                 });
                 
                 if (!response.ok) {
-                    const error = await response.json().catch(() => ({}));
-                    throw new Error(error.message || 'Erreur lors de la génération du code');
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Erreur lors de la génération du code');
                 }
                 
-                return response.json();
+                const data = await response.json();
+                
+                // L'API retourne { code, gift_code: {...}, message }
+                if (!data.code) {
+                    throw new Error('Code cadeau non reçu du serveur');
+                }
+                
+                return data;
             }
             
             // ========================================
@@ -842,6 +917,18 @@
             function startPaymentPolling() {
                 stopPaymentPolling();
                 
+                // Mode simulation: confirmation automatique après délai
+                if (SIMULATION_MODE) {
+                    console.log(`[SIMULATION] Paiement sera confirmé dans ${SIMULATION_DELAY_MS/1000}s`);
+                    _state.simulationTimeout = setTimeout(async () => {
+                        console.log('[SIMULATION] Paiement confirmé!');
+                        stopTimer();
+                        await handlePaymentConfirmed();
+                    }, SIMULATION_DELAY_MS);
+                    return;
+                }
+                
+                // Mode production: polling réel
                 _state.pollingInterval = setInterval(async () => {
                     if (!_state.paymentSession) return;
                     
@@ -857,8 +944,9 @@
                         } else if (status.status === 'failed') {
                             showError('qr-error', 'Le paiement a échoué. Veuillez réessayer.');
                         }
-                    } catch (error) {
+                    } catch (err) {
                         // Erreur silencieuse pour le polling (on réessaie)
+                        console.warn('Payment polling error:', err);
                     }
                 }, 5000); // Vérifier toutes les 5 secondes
             }
@@ -868,29 +956,48 @@
                     clearInterval(_state.pollingInterval);
                     _state.pollingInterval = null;
                 }
+                if (_state.simulationTimeout) {
+                    clearTimeout(_state.simulationTimeout);
+                    _state.simulationTimeout = null;
+                }
             }
             
             // ========================================
             // Gestion paiement confirmé
             // ========================================
             async function handlePaymentConfirmed() {
+                // Mettre à jour le statut visuel
+                const statusEl = document.getElementById('payment-status');
+                if (statusEl) {
+                    statusEl.innerHTML = '<span aria-hidden="true">⏳</span><span>Génération du code cadeau...</span>';
+                }
+                
                 try {
                     // Générer le code cadeau côté serveur
-                    const giftData = await createGiftCode(_state.paymentSession.session_id);
+                    const giftData = await createGiftCode(_state.paymentSession);
                     
                     // Afficher le code (échappé pour sécurité)
-                    document.getElementById('gift-code').textContent = 
-                        escapeHtml(giftData.code);
+                    // L'API retourne { code: "CINQ-XXXX-XXXX-XXXX", gift_code: {...}, message }
+                    const code = giftData.code;
+                    document.getElementById('gift-code').textContent = escapeHtml(code);
                     
                     // Stocker pour copie/partage
-                    _state.generatedCode = giftData.code;
+                    _state.generatedCode = code;
+                    _state.giftCodeData = giftData.gift_code;
                     
                     // Afficher l'écran de succès
                     showScreen('success');
                     announce('Paiement confirmé ! Votre code cadeau est prêt.');
                     
-                } catch (error) {
-                    showError('qr-error', 'Paiement reçu mais erreur lors de la génération du code. Contactez le support.');
+                } catch (err) {
+                    console.error('Gift code creation error:', err);
+                    const errorMessage = err.message || 'Erreur inconnue';
+                    showError('qr-error', `Erreur: ${errorMessage}. Contactez le support avec votre ID de paiement.`);
+                    
+                    // Mettre à jour le statut
+                    if (statusEl) {
+                        statusEl.innerHTML = '<span aria-hidden="true">❌</span><span class="text-red-400">Erreur de génération</span>';
+                    }
                 }
             }
             
@@ -1000,6 +1107,10 @@ Utilise ce code : ${code}
             function cleanup() {
                 stopTimer();
                 stopPaymentPolling();
+                if (_state.simulationTimeout) {
+                    clearTimeout(_state.simulationTimeout);
+                    _state.simulationTimeout = null;
+                }
             }
             
             // ========================================

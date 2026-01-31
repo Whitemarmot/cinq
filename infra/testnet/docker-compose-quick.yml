@@ -1,0 +1,75 @@
+# =============================================================================
+# BTCPay Server TESTNET - Mode Quick (sans Bitcoin Core)
+# =============================================================================
+# Usage: docker compose -f docker-compose-quick.yml up -d
+# Pour tests rapides de l'interface et API sans attendre la sync blockchain
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL - Base de données
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: cinq-testnet-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: btcpay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-testpassword123}
+      POSTGRES_DB: btcpayserver
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U btcpay -d btcpayserver"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # BTCPay Server - Mode standalone
+  # ---------------------------------------------------------------------------
+  btcpayserver:
+    image: btcpayserver/btcpayserver:1.12.5
+    container_name: cinq-testnet-btcpay
+    restart: unless-stopped
+    environment:
+      BTCPAY_NETWORK: testnet
+      BTCPAY_ROOTPATH: /
+      BTCPAY_BIND: 0.0.0.0:49392
+      BTCPAY_POSTGRES: Host=postgres;Database=btcpayserver;Username=btcpay;Password=${POSTGRES_PASSWORD:-testpassword123}
+      BTCPAY_PROTOCOL: http
+      # Mode sans blockchain - pour tests UI/API uniquement
+      BTCPAY_CHAINS: ""
+    volumes:
+      - btcpay_data:/datadir
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "49392:49392"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:49392/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  postgres_data:
+    name: cinq_testnet_postgres_data
+  btcpay_data:
+    name: cinq_testnet_btcpay_data
+
+networks:
+  frontend:
+    name: cinq_testnet_frontend
+    driver: bridge
+  backend:
+    name: cinq_testnet_backend
+    driver: bridge
