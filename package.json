@@ -19,7 +19,8 @@
     "check": "npm run lint && npm run test"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "eslint": "^8.57.1"

@@ -501,6 +501,32 @@
         // AUTH
         // ============================================
         async function initAuth() {
+            // First check localStorage (set by login.html)
+            const storedSession = localStorage.getItem('cinq_session');
+            const storedUser = localStorage.getItem('cinq_user');
+            
+            if (storedSession && storedUser) {
+                try {
+                    const sessionData = JSON.parse(storedSession);
+                    const userData = JSON.parse(storedUser);
+                    
+                    // Set session in Supabase client
+                    await db.auth.setSession({
+                        access_token: sessionData.access_token,
+                        refresh_token: sessionData.refresh_token
+                    });
+                    
+                    currentUser = userData;
+                    await loadApp();
+                    return;
+                } catch (e) {
+                    console.error('Error restoring session:', e);
+                    localStorage.removeItem('cinq_session');
+                    localStorage.removeItem('cinq_user');
+                }
+            }
+            
+            // Fallback to Supabase native session
             const { data: { session } } = await db.auth.getSession();
             
             if (session?.user) {

@@ -142,23 +142,38 @@ async function syncPings() {
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
-  const data = event.data.json();
+  let data;
+  try {
+    data = event.data.json();
+  } catch (e) {
+    data = { body: event.data.text() };
+  }
+
   const options = {
     body: data.body || 'Tu as reçu un nouveau message',
-    icon: '/assets/icons/icon-192x192.png',
-    badge: '/assets/icons/icon-72x72.png',
+    icon: data.icon || '/assets/icons/icon-192x192.png',
+    badge: data.badge || '/assets/icons/icon-72x72.png',
     vibrate: [100, 50, 100],
+    tag: data.tag || 'cinq-notification',
+    renotify: true,
+    requireInteraction: data.requireInteraction || false,
     data: {
-      url: data.url || '/app.html'
+      url: data.url || '/app.html',
+      ...data.data
     },
-    actions: [
+    actions: data.actions || [
       { action: 'open', title: 'Ouvrir' },
       { action: 'dismiss', title: 'Ignorer' }
     ]
   };
 
+  // Handle notification badge count
+  if ('setAppBadge' in navigator) {
+    navigator.setAppBadge(data.badgeCount || 1).catch(() => {});
+  }
+
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Cinq', options)
+    self.registration.showNotification(data.title || 'Cinq 💫', options)
   );
 });
 
@@ -166,20 +181,54 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
+  // Clear badge when notification is clicked
+  if ('clearAppBadge' in navigator) {
+    navigator.clearAppBadge().catch(() => {});
+  }
+
   if (event.action === 'dismiss') return;
+
+  const targetUrl = event.notification.data?.url || '/app.html';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
-        // Focus existing window if open
+        // Focus existing window if open and navigate
         for (const client of clientList) {
           if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.postMessage({
+              type: 'NOTIFICATION_CLICKED',
+              url: targetUrl,
+              data: event.notification.data
+            });
             return client.focus();
           }
         }
         // Otherwise open new window
-        return clients.openWindow(event.notification.data.url || '/app.html');
+        return clients.openWindow(targetUrl);
       })
+  );
+});
+
+// Notification close handler (dismissed by user)
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification dismissed:', event.notification.tag);
+});
+
+// Push subscription change handler
+self.addEventListener('pushsubscriptionchange', (event) => {
+  console.log('[SW] Push subscription changed');
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription.options)
+      .then((subscription) => {
+        // Re-register with server
+        return fetch('/.netlify/functions/push-subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription })
+        });
+      })
+      .catch((err) => console.error('[SW] Re-subscription failed:', err))
   );
 });
 

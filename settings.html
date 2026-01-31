@@ -231,6 +231,26 @@
                         <span>🔔</span> Notifications
                     </h2>
                     
+                    <!-- Bouton Push Notifications -->
+                    <div id="push-notification-card" class="settings-card rounded-2xl p-4 mb-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium flex items-center gap-2">
+                                    <span id="push-status-icon">🔕</span>
+                                    <span id="push-status-text">Notifications push</span>
+                                </p>
+                                <p id="push-status-desc" class="text-sm text-white/50">Reçois les notifications sur ton appareil</p>
+                            </div>
+                            <button 
+                                id="btn-push-toggle"
+                                class="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-medium transition disabled:opacity-50"
+                            >
+                                Activer
+                            </button>
+                        </div>
+                        <p id="push-error" class="text-xs text-red-400 mt-2 hidden"></p>
+                    </div>
+                    
                     <div class="settings-card rounded-2xl divide-y divide-white/10">
                         <!-- Nouveau message -->
                         <div class="flex items-center justify-between p-4">
@@ -727,6 +747,174 @@
         });
         
         // ============================================
+        // Push Notifications
+        // ============================================
+        const VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';
+        
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+        
+        function updatePushUI(isSubscribed, isSupported = true) {
+            const btn = $('btn-push-toggle');
+            const icon = $('push-status-icon');
+            const text = $('push-status-text');
+            const desc = $('push-status-desc');
+            
+            if (!isSupported) {
+                icon.textContent = '❌';
+                text.textContent = 'Non supporté';
+                desc.textContent = 'Ton navigateur ne supporte pas les notifications push';
+                btn.style.display = 'none';
+                return;
+            }
+            
+            if (isSubscribed) {
+                icon.textContent = '🔔';
+                text.textContent = 'Notifications actives';
+                desc.textContent = 'Tu recevras les notifications sur cet appareil';
+                btn.textContent = 'Désactiver';
+                btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-400');
+                btn.classList.add('bg-white/10', 'hover:bg-white/20');
+            } else {
+                icon.textContent = '🔕';
+                text.textContent = 'Notifications push';
+                desc.textContent = 'Reçois les notifications sur ton appareil';
+                btn.textContent = 'Activer';
+                btn.classList.add('bg-indigo-500', 'hover:bg-indigo-400');
+                btn.classList.remove('bg-white/10', 'hover:bg-white/20');
+            }
+        }
+        
+        async function checkPushSubscription() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                updatePushUI(false, false);
+                return false;
+            }
+            
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.getSubscription();
+                updatePushUI(!!subscription);
+                return !!subscription;
+            } catch (err) {
+                console.error('Error checking push subscription:', err);
+                updatePushUI(false);
+                return false;
+            }
+        }
+        
+        async function subscribeToPush() {
+            const btn = $('btn-push-toggle');
+            btn.disabled = true;
+            btn.textContent = '...';
+            hideMessage('push-error');
+            
+            try {
+                // Demander la permission
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    showMessage('push-error', 'Permission refusée. Autorise les notifications dans les paramètres de ton navigateur.', true);
+                    btn.disabled = false;
+                    updatePushUI(false);
+                    return;
+                }
+                
+                // S'abonner au push
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+                
+                // Enregistrer sur le serveur
+                const token = UserProfile.getSession()?.access_token;
+                const response = await fetch('/.netlify/functions/push-subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ subscription: subscription.toJSON() })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Erreur serveur');
+                }
+                
+                updatePushUI(true);
+                showToast('Notifications activées ! 🔔');
+                
+            } catch (err) {
+                console.error('Push subscription error:', err);
+                showMessage('push-error', err.message, true);
+                updatePushUI(false);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        async function unsubscribeFromPush() {
+            const btn = $('btn-push-toggle');
+            btn.disabled = true;
+            btn.textContent = '...';
+            hideMessage('push-error');
+            
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                const subscription = await registration.pushManager.getSubscription();
+                
+                if (subscription) {
+                    // Supprimer du serveur
+                    const token = UserProfile.getSession()?.access_token;
+                    await fetch('/.netlify/functions/push-subscribe', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ endpoint: subscription.endpoint })
+                    });
+                    
+                    // Se désabonner localement
+                    await subscription.unsubscribe();
+                }
+                
+                updatePushUI(false);
+                showToast('Notifications désactivées');
+                
+            } catch (err) {
+                console.error('Push unsubscribe error:', err);
+                showMessage('push-error', err.message, true);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        
+        async function togglePushNotifications() {
+            const isSubscribed = await checkPushSubscription();
+            if (isSubscribed) {
+                await unsubscribeFromPush();
+            } else {
+                await subscribeToPush();
+            }
+        }
+        
+        // Attacher l'événement au bouton
+        $('btn-push-toggle').addEventListener('click', togglePushNotifications);
+        
+        // ============================================
         // Initialize
         // ============================================
         async function init() {
@@ -767,6 +955,9 @@
                 } catch (e) {
                     // Utiliser les valeurs par défaut
                 }
+                
+                // Vérifier l'état des push notifications
+                await checkPushSubscription();
                 
                 showScreen('settings');
                 
