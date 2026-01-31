@@ -77,6 +77,19 @@ export default async function handler(req, res) {
                 .single();
 
             if (error) throw error;
+
+            // Send push notification to receiver
+            const senderName = user.email?.split('@')[0] || 'Quelqu\'un';
+            const date = new Date(proposed_at).toLocaleDateString('fr-FR', { 
+                weekday: 'short', day: 'numeric', month: 'short' 
+            });
+            sendPushNotification(contact_id, {
+                title: '📅 Nouvelle proposition',
+                body: `${senderName} te propose un RDV ${date}${location ? ' à ' + location : ''}`,
+                tag: `proposal-${data.id}`,
+                data: { proposalId: data.id, senderId: user.id }
+            });
+
             return res.status(201).json({ success: true, proposal: data });
         }
 
@@ -111,6 +124,18 @@ export default async function handler(req, res) {
                 .single();
 
             if (error) throw error;
+
+            // Send push notification to proposal sender
+            const responderName = user.email?.split('@')[0] || 'Quelqu\'un';
+            const emoji = action === 'accept' ? '✅' : '❌';
+            const status = action === 'accept' ? 'accepté' : 'décliné';
+            sendPushNotification(proposal.sender_id, {
+                title: `${emoji} Proposition ${status}e`,
+                body: `${responderName} a ${status} ton RDV`,
+                tag: `proposal-${data.id}`,
+                data: { proposalId: data.id, responderId: user.id }
+            });
+
             return res.json({ success: true, proposal: data });
         }
 
