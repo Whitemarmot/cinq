@@ -107,6 +107,7 @@
         .code-input::placeholder {
             text-transform: none;
             letter-spacing: normal;
+            color: rgba(255, 255, 255, 0.5);
         }
         .code-input:focus {
             outline: none;
@@ -195,7 +196,7 @@
             </h1>
             
             <!-- Sous-titre -->
-            <p class="text-lg text-center text-white/70 mb-8">
+            <p class="text-lg text-center text-white/80 mb-8">
                 Entre ton code pour activer ton accès à <span class="font-semibold text-white">Cinq</span>
             </p>
             
@@ -204,7 +205,7 @@
                 
                 <!-- Input code -->
                 <div>
-                    <label for="gift-code" class="block text-sm font-medium text-white/80 mb-2">
+                    <label for="gift-code" class="block text-sm font-medium text-white/90 mb-2">
                         Code cadeau
                     </label>
                     <input 
@@ -221,7 +222,7 @@
                         aria-describedby="code-hint code-error"
                         required
                     >
-                    <p id="code-hint" class="mt-2 text-sm text-white/50">
+                    <p id="code-hint" class="mt-2 text-sm text-white/60">
                         Format: CINQ-XXXX-XXXX-XXXX
                     </p>
                     <p id="code-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
@@ -241,7 +242,7 @@
             
             <!-- Lien acheter -->
             <div class="mt-8 text-center">
-                <a href="/gift" class="text-white/50 hover:text-white/70 text-sm transition">
+                <a href="/gift" class="text-white/60 hover:text-white/80 text-sm transition">
                     Pas encore de code ? <span class="underline">Acheter un accès →</span>
                 </a>
             </div>
@@ -270,14 +271,14 @@
             <h2 id="email-title" class="text-2xl font-bold text-center mb-2">
                 Crée ton compte
             </h2>
-            <p class="text-center text-white/70 mb-8">
+            <p class="text-center text-white/80 mb-8">
                 Une dernière étape pour activer ton accès
             </p>
             
             <!-- Info code -->
             <div id="code-info" class="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 mb-6">
                 <div class="flex items-center justify-between">
-                    <span class="text-white/60 text-sm">Code cadeau</span>
+                    <span class="text-white/70 text-sm">Code cadeau</span>
                     <span id="verified-code" class="font-mono text-indigo-400"></span>
                 </div>
             </div>
@@ -287,7 +288,7 @@
                 
                 <!-- Input email -->
                 <div>
-                    <label for="user-email" class="block text-sm font-medium text-white/80 mb-2">
+                    <label for="user-email" class="block text-sm font-medium text-white/90 mb-2">
                         Ton adresse email
                     </label>
                     <input 
@@ -305,7 +306,7 @@
                 
                 <!-- Input password -->
                 <div>
-                    <label for="user-password" class="block text-sm font-medium text-white/80 mb-2">
+                    <label for="user-password" class="block text-sm font-medium text-white/90 mb-2">
                         Choisis un mot de passe
                     </label>
                     <input 
@@ -319,7 +320,7 @@
                         aria-describedby="password-hint password-error"
                         required
                     >
-                    <p id="password-hint" class="mt-2 text-sm text-white/50">
+                    <p id="password-hint" class="mt-2 text-sm text-white/60">
                         Minimum 8 caractères, avec au moins une lettre et un chiffre
                     </p>
                     <p id="password-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
@@ -334,7 +335,7 @@
                         class="mt-1 w-5 h-5 rounded border-white/20 bg-white/10 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-0"
                         required
                     >
-                    <label for="accept-terms" class="text-sm text-white/70">
+                    <label for="accept-terms" class="text-sm text-white/80">
                         J'accepte les <a href="/terms" class="text-indigo-400 hover:underline">conditions d'utilisation</a> 
                         et la <a href="/privacy" class="text-indigo-400 hover:underline">politique de confidentialité</a>
                     </label>
@@ -353,7 +354,7 @@
             </form>
             
             <!-- Note -->
-            <p class="text-center mt-6 text-white/50 text-xs">
+            <p class="text-center mt-6 text-white/60 text-xs">
                 Tu as déjà un compte ? <a href="/login" class="text-indigo-400 hover:underline">Connecte-toi</a>
             </p>
             
@@ -375,20 +376,20 @@
             <h2 id="success-title" class="text-2xl font-bold text-center mb-2 text-emerald-400">
                 Bienvenue dans le cercle ! 💜
             </h2>
-            <p class="text-center text-white/70 mb-8">
+            <p class="text-center text-white/80 mb-8">
                 Ton compte est prêt. Maintenant, choisis bien tes 5.<br>
-                <span class="text-white/50 text-sm">(Pas de pression. Ou un peu.)</span>
+                <span class="text-white/60 text-sm">(Pas de pression. Ou un peu.)</span>
             </p>
             
             <!-- Récap -->
             <div class="bg-white/5 backdrop-blur border border-emerald-400/30 rounded-2xl p-6 mb-8">
                 <div class="space-y-3 text-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-white/60">Email</span>
+                        <span class="text-white/70">Email</span>
                         <span id="success-email" class="text-white font-medium"></span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-white/60">Accès</span>
+                        <span class="text-white/70">Accès</span>
                         <span class="text-emerald-400 font-medium">✓ Activé à vie</span>
                     </div>
                 </div>
@@ -400,7 +401,7 @@
                     <span class="text-xl" aria-hidden="true">🔐</span>
                     <div>
                         <p class="text-white/90 font-medium">Ton compte est prêt</p>
-                        <p class="text-white/60 text-sm mt-1">
+                        <p class="text-white/70 text-sm mt-1">
                             Tu peux maintenant te connecter avec ton email et mot de passe.
                         </p>
                     </div>
@@ -408,7 +409,7 @@
             </div>
             
             <!-- Timer redirect -->
-            <p id="redirect-notice" class="text-center text-white/50 text-sm mb-6">
+            <p id="redirect-notice" class="text-center text-white/60 text-sm mb-6">
                 Redirection automatique dans <span id="redirect-timer">5</span>s...
             </p>
             
@@ -423,7 +424,7 @@
             
             <!-- Lien secondaire -->
             <div class="mt-6 text-center">
-                <a href="/" class="text-white/50 hover:text-white/70 text-sm transition">
+                <a href="/" class="text-white/60 hover:text-white/80 text-sm transition">
                     ← Retour à l'accueil
                 </a>
             </div>
@@ -446,7 +447,7 @@
             <h2 id="error-title" class="text-2xl font-bold text-center mb-2 text-red-400">
                 Oups, un problème
             </h2>
-            <p id="error-message" class="text-center text-white/70 mb-8">
+            <p id="error-message" class="text-center text-white/80 mb-8">
                 Une erreur s'est produite
             </p>
             
@@ -465,7 +466,7 @@
             
             <!-- Contact support -->
             <div class="mt-8 text-center">
-                <p class="text-white/50 text-sm">
+                <p class="text-white/60 text-sm">
                     Besoin d'aide ? <a href="mailto:support@cinq.app" class="text-indigo-400 hover:underline">Contacte le support</a>
                 </p>
             </div>
