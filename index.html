@@ -192,11 +192,7 @@
             try {
                 const { data, error } = await db
                     .from('waitlist')
-                    .insert([{ 
-                        email: email.toLowerCase().trim(),
-                        referrer: document.referrer || null,
-                        utm_source: new URLSearchParams(window.location.search).get('utm_source')
-                    }]);
+                    .insert([{ email: email.toLowerCase().trim() }]);
                 
                 if (error) {
                     if (error.code === '23505') {
