@@ -240,13 +240,22 @@
                             </button>
                             <span id="chat-contact-name">Conversation</span>
                         </h2>
-                        <button 
-                            id="btn-ping"
-                            class="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-full transition flex items-center gap-1"
-                            title="Juste dire 'je pense à toi'"
-                        >
-                            <span>💫</span> Ping
-                        </button>
+                        <div class="flex gap-2">
+                            <button 
+                                id="btn-ping"
+                                class="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-full transition flex items-center gap-1"
+                                title="Juste dire 'je pense à toi'"
+                            >
+                                <span>💫</span> Ping
+                            </button>
+                            <button 
+                                id="btn-propose"
+                                class="px-3 py-1.5 text-sm bg-indigo-500/30 hover:bg-indigo-500/50 rounded-full transition flex items-center gap-1"
+                                title="Proposer un moment"
+                            >
+                                <span>📅</span> Proposer
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Messages -->
@@ -350,6 +359,67 @@
     </div>
 
     <!-- ============================================ -->
+    <!-- Modal: Proposer un moment -->
+    <!-- ============================================ -->
+    <div id="modal-propose" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-sm glow-soft">
+            <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
+                <span>📅</span> Proposer un moment
+            </h3>
+            <p class="text-white/50 text-sm mb-4">
+                On se voit quand ?
+            </p>
+            <form id="propose-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Date et heure *</label>
+                    <input 
+                        type="datetime-local" 
+                        id="propose-datetime"
+                        required
+                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:border-indigo-400 transition"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Lieu <span class="text-white/40">(optionnel)</span></label>
+                    <input 
+                        type="text" 
+                        id="propose-location"
+                        placeholder="Ex: Café du coin, chez moi..."
+                        maxlength="100"
+                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm text-white/70 mb-1">Message <span class="text-white/40">(optionnel)</span></label>
+                    <input 
+                        type="text" 
+                        id="propose-message"
+                        placeholder="Un petit mot..."
+                        maxlength="200"
+                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
+                    >
+                </div>
+                <div class="flex gap-2">
+                    <button 
+                        type="button"
+                        id="btn-cancel-propose"
+                        class="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-4 py-3 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition"
+                    >
+                        Envoyer 📅
+                    </button>
+                </div>
+                <p id="propose-error" class="text-center text-red-400 text-sm hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
     <!-- SCRIPTS -->
     <!-- ============================================ -->
     <script src="/fun.js"></script>
@@ -371,6 +441,7 @@
         let contacts = [];
         let selectedContact = null;
         let messages = [];
+        let proposals = []; // Proposals for current conversation
         let contactToRemove = null;
         let unreadContacts = new Set(); // Track contacts with unread messages
         let realtimeChannel = null; // Supabase realtime channel
@@ -807,25 +878,38 @@
                     return;
                 }
                 
-                const response = await fetch(`${API_BASE}/messages?contact_id=${contactUserId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Load messages and proposals in parallel
+                const [msgResponse, propResponse] = await Promise.all([
+                    fetch(`${API_BASE}/messages?contact_id=${contactUserId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE}/proposals?contact_id=${contactUserId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
                 
-                const result = await response.json();
+                const msgResult = await msgResponse.json();
+                const propResult = await propResponse.json();
                 
-                if (result.success) {
-                    messages = result.messages || [];
+                if (msgResult.success) {
+                    messages = msgResult.messages || [];
                 } else {
-                    console.error('Error loading messages:', result.error);
+                    console.error('Error loading messages:', msgResult.error);
                     messages = [];
+                }
+                
+                if (propResult.success) {
+                    proposals = propResult.proposals || [];
+                } else {
+                    console.error('Error loading proposals:', propResult.error);
+                    proposals = [];
                 }
                 
                 renderMessages();
             } catch (err) {
                 console.error('Error loading messages:', err);
                 messages = [];
+                proposals = [];
                 renderMessages();
             }
         }
@@ -834,16 +918,26 @@
             const list = $('messages-list');
             const empty = $('messages-empty');
             
-            if (messages.length === 0) {
+            // Combine messages and proposals, sort by created_at
+            const allItems = [
+                ...messages.map(m => ({ ...m, type: 'message' })),
+                ...proposals.map(p => ({ ...p, type: 'proposal' }))
+            ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            if (allItems.length === 0) {
                 list.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
             
             empty.classList.add('hidden');
-            list.innerHTML = messages.map(msg => {
-                const isMine = msg.is_mine || msg.sender_id === currentUser.id;
-                const isPing = msg.is_ping;
+            list.innerHTML = allItems.map(item => {
+                if (item.type === 'proposal') {
+                    return renderProposal(item);
+                }
+                
+                const isMine = item.is_mine || item.sender_id === currentUser.id;
+                const isPing = item.is_ping;
                 
                 if (isPing) {
                     return `
@@ -851,7 +945,7 @@
                             <span class="inline-block px-3 py-1 bg-indigo-500/20 rounded-full text-sm">
                                 💫 ${isMine ? 'Tu as envoyé un ping' : 'Ping reçu'}
                             </span>
-                            <p class="text-xs text-white/30 mt-1">${formatTime(msg.created_at)}</p>
+                            <p class="text-xs text-white/30 mt-1">${formatTime(item.created_at)}</p>
                         </div>
                     `;
                 }
@@ -859,15 +953,102 @@
                 return `
                     <div class="message ${isMine ? 'text-right' : 'text-left'}">
                         <div class="inline-block max-w-[80%] px-4 py-2 rounded-2xl ${isMine ? 'bg-indigo-500/30 rounded-br-sm' : 'bg-white/10 rounded-bl-sm'}">
-                            <p class="text-sm">${escapeHtml(msg.content)}</p>
+                            <p class="text-sm">${escapeHtml(item.content)}</p>
                         </div>
-                        <p class="text-xs text-white/30 mt-1">${formatTime(msg.created_at)}</p>
+                        <p class="text-xs text-white/30 mt-1">${formatTime(item.created_at)}</p>
                     </div>
                 `;
             }).join('');
             
             // Scroll to bottom avec animation smooth
             scrollToBottom();
+        }
+        
+        function renderProposal(prop) {
+            const isMine = prop.is_mine || prop.sender_id === currentUser.id;
+            const proposedDate = new Date(prop.proposed_at);
+            const dateStr = proposedDate.toLocaleDateString('fr-FR', { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const statusBadge = {
+                'pending': '<span class="text-yellow-400">⏳ En attente</span>',
+                'accepted': '<span class="text-green-400">✅ Accepté</span>',
+                'declined': '<span class="text-red-400">❌ Décliné</span>',
+                'expired': '<span class="text-white/40">⏰ Expiré</span>'
+            }[prop.status] || '';
+            
+            const actionButtons = (!isMine && prop.status === 'pending') ? `
+                <div class="flex gap-2 mt-3">
+                    <button onclick="respondProposal('${prop.id}', 'accept')" class="flex-1 px-3 py-2 bg-green-500/30 hover:bg-green-500/50 rounded-lg text-sm transition">
+                        ✅ J'accepte
+                    </button>
+                    <button onclick="respondProposal('${prop.id}', 'decline')" class="flex-1 px-3 py-2 bg-red-500/30 hover:bg-red-500/50 rounded-lg text-sm transition">
+                        ❌ Pas dispo
+                    </button>
+                </div>
+            ` : '';
+            
+            return `
+                <div class="message ${isMine ? 'text-right' : 'text-left'}">
+                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 ${isMine ? 'rounded-br-sm' : 'rounded-bl-sm'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-lg">📅</span>
+                            <span class="font-medium">${isMine ? 'Tu proposes' : 'Proposition reçue'}</span>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <p><strong>📆 ${dateStr}</strong></p>
+                            ${prop.location ? `<p>📍 ${escapeHtml(prop.location)}</p>` : ''}
+                            ${prop.message ? `<p class="text-white/70 italic">"${escapeHtml(prop.message)}"</p>` : ''}
+                        </div>
+                        <div class="mt-2 text-xs">${statusBadge}</div>
+                        ${actionButtons}
+                    </div>
+                    <p class="text-xs text-white/30 mt-1">${formatTime(prop.created_at)}</p>
+                </div>
+            `;
+        }
+        
+        async function respondProposal(proposalId, action) {
+            try {
+                const token = await getAccessToken();
+                if (!token) {
+                    alert('Session expirée. Reconnecte-toi.');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/proposals`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        proposal_id: proposalId,
+                        action: action
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update local proposal
+                    const idx = proposals.findIndex(p => p.id === proposalId);
+                    if (idx >= 0) {
+                        proposals[idx] = result.proposal;
+                    }
+                    renderMessages();
+                } else {
+                    alert(result.error || 'Erreur');
+                }
+            } catch (err) {
+                console.error('Error responding to proposal:', err);
+                alert('Erreur lors de la réponse');
+            }
         }
         
         function scrollToBottom() {
@@ -982,6 +1163,96 @@
                 btn.classList.remove('ping-sent');
                 btn.disabled = false;
             }, 500);
+        });
+        
+        // ============================================
+        // PROPOSE MODAL 📅
+        // ============================================
+        
+        function openProposeModal() {
+            if (!selectedContact) return;
+            
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset() + 30);
+            $('propose-datetime').min = now.toISOString().slice(0, 16);
+            $('propose-datetime').value = '';
+            $('propose-location').value = '';
+            $('propose-message').value = '';
+            hideError('propose-error');
+            
+            $('modal-propose').classList.remove('hidden');
+            $('propose-datetime').focus();
+        }
+        
+        function closeProposeModal() {
+            $('modal-propose').classList.add('hidden');
+        }
+        
+        $('btn-propose').addEventListener('click', openProposeModal);
+        $('btn-cancel-propose').addEventListener('click', closeProposeModal);
+        
+        $('propose-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError('propose-error');
+            
+            const datetime = $('propose-datetime').value;
+            const location = $('propose-location').value.trim();
+            const message = $('propose-message').value.trim();
+            
+            if (!datetime) {
+                showError('propose-error', 'Choisis une date et heure');
+                return;
+            }
+            
+            const proposedDate = new Date(datetime);
+            if (proposedDate <= new Date()) {
+                showError('propose-error', 'La date doit être dans le futur');
+                return;
+            }
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
+            
+            try {
+                const token = await getAccessToken();
+                if (!token) {
+                    alert('Session expirée. Reconnecte-toi.');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/proposals`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contact_id: selectedContact.contact_user_id,
+                        proposed_at: proposedDate.toISOString(),
+                        location: location || null,
+                        message: message || null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeProposeModal();
+                    // Add proposal locally
+                    proposals.push(result.proposal);
+                    renderMessages();
+                } else {
+                    showError('propose-error', result.error || 'Erreur');
+                }
+            } catch (err) {
+                console.error('Error creating proposal:', err);
+                showError('propose-error', 'Erreur lors de l\'envoi');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Envoyer 📅';
+            }
         });
         
         // ============================================
