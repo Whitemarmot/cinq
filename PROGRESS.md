@@ -11,22 +11,22 @@
 - Compte-rendus obligatoires
 - Recrutement autorisé si nécessaire
 
-### Tâches en cours :
-- [ ] BTCPay Server setup (Sarah)
-- [ ] UI Flow cadeau (Alex)
-- [ ] Copywriting landing (Marco)
-- [ ] Review architecture (Zoé)
+### Tâches terminées :
+- [x] BTCPay Server setup (Sarah) ✅
+- [x] UI Flow cadeau (Alex) ✅
+- [x] Copywriting landing (Marco) ✅
+- [x] Review architecture (Zoé) ✅
 
 ---
 
 ## 📊 Statut équipe
 
-| Agent | Tâche actuelle | Status |
-|-------|----------------|--------|
-| Sarah | BTCPay Docker setup | 🔄 En cours |
-| Alex | Wireframes gift flow | 🔄 En cours |
-| Marco | Textes anti-viraux | 🔄 En cours |
-| Zoé | Audit sécurité spec | 🔄 En cours |
+| Agent | Tâche | Status | Livrable |
+|-------|-------|--------|----------|
+| Sarah | BTCPay Docker | ✅ Done | `infra/docker-compose.yml` |
+| Alex | Wireframes gift | ✅ Done | `design/gift-flow.md` |
+| Marco | Copy anti-social | ✅ Done | `design/copy-v2.md` |
+| Zoé | Audit sécurité | ✅ Done | `docs/security-audit.md` |
 
 ---
 

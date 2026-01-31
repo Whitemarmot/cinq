@@ -1,0 +1,36 @@
+# CINQ Gift Codes - Netlify Configuration
+# Ajouter ces redirects à votre netlify.toml principal
+
+# ============================================
+# API Redirects
+# ============================================
+
+# POST /api/gift/create → gift-create function
+[[redirects]]
+  from = "/api/gift/create"
+  to = "/.netlify/functions/gift-create"
+  status = 200
+
+# POST /api/gift/redeem → gift-redeem function
+[[redirects]]
+  from = "/api/gift/redeem"
+  to = "/.netlify/functions/gift-redeem"
+  status = 200
+
+# GET /api/gift/verify/:code → gift-verify function
+[[redirects]]
+  from = "/api/gift/verify/*"
+  to = "/.netlify/functions/gift-verify/:splat"
+  status = 200
+
+# ============================================
+# Environment Variables Required
+# ============================================
+# 
+# SUPABASE_URL - Your Supabase project URL
+# SUPABASE_SERVICE_ROLE_KEY - Service role key (not anon!)
+# GIFT_CODE_SALT - Random string for hashing codes (32+ chars)
+# GIFT_ADMIN_SECRET - Secret for admin API access
+# GIFT_API_KEY - API key for service-to-service calls
+# GIFT_WEBHOOK_SECRET - Stripe webhook secret (optional)
+# ALLOWED_ORIGIN - CORS origin (e.g., https://cinq.shop)

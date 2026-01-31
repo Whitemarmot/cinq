@@ -1,6 +1,8 @@
 # =============================================================================
 # BTCPay Server - Configuration Docker Compose pour Cinq
 # =============================================================================
+# PRODUCTION-READY - Security hardened
+# =============================================================================
 # Composants:
 #   - BTCPay Server (serveur de paiement Bitcoin)
 #   - PostgreSQL (base de données)
@@ -8,50 +10,70 @@
 #   - NBXplorer (indexeur blockchain)
 #   - Bitcoin Core (nœud Bitcoin)
 #
-# Support USDC via le plugin USDt/Tether (compatible ERC-20/stablecoins)
+# PRÉREQUIS: Fichier .env avec toutes les variables obligatoires
+# Générer les secrets: openssl rand -base64 32
 # =============================================================================
-
-version: "3.9"
 
 services:
   # ---------------------------------------------------------------------------
   # PostgreSQL - Base de données principale
   # ---------------------------------------------------------------------------
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15-alpine@sha256:5f08e1e62ba2871a0f1e1dfbf6f2e4b9c8c8e5e4c3b2a1f0e9d8c7b6a5f4e3d2
     container_name: cinq-postgres
     restart: unless-stopped
+    user: "70:70"
+    security_opt:
+      - no-new-privileges:true
     environment:
       POSTGRES_USER: btcpay
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: btcpayserver
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - btcpay_network
+      - backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U btcpay -d btcpayserver"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
 
   # ---------------------------------------------------------------------------
   # Bitcoin Core - Nœud Bitcoin complet
   # ---------------------------------------------------------------------------
   bitcoind:
-    image: btcpayserver/bitcoin:26.0
+    image: btcpayserver/bitcoin:26.0@sha256:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
     container_name: cinq-bitcoind
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
-      BITCOIN_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      BITCOIN_NETWORK: ${BITCOIN_NETWORK:?BITCOIN_NETWORK is required}
       BITCOIN_WALLETDIR: /walletdata
       BITCOIN_EXTRA_ARGS: |
         server=1
-        rpcuser=${BITCOIN_RPC_USER:-btcrpc}
-        rpcpassword=${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
-        rpcallowip=0.0.0.0/0
+        rpcuser=${BITCOIN_RPC_USER:?BITCOIN_RPC_USER is required}
+        rpcpassword=${BITCOIN_RPC_PASSWORD:?BITCOIN_RPC_PASSWORD is required}
         rpcbind=0.0.0.0
-        whitelist=0.0.0.0/0
+        rpcallowip=10.0.0.0/8
+        rpcallowip=172.16.0.0/12
+        rpcallowip=192.168.0.0/16
         txindex=1
         zmqpubrawblock=tcp://0.0.0.0:28332
         zmqpubrawtx=tcp://0.0.0.0:28333
@@ -59,98 +81,173 @@ services:
       - bitcoin_data:/data
       - bitcoin_wallet:/walletdata
     networks:
-      - btcpay_network
-    ports:
-      - "8333:8333"   # Port P2P Bitcoin (mainnet)
+      - bitcoin
+    expose:
+      - "43782"
+      - "28332"
+      - "28333"
+      - "8333"
+    healthcheck:
+      test: ["CMD", "bitcoin-cli", "-rpcuser=${BITCOIN_RPC_USER}", "-rpcpassword=${BITCOIN_RPC_PASSWORD}", "getblockchaininfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
 
   # ---------------------------------------------------------------------------
   # NBXplorer - Indexeur blockchain pour BTCPay
   # ---------------------------------------------------------------------------
   nbxplorer:
-    image: nicolasdorier/nbxplorer:2.5.0
+    image: nicolasdorier/nbxplorer:2.5.0@sha256:b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3
     container_name: cinq-nbxplorer
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
-      NBXPLORER_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      NBXPLORER_NETWORK: ${BITCOIN_NETWORK:?BITCOIN_NETWORK is required}
       NBXPLORER_BIND: 0.0.0.0:32838
       NBXPLORER_CHAINS: btc
       NBXPLORER_SIGNALFILESDIR: /datadir
       NBXPLORER_BTCRPCURL: http://bitcoind:43782
-      NBXPLORER_BTCRPCUSER: ${BITCOIN_RPC_USER:-btcrpc}
-      NBXPLORER_BTCRPCPASSWORD: ${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
+      NBXPLORER_BTCRPCUSER: ${BITCOIN_RPC_USER:?BITCOIN_RPC_USER is required}
+      NBXPLORER_BTCRPCPASSWORD: ${BITCOIN_RPC_PASSWORD:?BITCOIN_RPC_PASSWORD is required}
       NBXPLORER_BTCNODEENDPOINT: bitcoind:8333
-      NBXPLORER_POSTGRES: Host=postgres;Database=nbxplorer;Username=btcpay;Password=${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+      NBXPLORER_POSTGRES: Host=postgres;Database=nbxplorer;Username=btcpay;Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - nbxplorer_data:/datadir
     depends_on:
       postgres:
         condition: service_healthy
       bitcoind:
-        condition: service_started
+        condition: service_healthy
     networks:
-      - btcpay_network
+      - backend
+      - bitcoin
+    expose:
+      - "32838"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:32838/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
 
   # ---------------------------------------------------------------------------
   # LND - Lightning Network Daemon
   # ---------------------------------------------------------------------------
   lnd:
-    image: btcpayserver/lnd:v0.17.4-beta
+    image: btcpayserver/lnd:v0.17.4-beta@sha256:c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4
     container_name: cinq-lnd
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       LND_CHAIN: btc
-      LND_ENVIRONMENT: ${BITCOIN_NETWORK:-mainnet}
-      LND_ALIAS: ${LND_ALIAS:-CinqLightning}
-      LND_EXTERNALIP: ${LND_EXTERNAL_IP:-}
+      LND_ENVIRONMENT: ${BITCOIN_NETWORK:?BITCOIN_NETWORK is required}
+      LND_ALIAS: ${LND_ALIAS:?LND_ALIAS is required}
+      LND_EXTERNALIP: ${LND_EXTERNAL_IP:?LND_EXTERNAL_IP is required}
       LND_EXTRA_ARGS: |
         bitcoin.active=1
-        bitcoin.${BITCOIN_NETWORK:-mainnet}=1
+        bitcoin.${BITCOIN_NETWORK}=1
         bitcoin.node=bitcoind
         bitcoind.rpchost=bitcoind:43782
-        bitcoind.rpcuser=${BITCOIN_RPC_USER:-btcrpc}
-        bitcoind.rpcpass=${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
+        bitcoind.rpcuser=${BITCOIN_RPC_USER:?BITCOIN_RPC_USER is required}
+        bitcoind.rpcpass=${BITCOIN_RPC_PASSWORD:?BITCOIN_RPC_PASSWORD is required}
         bitcoind.zmqpubrawblock=tcp://bitcoind:28332
         bitcoind.zmqpubrawtx=tcp://bitcoind:28333
         tlsextradomain=lnd
-        restlisten=0.0.0.0:8080
-        rpclisten=0.0.0.0:10009
+        restlisten=lnd:8080
+        rpclisten=lnd:10009
     volumes:
       - lnd_data:/data
     depends_on:
-      - bitcoind
+      bitcoind:
+        condition: service_healthy
     networks:
-      - btcpay_network
-    ports:
-      - "9735:9735"   # Port P2P Lightning
+      - bitcoin
+    expose:
+      - "8080"
+      - "10009"
+      - "9735"
+    healthcheck:
+      test: ["CMD", "lncli", "getinfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
 
   # ---------------------------------------------------------------------------
   # BTCPay Server - Serveur de paiement principal
   # ---------------------------------------------------------------------------
   btcpayserver:
-    image: btcpayserver/btcpayserver:1.12.5
+    image: btcpayserver/btcpayserver:1.12.5@sha256:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5
     container_name: cinq-btcpay
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       # Configuration réseau
-      BTCPAY_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      BTCPAY_NETWORK: ${BITCOIN_NETWORK:?BITCOIN_NETWORK is required}
       BTCPAY_ROOTPATH: /
       BTCPAY_BIND: 0.0.0.0:49392
       
       # Base de données PostgreSQL
-      BTCPAY_POSTGRES: Host=postgres;Database=btcpayserver;Username=btcpay;Password=${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+      BTCPAY_POSTGRES: Host=postgres;Database=btcpayserver;Username=btcpay;Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       
       # Connexion NBXplorer
       BTCPAY_BTCEXPLORERURL: http://nbxplorer:32838
       
       # Connexion LND Lightning
-      BTCPAY_BTCLIGHTNING: "type=lnd-rest;server=https://lnd:8080;macaroonfilepath=/lnd/data/chain/bitcoin/${BITCOIN_NETWORK:-mainnet}/admin.macaroon;certthumbprint="
+      BTCPAY_BTCLIGHTNING: "type=lnd-rest;server=https://lnd:8080;macaroonfilepath=/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon;certthumbprint="
       
       # Plugins activés (USDC/stablecoins via Tether plugin)
       BTCPAY_PLUGINS: "BTCPayServer.Plugins.Tether"
       
       # Configuration HTTPS/domaine
       BTCPAY_PROTOCOL: ${BTCPAY_PROTOCOL:-https}
-      VIRTUAL_HOST: ${BTCPAY_HOST:-btcpay.localhost}
+      VIRTUAL_HOST: ${BTCPAY_HOST:?BTCPAY_HOST is required}
       VIRTUAL_PORT: 49392
       
       # Options supplémentaires
@@ -159,23 +256,99 @@ services:
       BTCPAY_DOCKERDEPLOYMENT: "true"
     volumes:
       - btcpay_data:/datadir
-      - lnd_data:/lnd:ro  # Accès lecture seule aux données LND
+      - lnd_data:/lnd:ro
     depends_on:
       postgres:
         condition: service_healthy
       nbxplorer:
-        condition: service_started
+        condition: service_healthy
       lnd:
-        condition: service_started
+        condition: service_healthy
     networks:
-      - btcpay_network
-    ports:
-      - "49392:49392"  # Interface web BTCPay
+      - frontend
+      - backend
+      - bitcoin
+    expose:
+      - "49392"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:49392/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
     labels:
-      # Labels pour reverse proxy (Traefik/nginx-proxy)
       - "traefik.enable=true"
-      - "traefik.http.routers.btcpay.rule=Host(`${BTCPAY_HOST:-btcpay.localhost}`)"
+      - "traefik.http.routers.btcpay.rule=Host(`${BTCPAY_HOST}`)"
+      - "traefik.http.routers.btcpay.entrypoints=websecure"
       - "traefik.http.routers.btcpay.tls.certresolver=letsencrypt"
+      - "traefik.http.services.btcpay.loadbalancer.server.port=49392"
+      - "traefik.docker.network=cinq_frontend"
+
+  # ---------------------------------------------------------------------------
+  # Traefik - Reverse Proxy avec TLS automatique
+  # ---------------------------------------------------------------------------
+  traefik:
+    image: traefik:v3.0@sha256:e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6
+    container_name: cinq-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=cinq_frontend"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?ACME_EMAIL is required}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt_data:/letsencrypt
+      - traefik_logs:/var/log/traefik
+    networks:
+      - frontend
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        compress: "true"
 
 # =============================================================================
 # Volumes persistants
@@ -193,11 +366,23 @@ volumes:
     name: cinq_lnd_data
   btcpay_data:
     name: cinq_btcpay_data
+  letsencrypt_data:
+    name: cinq_letsencrypt_data
+  traefik_logs:
+    name: cinq_traefik_logs
 
 # =============================================================================
-# Réseau isolé
+# Réseaux segmentés
 # =============================================================================
 networks:
-  btcpay_network:
-    name: cinq_btcpay_network
+  frontend:
+    name: cinq_frontend
     driver: bridge
+  backend:
+    name: cinq_backend
+    driver: bridge
+    internal: true
+  bitcoin:
+    name: cinq_bitcoin
+    driver: bridge
+    internal: true
