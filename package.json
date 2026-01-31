@@ -1,6 +1,6 @@
 {
   "name": "cinq",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "L'anti-réseau social — 5 contacts max, zéro bullshit",
   "main": "index.html",
   "scripts": {
