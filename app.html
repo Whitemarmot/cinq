@@ -1824,7 +1824,9 @@
                 <!-- Edit Profile -->
                 <div class="settings-card" role="region" aria-labelledby="settings-profile-title">
                     <div class="settings-card-header" id="settings-profile-title">
-                        <span aria-hidden="true">✏️</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
                         <span>Modifier mon profil</span>
                     </div>
                     <div class="settings-field">
@@ -1836,32 +1838,43 @@
                         <textarea id="profile-bio" class="settings-input" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
                     <button onclick="saveProfile()" id="save-profile-btn" class="save-btn" type="button">
-                        <span aria-hidden="true">💾</span> Enregistrer
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Enregistrer
                     </button>
                 </div>
                 
                 <!-- Data & Actions -->
                 <div class="settings-card" role="region" aria-labelledby="settings-data-title">
                     <div class="settings-card-header" id="settings-data-title">
-                        <span aria-hidden="true">📦</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
                         <span>Mes données</span>
                     </div>
                     <button onclick="exportData()" id="export-data-btn" class="settings-btn" type="button">
-                        <span aria-hidden="true">📥</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
                         <div class="settings-btn-info">
                             <span class="settings-btn-title">Récupérer mes données</span>
                             <span class="settings-btn-subtitle">Tout ce qu'on a sur toi, dans un fichier</span>
                         </div>
                     </button>
                     <button onclick="logout()" class="settings-btn" type="button">
-                        <span aria-hidden="true">🚪</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
                         <div class="settings-btn-info">
                             <span class="settings-btn-title">Déconnexion</span>
                             <span class="settings-btn-subtitle">À plus tard !</span>
                         </div>
                     </button>
                     <button onclick="openDeleteAccountModal()" class="settings-btn settings-btn-danger" type="button">
-                        <span aria-hidden="true">🗑️</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
                         <div class="settings-btn-info">
                             <span class="settings-btn-title">Supprimer mon compte</span>
                             <span class="settings-btn-subtitle">On espère que tu reviendras</span>
@@ -1963,7 +1976,12 @@
     <!-- Delete Account Modal -->
     <div class="modal-overlay" id="delete-account-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-desc" aria-hidden="true">
         <div class="modal">
-            <h2 class="modal-title" id="delete-modal-title" style="color:var(--color-error);"><span aria-hidden="true">🗑️</span> Supprimer mon compte</h2>
+            <h2 class="modal-title" id="delete-modal-title" style="color:var(--color-error);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 8px;">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+                Supprimer mon compte
+            </h2>
             <p id="delete-modal-desc" style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Cette action est <strong style="color:var(--color-error);">définitive et irréversible</strong>.</p>
             <div style="background:var(--color-error-muted);border:1px solid var(--color-error);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);" role="alert">
                 <p style="font-size:var(--text-sm);color:var(--color-text-primary);margin-bottom:var(--space-2);"><strong>Seront supprimés :</strong></p>
