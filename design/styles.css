@@ -8,13 +8,13 @@
    TOKENS - Design Variables
    ============================================ */
 :root {
-  /* Colors - Dark Mode mais plus clair et lisible */
-  --color-bg-primary: #121218;
-  --color-bg-secondary: #1a1a22;
-  --color-bg-tertiary: #222230;
-  --color-bg-elevated: #2a2a38;
-  --color-bg-hover: rgba(255, 255, 255, 0.06);
-  --color-bg-active: rgba(255, 255, 255, 0.08);
+  /* Colors - Dark Mode ÉCLAIRCI pour meilleure lisibilité */
+  --color-bg-primary: #1a1a24;
+  --color-bg-secondary: #232330;
+  --color-bg-tertiary: #2d2d3a;
+  --color-bg-elevated: #383848;
+  --color-bg-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-active: rgba(255, 255, 255, 0.12);
   
   /* Surface with subtle gradient */
   --surface-gradient: linear-gradient(
@@ -44,9 +44,9 @@
   --color-error-muted: rgba(239, 68, 68, 0.15);
   
   /* Borders - Plus visibles */
-  --color-border: rgba(255, 255, 255, 0.12);
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
-  --color-border-active: rgba(255, 255, 255, 0.22);
+  --color-border: rgba(255, 255, 255, 0.18);
+  --color-border-subtle: rgba(255, 255, 255, 0.10);
+  --color-border-active: rgba(255, 255, 255, 0.30);
   
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
