@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -17,6 +18,19 @@ function generateCode() {
     return code;
 }
 
+async function getUser(req) {
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith('Bearer ')) return null;
+    
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(auth.split(' ')[1]);
+        if (error) return null;
+        return user;
+    } catch {
+        return null;
+    }
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -27,29 +41,28 @@ export default async function handler(req, res) {
     const action = req.query.action || req.body?.action;
 
     try {
-        // ============ CREATE (auth optional for MVP/simulation) ============
+        // ============ CREATE (auth REQUIRED) ============
         if (action === 'create') {
-            let userId = null;
-            
-            // Try to get user if auth provided
-            const authHeader = req.headers.authorization;
-            if (authHeader?.startsWith('Bearer ')) {
-                const token = authHeader.split(' ')[1];
-                const { data: { user } } = await supabase.auth.getUser(token);
-                userId = user?.id;
+            // Rate limit - very strict for gift creation
+            if (!checkRateLimit(req, res, { ...RATE_LIMITS.GIFT_CREATE, keyPrefix: 'gift:create' })) {
+                return;
             }
 
-            // If authenticated, check limit
-            if (userId) {
-                const { count } = await supabase
-                    .from('gift_codes')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('created_by', userId)
-                    .eq('status', 'active');
+            // SECURITY FIX: Auth is now REQUIRED
+            const user = await getUser(req);
+            if (!user) {
+                return res.status(401).json({ error: 'Authentification requise pour créer un code cadeau' });
+            }
 
-                if (count >= 5) {
-                    return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
-                }
+            // Check limit per user
+            const { count } = await supabase
+                .from('gift_codes')
+                .select('*', { count: 'exact', head: true })
+                .eq('created_by', user.id)
+                .eq('status', 'active');
+
+            if (count >= 5) {
+                return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
             }
 
             // Create gift code
@@ -61,7 +74,7 @@ export default async function handler(req, res) {
                 .from('gift_codes')
                 .insert({
                     code,
-                    created_by: userId,
+                    created_by: user.id,
                     status: 'active',
                     expires_at: expiresAt.toISOString()
                 })
@@ -83,10 +96,20 @@ export default async function handler(req, res) {
 
         // ============ VERIFY (check if code is valid) ============
         if (action === 'verify') {
+            // Rate limit
+            if (!checkRateLimit(req, res, { ...RATE_LIMITS.READ, keyPrefix: 'gift:verify' })) {
+                return;
+            }
+
             const code = (req.query.code || req.body?.code || '').toUpperCase().trim();
             
             if (!code) {
                 return res.status(400).json({ error: 'Code requis' });
+            }
+
+            // Validate format before querying
+            if (!/^CINQ-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) {
+                return res.json({ valid: false, reason: 'Format invalide' });
             }
 
             const { data, error } = await supabase
@@ -122,14 +145,15 @@ export default async function handler(req, res) {
 
         // ============ LIST (user's gifts) ============
         if (action === 'list') {
-            const authHeader = req.headers.authorization;
-            if (!authHeader?.startsWith('Bearer ')) {
+            const user = await getUser(req);
+            if (!user) {
                 return res.status(401).json({ error: 'Non authentifié' });
             }
 
-            const token = authHeader.split(' ')[1];
-            const { data: { user } } = await supabase.auth.getUser(token);
-            if (!user) return res.status(401).json({ error: 'Token invalide' });
+            // Rate limit
+            if (!checkRateLimit(req, res, { ...RATE_LIMITS.READ, keyPrefix: 'gift:list', userId: user.id })) {
+                return;
+            }
 
             const { data, error } = await supabase
                 .from('gift_codes')

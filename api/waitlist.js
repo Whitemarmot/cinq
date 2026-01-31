@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { trackEvent, logRequest, logError, logStructured, EventType } from './_analytics.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -14,6 +15,8 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
+
+    logRequest(req, '/api/waitlist');
 
     // GET = count
     if (req.method === 'GET') {
@@ -55,8 +58,13 @@ export default async function handler(req, res) {
                 .from('waitlist')
                 .select('*', { count: 'exact', head: true });
 
+            // Track waitlist signup
+            trackEvent(EventType.WAITLIST_SIGNUP, { count: count || 1 });
+            logStructured('info', 'Waitlist signup', { count: count || 1 });
+
             return res.json({ success: true, count: count || 1 });
         } catch (e) {
+            logError(e, '/api/waitlist');
             return res.status(500).json({ error: e.message });
         }
     }

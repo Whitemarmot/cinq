@@ -526,7 +526,71 @@ Toutes les erreurs suivent ce format :
 
 ---
 
+## 📊 Stats (`/api/stats`) - Admin Only
+
+### Récupérer les métriques
+
+```http
+GET /api/stats?period=week
+Authorization: Bearer <admin_token>
+```
+
+Ou avec le secret admin :
+```http
+GET /api/stats?period=week
+X-Admin-Secret: <ADMIN_SECRET>
+```
+
+**Périodes disponibles:** `day`, `week`, `month`, `all`
+
+**Réponse (200):**
+```json
+{
+  "period": "week",
+  "since": "2024-01-24T12:00:00Z",
+  "totals": {
+    "users": 42,
+    "messages": 156,
+    "gift_codes": 28,
+    "active_gift_codes": 12,
+    "waitlist": 89
+  },
+  "events": {
+    "user_registered": 8,
+    "user_login": 45,
+    "message_sent": 120,
+    "ping_sent": 36,
+    "gift_code_created": 15,
+    "gift_code_verified": 22,
+    "waitlist_signup": 12
+  },
+  "daily": {
+    "2024-01-31": {
+      "user_registered": 2,
+      "message_sent": 18
+    }
+  },
+  "derived": {
+    "messages_per_user": "3.71",
+    "gift_redemption_rate": "57.1%",
+    "conversion_rate": "32.1%"
+  }
+}
+```
+
+**Configuration admin (variables d'environnement):**
+- `ADMIN_EMAILS`: Liste d'emails admin séparés par virgule
+- `ADMIN_SECRET`: Token secret pour accès API sans auth
+
+---
+
 ## Changelog
+
+### v1.2.0 (2024-01-31)
+- 🆕 `GET /api/stats` - Endpoint admin pour les métriques
+- 🆕 Système d'analytics côté serveur
+- 🆕 Logs structurés JSON dans toutes les APIs
+- 🆕 Tracking: inscriptions, messages, pings, gift codes
 
 ### v1.1.0 (2024-01-31)
 - 🆕 `GET /api/contacts?action=search&search=email` - Recherche par email

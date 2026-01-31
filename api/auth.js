@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, RATE_LIMITS, getClientIP } from './_rate-limit.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -33,6 +34,13 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     const action = req.query.action || req.body?.action;
+
+    // Rate limiting - stricter for auth endpoints
+    if (['register', 'login'].includes(action)) {
+        if (!checkRateLimit(req, res, { ...RATE_LIMITS.AUTH, keyPrefix: `auth:${action}` })) {
+            return; // Response already sent by checkRateLimit
+        }
+    }
 
     try {
         // ============ REGISTER ============
