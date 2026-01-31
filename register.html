@@ -19,7 +19,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="theme-color" content="#121218">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
     
@@ -50,128 +50,97 @@
             const next = current === 'light' ? 'dark' : 'light';
             html.setAttribute('data-theme', next);
             localStorage.setItem('cinq_theme', next);
+            
+            const meta = document.getElementById('theme-color-meta');
+            meta.content = next === 'light' ? '#f8f8fc' : '#0e0e12';
         }
     </script>
     <style>
+        /* ===== LAYOUT ===== */
         .register-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: var(--space-5);
         }
         
         @media (max-width: 380px) {
             .register-container {
-                padding: 1rem;
+                padding: var(--space-4);
             }
         }
         
-        /* Theme toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: var(--color-bg-tertiary);
-            border: 1px solid var(--color-border);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            overflow: hidden;
-        }
-        .theme-toggle:hover {
-            background: var(--color-bg-elevated);
-            transform: scale(1.05);
-        }
-        .theme-toggle .icon-sun,
-        .theme-toggle .icon-moon {
-            position: absolute;
-            transition: all 0.3s ease;
-            color: var(--color-text-secondary);
-        }
-        .theme-toggle .icon-sun {
-            opacity: 1;
-            transform: rotate(0) scale(1);
-        }
-        .theme-toggle .icon-moon {
-            opacity: 0;
-            transform: rotate(-90deg) scale(0.5);
-        }
-        [data-theme="light"] .theme-toggle .icon-sun {
-            opacity: 0;
-            transform: rotate(90deg) scale(0.5);
-        }
-        [data-theme="light"] .theme-toggle .icon-moon {
-            opacity: 1;
-            transform: rotate(0) scale(1);
-        }
-        
-        /* Pentagon pattern */
-        .pentagon-pattern {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: -2;
-            opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
-            background-size: 60px 60px;
-        }
-        
-        /* Gradient orbs */
-        .gradient-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.2;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .gradient-orb-1 {
-            width: 400px;
-            height: 400px;
-            background: #ff6b4a;
-            top: -100px;
-            right: -100px;
-        }
-        
-        .gradient-orb-2 {
-            width: 300px;
-            height: 300px;
-            background: #a78bfa;
-            bottom: -50px;
-            left: -50px;
-        }
+        /* ===== CARD ===== */
         .register-card {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
+            border-radius: var(--radius-2xl);
+            padding: var(--space-6);
             width: 100%;
             max-width: 400px;
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            animation: card-enter 0.4s var(--ease-out-expo);
         }
+        
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .register-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: var(--cinq-gradient);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            padding: 1px;
+        }
+        
+        .register-card:hover::before {
+            opacity: 0.4;
+        }
+        
+        .register-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: var(--space-6);
+            right: var(--space-6);
+            height: 1px;
+            background: var(--glass-highlight);
+            pointer-events: none;
+        }
+        
+        /* ===== LOGO ===== */
         .register-logo {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: var(--space-6);
         }
+        
         .register-logo .five {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: var(--font-display);
             font-size: 4rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 4px 12px rgba(255, 107, 74, 0.35));
+            filter: drop-shadow(0 4px 12px var(--color-brand-glow));
             position: relative;
             display: inline-block;
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        .register-logo .five:hover {
+            transform: scale(1.05) rotate(-3deg);
         }
         
         .register-logo .five::before {
@@ -190,80 +159,222 @@
             opacity: 0.5;
             z-index: -1;
             filter: blur(20px);
+            animation: pentagon-pulse 4s ease-in-out infinite;
         }
         
+        @keyframes pentagon-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+        
+        /* ===== TITLES ===== */
         .register-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem;
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
             font-weight: 600;
             text-align: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: var(--space-2);
+            letter-spacing: -0.02em;
         }
+        
         .register-subtitle {
             color: var(--color-text-muted);
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: var(--space-6);
+            font-size: var(--text-sm);
         }
+        
+        /* ===== GIFTER INFO ===== */
         .gifter-info {
             background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
+            padding: var(--space-4);
+            margin-bottom: var(--space-5);
             text-align: center;
+            animation: gifter-enter 0.5s var(--ease-out-expo) 0.2s both;
         }
-        .gifter-info .emoji { font-size: 1.5rem; }
+        
+        @keyframes gifter-enter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .gifter-info .emoji { 
+            font-size: 1.5rem; 
+        }
+        
         .gifter-info .text { 
             color: var(--color-text-muted); 
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
+            font-size: var(--text-sm);
+            margin-top: var(--space-2);
         }
+        
         .gifter-info .name { 
-            color: var(--color-text-primary); 
+            color: var(--color-brand); 
             font-weight: 600;
         }
+        
+        /* ===== FORM ===== */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: var(--space-4);
         }
+        
         .form-label {
             display: block;
-            font-size: 0.875rem;
+            font-size: var(--text-sm);
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: var(--space-2);
+            color: var(--color-text-secondary);
         }
+        
         .form-input {
             width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--color-bg-primary);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             color: var(--color-text-primary);
-            font-size: 1rem;
+            font-size: var(--text-base);
+            transition: 
+                border-color 0.2s,
+                box-shadow 0.2s,
+                background 0.2s;
         }
+        
         .form-input:focus {
             outline: none;
             border-color: var(--color-brand);
             box-shadow: 0 0 0 3px var(--color-brand-muted);
+            background: var(--color-bg-elevated);
         }
+        
+        .form-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
         .form-input.error {
             border-color: var(--color-error);
+            box-shadow: 0 0 0 3px var(--color-error-muted);
         }
+        
+        .form-input.success {
+            border-color: var(--color-success);
+        }
+        
+        /* Password field with toggle */
+        .password-field {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: var(--space-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .password-field .form-input {
+            padding-right: var(--space-10);
+        }
+        
+        /* Password hint */
+        .form-hint {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        /* Password strength meter */
+        .password-strength {
+            margin-top: var(--space-2);
+        }
+        
+        .strength-bar {
+            height: 4px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--space-1);
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+            border-radius: inherit;
+        }
+        
+        .strength-fill.weak { width: 25%; background: var(--color-error); }
+        .strength-fill.fair { width: 50%; background: var(--color-warning); }
+        .strength-fill.good { width: 75%; background: #22c55e; }
+        .strength-fill.strong { width: 100%; background: var(--color-success); }
+        
+        .strength-text {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            text-align: right;
+        }
+        
+        .strength-text.weak { color: var(--color-error); }
+        .strength-text.fair { color: var(--color-warning); }
+        .strength-text.good { color: #22c55e; }
+        .strength-text.strong { color: var(--color-success); }
+        
+        /* Field error */
+        .field-error {
+            font-size: var(--text-xs);
+            color: var(--color-error);
+            margin-top: var(--space-1);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            animation: field-error-in 0.2s ease-out;
+        }
+        
+        @keyframes field-error-in {
+            from { opacity: 0; transform: translateX(-5px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ===== SUBMIT BUTTON ===== */
         .submit-btn {
             width: 100%;
-            padding: 0.875rem;
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            padding: var(--space-4);
+            background: var(--cinq-gradient);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1rem;
+            font-family: var(--font-display);
+            font-size: var(--text-base);
             font-weight: 600;
             cursor: pointer;
-            margin-top: 1rem;
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-            box-shadow: 0 2px 12px rgba(255, 107, 74, 0.3);
+            margin-top: var(--space-5);
+            transition: 
+                transform 0.15s var(--ease-spring),
+                box-shadow 0.2s,
+                opacity 0.15s;
+            box-shadow: var(--shadow-glow-sm);
             position: relative;
             overflow: hidden;
         }
+        
         .submit-btn::before {
             content: '';
             position: absolute;
@@ -274,95 +385,275 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
+        
         .submit-btn:hover:not(:disabled)::before {
             left: 100%;
         }
+        
         .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.35);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: var(--shadow-glow);
         }
+        
         .submit-btn:active:not(:disabled) {
             transform: translateY(0) scale(0.98);
         }
+        
         .submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
-        .message {
-            padding: 0.75rem;
-            border-radius: var(--radius-lg);
-            margin-top: 1rem;
-            font-size: 0.875rem;
-        }
-        .message.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--color-error);
-        }
-        .message.success {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--color-success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-        .message {
-            animation: message-in 0.3s ease-out;
-        }
-        @keyframes message-in {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
+        /* ===== LOADING ===== */
         .loading-spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-right: 0.5rem;
+            margin-right: var(--space-2);
+            vertical-align: middle;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* ===== MESSAGES ===== */
+        .message {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-top: var(--space-4);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            animation: message-in 0.3s var(--ease-out-expo);
+        }
+        
+        @keyframes message-in {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .message.error {
+            background: var(--color-error-muted);
+            color: var(--color-error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .message.success {
+            background: var(--color-success-muted);
+            color: var(--color-success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .message-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        
+        /* ===== INVALID CODE ===== */
+        .invalid-code {
+            text-align: center;
+            padding: var(--space-8) var(--space-5);
+        }
+        
+        .invalid-code h2 { 
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            margin: var(--space-3) 0;
+        }
+        
+        .invalid-code p { 
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-4);
+        }
+        
+        /* ===== LINKS ===== */
         .login-link {
             text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
+            margin-top: var(--space-5);
+            font-size: var(--text-sm);
             color: var(--color-text-muted);
         }
+        
         .login-link a {
             color: var(--color-brand);
             text-decoration: none;
-        }
-        .invalid-code {
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-        .invalid-code h2 { margin: 0.5rem 0 0.5rem; }
-        .invalid-code p { color: var(--color-text-muted); }
-        
-        .register-card {
-            position: relative;
-            box-shadow: 0 24px 48px -8px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
         }
         
-        /* Gradient border glow on hover */
-        .register-card::before {
-            content: '';
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--color-bg-elevated);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
             position: absolute;
-            inset: -1px;
-            border-radius: inherit;
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #a78bfa 100%);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            padding: 1px;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
         }
         
-        .register-card:hover::before {
-            opacity: 0.4;
+        .theme-toggle .icon-sun {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+        
+        .theme-toggle .icon-moon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.5);
+        }
+        
+        [data-theme="light"] .theme-toggle .icon-sun {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.5);
+        }
+        
+        [data-theme="light"] .theme-toggle .icon-moon {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+        
+        /* ===== BACKGROUND ===== */
+        .pentagon-pattern {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+        
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .gradient-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--color-brand);
+            top: -100px;
+            right: -100px;
+        }
+        
+        .gradient-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #a78bfa;
+            bottom: -50px;
+            left: -50px;
+        }
+        
+        /* ===== FOOTER ===== */
+        .auth-footer {
+            padding: var(--space-5);
+            padding-bottom: max(var(--space-5), calc(env(safe-area-inset-bottom, 0px) + var(--space-4)));
+            text-align: center;
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: auto;
+        }
+        
+        .auth-footer nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+        
+        .auth-footer a {
+            color: var(--color-text-muted);
+            padding: var(--space-2) var(--space-3);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--radius-md);
+            transition: color 0.2s, background 0.2s;
+        }
+        
+        .auth-footer a:hover {
+            color: var(--color-text-secondary);
+            background: var(--color-bg-tertiary);
+        }
+        
+        /* ===== LOADING STATE ===== */
+        #loading {
+            text-align: center;
+            padding: var(--space-4);
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+        }
+        
+        .loading-dots span {
+            width: 10px;
+            height: 10px;
+            background: var(--color-brand);
+            border-radius: 50%;
+            animation: loading-bounce 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes loading-bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            .register-card,
+            .gifter-info,
+            .message,
+            .register-logo .five::before,
+            .field-error,
+            .loading-dots span {
+                animation: none !important;
+            }
+            
+            .submit-btn::before {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -373,7 +664,7 @@
     <div class="noise-overlay" aria-hidden="true"></div>
     
     <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: 1rem; right: 1rem; z-index: 100;">
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
         <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -383,73 +674,126 @@
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
 
     <main id="main-content" style="flex: 1; display: flex;">
-    <div class="register-container">
-        <div class="register-card" id="register-card">
-            <div class="register-logo">
-                <span class="five">5</span>
-            </div>
-            
-            <div id="loading" style="text-align: center;">
-                <p>Vérification du code...</p>
-            </div>
-
-            <div id="invalid-code" class="invalid-code" style="display: none;">
-                <svg class="invalid-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;">
-                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <h2>Code invalide</h2>
-                <p id="invalid-reason">Ce code n'existe pas ou a déjà été utilisé.</p>
-                <a href="/" style="color: var(--color-brand);">Retour à l'accueil</a>
-            </div>
-
-            <div id="register-form-container" style="display: none;">
-                <h1 class="register-title">Bienvenue sur Cinq</h1>
-                <p class="register-subtitle">Tu as reçu une invitation</p>
-
-                <div class="gifter-info" id="gifter-info">
-                    <svg class="gifter-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem;">
-                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
-                    </svg>
-                    <div class="text">Offert par <span class="name" id="gifter-name">un ami</span></div>
+        <div class="register-container">
+            <div class="register-card" id="register-card">
+                <div class="register-logo">
+                    <span class="five" aria-hidden="true">5</span>
+                </div>
+                
+                <div id="loading">
+                    <div class="loading-dots" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <p>Vérification du code...</p>
                 </div>
 
-                <form id="register-form" aria-label="Formulaire d'inscription">
-                    <input type="hidden" id="gift-code" name="giftCode">
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email</label>
-                        <input type="email" id="email" name="email" class="form-input" required autocomplete="email" aria-required="true">
+                <div id="invalid-code" class="invalid-code" style="display: none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <h2>Code invalide</h2>
+                    <p id="invalid-reason">Ce code n'existe pas ou a déjà été utilisé.</p>
+                    <a href="/" style="color: var(--color-brand);">Retour à l'accueil</a>
+                </div>
+
+                <div id="register-form-container" style="display: none;">
+                    <h1 class="register-title">Bienvenue sur Cinq</h1>
+                    <p class="register-subtitle">Tu as reçu une invitation</p>
+
+                    <div class="gifter-info" id="gifter-info">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                        </svg>
+                        <div class="text">Offert par <span class="name" id="gifter-name">un ami</span></div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="password">Mot de passe</label>
-                        <input type="password" id="password" name="password" class="form-input" required minlength="8" autocomplete="new-password" aria-required="true" aria-describedby="password-hint">
-                        <small id="password-hint" style="color: var(--color-text-muted); font-size: 0.75rem;">Min. 8 caractères, 1 lettre, 1 chiffre</small>
+                    <form id="register-form" aria-label="Formulaire d'inscription" novalidate>
+                        <input type="hidden" id="gift-code" name="giftCode">
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input" 
+                                required 
+                                autocomplete="email" 
+                                aria-required="true"
+                                placeholder="ton@email.com"
+                                aria-describedby="email-error"
+                            >
+                            <div id="email-error" class="field-error" style="display: none;" role="alert"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Mot de passe</label>
+                            <div class="password-field">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-input" 
+                                    required 
+                                    minlength="8" 
+                                    autocomplete="new-password" 
+                                    aria-required="true" 
+                                    aria-describedby="password-hint password-error"
+                                    placeholder="••••••••"
+                                >
+                                <button 
+                                    type="button" 
+                                    class="password-toggle" 
+                                    onclick="togglePassword()" 
+                                    aria-label="Afficher le mot de passe"
+                                    id="password-toggle-btn"
+                                >
+                                    <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg id="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Password strength meter -->
+                            <div class="password-strength" id="password-strength" style="display: none;">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strength-fill"></div>
+                                </div>
+                                <div class="strength-text" id="strength-text">Faible</div>
+                            </div>
+                            
+                            <p id="password-hint" class="form-hint">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                Min. 8 caractères, 1 lettre, 1 chiffre
+                            </p>
+                            <div id="password-error" class="field-error" style="display: none;" role="alert"></div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submit-btn" aria-label="Créer mon compte Cinq">
+                            Créer mon compte
+                        </button>
+
+                        <div id="message" class="message" style="display: none;" role="alert" aria-live="polite"></div>
+                    </form>
+
+                    <div class="login-link">
+                        Déjà inscrit ? <a href="/login.html" aria-label="Se connecter à un compte existant">Se connecter</a>
                     </div>
-
-                    <button type="submit" class="submit-btn" id="submit-btn" aria-label="Créer mon compte Cinq">
-                        Créer mon compte
-                    </button>
-
-                    <div id="message" class="message" style="display: none;" role="alert" aria-live="polite"></div>
-                </form>
-
-                <div class="login-link">
-                    Déjà inscrit ? <a href="/login.html" aria-label="Se connecter à un compte existant">Se connecter</a>
                 </div>
             </div>
         </div>
-    </div>
     </main>
 
     <script>
         const API_URL = '/api';
         const params = new URLSearchParams(window.location.search);
         const giftCode = params.get('code');
+        let isPasswordVisible = false;
 
         async function init() {
             if (!giftCode) {
-                showInvalid('Aucun code fourni');
+                showInvalid('Aucun code fourni. Tu as besoin d\'une invitation pour rejoindre Cinq.');
                 return;
             }
 
@@ -459,7 +803,7 @@
                 const data = await res.json();
 
                 if (!data.valid) {
-                    showInvalid(data.reason);
+                    showInvalid(getInvalidReason(data.reason));
                     return;
                 }
 
@@ -467,11 +811,21 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('register-form-container').style.display = 'block';
                 document.getElementById('gift-code').value = giftCode;
-                document.getElementById('gifter-name').textContent = data.gifter;
+                document.getElementById('gifter-name').textContent = data.gifter || 'un ami';
 
             } catch (e) {
-                showInvalid('Erreur de vérification');
+                showInvalid('Erreur de vérification. Réessaie plus tard.');
             }
+        }
+
+        function getInvalidReason(reason) {
+            const reasons = {
+                'not_found': 'Ce code n\'existe pas. Vérifie que tu l\'as bien copié.',
+                'already_used': 'Ce code a déjà été utilisé.',
+                'expired': 'Ce code a expiré.',
+                'invalid': 'Ce code n\'est pas valide.'
+            };
+            return reasons[reason] || reason || 'Ce code n\'est pas valide.';
         }
 
         function showInvalid(reason) {
@@ -480,23 +834,145 @@
             document.getElementById('invalid-reason').textContent = reason;
         }
 
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            const eyeOffIcon = document.getElementById('eye-off-icon');
+            const toggleBtn = document.getElementById('password-toggle-btn');
+            
+            isPasswordVisible = !isPasswordVisible;
+            passwordInput.type = isPasswordVisible ? 'text' : 'password';
+            eyeIcon.style.display = isPasswordVisible ? 'none' : 'block';
+            eyeOffIcon.style.display = isPasswordVisible ? 'block' : 'none';
+            toggleBtn.setAttribute('aria-label', isPasswordVisible ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+        }
+
+        function showFieldError(fieldId, message) {
+            const errorEl = document.getElementById(`${fieldId}-error`);
+            const inputEl = document.getElementById(fieldId);
+            if (errorEl && inputEl) {
+                errorEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> ${message}`;
+                errorEl.style.display = 'flex';
+                inputEl.classList.add('error');
+                inputEl.setAttribute('aria-invalid', 'true');
+            }
+        }
+
+        function hideFieldError(fieldId) {
+            const errorEl = document.getElementById(`${fieldId}-error`);
+            const inputEl = document.getElementById(fieldId);
+            if (errorEl && inputEl) {
+                errorEl.style.display = 'none';
+                inputEl.classList.remove('error');
+                inputEl.removeAttribute('aria-invalid');
+            }
+        }
+
         function showMessage(text, type) {
             const msg = document.getElementById('message');
-            msg.textContent = text;
+            const icon = type === 'error' 
+                ? '<svg class="message-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+                : '<svg class="message-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            
+            msg.innerHTML = `${icon}<span>${text}</span>`;
             msg.className = `message ${type}`;
-            msg.style.display = 'block';
+            msg.style.display = 'flex';
         }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function checkPasswordStrength(password) {
+            let score = 0;
+            
+            if (password.length >= 8) score++;
+            if (password.length >= 12) score++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+            if (/\d/.test(password)) score++;
+            if (/[^a-zA-Z0-9]/.test(password)) score++;
+            
+            if (score <= 1) return { class: 'weak', text: 'Faible', valid: false };
+            if (score === 2) return { class: 'fair', text: 'Moyen', valid: true };
+            if (score === 3) return { class: 'good', text: 'Bon', valid: true };
+            return { class: 'strong', text: 'Fort', valid: true };
+        }
+
+        function validatePassword(password) {
+            if (password.length < 8) return { valid: false, message: 'Minimum 8 caractères requis' };
+            if (!/[a-zA-Z]/.test(password)) return { valid: false, message: 'Au moins une lettre requise' };
+            if (!/\d/.test(password)) return { valid: false, message: 'Au moins un chiffre requis' };
+            return { valid: true };
+        }
+
+        // Real-time validation
+        document.getElementById('email').addEventListener('blur', function() {
+            if (this.value && !validateEmail(this.value)) {
+                showFieldError('email', 'Adresse email invalide');
+            } else {
+                hideFieldError('email');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            hideFieldError('email');
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            hideFieldError('password');
+            
+            const strengthMeter = document.getElementById('password-strength');
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthText = document.getElementById('strength-text');
+            
+            if (this.value.length > 0) {
+                strengthMeter.style.display = 'block';
+                const strength = checkPasswordStrength(this.value);
+                
+                strengthFill.className = 'strength-fill ' + strength.class;
+                strengthText.className = 'strength-text ' + strength.class;
+                strengthText.textContent = strength.text;
+            } else {
+                strengthMeter.style.display = 'none';
+            }
+        });
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // Reset errors
+            hideFieldError('email');
+            hideFieldError('password');
+            document.getElementById('message').style.display = 'none';
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const code = document.getElementById('gift-code').value;
+
+            // Validation
+            let hasError = false;
+
+            if (!email) {
+                showFieldError('email', 'L\'email est requis');
+                hasError = true;
+            } else if (!validateEmail(email)) {
+                showFieldError('email', 'Adresse email invalide');
+                hasError = true;
+            }
+
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                showFieldError('password', passwordValidation.message);
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Submit
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading-spinner"></span>Création...';
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const code = document.getElementById('gift-code').value;
 
             try {
                 const res = await fetch(`${API_URL}/auth?action=register`, {
@@ -508,20 +984,28 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    throw new Error(data.error || 'Erreur');
+                    let errorMessage = data.error || 'Erreur lors de la création du compte';
+                    
+                    if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('exist')) {
+                        errorMessage = 'Cette adresse email est déjà utilisée. Essaie de te connecter.';
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
 
                 // Auto-login: store session and go to app
                 if (data.session && data.user) {
                     localStorage.setItem('cinq_session', JSON.stringify(data.session));
                     localStorage.setItem('cinq_user', JSON.stringify(data.user));
-                    localStorage.setItem('cinq_new_user', 'true'); // Flag for onboarding
-                    showMessage('Bienvenue sur Cinq !', 'success');
+                    localStorage.setItem('cinq_new_user', 'true');
+                    
+                    showMessage('Bienvenue sur Cinq ! 🎉', 'success');
+                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Compte créé !';
+                    
                     setTimeout(() => {
                         window.location.href = '/app.html';
                     }, 800);
                 } else {
-                    // Fallback: manual login required
                     showMessage('Compte créé ! Connecte-toi maintenant.', 'success');
                     setTimeout(() => {
                         window.location.href = '/login.html?registered=1';
@@ -532,20 +1016,36 @@
                 showMessage(err.message, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Créer mon compte';
+                
+                // Shake animation
+                btn.style.animation = 'none';
+                btn.offsetHeight;
+                btn.style.animation = 'shake 0.5s ease-out';
             }
         });
+
+        // Shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+                20%, 40%, 60%, 80% { transform: translateX(4px); }
+            }
+        `;
+        document.head.appendChild(style);
 
         init();
     </script>
 
-    <!-- Footer - part of page flow -->
-    <footer role="contentinfo" style="padding: 1.5rem; padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1rem)); text-align: center; font-size: 0.75rem; color: var(--color-text-muted); margin-top: auto;">
-        <nav aria-label="Liens légaux" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-            <a href="/privacy.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">Confidentialité</a>
+    <!-- Footer -->
+    <footer class="auth-footer" role="contentinfo">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html">Confidentialité</a>
             <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <a href="/terms.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">CGU</a>
+            <a href="/terms.html">CGU</a>
             <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <span style="padding: 0 0.5rem;">© 2026 Cinq</span>
+            <span style="padding: 0 var(--space-2);">© 2025 Cinq</span>
         </nav>
     </footer>
 </body>
