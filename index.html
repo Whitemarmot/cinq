@@ -84,27 +84,53 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.5rem;
-            background: rgba(12, 12, 15, 0.7);
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            transition: background 0.3s ease, backdrop-filter 0.3s ease;
+        }
+        
+        .site-header.scrolled {
+            background: rgba(12, 12, 15, 0.85);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--color-border-subtle);
         }
         
+        [data-theme="light"] .site-header.scrolled {
+            background: rgba(250, 249, 247, 0.85);
+        }
+        
         .header-logo {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
             text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+        
+        .header-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .header-logo-icon {
+            width: 32px;
+            height: 32px;
+            position: relative;
+        }
+        
+        .header-logo-icon svg {
+            width: 100%;
+            height: 100%;
         }
         
         .header-logo-number {
-            font-size: 2rem;
+            font-family: var(--font-display, 'Space Grotesk', sans-serif);
+            font-size: 1.5rem;
             font-weight: 700;
             background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 2px 8px var(--color-brand-glow));
         }
         
         .header-nav {
@@ -928,7 +954,19 @@
     <!-- Header -->
     <header class="site-header" role="banner">
         <a href="/" class="header-logo" aria-label="Cinq - Accueil">
-            <span class="header-logo-number">5</span>
+            <span class="header-logo-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2L29.5 11.5L24.5 27.5H7.5L2.5 11.5L16 2Z" stroke="url(#logo-gradient)" stroke-width="2" fill="none"/>
+                    <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-gradient)">5</text>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b4a"/>
+                            <stop offset="100%" style="stop-color:#ff8a6a"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </span>
+            <span class="header-logo-text" style="font-family: var(--font-display); font-weight: 600; color: var(--color-text-primary); font-size: 1.1rem;">cinq</span>
         </a>
         <nav class="header-nav" aria-label="Navigation principale">
             <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" type="button">
@@ -1179,6 +1217,19 @@
                     .then(reg => console.log('[PWA] SW registered'))
                     .catch(err => console.log('[PWA] SW failed:', err));
             });
+        }
+    </script>
+    <script>
+        // Header scroll effect
+        const header = document.querySelector('.site-header');
+        if (header) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            }, { passive: true });
         }
     </script>
     <script src="/pwa-install.js" defer></script>
