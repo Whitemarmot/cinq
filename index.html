@@ -365,7 +365,16 @@
         }
         
         .feature-icon {
-            font-size: 14px;
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            stroke: var(--color-brand);
+            transition: stroke 0.2s, transform 0.2s;
+        }
+        
+        .feature-pill:hover .feature-icon {
+            stroke: var(--color-brand-light);
+            transform: scale(1.1);
         }
 
         /* ===== CTA SECTION ===== */
@@ -422,6 +431,15 @@
         
         .cta-button:active {
             transform: translateY(-1px);
+        }
+        
+        .cta-icon {
+            flex-shrink: 0;
+            transition: transform 0.2s var(--ease-spring);
+        }
+        
+        .cta-button:hover .cta-icon {
+            transform: scale(1.15) rotate(-5deg);
         }
         
         .cta-note {
@@ -744,60 +762,69 @@
         
         /* ===== LEGAL FOOTER ===== */
         .legal-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem 1.5rem;
-            padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+            position: relative;
+            width: 100%;
+            padding: 1.5rem;
+            padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
             text-align: center;
             font-size: 0.75rem;
             color: var(--color-text-muted);
-            background: var(--color-bg-primary);
-            border-top: 1px solid var(--color-border);
-            z-index: 100;
+            background: transparent;
+            margin-top: auto;
+        }
+        
+        .legal-footer nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
         
         .legal-footer a {
             color: var(--color-text-muted);
-            margin: 0 0.75rem;
             text-decoration: none;
             transition: color 0.2s;
             /* Touch target minimum */
             display: inline-flex;
             align-items: center;
             min-height: 44px;
-            padding: 0.5rem 0.25rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
         }
         
         .legal-footer a:hover {
-            color: var(--color-text-secondary);
+            color: var(--color-brand);
+            background: var(--color-brand-muted);
         }
         
-        .legal-footer span {
-            opacity: 0.5;
+        .legal-footer span[aria-hidden] {
+            opacity: 0.3;
         }
         
-        /* Add bottom padding to hero to avoid footer overlap */
+        .legal-footer span:not([aria-hidden]) {
+            padding: 0 0.5rem;
+        }
+        
+        /* Hero needs enough space but no fixed footer compensation */
         .hero {
-            padding-bottom: calc(var(--space-8) + 80px) !important;
+            padding-bottom: var(--space-6) !important;
         }
         
         @media (max-width: 640px) {
             .legal-footer {
-                padding: 0.75rem 1rem;
-                padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+                padding: 1.25rem 1rem;
             }
             
             .hero {
-                padding-bottom: calc(var(--space-4) + 56px) !important;
+                padding-bottom: var(--space-4) !important;
             }
         }
         
         @media (max-width: 380px) {
             .legal-footer a {
-                margin: 0 0.5rem;
                 font-size: 0.6875rem;
+                padding: 0.5rem 0.5rem;
             }
             
             .legal-footer span[aria-hidden] {
@@ -825,7 +852,7 @@
         }
     </script>
 </head>
-<body>
+<body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
     <!-- Skip to content -->
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
     
@@ -853,7 +880,7 @@
         </nav>
     </header>
 
-    <main id="main-content">
+    <main id="main-content" style="flex: 1;">
     <section class="hero" role="region" aria-label="Présentation de Cinq">
         <div class="hero-content">
             
@@ -884,19 +911,27 @@
             <!-- Feature pills -->
             <div class="features animate-fade-in-up animate-delay-3" data-stagger>
                 <span class="feature-pill">
-                    <span class="feature-icon">🎯</span>
+                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                    </svg>
                     <span>5 slots. C'est tout.</span>
                 </span>
                 <span class="feature-pill">
-                    <span class="feature-icon">🎁</span>
+                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    </svg>
                     <span>Offrir > S'inscrire</span>
                 </span>
                 <span class="feature-pill">
-                    <span class="feature-icon">🚫</span>
+                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                    </svg>
                     <span>Zéro likes, zéro validation</span>
                 </span>
                 <span class="feature-pill">
-                    <span class="feature-icon">⚡</span>
+                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
                     <span>La friction est le feature</span>
                 </span>
             </div>
@@ -904,7 +939,9 @@
             <!-- CTA -->
             <div class="cta-section animate-fade-in-up animate-delay-4">
                 <a href="gift.html" class="cta-button" aria-label="Offrir Cinq à un proche">
-                    <span aria-hidden="true">🎁</span>
+                    <svg class="cta-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    </svg>
                     <span>Offrir Cinq</span>
                 </a>
                 <p class="cta-note">
@@ -946,7 +983,10 @@
             <!-- Footer quote -->
             <div class="footer-quote">
                 <p class="quote-text">
-                    "L'app qui refuse de scaler. Et c'est le point. 🎯"
+                    "L'app qui refuse de scaler. Et c'est le point."
+                    <svg class="quote-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: inline; vertical-align: middle; margin-left: 4px; stroke: var(--color-brand);">
+                        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                    </svg>
                 </p>
             </div>
 
@@ -954,7 +994,7 @@
     </section>
     </main>
 
-    <!-- Legal Footer -->
+    <!-- Legal Footer - Now part of page flow, not fixed -->
     <footer class="legal-footer" role="contentinfo">
         <nav aria-label="Liens légaux">
             <a href="/privacy.html">Confidentialité</a>
