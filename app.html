@@ -1376,28 +1376,45 @@
         }
 
         async function init() {
-            const sessionStr = localStorage.getItem('cinq_session');
-            const userStr = localStorage.getItem('cinq_user');
-            
-            if (!sessionStr || !userStr) {
-                window.location.href = '/login.html';
-                return;
+            try {
+                console.log('Init started');
+                
+                const sessionStr = localStorage.getItem('cinq_session');
+                const userStr = localStorage.getItem('cinq_user');
+                
+                if (!sessionStr || !userStr) {
+                    console.log('No session, redirecting to login');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                session = JSON.parse(sessionStr);
+                user = JSON.parse(userStr);
+                
+                console.log('User loaded:', user?.email);
+
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) {
+                    userNameEl.textContent = user.email?.split('@')[0] || 'User';
+                }
+
+                // Check if new user and show onboarding
+                const isNewUser = localStorage.getItem('cinq_new_user');
+                if (isNewUser === 'true') {
+                    showOnboarding();
+                }
+
+                console.log('Loading contacts...');
+                await loadContacts();
+                console.log('Loading profile...');
+                await loadProfile();
+                console.log('Starting polling...');
+                startPolling();
+                console.log('Init complete');
+            } catch (e) {
+                console.error('Init error:', e);
+                alert('Erreur de chargement: ' + e.message);
             }
-
-            session = JSON.parse(sessionStr);
-            user = JSON.parse(userStr);
-
-            document.getElementById('user-name').textContent = user.email.split('@')[0];
-
-            // Check if new user and show onboarding
-            const isNewUser = localStorage.getItem('cinq_new_user');
-            if (isNewUser === 'true') {
-                showOnboarding();
-            }
-
-            await loadContacts();
-            await loadProfile();
-            startPolling();
         }
 
         // ===== ONBOARDING =====
