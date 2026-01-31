@@ -1769,19 +1769,54 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: var(--space-5);
+            padding-bottom: var(--space-3);
             min-height: 280px;
             display: flex;
             flex-direction: column;
             gap: var(--space-2);
             scroll-behavior: smooth;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
         
-        .chat-messages:empty::before {
+        /* Custom scrollbar for chat */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--color-text-muted);
+        }
+        
+        /* Empty state */
+        .chat-messages:not(:has(.chat-message)):not(:has(.chat-date-separator))::before {
             content: 'Premier message ? À toi de jouer 👋';
             text-align: center;
             color: var(--color-text-muted);
             margin: auto;
+            padding: var(--space-8);
+        }
+        
+        /* Fallback for browsers without :has() */
+        .chat-messages-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--color-text-muted);
+            text-align: center;
+            padding: var(--space-8);
         }
         
         .chat-message {
@@ -1957,18 +1992,33 @@
         .typing-indicator {
             display: none;
             align-items: center;
-            gap: var(--space-2);
+            justify-content: center;
+            gap: 4px;
             padding: var(--space-3) var(--space-4);
             background: var(--color-bg-elevated);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             border-bottom-left-radius: 4px;
-            max-width: 80px;
-            animation: message-in-received 0.3s ease-out;
+            width: fit-content;
+            min-width: 60px;
+            animation: typing-appear 0.3s ease-out;
+            position: relative;
+            margin-top: var(--space-1);
         }
         
         .typing-indicator.visible {
             display: flex;
+        }
+        
+        @keyframes typing-appear {
+            0% {
+                opacity: 0;
+                transform: translateX(-10px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
         
         .typing-indicator::after {
@@ -1983,8 +2033,8 @@
         }
         
         .typing-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             background: var(--color-text-muted);
             border-radius: 50%;
             animation: typing-bounce 1.4s infinite ease-in-out both;
@@ -2000,7 +2050,7 @@
                 opacity: 0.4;
             }
             30% { 
-                transform: translateY(-6px);
+                transform: translateY(-5px);
                 opacity: 1;
             }
         }
@@ -2705,11 +2755,6 @@
             </button>
         </div>
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
-        <div class="typing-indicator" id="typing-indicator" aria-live="polite" aria-label="En train d'écrire">
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-        </div>
         <div class="chat-input-area">
             <button class="ping-btn" onclick="sendPing()" type="button" aria-label="Envoyer un coucou">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2963,6 +3008,9 @@
                 setupComposer();
                 setupChatInput();
                 
+                // Setup lazy loading
+                setupLazyLoading();
+                
                 // Load data
                 await Promise.all([loadProfile(), loadContacts(), loadPosts()]);
                 startPolling();
@@ -2972,6 +3020,49 @@
                 console.error('Init error:', e);
                 showToast({ type: 'error', title: 'Aïe', message: 'L\'app n\'a pas voulu démarrer. Réessaie ?' });
             }
+        }
+
+        // ===== LAZY LOADING (Performance Optimization) =====
+        let lazyImageObserver = null;
+        
+        function setupLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                lazyImageObserver = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                const src = img.dataset.src;
+                                if (src) {
+                                    img.src = src;
+                                    img.onload = () => {
+                                        img.classList.add('loaded');
+                                        img.closest('.lazy-image-container')?.classList.add('loaded');
+                                    };
+                                    img.onerror = () => {
+                                        img.classList.add('error');
+                                    };
+                                    lazyImageObserver.unobserve(img);
+                                }
+                            }
+                        });
+                    },
+                    {
+                        root: null,
+                        rootMargin: '50px',
+                        threshold: 0.01
+                    }
+                );
+            }
+        }
+        
+        function observeLazyImages() {
+            if (!lazyImageObserver) return;
+            document.querySelectorAll('img.lazy-image[data-src]').forEach(img => {
+                if (!img.src || img.src === '') {
+                    lazyImageObserver.observe(img);
+                }
+            });
         }
 
         // ===== PROFILE =====
@@ -3305,6 +3396,9 @@
                     </article>
                 `;
             }).join('');
+            
+            // Observe lazy images after render
+            requestAnimationFrame(() => observeLazyImages());
         }
         
         function togglePostMenu(postId) {
@@ -3449,6 +3543,9 @@
             }
 
             document.getElementById('contact-count').textContent = `${contacts.length}/5`;
+            
+            // Observe lazy images after render
+            requestAnimationFrame(() => observeLazyImages());
         }
 
         // ===== CHAT =====
@@ -3620,6 +3717,10 @@
             const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
             const contactName = currentChatContact?.contact?.display_name || 'Contact';
             
+            // Preserve typing indicator state
+            const typingIndicator = document.getElementById('typing-indicator');
+            const wasTypingVisible = typingIndicator?.classList.contains('visible');
+            
             let lastDate = null;
             let html = '';
             
@@ -3658,6 +3759,15 @@
                     `;
                 }
             });
+            
+            // Add typing indicator at the end
+            html += `
+                <div class="typing-indicator${wasTypingVisible ? ' visible' : ''}" id="typing-indicator" aria-live="polite" aria-label="En train d'écrire">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
             
             container.innerHTML = html;
 

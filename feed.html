@@ -1430,9 +1430,13 @@
         }
         
         async function refreshPosts() {
-            currentPage = 0;
+            nextCursor = null;
             hasMorePosts = true;
             posts = [];
+            
+            // Remove end message if exists
+            document.querySelector('.infinite-scroll-end')?.remove();
+            
             await loadPosts();
         }
 
@@ -1458,29 +1462,48 @@
         }
         
         async function loadMorePosts() {
-            if (isLoadingMore || !hasMorePosts) return;
+            if (isLoadingMore || !hasMorePosts || !nextCursor) return;
             
             isLoadingMore = true;
             
-            // Show loading indicator
+            // Show skeleton loaders
             const container = document.getElementById('posts-list');
             const loaderId = 'infinite-loader';
             
-            if (!document.getElementById(loaderId)) {
-                const loader = document.createElement('div');
-                loader.id = loaderId;
-                loader.className = 'infinite-scroll-loader';
-                loader.setAttribute('aria-label', 'Chargement de plus de posts');
-                loader.innerHTML = `
-                    <div class="loading-spinner"></div>
-                    <span>Chargement...</span>
-                `;
-                container.appendChild(loader);
-            }
+            // Remove any existing loader/end message
+            document.getElementById(loaderId)?.remove();
+            document.querySelector('.infinite-scroll-end')?.remove();
+            
+            // Add skeleton loaders
+            const skeletonHtml = `
+                <div id="${loaderId}" class="skeleton-loader-group" aria-label="Chargement de plus de posts">
+                    <div class="skeleton-post loading-skeleton">
+                        <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-title"></div>
+                                <div class="skeleton skeleton-text"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-body"></div>
+                    </div>
+                    <div class="skeleton-post loading-skeleton" style="animation-delay: 0.1s;">
+                        <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-title" style="width: 50%;"></div>
+                                <div class="skeleton skeleton-text" style="width: 35%;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-body" style="height: 45px;"></div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', skeletonHtml);
             
             try {
-                const nextPage = currentPage + 1;
-                const res = await fetch(`${API_URL}/posts?page=${nextPage}&limit=${pageSize}`, {
+                // Cursor-based pagination: get posts older than cursor
+                const res = await fetch(`${API_URL}/posts?cursor=${encodeURIComponent(nextCursor)}&limit=${pageSize}`, {
                     headers: authHeaders()
                 });
                 
@@ -1490,14 +1513,17 @@
                 
                 const newPosts = data.posts || [];
                 
-                if (newPosts.length < pageSize) {
-                    hasMorePosts = false;
-                }
+                // Update cursor for next load
+                nextCursor = data.nextCursor || null;
+                hasMorePosts = data.hasMore !== false && nextCursor !== null;
                 
                 if (newPosts.length > 0) {
-                    currentPage = nextPage;
+                    // Append new posts
+                    const startIndex = posts.length;
                     posts = [...posts, ...newPosts];
-                    renderPosts();
+                    
+                    // Render only new posts with staggered animation
+                    renderNewPosts(newPosts, startIndex);
                 }
                 
             } catch (e) {
@@ -1506,18 +1532,38 @@
             } finally {
                 isLoadingMore = false;
                 
-                // Remove loader
-                const loader = document.getElementById('infinite-loader');
-                if (loader) loader.remove();
+                // Remove skeleton loader
+                document.getElementById(loaderId)?.remove();
                 
                 // Show end message if no more posts
-                if (!hasMorePosts) {
+                if (!hasMorePosts && !document.querySelector('.infinite-scroll-end')) {
                     const endMsg = document.createElement('div');
                     endMsg.className = 'infinite-scroll-end';
-                    endMsg.textContent = '🎉 Tu as tout vu !';
+                    endMsg.innerHTML = `
+                        <div style="opacity: 0; animation: post-fade-in 0.4s ease forwards;">
+                            ✨ Tu as tout vu !
+                        </div>
+                    `;
                     container.appendChild(endMsg);
                 }
             }
+        }
+        
+        /**
+         * Render only new posts (for infinite scroll) with staggered animation
+         */
+        function renderNewPosts(newPosts, startIndex) {
+            const container = document.getElementById('posts-list');
+            
+            newPosts.forEach((post, i) => {
+                const postHtml = renderPost(post, false, startIndex + i);
+                container.insertAdjacentHTML('beforeend', postHtml);
+            });
+            
+            // Setup lazy loading for new images
+            requestAnimationFrame(() => {
+                observeLazyImages();
+            });
         }
 
         // ===== LAZY LOADING IMAGES =====
@@ -1561,8 +1607,10 @@
 
         // ===== LOAD POSTS =====
         async function loadPosts() {
+            isInitialLoad = true;
+            
             try {
-                const res = await fetch(`${API_URL}/posts?page=${currentPage}&limit=${pageSize}`, {
+                const res = await fetch(`${API_URL}/posts?limit=${pageSize}`, {
                     headers: authHeaders()
                 });
                 
@@ -1571,10 +1619,8 @@
                 if (!res.ok) throw new Error(data.error || 'Erreur de chargement');
                 
                 posts = data.posts || [];
-                
-                if (posts.length < pageSize) {
-                    hasMorePosts = false;
-                }
+                nextCursor = data.nextCursor || null;
+                hasMorePosts = data.hasMore !== false && nextCursor !== null;
                 
                 renderPosts();
                 
@@ -1587,6 +1633,8 @@
                         <div class="empty-state-text">${e.message}</div>
                     </div>
                 `;
+            } finally {
+                isInitialLoad = false;
             }
         }
 
@@ -1594,8 +1642,9 @@
         function renderPosts(isNewPost = false) {
             const container = document.getElementById('posts-list');
             
-            // Remove skeletons
+            // Remove skeletons and end message
             document.querySelectorAll('.skeleton-post').forEach(el => el.remove());
+            document.querySelector('.infinite-scroll-end')?.remove();
             
             if (posts.length === 0) {
                 container.innerHTML = `
@@ -1611,8 +1660,20 @@
             }
             
             container.innerHTML = posts.map((post, index) => 
-                renderPost(post, isNewPost && index === 0)
+                renderPost(post, isNewPost && index === 0, index)
             ).join('');
+            
+            // Show end message if no more posts after initial load
+            if (!hasMorePosts && posts.length > 0) {
+                const endMsg = document.createElement('div');
+                endMsg.className = 'infinite-scroll-end';
+                endMsg.innerHTML = `
+                    <div style="opacity: 0; animation: post-fade-in 0.4s ease 0.3s forwards;">
+                        ✨ Tu as tout vu !
+                    </div>
+                `;
+                container.appendChild(endMsg);
+            }
             
             // Setup lazy loading for new images
             requestAnimationFrame(() => {
@@ -1620,7 +1681,7 @@
             });
         }
         
-        function renderPost(post, isNew = false) {
+        function renderPost(post, isNew = false, index = 0) {
             const author = post.author || {};
             const isOwn = post.user_id === user.id;
             const initial = (author.display_name || author.email || '?')[0].toUpperCase();
@@ -1650,8 +1711,14 @@
             
             const newPostClass = isNew ? 'new-post' : '';
             
+            // Staggered animation delay for infinite scroll posts
+            // Cap at 0.5s max delay for posts loaded via infinite scroll
+            const animDelay = isInitialLoad 
+                ? Math.min(index * 0.05, 0.3) 
+                : Math.min((index % pageSize) * 0.08, 0.5);
+            
             return `
-                <article class="post-card ${newPostClass}" aria-label="Post de ${escapeHtml(displayName)}">
+                <article class="post-card ${newPostClass}" style="animation-delay: ${animDelay}s;" aria-label="Post de ${escapeHtml(displayName)}">
                     <div class="post-header">
                         <div class="post-author">
                             <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${initial}</div>

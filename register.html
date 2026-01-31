@@ -865,6 +865,12 @@
                         <div class="text">Offert par <span class="name" id="gifter-name">un ami</span></div>
                     </div>
 
+                    <!-- Encouragement messages -->
+                    <div class="encouragement" id="encouragement" role="status" aria-live="polite">
+                        <span class="emoji">🎯</span>
+                        <span id="encouragement-text">Plus que quelques secondes...</span>
+                    </div>
+                    
                     <form id="register-form" aria-label="Formulaire d'inscription" novalidate>
                         <input type="hidden" id="gift-code" name="giftCode">
                         
@@ -1062,17 +1068,66 @@
             return { valid: true };
         }
 
-        // Real-time validation
+        // ===== ENCOURAGEMENT MESSAGES =====
+        const encouragementMessages = {
+            email_valid: { emoji: '✅', text: 'Super, email valide !' },
+            password_start: { emoji: '🔐', text: 'Choisis un mot de passe sécurisé...' },
+            password_weak: { emoji: '💪', text: 'Continue, tu peux faire mieux !' },
+            password_fair: { emoji: '👍', text: 'Pas mal ! Un peu plus de caractères ?' },
+            password_good: { emoji: '🎯', text: 'Excellent choix !' },
+            password_strong: { emoji: '🏆', text: 'Mot de passe ultra sécurisé !' },
+            ready: { emoji: '🚀', text: 'Tu es prêt(e) ! Crée ton compte !' }
+        };
+        
+        function showEncouragement(key) {
+            const el = document.getElementById('encouragement');
+            const textEl = document.getElementById('encouragement-text');
+            const msg = encouragementMessages[key];
+            
+            if (msg) {
+                el.querySelector('.emoji').textContent = msg.emoji;
+                textEl.textContent = msg.text;
+                el.classList.add('visible');
+            }
+        }
+        
+        function hideEncouragement() {
+            document.getElementById('encouragement').classList.remove('visible');
+        }
+        
+        function checkFormReady() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (validateEmail(email) && validatePassword(password).valid) {
+                showEncouragement('ready');
+                return true;
+            }
+            return false;
+        }
+
+        // Real-time validation with encouragement
         document.getElementById('email').addEventListener('blur', function() {
             if (this.value && !validateEmail(this.value)) {
                 showFieldError('email', 'Adresse email invalide');
-            } else {
+                hideEncouragement();
+            } else if (this.value && validateEmail(this.value)) {
                 hideFieldError('email');
+                this.classList.add('success');
+                showEncouragement('email_valid');
+                checkFormReady();
             }
         });
 
         document.getElementById('email').addEventListener('input', function() {
             hideFieldError('email');
+            this.classList.remove('success');
+        });
+
+        document.getElementById('password').addEventListener('focus', function() {
+            if (this.value.length === 0) {
+                showEncouragement('password_start');
+            }
         });
 
         document.getElementById('password').addEventListener('input', function() {
@@ -1089,8 +1144,24 @@
                 strengthFill.className = 'strength-fill ' + strength.class;
                 strengthText.className = 'strength-text ' + strength.class;
                 strengthText.textContent = strength.text;
+                
+                // Show encouragement based on strength
+                if (strength.class === 'weak') showEncouragement('password_weak');
+                else if (strength.class === 'fair') showEncouragement('password_fair');
+                else if (strength.class === 'good') showEncouragement('password_good');
+                else if (strength.class === 'strong') showEncouragement('password_strong');
+                
+                // Check if form is ready
+                if (strength.valid) {
+                    this.classList.add('success');
+                    checkFormReady();
+                } else {
+                    this.classList.remove('success');
+                }
             } else {
                 strengthMeter.style.display = 'none';
+                this.classList.remove('success');
+                showEncouragement('password_start');
             }
         });
 
@@ -1154,13 +1225,23 @@
                     localStorage.setItem('cinq_session', JSON.stringify(data.session));
                     localStorage.setItem('cinq_user', JSON.stringify(data.user));
                     localStorage.setItem('cinq_new_user', 'true');
+                    localStorage.setItem('cinq_onboarding_step', '0'); // Track onboarding progress
                     
-                    showMessage('Bienvenue sur Cinq ! 🎉', 'success');
+                    // Update progress indicator to step 2
+                    document.querySelector('.progress-steps').classList.add('step-2');
+                    
+                    showMessage('Bienvenue sur Cinq ! 🎉 Prépare-toi pour la suite...', 'success');
                     btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Compte créé !';
+                    
+                    // Show encouragement before redirect
+                    const encouragementEl = document.getElementById('encouragement');
+                    encouragementEl.querySelector('.emoji').textContent = '🎊';
+                    document.getElementById('encouragement-text').textContent = 'Ton compte est prêt ! On t\'emmène dans ton espace...';
+                    encouragementEl.classList.add('visible');
                     
                     setTimeout(() => {
                         window.location.href = '/app.html';
-                    }, 800);
+                    }, 1500);
                 } else {
                     showMessage('Compte créé ! Connecte-toi maintenant.', 'success');
                     setTimeout(() => {
