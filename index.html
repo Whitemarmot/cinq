@@ -753,10 +753,9 @@
             text-align: center;
             font-size: 0.75rem;
             color: var(--color-text-muted);
-            background: linear-gradient(to top, rgba(12, 12, 15, 0.95) 0%, rgba(12, 12, 15, 0.8) 70%, transparent 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 50;
+            background: var(--color-bg-primary);
+            border-top: 1px solid var(--color-border);
+            z-index: 100;
         }
         
         .legal-footer a {
@@ -781,7 +780,7 @@
         
         /* Add bottom padding to hero to avoid footer overlap */
         .hero {
-            padding-bottom: calc(var(--space-8) + 60px) !important;
+            padding-bottom: calc(var(--space-8) + 80px) !important;
         }
         
         @media (max-width: 640px) {
@@ -962,7 +961,7 @@
             <span aria-hidden="true">·</span>
             <a href="/terms.html">CGU</a>
             <span aria-hidden="true">·</span>
-            <span>© 2025 Cinq</span>
+            <span>© 2026 Cinq</span>
         </nav>
     </footer>
 
