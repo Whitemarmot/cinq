@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 
         // ============ VERIFY (check if code is valid) ============
         if (action === 'verify') {
-            const code = (req.query.code || req.body?.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const code = (req.query.code || req.body?.code || '').toUpperCase().trim();
             
             if (!code) {
                 return res.status(400).json({ error: 'Code requis' });

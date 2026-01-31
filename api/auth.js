@@ -24,7 +24,7 @@ export default async function handler(req, res) {
             }
 
             // Validate gift code
-            const code = giftCode.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const code = giftCode.toUpperCase().trim();
             const { data: gift, error: giftErr } = await supabase
                 .from('gift_codes')
                 .select('id, status')
