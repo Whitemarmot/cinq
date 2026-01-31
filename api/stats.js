@@ -1,50 +1,21 @@
 /**
- * Cinq Stats API - Admin-only endpoint for viewing metrics
+ * Stats API - Admin-only metrics endpoint
  * 
- * GET /api/stats?period=week
- * Requires: Authorization header with admin token or ADMIN_SECRET env var
+ * Endpoints:
+ * - GET ?period=week - Get platform statistics
+ * 
+ * Requires admin access (x-admin-secret header or admin email)
  */
 
-import { createClient } from '@supabase/supabase-js';
-import { getStats, logRequest, logError, logStructured } from './_analytics.js';
-import { cors } from './_cors.js';
+import { supabase, getUser, handleCors } from './_supabase.js';
+import { getStats, logRequest, logError as analyticsLogError, logStructured } from './_analytics.js';
 
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-);
-
-// Admin emails - add your admin emails here
+// Admin emails
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').filter(Boolean);
-
-// Admin secret for API access without user auth
 const ADMIN_SECRET = process.env.ADMIN_SECRET;
 
-async function isAdmin(req) {
-    // Check admin secret header first
-    const secretHeader = req.headers['x-admin-secret'];
-    if (ADMIN_SECRET && secretHeader === ADMIN_SECRET) {
-        return true;
-    }
-
-    // Check user authentication
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-        return false;
-    }
-
-    const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    
-    if (error || !user) return false;
-    
-    // Check if user email is in admin list
-    return ADMIN_EMAILS.includes(user.email);
-}
-
 export default async function handler(req, res) {
-    // SECURITY: Validate CORS origin (admin endpoints still need CORS protection)
-    if (!cors(req, res)) return;
+    if (handleCors(req, res, ['GET', 'OPTIONS'])) return;
 
     logRequest(req, '/api/stats');
 
@@ -76,18 +47,8 @@ export default async function handler(req, res) {
         
         const stats = await getStats(period);
 
-        // Add some derived metrics
-        stats.derived = {
-            messages_per_user: stats.totals.users > 0 
-                ? (stats.totals.messages / stats.totals.users).toFixed(2) 
-                : 0,
-            gift_redemption_rate: stats.totals.gift_codes > 0
-                ? (((stats.totals.gift_codes - stats.totals.active_gift_codes) / stats.totals.gift_codes) * 100).toFixed(1) + '%'
-                : '0%',
-            conversion_rate: stats.totals.waitlist > 0 && stats.totals.users > 0
-                ? ((stats.totals.users / (stats.totals.waitlist + stats.totals.users)) * 100).toFixed(1) + '%'
-                : '0%'
-        };
+        // Add derived metrics
+        stats.derived = computeDerivedMetrics(stats.totals);
 
         logStructured('info', 'Stats fetched successfully', { 
             period,
@@ -97,10 +58,41 @@ export default async function handler(req, res) {
         return res.json(stats);
 
     } catch (e) {
-        logError(e, '/api/stats');
+        analyticsLogError(e, '/api/stats');
         return res.status(500).json({ 
             error: 'Failed to fetch stats',
             details: process.env.NODE_ENV === 'development' ? e.message : undefined
         });
     }
+}
+
+// ===== HELPERS =====
+
+async function isAdmin(req) {
+    // Check admin secret header
+    const secretHeader = req.headers['x-admin-secret'];
+    if (ADMIN_SECRET && secretHeader === ADMIN_SECRET) {
+        return true;
+    }
+
+    // Check user authentication
+    const user = await getUser(req);
+    if (!user) return false;
+    
+    // Check if user email is in admin list
+    return ADMIN_EMAILS.includes(user.email);
+}
+
+function computeDerivedMetrics(totals) {
+    return {
+        messages_per_user: totals.users > 0 
+            ? (totals.messages / totals.users).toFixed(2) 
+            : 0,
+        gift_redemption_rate: totals.gift_codes > 0
+            ? (((totals.gift_codes - totals.active_gift_codes) / totals.gift_codes) * 100).toFixed(1) + '%'
+            : '0%',
+        conversion_rate: totals.waitlist > 0 && totals.users > 0
+            ? ((totals.users / (totals.waitlist + totals.users)) * 100).toFixed(1) + '%'
+            : '0%'
+    };
 }

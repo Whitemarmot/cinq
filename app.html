@@ -2115,10 +2115,19 @@
         }
         
         function togglePostMenu(postId) {
+            // Close other menus and update their aria-expanded
             document.querySelectorAll('.post-menu.open').forEach(m => {
-                if (m.id !== `menu-${postId}`) m.classList.remove('open');
+                if (m.id !== `menu-${postId}`) {
+                    m.classList.remove('open');
+                    const btn = m.previousElementSibling;
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                }
             });
-            document.getElementById(`menu-${postId}`).classList.toggle('open');
+            
+            const menu = document.getElementById(`menu-${postId}`);
+            const isOpen = menu.classList.toggle('open');
+            const btn = menu.previousElementSibling;
+            if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         }
         
         async function deletePost(postId) {
@@ -2361,13 +2370,15 @@
         function renderMessages(messages) {
             const container = document.getElementById('chat-messages');
             const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+            const contactName = currentChatContact?.contact?.display_name || 'Contact';
             
             container.innerHTML = messages.map(msg => {
                 const isSent = msg.sender_id === user.id;
+                const sender = isSent ? 'Toi' : contactName;
                 if (msg.is_ping) {
-                    return `<div class="chat-message ping">👋</div>`;
+                    return `<div class="chat-message ping" role="article" aria-label="${sender} a envoyé un coucou"><span aria-hidden="true">👋</span></div>`;
                 }
-                return `<div class="chat-message ${isSent ? 'sent' : 'received'}">${escapeHtml(msg.content)}</div>`;
+                return `<div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} dit">${escapeHtml(msg.content)}</div>`;
             }).join('');
 
             if (wasAtBottom) container.scrollTop = container.scrollHeight;
