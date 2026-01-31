@@ -7,566 +7,720 @@
     
     <!-- SEO -->
     <meta name="description" content="Offre Cinq à quelqu'un qui compte vraiment. 5 personnes. Pas 500. Pas de bullshit.">
-    <meta name="keywords" content="cinq, cadeau, réseau social, anti social, crypto">
-    <meta name="author" content="Cinq">
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://cinq.app/gift">
     
     <!-- Open Graph -->
     <meta property="og:title" content="🎁 Offrir Cinq — L'anti-réseau social">
     <meta property="og:description" content="Tu ne télécharges pas Cinq. Tu l'offres. Parce que si quelqu'un doit choisir 5 personnes dans sa vie, c'est toi qui fais le premier pas.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://cinq.app/gift">
     <meta property="og:image" content="https://cinq.app/og-gift.png">
-    <meta property="og:site_name" content="Cinq">
-    <meta property="og:locale" content="fr_FR">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="🎁 Offrir Cinq">
-    <meta name="twitter:description" content="5 personnes. Pas 500. C'est toi qui fais le premier pas.">
-    <meta name="twitter:image" content="https://cinq.app/og-gift.png">
-    <meta name="twitter:site" content="@cinqapp">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#0a0a0b">
     
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.cinq.app https://*.netlify.app; img-src 'self' data: https:;">
-    
-    <!-- API Key pour gift-create (injectée côté serveur ou via env) -->
-    <!-- <meta name="gift-api-key" content="YOUR_API_KEY_HERE"> -->
-    
-    <!-- 
-        ⚠️ WARNING SÉCURITÉ: Tailwind CDN ne supporte pas SRI (integrity hash)
-        TODO PROD: Remplacer par build local avec purge CSS
-        npm install -D tailwindcss && npx tailwindcss build -o styles.css
-    -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.css">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Background gradient - cohérent avec index.html */
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        /* Gift flow layout */
+        .gift-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8) var(--space-4);
+            position: relative;
+            overflow: hidden;
         }
         
-        /* Effet glow pour les éléments importants */
-        .glow {
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
-        }
-        .glow-success {
-            box-shadow: 0 0 60px rgba(34, 197, 94, 0.4);
-        }
-        
-        /* Animation des cercles décoratifs */
-        .circle {
-            animation: pulse 4s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+        .gift-container {
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            z-index: 10;
         }
         
-        /* Animation de fade pour les transitions d'écran */
+        /* Screen transitions */
         .screen {
-            animation: fadeIn 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            display: none;
+            animation: screen-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Animation loader pour l'attente de paiement */
-        .loader-dot {
-            animation: loaderPulse 1.4s ease-in-out infinite;
-        }
-        .loader-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loader-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes loaderPulse {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
+        .screen.active {
+            display: block;
         }
         
-        /* Cartes de paiement avec hover effect */
-        .payment-card {
-            transition: all 0.2s ease;
-        }
-        .payment-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(99, 102, 241, 0.5);
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* QR Code placeholder */
-        .qr-placeholder {
-            background: repeating-conic-gradient(
-                rgba(255,255,255,0.1) 0deg 90deg,
-                rgba(255,255,255,0.2) 90deg 180deg
-            );
-            background-size: 20px 20px;
-        }
-        
-        /* Bouton copier feedback */
-        .copy-btn.copied {
-            background: rgba(34, 197, 94, 0.2) !important;
-            border-color: rgba(34, 197, 94, 0.5) !important;
-        }
-        
-        /* Animation celebration */
-        @keyframes celebrate {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .celebrate {
-            animation: celebrate 0.5s ease-out;
-        }
-        
-        /* ========================================
-           Accessibilité: Focus visible
-           ======================================== */
-        button:focus-visible,
-        a:focus-visible {
-            outline: 2px solid rgba(99, 102, 241, 0.8);
-            outline-offset: 2px;
-            border-radius: 0.5rem;
-        }
-        
-        /* ========================================
-           Accessibilité: Reduced motion
-           ======================================== */
-        @media (prefers-reduced-motion: reduce) {
-            .circle,
-            .loader-dot,
-            .celebrate,
-            .screen {
-                animation: none !important;
+        @keyframes screen-enter {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
             }
-            .payment-card {
-                transition: none !important;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
         
-        /* ========================================
-           États d'erreur et loading
-           ======================================== */
-        .error-state {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.5);
+        /* Back button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) 0;
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            margin-bottom: var(--space-6);
         }
-        .loading-overlay {
-            background: rgba(0, 0, 0, 0.7);
+        
+        .back-btn:hover {
+            color: var(--color-text-secondary);
+        }
+        
+        /* Gift icon/logo for screens */
+        .screen-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-6);
+            border-radius: 50%;
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .screen-icon.success {
+            border-color: var(--color-success);
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.3);
+        }
+        
+        .screen-title {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: var(--space-2);
+        }
+        
+        .screen-subtitle {
+            font-size: var(--text-base);
+            color: var(--color-text-secondary);
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+        
+        /* Value proposition card */
+        .value-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            text-align: center;
+        }
+        
+        .value-card p {
+            font-size: var(--text-sm);
+            line-height: 1.7;
+            color: var(--color-text-secondary);
+            max-width: none;
+        }
+        
+        .value-card strong {
+            color: var(--color-text-primary);
+        }
+        
+        .value-card .highlight {
+            color: var(--color-brand);
+        }
+        
+        /* Payment options */
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: 
+                background var(--transition-fast),
+                border-color var(--transition-fast),
+                transform var(--transition-fast);
+        }
+        
+        .payment-option:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-active);
+            transform: translateY(-1px);
+        }
+        
+        .payment-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .payment-icon.usdc { background: rgba(34, 197, 94, 0.15); }
+        .payment-icon.btc { background: rgba(249, 115, 22, 0.15); }
+        .payment-icon.eth { background: rgba(99, 102, 241, 0.15); }
+        
+        .payment-info {
+            flex: 1;
+        }
+        
+        .payment-name {
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        .payment-desc {
+            font-size: var(--text-sm);
+            color: var(--color-text-tertiary);
+        }
+        
+        .payment-arrow {
+            color: var(--color-text-muted);
+            transition: transform var(--transition-fast);
+        }
+        
+        .payment-option:hover .payment-arrow {
+            transform: translateX(2px);
+        }
+        
+        /* QR section */
+        .qr-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+        }
+        
+        .timer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-warning-muted);
+            color: var(--color-warning);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            border-radius: var(--radius-full);
+        }
+        
+        .timer-badge.urgent {
+            background: var(--color-error-muted);
+            color: var(--color-error);
+        }
+        
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .qr-frame {
+            width: 220px;
+            height: 220px;
+            background: white;
+            border-radius: var(--radius-2xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .qr-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .amount-display {
+            text-align: center;
+            padding: var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-6);
+        }
+        
+        .amount-crypto {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .amount-fiat {
+            font-size: var(--text-sm);
+            color: var(--color-text-tertiary);
+        }
+        
+        .copy-address {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: 
+                background var(--transition-fast),
+                border-color var(--transition-fast);
+            margin-bottom: var(--space-6);
+        }
+        
+        .copy-address:hover {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-active);
+        }
+        
+        .copy-address.copied {
+            border-color: var(--color-success);
+            background: var(--color-success-muted);
+        }
+        
+        .copy-icon {
+            font-size: 20px;
+        }
+        
+        .copy-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .copy-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-tertiary);
+        }
+        
+        .copy-value {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .copy-status {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        /* Instructions */
+        .instructions {
+            list-style: none;
+            margin-bottom: var(--space-8);
+        }
+        
+        .instructions li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-2) 0;
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+        }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-brand-muted);
+            color: var(--color-brand);
+            font-size: var(--text-xs);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        /* Payment status */
+        .payment-status {
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+        }
+        
+        .payment-status .loader {
+            margin: var(--space-3) auto 0;
+        }
+        
+        /* Gift code display */
+        .gift-code-box {
+            padding: var(--space-8);
+            background: var(--color-bg-secondary);
+            border: 2px dashed var(--color-brand);
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .gift-code {
+            font-family: var(--font-mono);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--color-text-primary);
+            user-select: all;
+        }
+        
+        /* Success actions */
+        .success-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .validity-info {
+            text-align: center;
+            margin-top: var(--space-6);
+        }
+        
+        .validity-info p {
+            font-size: var(--text-sm);
+            color: var(--color-text-tertiary);
+            margin: var(--space-1) 0;
+        }
+        
+        .validity-info a {
+            color: var(--color-brand);
+        }
+        
+        .validity-info a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Secondary link */
+        .secondary-link {
+            display: block;
+            text-align: center;
+            margin-top: var(--space-8);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        .secondary-link a {
+            color: var(--color-text-secondary);
+            text-decoration: underline;
+        }
+        
+        .secondary-link a:hover {
+            color: var(--color-text-primary);
+        }
+        
+        /* Alert boxes */
+        .alert {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            margin-top: var(--space-4);
+        }
+        
+        .alert-error {
+            background: var(--color-error-muted);
+            color: var(--color-error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .alert-info {
+            background: var(--color-brand-muted);
+            color: var(--color-brand);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Simulation badge */
+        .simulation-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-warning-muted);
+            color: var(--color-warning);
+            font-size: var(--text-xs);
+            border-radius: var(--radius-full);
+            margin-top: var(--space-4);
+        }
+        
+        /* Price tag */
+        .price-tag {
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .price-value {
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .price-note {
+            font-size: var(--text-sm);
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Security note */
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body>
+    <!-- Noise overlay -->
+    <div class="noise-overlay" aria-hidden="true"></div>
     
-    <!-- ============================================
-         Cercles décoratifs (cohérent avec index.html)
-         ============================================ -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
-        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
-        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
-    </div>
+    <!-- Gradient orbs -->
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
 
-    <!-- ============================================
-         Container principal
-         ============================================ -->
-    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8" role="main">
-        
-        <!-- Zone d'annonces pour lecteurs d'écran -->
-        <div id="sr-announcements" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
-        
-        <!-- ==========================================
-             ÉCRAN 1: Accueil
-             ========================================== -->
-        <section id="screen-welcome" class="screen w-full max-w-md" aria-labelledby="welcome-title">
+    <main class="gift-page">
+        <div class="gift-container">
             
-            <!-- Logo avec icône cadeau -->
-            <div class="flex justify-center mb-8">
-                <div class="w-24 h-24 rounded-full border-4 border-white/20 flex items-center justify-center glow bg-white/5 backdrop-blur" aria-hidden="true">
-                    <span class="text-4xl">🎁</span>
-                </div>
-            </div>
-            
-            <!-- Headline provocatrice (copy Marco - Option A) -->
-            <h1 id="welcome-title" class="text-2xl md:text-3xl font-bold mb-4 text-center leading-tight">
-                Tu as 847 amis Facebook.<br>
-                <span class="text-white/60">Combien t'appelleraient à 3h du mat' ?</span>
-            </h1>
-            
-            <!-- Séparateur -->
-            <div class="flex justify-center my-6" aria-hidden="true">
-                <div class="w-16 h-0.5 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-            </div>
-            
-            <!-- Sous-headline -->
-            <p class="text-lg text-center text-white/70 mb-8">
-                5 personnes. Pas 500. Pas 5000.<br>
-                <span class="font-semibold text-white">Cinq.</span>
-            </p>
-            
-            <!-- Proposition de valeur -->
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 mb-8">
-                <p class="text-center text-white/80 text-sm leading-relaxed">
-                    <strong>Tu ne télécharges pas Cinq. Tu l'offres.</strong><br><br>
-                    Parce que si quelqu'un doit choisir 5 personnes dans sa vie, 
-                    et que tu veux en faire partie…<br>
-                    <span class="text-indigo-400">c'est toi qui fais le premier pas.</span>
+            <!-- Screen: Welcome -->
+            <section id="screen-welcome" class="screen active">
+                <div class="screen-icon">🎁</div>
+                
+                <h1 class="screen-title">
+                    Tu as 847 amis Facebook.
+                </h1>
+                <p class="screen-subtitle">
+                    Combien t'appelleraient à 3h du mat' ?
                 </p>
-            </div>
-            
-            <!-- CTA Principal -->
-            <button 
-                onclick="CinqGift.showScreen('payment')" 
-                class="w-full py-4 px-6 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold text-lg transition transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
-                aria-describedby="gift-price"
-            >
-                <span aria-hidden="true">🎁</span>
-                <span>Offrir Cinq à quelqu'un</span>
-            </button>
-            <p id="gift-price" class="sr-only">Prix : 50 euros, accès à vie</p>
-            
-            <!-- Lien secondaire -->
-            <div class="mt-6 text-center">
-                <a href="/redeem" class="text-white/50 hover:text-white/70 text-sm transition">
-                    Déjà un code cadeau ? <span class="underline">Activez-le ici →</span>
-                </a>
-            </div>
-            
-            <!-- Note anti-spam -->
-            <p class="text-center mt-8 text-white/60 text-xs">
-                Pas de compte à créer. Pas de spam. Juste un geste.
-            </p>
-            
-        </section>
-
-        <!-- ==========================================
-             ÉCRAN 2: Choix du paiement
-             ========================================== -->
-        <section id="screen-payment" class="screen w-full max-w-md hidden" aria-labelledby="payment-title">
-            
-            <!-- Header avec retour -->
-            <button onclick="CinqGift.showScreen('welcome')" aria-label="Retour à l'accueil" class="flex items-center gap-2 text-white/60 hover:text-white mb-8 transition">
-                <span aria-hidden="true">←</span>
-                <span>Retour</span>
-            </button>
-            
-            <!-- Titre -->
-            <h2 id="payment-title" class="text-2xl font-bold text-center mb-2">
-                Comment souhaitez-vous payer ?
-            </h2>
-            
-            <!-- Prix -->
-            <p class="text-center text-white/60 mb-8">
-                50 € · Accès à vie
-            </p>
-            
-            <!-- Loading state -->
-            <div id="payment-loading" class="hidden text-center py-8">
-                <div class="flex justify-center gap-2 mb-4" aria-hidden="true">
-                    <div class="loader-dot w-3 h-3 rounded-full bg-indigo-400"></div>
-                    <div class="loader-dot w-3 h-3 rounded-full bg-indigo-400"></div>
-                    <div class="loader-dot w-3 h-3 rounded-full bg-indigo-400"></div>
+                
+                <div class="value-card">
+                    <p>
+                        <strong>Tu ne télécharges pas Cinq. Tu l'offres.</strong><br><br>
+                        Parce que si quelqu'un doit choisir 5 personnes dans sa vie, 
+                        et que tu veux en faire partie…<br>
+                        <span class="highlight">c'est toi qui fais le premier pas.</span>
+                    </p>
                 </div>
-                <p class="text-white/60">Chargement des options de paiement...</p>
-            </div>
-            
-            <!-- Options de paiement -->
-            <div id="payment-options" class="space-y-4" role="radiogroup" aria-label="Méthode de paiement">
                 
-                <!-- USDC -->
-                <button onclick="CinqGift.selectPayment('usdc')" class="payment-card w-full bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 text-left" role="radio" aria-checked="false">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-2xl" aria-hidden="true">
-                                💵
-                            </div>
-                            <div>
-                                <div class="font-semibold">USDC (Stablecoin)</div>
-                                <div class="text-sm text-white/60">Valeur stable • Frais réduits</div>
-                            </div>
-                        </div>
-                        <span class="text-white/40" aria-hidden="true">▶</span>
-                    </div>
+                <button onclick="CinqGift.showScreen('payment')" class="btn btn-primary btn-xl w-full">
+                    <span>🎁</span>
+                    <span>Offrir Cinq à quelqu'un</span>
                 </button>
                 
-                <!-- Bitcoin -->
-                <button onclick="CinqGift.selectPayment('btc')" class="payment-card w-full bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 text-left" role="radio" aria-checked="false">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <span aria-label="Bitcoin">₿</span>
-                            </div>
-                            <div>
-                                <div class="font-semibold">Bitcoin (BTC)</div>
-                                <div class="text-sm text-white/60">Le standard • Lightning ⚡</div>
-                            </div>
-                        </div>
-                        <span class="text-white/40" aria-hidden="true">▶</span>
-                    </div>
-                </button>
-                
-                <!-- Ethereum -->
-                <button onclick="CinqGift.selectPayment('eth')" class="payment-card w-full bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-5 text-left" role="radio" aria-checked="false">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <span aria-label="Ethereum">◊</span>
-                            </div>
-                            <div>
-                                <div class="font-semibold">Ethereum (ETH)</div>
-                                <div class="text-sm text-white/60">Réseau ERC-20</div>
-                            </div>
-                        </div>
-                        <span class="text-white/40" aria-hidden="true">▶</span>
-                    </div>
-                </button>
-                
-            </div>
-            
-            <!-- Erreur -->
-            <div id="payment-error" class="hidden mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm" role="alert">
-                <span id="payment-error-message"></span>
-            </div>
-            
-            <!-- Note de sécurité -->
-            <div class="mt-8 text-center">
-                <p class="text-white/60 text-sm">
-                    <span aria-hidden="true">💡</span> Tous les paiements sont sécurisés et non-custodial
+                <p class="secondary-link">
+                    Déjà un code cadeau ? <a href="/redeem">Activer ici →</a>
                 </p>
-            </div>
-            
-        </section>
+            </section>
 
-        <!-- ==========================================
-             ÉCRAN 3: QR Code de paiement
-             ========================================== -->
-        <section id="screen-qr" class="screen w-full max-w-md hidden" aria-labelledby="qr-title">
-            
-            <!-- Header avec retour et timer -->
-            <div class="flex items-center justify-between mb-6">
-                <button onclick="CinqGift.showScreen('payment')" aria-label="Retour au choix de paiement" class="flex items-center gap-2 text-white/60 hover:text-white transition">
-                    <span aria-hidden="true">←</span>
-                    <span>Retour</span>
+            <!-- Screen: Payment Choice -->
+            <section id="screen-payment" class="screen">
+                <button onclick="CinqGift.showScreen('welcome')" class="back-btn">
+                    ← Retour
                 </button>
-                <div class="flex items-center gap-2 text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full text-sm" role="timer" aria-live="polite" aria-atomic="true">
-                    <span aria-hidden="true">⏱</span>
-                    <span id="timer" aria-label="Temps restant">14:59</span>
+                
+                <h2 class="screen-title">Choisir le paiement</h2>
+                
+                <div class="price-tag">
+                    <div class="price-value">50 €</div>
+                    <div class="price-note">Accès à vie</div>
                 </div>
-            </div>
-            
-            <!-- Titre -->
-            <h2 id="qr-title" class="text-2xl font-bold text-center mb-6">
-                Scannez pour payer
-            </h2>
-            
-            <!-- QR Code Container -->
-            <div class="flex justify-center mb-6">
-                <div id="qr-container" class="w-56 h-56 rounded-2xl border-2 border-white/20 flex items-center justify-center bg-white" aria-label="QR Code de paiement">
-                    <!-- QR code sera injecté ici par l'API -->
-                    <div id="qr-loading" class="text-center">
-                        <div class="flex justify-center gap-2 mb-2" aria-hidden="true">
-                            <div class="loader-dot w-2 h-2 rounded-full bg-gray-400"></div>
-                            <div class="loader-dot w-2 h-2 rounded-full bg-gray-400"></div>
-                            <div class="loader-dot w-2 h-2 rounded-full bg-gray-400"></div>
+                
+                <div class="payment-options">
+                    <button onclick="CinqGift.selectPayment('usdc')" class="payment-option">
+                        <div class="payment-icon usdc">💵</div>
+                        <div class="payment-info">
+                            <div class="payment-name">USDC (Stablecoin)</div>
+                            <div class="payment-desc">Valeur stable • Frais réduits</div>
                         </div>
-                        <div class="text-gray-500 text-sm">Chargement...</div>
+                        <span class="payment-arrow">→</span>
+                    </button>
+                    
+                    <button onclick="CinqGift.selectPayment('btc')" class="payment-option">
+                        <div class="payment-icon btc">₿</div>
+                        <div class="payment-info">
+                            <div class="payment-name">Bitcoin (BTC)</div>
+                            <div class="payment-desc">Le standard • Lightning ⚡</div>
+                        </div>
+                        <span class="payment-arrow">→</span>
+                    </button>
+                    
+                    <button onclick="CinqGift.selectPayment('eth')" class="payment-option">
+                        <div class="payment-icon eth">◊</div>
+                        <div class="payment-info">
+                            <div class="payment-name">Ethereum (ETH)</div>
+                            <div class="payment-desc">Réseau ERC-20</div>
+                        </div>
+                        <span class="payment-arrow">→</span>
+                    </button>
+                </div>
+                
+                <div id="payment-error" class="alert alert-error hidden"></div>
+                
+                <div class="security-note">
+                    <span>🔒</span>
+                    <span>Paiements sécurisés et non-custodial</span>
+                </div>
+            </section>
+
+            <!-- Screen: QR Payment -->
+            <section id="screen-qr" class="screen">
+                <div class="qr-header">
+                    <button onclick="CinqGift.showScreen('payment')" class="back-btn" style="margin-bottom: 0;">
+                        ← Retour
+                    </button>
+                    <div id="timer-badge" class="timer-badge">
+                        <span>⏱</span>
+                        <span id="timer">14:59</span>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Montant -->
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 text-center mb-6">
-                <div class="text-2xl font-bold" id="amount-crypto">--</div>
-                <div class="text-white/60">≈ 50.00 €</div>
-            </div>
-            
-            <!-- Copier l'adresse -->
-            <button 
-                onclick="CinqGift.copyAddress()" 
-                id="copy-btn"
-                class="copy-btn w-full bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 flex items-center justify-between hover:bg-white/10 transition"
-                aria-describedby="copy-status-sr"
-            >
-                <div class="flex items-center gap-3">
-                    <span aria-hidden="true">📋</span>
-                    <div class="text-left">
-                        <div class="text-sm text-white/60">Copier l'adresse</div>
-                        <div class="font-mono text-sm" id="wallet-address">Chargement...</div>
+                
+                <h2 class="screen-title">Scannez pour payer</h2>
+                
+                <div class="qr-container">
+                    <div class="qr-frame" id="qr-frame">
+                        <div class="loader">
+                            <div class="loader-dot"></div>
+                            <div class="loader-dot"></div>
+                            <div class="loader-dot"></div>
+                        </div>
                     </div>
                 </div>
-                <span id="copy-status" class="text-white/40 text-sm" aria-hidden="true">Copier</span>
-            </button>
-            <span id="copy-status-sr" class="sr-only" aria-live="polite"></span>
-            
-            <!-- Instructions -->
-            <ol class="mt-6 space-y-3" aria-label="Instructions de paiement">
-                <li class="flex items-center gap-3 text-white/70">
-                    <span class="w-6 h-6 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm" aria-hidden="true">1</span>
-                    <span>Ouvrez votre wallet</span>
-                </li>
-                <li class="flex items-center gap-3 text-white/70">
-                    <span class="w-6 h-6 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm" aria-hidden="true">2</span>
-                    <span>Scannez ce QR code</span>
-                </li>
-                <li class="flex items-center gap-3 text-white/70">
-                    <span class="w-6 h-6 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm" aria-hidden="true">3</span>
-                    <span>Confirmez le montant</span>
-                </li>
-            </ol>
-            
-            <!-- État d'attente -->
-            <div class="mt-8 text-center" role="status" aria-live="polite">
-                <div id="payment-status" class="flex items-center justify-center gap-2 text-white/60">
-                    <span aria-hidden="true">⏳</span>
-                    <span>En attente du paiement...</span>
+                
+                <div class="amount-display">
+                    <div class="amount-crypto" id="amount-crypto">--</div>
+                    <div class="amount-fiat">≈ 50.00 €</div>
                 </div>
-                <div class="flex justify-center gap-2 mt-3" aria-hidden="true">
-                    <div class="loader-dot w-2 h-2 rounded-full bg-indigo-400"></div>
-                    <div class="loader-dot w-2 h-2 rounded-full bg-indigo-400"></div>
-                    <div class="loader-dot w-2 h-2 rounded-full bg-indigo-400"></div>
+                
+                <button id="copy-btn" onclick="CinqGift.copyAddress()" class="copy-address">
+                    <span class="copy-icon">📋</span>
+                    <div class="copy-info">
+                        <div class="copy-label">Copier l'adresse</div>
+                        <div class="copy-value" id="wallet-address">Chargement...</div>
+                    </div>
+                    <span class="copy-status" id="copy-status">Copier</span>
+                </button>
+                
+                <ol class="instructions">
+                    <li>
+                        <span class="step-number">1</span>
+                        <span>Ouvrez votre wallet</span>
+                    </li>
+                    <li>
+                        <span class="step-number">2</span>
+                        <span>Scannez ce QR code</span>
+                    </li>
+                    <li>
+                        <span class="step-number">3</span>
+                        <span>Confirmez le montant</span>
+                    </li>
+                </ol>
+                
+                <div class="payment-status" id="payment-status">
+                    <span>⏳ En attente du paiement...</span>
+                    <div class="loader">
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                        <div class="loader-dot"></div>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Badge mode simulation (dev only) -->
-            <div id="simulation-badge" class="hidden mt-4 text-center">
-                <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full">
+                
+                <div id="simulation-badge" class="simulation-badge hidden" style="margin: var(--space-4) auto 0; display: none;">
                     <span>⚠️</span>
                     <span>Mode simulation — Confirmation auto dans 5s</span>
-                </span>
-            </div>
-            
-            <!-- Erreur -->
-            <div id="qr-error" class="hidden mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm" role="alert">
-                <span id="qr-error-message"></span>
-            </div>
-            
-        </section>
-
-        <!-- ==========================================
-             ÉCRAN 4: Confirmation & Code cadeau
-             ========================================== -->
-        <section id="screen-success" class="screen w-full max-w-md hidden" aria-labelledby="success-title">
-            
-            <!-- Animation de succès -->
-            <div class="flex justify-center mb-6">
-                <div class="celebrate w-24 h-24 rounded-full border-4 border-emerald-400/50 flex items-center justify-center glow-success bg-emerald-500/10 backdrop-blur" aria-hidden="true">
-                    <span class="text-5xl">🎉</span>
                 </div>
-            </div>
-            
-            <!-- Titre -->
-            <h2 id="success-title" class="text-2xl font-bold text-center mb-2 text-emerald-400">
-                Paiement confirmé !
-            </h2>
-            <p class="text-center text-white/70 mb-8">
-                Voici le code cadeau Cinq
-            </p>
-            
-            <!-- Code cadeau -->
-            <div class="bg-white/10 backdrop-blur border-2 border-dashed border-indigo-400/50 rounded-2xl p-6 text-center mb-6" role="region" aria-label="Code cadeau">
-                <div class="font-mono text-2xl font-bold tracking-wider select-all" id="gift-code" aria-live="polite">
-                    <!-- Code généré par le serveur -->
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="space-y-3">
-                <button 
-                    onclick="CinqGift.copyGiftCode()" 
-                    id="copy-code-btn"
-                    class="w-full py-4 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition flex items-center justify-center gap-2"
-                    aria-describedby="copy-code-status-sr"
-                >
-                    <span aria-hidden="true">📋</span>
-                    <span id="copy-code-text">Copier le code</span>
-                </button>
-                <span id="copy-code-status-sr" class="sr-only" aria-live="polite"></span>
                 
-                <button 
-                    onclick="CinqGift.shareGift()"
-                    class="w-full py-4 bg-white/10 hover:bg-white/15 border border-white/20 rounded-xl font-semibold transition flex items-center justify-center gap-2"
-                >
-                    <span aria-hidden="true">📤</span>
-                    <span>Partager</span>
-                </button>
-            </div>
-            
-            <!-- Infos validité -->
-            <div class="mt-6 text-center text-white/60 text-sm space-y-2">
-                <p>Le code est valable <strong class="text-white/70">12 mois</strong>.</p>
-                <p>Le destinataire pourra l'activer sur<br>
-                    <a href="/redeem" class="text-indigo-400 hover:underline">cinq.app/redeem</a>
-                </p>
-            </div>
-            
-            <!-- Retour -->
-            <div class="mt-8 text-center">
-                <a href="index.html" class="text-white/60 hover:text-white/70 text-sm transition">
-                    ← Retour à l'accueil
-                </a>
-            </div>
-            
-        </section>
+                <div id="qr-error" class="alert alert-error hidden"></div>
+            </section>
 
+            <!-- Screen: Success -->
+            <section id="screen-success" class="screen">
+                <div class="screen-icon success animate-celebrate">🎉</div>
+                
+                <h2 class="screen-title" style="color: var(--color-success);">
+                    Paiement confirmé !
+                </h2>
+                <p class="screen-subtitle">
+                    Voici le code cadeau Cinq
+                </p>
+                
+                <div class="gift-code-box">
+                    <div class="gift-code" id="gift-code">CINQ-XXXX-XXXX-XXXX</div>
+                </div>
+                
+                <div class="success-actions">
+                    <button onclick="CinqGift.copyGiftCode()" id="copy-code-btn" class="btn btn-primary btn-lg w-full">
+                        <span>📋</span>
+                        <span id="copy-code-text">Copier le code</span>
+                    </button>
+                    
+                    <button onclick="CinqGift.shareGift()" class="btn btn-secondary btn-lg w-full">
+                        <span>📤</span>
+                        <span>Partager</span>
+                    </button>
+                </div>
+                
+                <div class="validity-info">
+                    <p>Le code est valable <strong>12 mois</strong>.</p>
+                    <p>
+                        Le destinataire pourra l'activer sur<br>
+                        <a href="/redeem">cinq.app/redeem</a>
+                    </p>
+                </div>
+                
+                <p class="secondary-link">
+                    <a href="/">← Retour à l'accueil</a>
+                </p>
+            </section>
+
+        </div>
     </main>
 
-    <!-- ============================================
-         JavaScript - Logique sécurisée (IIFE)
-         ============================================ -->
     <script>
         /**
-         * CinqGift - Module de gestion des cartes cadeaux
-         * 
-         * SÉCURITÉ:
-         * - Génération de code côté serveur uniquement
-         * - Adresses wallet récupérées via API signée
-         * - Polling sécurisé pour vérification paiement
-         * - Aucune donnée sensible en dur
+         * CinqGift Module
          */
         const CinqGift = (function() {
             'use strict';
             
-            // ========================================
-            // Configuration
-            // ========================================
             const API_BASE = '/.netlify/functions';
-            const PAYMENT_TIMEOUT = 15 * 60; // 15 minutes en secondes
-            
-            // Mode simulation pour le développement (pas d'API de paiement encore)
-            // En production, mettre à false et implémenter les endpoints de paiement
+            const PAYMENT_TIMEOUT = 15 * 60;
             const SIMULATION_MODE = true;
-            const SIMULATION_DELAY_MS = 5000; // 5 secondes avant "paiement confirmé"
+            const SIMULATION_DELAY_MS = 5000;
             
-            // État interne (encapsulé)
             let _state = {
                 selectedPayment: null,
                 paymentSession: null,
                 timerInterval: null,
                 timeRemaining: PAYMENT_TIMEOUT,
-                pollingInterval: null,
                 sessionStartTime: null,
-                simulationTimeout: null
+                simulationTimeout: null,
+                generatedCode: null
             };
             
-            // ========================================
-            // Utilitaires
-            // ========================================
-            
-            /**
-             * Escape HTML pour prévenir XSS
-             */
             function escapeHtml(str) {
                 if (typeof str !== 'string') return '';
                 const div = document.createElement('div');
@@ -574,96 +728,25 @@
                 return div.innerHTML;
             }
             
-            /**
-             * Annonce pour lecteurs d'écran
-             */
-            function announce(message) {
-                const el = document.getElementById('sr-announcements');
-                if (el) {
-                    el.textContent = message;
-                }
-            }
-            
-            /**
-             * Gestion focus pour navigation clavier
-             */
-            function focusFirstElement(screenId) {
-                const screen = document.getElementById(screenId);
-                if (!screen) return;
+            function showScreen(screenName) {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
                 
-                // Trouver le premier élément focusable
-                const focusable = screen.querySelector(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
-                if (focusable) {
-                    // Petit délai pour laisser l'animation se terminer
-                    setTimeout(() => focusable.focus(), 100);
-                }
-            }
-            
-            /**
-             * Affiche une erreur dans un conteneur
-             */
-            function showError(containerId, message) {
-                const container = document.getElementById(containerId);
-                const messageEl = document.getElementById(containerId + '-message');
-                if (container && messageEl) {
-                    messageEl.textContent = escapeHtml(message);
-                    container.classList.remove('hidden');
-                    container.setAttribute('role', 'alert');
-                }
-            }
-            
-            /**
-             * Cache une erreur
-             */
-            function hideError(containerId) {
-                const container = document.getElementById(containerId);
-                if (container) {
-                    container.classList.add('hidden');
-                }
-            }
-            
-            /**
-             * Copie dans le presse-papier avec fallback
-             */
-            async function copyToClipboard(text) {
-                // Méthode moderne
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    try {
-                        await navigator.clipboard.writeText(text);
-                        return true;
-                    } catch (err) {
-                        // Fallback si permission refusée
-                    }
+                const target = document.getElementById(`screen-${screenName}`);
+                if (target) {
+                    target.classList.add('active');
                 }
                 
-                // Fallback : document.execCommand (deprecated mais fonctionnel)
-                try {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    textArea.style.position = 'fixed';
-                    textArea.style.left = '-9999px';
-                    textArea.style.top = '-9999px';
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    
-                    const success = document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    return success;
-                } catch (err) {
-                    return false;
+                if (screenName === 'qr') {
+                    startTimer();
+                    startPaymentPolling();
+                } else {
+                    stopTimer();
+                    stopPaymentPolling();
                 }
             }
             
-            // ========================================
-            // API Calls
-            // ========================================
-            
-            /**
-             * Génère des données de simulation pour le développement
-             */
             function generateSimulationData(paymentType) {
                 const sessionId = 'sim_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 
@@ -679,219 +762,74 @@
                     session_id: sessionId,
                     address: wallet.address,
                     amount_display: wallet.amount,
-                    amount_eur: 50,
-                    payment_type: paymentType,
-                    qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(wallet.address)}`,
-                    status: 'pending',
-                    expires_at: new Date(Date.now() + PAYMENT_TIMEOUT * 1000).toISOString()
+                    qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(wallet.address)}`
                 };
             }
             
-            /**
-             * Crée une session de paiement côté serveur
-             * Retourne l'adresse wallet et les détails de paiement
-             */
-            async function createPaymentSession(paymentType) {
-                // Mode simulation pour le développement
-                if (SIMULATION_MODE) {
-                    console.log('[SIMULATION] Création session paiement:', paymentType);
-                    return generateSimulationData(paymentType);
-                }
-                
-                // Mode production - appel à l'API de paiement crypto
-                const response = await fetch(`${API_BASE}/payment-create`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: paymentType,
-                        product: 'gift',
-                        amount_eur: 50
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || 'Erreur lors de la création du paiement');
-                }
-                
-                return response.json();
-            }
-            
-            /**
-             * Vérifie le statut du paiement
-             */
-            async function checkPaymentStatus(sessionId) {
-                // Mode simulation - retourne toujours "pending" (la confirmation vient du timeout)
-                if (SIMULATION_MODE) {
-                    return { status: 'pending' };
-                }
-                
-                // Mode production
-                const response = await fetch(`${API_BASE}/payment-status?session_id=${encodeURIComponent(sessionId)}`);
-                
-                if (!response.ok) {
-                    throw new Error('Erreur lors de la vérification du paiement');
-                }
-                
-                return response.json();
-            }
-            
-            /**
-             * Génère le code cadeau APRÈS confirmation du paiement
-             * Appelle la fonction Netlify gift-create
-             */
-            async function createGiftCode(paymentSession) {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                // Ajouter l'API key si configurée (via meta tag ou env)
-                const apiKeyMeta = document.querySelector('meta[name="gift-api-key"]');
-                if (apiKeyMeta && apiKeyMeta.content) {
-                    headers['X-Api-Key'] = apiKeyMeta.content;
-                }
-                
-                const response = await fetch('/.netlify/functions/gift-create', {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        amount_cents: 5000, // 50€
-                        currency: 'EUR',
-                        purchaser_email: paymentSession?.email || null,
-                        purchase_order_id: paymentSession?.session_id || null,
-                        expires_days: 365
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || 'Erreur lors de la génération du code');
-                }
-                
-                const data = await response.json();
-                
-                // L'API retourne { code, gift_code: {...}, message }
-                if (!data.code) {
-                    throw new Error('Code cadeau non reçu du serveur');
-                }
-                
-                return data;
-            }
-            
-            // ========================================
-            // Navigation entre écrans
-            // ========================================
-            function showScreen(screenName) {
-                // Cacher tous les écrans
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.add('hidden');
-                    screen.setAttribute('aria-hidden', 'true');
-                });
-                
-                // Afficher l'écran demandé
-                const targetScreen = document.getElementById(`screen-${screenName}`);
-                if (targetScreen) {
-                    targetScreen.classList.remove('hidden');
-                    targetScreen.setAttribute('aria-hidden', 'false');
-                    
-                    // Focus management pour accessibilité
-                    focusFirstElement(`screen-${screenName}`);
-                    
-                    // Annonce pour lecteurs d'écran
-                    const title = targetScreen.querySelector('h1, h2');
-                    if (title) {
-                        announce(title.textContent);
-                    }
-                }
-                
-                // Gérer le timer et polling pour l'écran QR
-                if (screenName === 'qr') {
-                    startTimer();
-                    startPaymentPolling();
-                } else {
-                    stopTimer();
-                    stopPaymentPolling();
-                }
-            }
-            
-            // ========================================
-            // Sélection du moyen de paiement
-            // ========================================
             async function selectPayment(paymentType) {
                 _state.selectedPayment = paymentType;
                 
-                // Afficher loading
-                hideError('payment-error');
+                const errorEl = document.getElementById('payment-error');
+                errorEl.classList.add('hidden');
                 
                 try {
-                    // Appel API pour créer la session et obtenir l'adresse
-                    const session = await createPaymentSession(paymentType);
+                    const session = SIMULATION_MODE 
+                        ? generateSimulationData(paymentType)
+                        : await fetch(`${API_BASE}/payment-create`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type: paymentType, product: 'gift', amount_eur: 50 })
+                        }).then(r => r.json());
                     
                     _state.paymentSession = session;
                     _state.timeRemaining = PAYMENT_TIMEOUT;
                     _state.sessionStartTime = Date.now();
                     
-                    // Mettre à jour l'affichage (données échappées)
-                    document.getElementById('amount-crypto').textContent = 
-                        escapeHtml(session.amount_display);
+                    document.getElementById('amount-crypto').textContent = escapeHtml(session.amount_display);
                     
-                    // Adresse tronquée pour affichage
                     const addr = session.address;
                     document.getElementById('wallet-address').textContent = 
-                        escapeHtml(addr.slice(0, 6) + '...' + addr.slice(-4));
+                        escapeHtml(addr.slice(0, 8) + '...' + addr.slice(-6));
                     
-                    // Afficher le QR code (URL fournie par le serveur)
-                    const qrContainer = document.getElementById('qr-container');
-                    const qrLoading = document.getElementById('qr-loading');
-                    
+                    const qrFrame = document.getElementById('qr-frame');
                     if (session.qr_code_url) {
                         const qrImg = document.createElement('img');
                         qrImg.src = session.qr_code_url;
-                        qrImg.alt = `QR Code pour payer ${escapeHtml(session.amount_display)}`;
-                        qrImg.className = 'w-full h-full object-contain';
-                        qrImg.onload = () => {
-                            qrLoading.classList.add('hidden');
-                        };
-                        qrImg.onerror = () => {
-                            qrLoading.innerHTML = '<div class="text-red-500 text-sm">Erreur QR</div>';
-                        };
-                        qrContainer.appendChild(qrImg);
+                        qrImg.alt = 'QR Code de paiement';
+                        qrFrame.innerHTML = '';
+                        qrFrame.appendChild(qrImg);
                     }
                     
-                    // Afficher l'écran QR
+                    if (SIMULATION_MODE) {
+                        const badge = document.getElementById('simulation-badge');
+                        badge.style.display = 'inline-flex';
+                    }
+                    
                     showScreen('qr');
                     
                 } catch (error) {
-                    showError('payment-error', error.message);
+                    errorEl.textContent = error.message;
+                    errorEl.classList.remove('hidden');
                 }
             }
             
-            // ========================================
-            // Timer de paiement (15 minutes)
-            // ========================================
             function startTimer() {
                 stopTimer();
-                
                 updateTimerDisplay();
+                
                 _state.timerInterval = setInterval(() => {
-                    // Calcul basé sur timestamp réel (gestion onglet arrière-plan)
                     if (_state.sessionStartTime) {
                         const elapsed = Math.floor((Date.now() - _state.sessionStartTime) / 1000);
                         _state.timeRemaining = Math.max(0, PAYMENT_TIMEOUT - elapsed);
-                    } else {
-                        _state.timeRemaining--;
                     }
-                    
                     updateTimerDisplay();
                     
                     if (_state.timeRemaining <= 0) {
                         stopTimer();
                         stopPaymentPolling();
-                        announce('Session expirée. Le délai de paiement a été dépassé.');
-                        showError('qr-error', 'Session expirée. Le délai de paiement (15 min) a été dépassé.');
-                        setTimeout(() => showScreen('payment'), 3000);
+                        const errorEl = document.getElementById('qr-error');
+                        errorEl.textContent = 'Session expirée. Veuillez réessayer.';
+                        errorEl.classList.remove('hidden');
                     }
                 }, 1000);
             }
@@ -907,129 +845,97 @@
                 const minutes = Math.floor(_state.timeRemaining / 60);
                 const seconds = _state.timeRemaining % 60;
                 const timerEl = document.getElementById('timer');
+                const badge = document.getElementById('timer-badge');
                 
                 timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 
-                // Changer la couleur si moins de 2 minutes
-                const timerContainer = timerEl.parentElement;
                 if (_state.timeRemaining < 120) {
-                    timerContainer.classList.remove('text-amber-400', 'bg-amber-500/10');
-                    timerContainer.classList.add('text-red-400', 'bg-red-500/10');
+                    badge.classList.add('urgent');
                 } else {
-                    timerContainer.classList.remove('text-red-400', 'bg-red-500/10');
-                    timerContainer.classList.add('text-amber-400', 'bg-amber-500/10');
+                    badge.classList.remove('urgent');
                 }
             }
             
-            // ========================================
-            // Polling de statut de paiement
-            // ========================================
             function startPaymentPolling() {
                 stopPaymentPolling();
                 
-                // Mode simulation: confirmation automatique après délai
                 if (SIMULATION_MODE) {
-                    console.log(`[SIMULATION] Paiement sera confirmé dans ${SIMULATION_DELAY_MS/1000}s`);
                     _state.simulationTimeout = setTimeout(async () => {
-                        console.log('[SIMULATION] Paiement confirmé!');
                         stopTimer();
                         await handlePaymentConfirmed();
                     }, SIMULATION_DELAY_MS);
                     return;
                 }
-                
-                // Mode production: polling réel
-                _state.pollingInterval = setInterval(async () => {
-                    if (!_state.paymentSession) return;
-                    
-                    try {
-                        const status = await checkPaymentStatus(_state.paymentSession.session_id);
-                        
-                        if (status.status === 'confirmed') {
-                            stopTimer();
-                            stopPaymentPolling();
-                            
-                            // Paiement confirmé ! Générer le code cadeau
-                            await handlePaymentConfirmed();
-                        } else if (status.status === 'failed') {
-                            showError('qr-error', 'Le paiement a échoué. Veuillez réessayer.');
-                        }
-                    } catch (err) {
-                        // Erreur silencieuse pour le polling (on réessaie)
-                        console.warn('Payment polling error:', err);
-                    }
-                }, 5000); // Vérifier toutes les 5 secondes
             }
             
             function stopPaymentPolling() {
-                if (_state.pollingInterval) {
-                    clearInterval(_state.pollingInterval);
-                    _state.pollingInterval = null;
-                }
                 if (_state.simulationTimeout) {
                     clearTimeout(_state.simulationTimeout);
                     _state.simulationTimeout = null;
                 }
             }
             
-            // ========================================
-            // Gestion paiement confirmé
-            // ========================================
             async function handlePaymentConfirmed() {
-                // Mettre à jour le statut visuel
                 const statusEl = document.getElementById('payment-status');
-                if (statusEl) {
-                    statusEl.innerHTML = '<span aria-hidden="true">⏳</span><span>Génération du code cadeau...</span>';
-                }
+                statusEl.innerHTML = '<span>⏳ Génération du code cadeau...</span>';
                 
                 try {
-                    // Générer le code cadeau côté serveur
-                    const giftData = await createGiftCode(_state.paymentSession);
+                    const response = await fetch('/.netlify/functions/gift-create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount_cents: 5000,
+                            currency: 'EUR',
+                            purchase_order_id: _state.paymentSession?.session_id,
+                            expires_days: 365
+                        })
+                    });
                     
-                    // Afficher le code (échappé pour sécurité)
-                    // L'API retourne { code: "CINQ-XXXX-XXXX-XXXX", gift_code: {...}, message }
-                    const code = giftData.code;
-                    document.getElementById('gift-code').textContent = escapeHtml(code);
+                    const data = await response.json();
                     
-                    // Stocker pour copie/partage
-                    _state.generatedCode = code;
-                    _state.giftCodeData = giftData.gift_code;
-                    
-                    // Afficher l'écran de succès
-                    showScreen('success');
-                    announce('Paiement confirmé ! Votre code cadeau est prêt.');
-                    
-                } catch (err) {
-                    console.error('Gift code creation error:', err);
-                    const errorMessage = err.message || 'Erreur inconnue';
-                    showError('qr-error', `Erreur: ${errorMessage}. Contactez le support avec votre ID de paiement.`);
-                    
-                    // Mettre à jour le statut
-                    if (statusEl) {
-                        statusEl.innerHTML = '<span aria-hidden="true">❌</span><span class="text-red-400">Erreur de génération</span>';
+                    if (data.code) {
+                        _state.generatedCode = data.code;
+                        document.getElementById('gift-code').textContent = escapeHtml(data.code);
+                        showScreen('success');
+                    } else {
+                        throw new Error(data.error || 'Erreur de génération');
                     }
+                } catch (err) {
+                    const errorEl = document.getElementById('qr-error');
+                    errorEl.textContent = err.message;
+                    errorEl.classList.remove('hidden');
                 }
             }
             
-            // ========================================
-            // Copier l'adresse
-            // ========================================
+            async function copyToClipboard(text) {
+                if (navigator.clipboard) {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    } catch (e) {}
+                }
+                
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                const success = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return success;
+            }
+            
             async function copyAddress() {
                 if (!_state.paymentSession) return;
                 
                 const success = await copyToClipboard(_state.paymentSession.address);
-                
                 const btn = document.getElementById('copy-btn');
                 const status = document.getElementById('copy-status');
-                const statusSr = document.getElementById('copy-status-sr');
                 
                 if (success) {
                     btn.classList.add('copied');
                     status.textContent = '✓ Copié !';
-                    statusSr.textContent = 'Adresse copiée dans le presse-papier';
-                } else {
-                    status.textContent = '✗ Erreur';
-                    statusSr.textContent = 'Impossible de copier l\'adresse';
                 }
                 
                 setTimeout(() => {
@@ -1038,24 +944,15 @@
                 }, 2000);
             }
             
-            // ========================================
-            // Copier le code cadeau
-            // ========================================
             async function copyGiftCode() {
-                const code = _state.generatedCode || document.getElementById('gift-code').textContent;
+                const code = _state.generatedCode;
                 if (!code) return;
                 
                 const success = await copyToClipboard(code);
-                
                 const textEl = document.getElementById('copy-code-text');
-                const statusSr = document.getElementById('copy-code-status-sr');
                 
                 if (success) {
                     textEl.textContent = '✓ Code copié !';
-                    statusSr.textContent = 'Code cadeau copié dans le presse-papier';
-                } else {
-                    textEl.textContent = '✗ Erreur de copie';
-                    statusSr.textContent = 'Impossible de copier le code';
                 }
                 
                 setTimeout(() => {
@@ -1063,11 +960,8 @@
                 }, 2000);
             }
             
-            // ========================================
-            // Partager le cadeau
-            // ========================================
             async function shareGift() {
-                const code = _state.generatedCode || document.getElementById('gift-code').textContent;
+                const code = _state.generatedCode;
                 if (!code) return;
                 
                 const shareText = `🎁 Je t'offre un accès à Cinq !
@@ -1085,74 +979,17 @@ Utilise ce code : ${code}
                             url: 'https://cinq.app/redeem'
                         });
                     } catch (err) {
-                        // User cancelled ou erreur - fallback silencieux
                         if (err.name !== 'AbortError') {
-                            await fallbackShare(shareText);
+                            await copyToClipboard(shareText);
+                            alert('Message copié ! Collez-le dans votre messagerie.');
                         }
                     }
                 } else {
-                    await fallbackShare(shareText);
+                    await copyToClipboard(shareText);
+                    alert('Message copié ! Collez-le dans votre messagerie.');
                 }
             }
             
-            async function fallbackShare(text) {
-                const success = await copyToClipboard(text);
-                if (success) {
-                    announce('Message copié ! Vous pouvez le coller dans votre app de messagerie.');
-                    // Feedback visuel simple
-                    const btn = document.querySelector('[onclick="CinqGift.shareGift()"]');
-                    if (btn) {
-                        const original = btn.innerHTML;
-                        btn.innerHTML = '<span>✓</span><span>Message copié !</span>';
-                        setTimeout(() => {
-                            btn.innerHTML = original;
-                        }, 2000);
-                    }
-                }
-            }
-            
-            // ========================================
-            // Nettoyage au déchargement
-            // ========================================
-            function cleanup() {
-                stopTimer();
-                stopPaymentPolling();
-                if (_state.simulationTimeout) {
-                    clearTimeout(_state.simulationTimeout);
-                    _state.simulationTimeout = null;
-                }
-            }
-            
-            // ========================================
-            // Initialisation
-            // ========================================
-            function init() {
-                // Nettoyage au déchargement de la page
-                window.addEventListener('beforeunload', cleanup);
-                
-                // Gestion de la visibilité (pause/resume quand onglet en arrière-plan)
-                document.addEventListener('visibilitychange', () => {
-                    if (document.visibilityState === 'visible' && _state.paymentSession) {
-                        // Recalculer le temps restant basé sur le timestamp
-                        if (_state.sessionStartTime) {
-                            const elapsed = Math.floor((Date.now() - _state.sessionStartTime) / 1000);
-                            _state.timeRemaining = Math.max(0, PAYMENT_TIMEOUT - elapsed);
-                            updateTimerDisplay();
-                        }
-                    }
-                });
-            }
-            
-            // Initialiser au chargement
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-            
-            // ========================================
-            // API publique
-            // ========================================
             return {
                 showScreen,
                 selectPayment,
@@ -1160,9 +997,7 @@ Utilise ce code : ${code}
                 copyGiftCode,
                 shareGift
             };
-            
         })();
     </script>
-
 </body>
 </html>

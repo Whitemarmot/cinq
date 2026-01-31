@@ -42,6 +42,50 @@ Cinq est un réseau social qui combat l'addiction, la superficialité et la cour
 
 ---
 
+## 🏗️ Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                         UTILISATEUR                               │
+│                    (Navigateur / Mobile)                          │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      NETLIFY EDGE                                 │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                    Pages Statiques                           │ │
+│  │  index.html │ app.html │ gift.html │ login.html │ redeem.html │
+│  └─────────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                   Netlify Functions                          │ │
+│  │  /api/auth-*     │  /api/contacts  │  /api/messages         │ │
+│  │  /api/gift-*     │  /api/user-*    │  /api/waitlist         │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │
+            ┌───────────────┴───────────────┐
+            ▼                               ▼
+┌───────────────────────┐       ┌───────────────────────┐
+│      SUPABASE         │       │     BTCPAY SERVER     │
+│  ┌─────────────────┐  │       │                       │
+│  │   PostgreSQL    │  │       │  Bitcoin / Lightning  │
+│  │   + Auth        │  │       │  USDC (Base)          │
+│  │   + RLS         │  │       │  ETH (Base)           │
+│  └─────────────────┘  │       │                       │
+└───────────────────────┘       └───────────────────────┘
+
+Tables Supabase:
+├── users          (id, email, gift_code_used)
+├── contacts       (user_id → contact_user_id, max 5)
+├── messages       (sender_id, receiver_id, content)
+├── gift_codes     (code_hash, status, amount_cents)
+├── gift_code_attempts (rate limiting)
+└── waitlist       (email, utm_*)
+```
+
+---
+
 ## 🛠️ Stack Technique
 
 | Composant | Technologie |
@@ -232,6 +276,79 @@ curl -X POST http://localhost:8888/api/waitlist \
   -H "Content-Type: application/json" \
   -d '{"email": "test@example.com"}'
 ```
+
+---
+
+## 🚀 Comment Ajouter une Feature (5 étapes)
+
+### 1️⃣ Créer la branche
+
+```bash
+git checkout main && git pull
+git checkout -b feat/nom-de-ma-feature
+```
+
+### 2️⃣ Coder le backend (si nécessaire)
+
+Créer `/netlify/functions/ma-feature.js` :
+
+```javascript
+const { success, error, headers } = require('./gift-utils');
+
+exports.handler = async (event, context) => {
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers, body: '' };
+    }
+    
+    // Ta logique ici
+    return success({ data: 'ok' });
+};
+```
+
+Ajouter le redirect dans `netlify.toml` :
+```toml
+[[redirects]]
+  from = "/api/ma-feature/*"
+  to = "/.netlify/functions/ma-feature/:splat"
+  status = 200
+```
+
+### 3️⃣ Coder le frontend
+
+- HTML : Ajouter dans la page concernée
+- CSS : Dans `animations.css` ou inline si <50 lignes
+- JS : Inline ou dans `fun.js` si réutilisable
+
+### 4️⃣ Tester
+
+```bash
+npm run dev          # Lancer le serveur local
+npm run lint         # Vérifier le code
+npm run test         # Tests automatisés
+```
+
+### 5️⃣ Commit et PR
+
+```bash
+git add .
+git commit -m "feat: description courte"
+git push -u origin feat/nom-de-ma-feature
+# Créer PR sur GitHub
+```
+
+---
+
+## 📐 Conventions de Nommage
+
+| Type | Convention | Exemple |
+|------|------------|---------|
+| **Fichiers** | `kebab-case` | `auth-login.js`, `gift-flow.html` |
+| **Variables** | `camelCase` | `userName`, `isValid` |
+| **Constantes** | `UPPER_SNAKE_CASE` | `MAX_CONTACTS`, `API_URL` |
+| **Fonctions** | `camelCase` | `fetchUser()`, `handleClick()` |
+| **Classes CSS** | `kebab-case` (BEM-inspired) | `.contact-slot--empty` |
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les règles complètes.
 
 ---
 

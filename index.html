@@ -397,14 +397,14 @@
     <section class="hero">
         <div class="hero-content">
             
-            <!-- The iconic 5 logo -->
-            <div class="hero-logo animate-fade-in-up">
-                <div class="five">
-                    <div class="five-ring"></div>
-                    <div class="five-ring"></div>
-                    <div class="five-ring"></div>
+            <!-- The iconic 5 logo - AWWWARDS LEVEL -->
+            <div class="hero-logo">
+                <div class="five animate-hero-logo">
+                    <div class="five-ring animate-ring"></div>
+                    <div class="five-ring animate-ring"></div>
+                    <div class="five-ring animate-ring"></div>
                     <div class="five-core">
-                        <span class="five-number">5</span>
+                        <span class="five-number animate-hero-number">5</span>
                     </div>
                 </div>
             </div>
@@ -421,29 +421,29 @@
                 <strong>Cinq te rend la réalité.</strong>
             </p>
 
-            <!-- Feature pills -->
-            <div class="features animate-fade-in-up animate-delay-3">
-                <span class="feature-pill">
+            <!-- Feature pills - Floating animation -->
+            <div class="features animate-fade-in-up animate-delay-3" data-stagger>
+                <span class="feature-pill tag-animated card-hover">
                     <span class="feature-icon">🎯</span>
                     <span>5 slots. C'est tout.</span>
                 </span>
-                <span class="feature-pill">
+                <span class="feature-pill tag-animated card-hover">
                     <span class="feature-icon">🎁</span>
                     <span>Offrir > S'inscrire</span>
                 </span>
-                <span class="feature-pill">
+                <span class="feature-pill tag-animated card-hover">
                     <span class="feature-icon">🚫</span>
                     <span>Zéro likes, zéro validation</span>
                 </span>
-                <span class="feature-pill">
+                <span class="feature-pill tag-animated card-hover">
                     <span class="feature-icon">⚡</span>
                     <span>La friction est le feature</span>
                 </span>
             </div>
 
-            <!-- CTA -->
+            <!-- CTA - Magnetic + Glow -->
             <div class="cta-section animate-fade-in-up animate-delay-4">
-                <a href="gift.html" class="cta-button">
+                <a href="gift.html" class="cta-button btn-ripple btn-glow btn-magnetic">
                     <span>🎁</span>
                     <span>Offrir Cinq</span>
                 </a>
@@ -453,7 +453,7 @@
                 </p>
             </div>
 
-            <!-- Waitlist -->
+            <!-- Waitlist - Enhanced interactions -->
             <div class="waitlist-section animate-fade-in-up animate-delay-5">
                 <p class="waitlist-label">Ou rejoins la waitlist</p>
                 <form id="waitlist-form" class="waitlist-form">
@@ -464,9 +464,9 @@
                         placeholder="ton@email.com" 
                         required
                         autocomplete="email"
-                        class="waitlist-input"
+                        class="waitlist-input input"
                     >
-                    <button type="submit" class="waitlist-submit">
+                    <button type="submit" class="waitlist-submit btn-ripple btn-magnetic">
                         Rejoindre
                     </button>
                 </form>
@@ -491,6 +491,8 @@
         </div>
     </section>
 
+    <!-- Elite Animations -->
+    <script src="/animations.js"></script>
     <script src="/fun.js"></script>
     <script>
         const API_URL = '/.netlify/functions/waitlist';
@@ -512,7 +514,7 @@
             }
         }
         
-        // Animate counter with smooth easing
+        // Animate counter with smooth easing & visual flair
         function animateCounter(target) {
             const duration = 1500;
             const start = parseInt(counterValue.textContent) || 0;
@@ -521,12 +523,22 @@
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
+                // Smooth ease-out quart
                 const eased = 1 - Math.pow(1 - progress, 4);
                 const current = Math.floor(start + (target - start) * eased);
                 counterValue.textContent = current.toLocaleString('fr-FR');
                 
+                // Subtle scale pulse during animation
+                const scale = 1 + Math.sin(progress * Math.PI * 6) * 0.03;
+                counterValue.style.transform = `scale(${scale})`;
+                
                 if (progress < 1) {
                     requestAnimationFrame(update);
+                } else {
+                    // Final bounce
+                    counterValue.style.transform = 'scale(1)';
+                    counterValue.classList.add('animate-counter');
+                    setTimeout(() => counterValue.classList.remove('animate-counter'), 500);
                 }
             }
             requestAnimationFrame(update);
