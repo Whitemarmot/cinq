@@ -57,6 +57,52 @@ a.btn,
   justify-content: center;
 }
 
+/* Header action buttons - ensure touch-friendly */
+.theme-toggle,
+.header-avatar {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+}
+
+/* Post menu button - critical touch target */
+.post-menu-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Post menu items */
+.post-menu-item {
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+}
+
+/* Image preview remove button */
+.image-preview-remove {
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
+}
+
+/* Composer buttons */
+.composer-btn {
+  min-height: 44px;
+  padding: 0.625rem 0.875rem;
+}
+
+/* Nav items - ensure tappable */
+.nav-item {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem;
+}
+
 /* ==========================================================================
    APP.HTML - Mobile Fixes
    ========================================================================== */
@@ -544,6 +590,66 @@ select {
     transform: scale(0.98);
     opacity: 0.9;
   }
+}
+
+/* ==========================================================================
+   ENHANCED TAP FEEDBACK
+   ========================================================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Universal tap feedback for all interactive elements */
+  button:active,
+  [role="button"]:active,
+  a:active,
+  .nav-item:active,
+  .post-menu-btn:active,
+  .composer-btn:active,
+  .action-btn:active,
+  .settings-btn:active,
+  .ping-btn:active,
+  .chat-send:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+  }
+  
+  /* Ripple-like highlight on tap */
+  .contact-slot:active,
+  .post-card:active {
+    box-shadow: inset 0 0 0 3px rgba(99, 102, 241, 0.3);
+  }
+  
+  /* Chat close button feedback */
+  .chat-close:active {
+    transform: scale(0.9) rotate(45deg);
+  }
+  
+  /* Modal tap to dismiss feedback */
+  .modal-overlay:active {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ==========================================================================
+   KEYBOARD HANDLING
+   ========================================================================== */
+
+/* Ensure inputs are visible when keyboard is open */
+@supports (padding-bottom: env(keyboard-inset-height)) {
+  .chat-input-area {
+    padding-bottom: max(var(--space-5), env(keyboard-inset-height, 0px));
+    transition: padding-bottom 0.2s ease-out;
+  }
+}
+
+/* Visual Viewport API fallback for keyboard handling */
+.keyboard-open .chat-panel {
+  max-height: 50vh;
+}
+
+.keyboard-open .bottom-nav {
+  transform: translateY(100%);
+  transition: transform 0.2s ease-out;
 }
 
 /* ==========================================================================
