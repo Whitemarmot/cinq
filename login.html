@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Connecte-toi à Cinq, l'anti-réseau social. 5 personnes. Pas 500.">
+    <meta name="keywords" content="cinq, connexion, login, réseau social, anti social">
+    <meta name="author" content="Cinq">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Connexion — Cinq">
+    <meta property="og:description" content="Connecte-toi à Cinq. 5 personnes. Pas 500.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/login">
+    <meta property="og:image" content="https://cinq.app/og-login.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Connexion — Cinq">
+    <meta name="twitter:description" content="5 personnes. Pas 500.">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+    
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.cinq.app https://*.netlify.app; img-src 'self' data: https:;">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Background gradient - cohérent avec les autres pages */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        /* Effet glow pour les éléments importants */
+        .glow {
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Animation des cercles décoratifs */
+        .circle {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        /* Animation de fade pour les transitions */
+        .screen {
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Animation loader */
+        .loader-dot {
+            animation: loaderPulse 1.4s ease-in-out infinite;
+        }
+        .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes loaderPulse {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Input styling */
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(99, 102, 241, 0.8);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .input-field.error {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Accessibilité: Focus visible */
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible {
+            outline: 2px solid rgba(99, 102, 241, 0.8);
+            outline-offset: 2px;
+            border-radius: 0.5rem;
+        }
+        
+        /* Accessibilité: Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .circle,
+            .loader-dot,
+            .screen {
+                animation: none !important;
+            }
+        }
+        
+        /* Bouton disabled */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Password toggle */
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .password-toggle:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- Cercles décoratifs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
+        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
+    </div>
+
+    <!-- Container principal -->
+    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8" role="main">
+        
+        <!-- Zone d'annonces pour lecteurs d'écran -->
+        <div id="sr-announcements" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+        
+        <!-- ==========================================
+             ÉCRAN LOGIN
+             ========================================== -->
+        <section id="screen-login" class="screen w-full max-w-md" aria-labelledby="login-title">
+            
+            <!-- Logo -->
+            <div class="flex justify-center mb-8">
+                <a href="/" class="w-24 h-24 rounded-full border-4 border-white/20 flex items-center justify-center glow bg-white/5 backdrop-blur transition hover:scale-105" aria-label="Retour à l'accueil">
+                    <span class="text-4xl">🔐</span>
+                </a>
+            </div>
+            
+            <!-- Titre -->
+            <h1 id="login-title" class="text-2xl md:text-3xl font-bold mb-4 text-center leading-tight">
+                Content de te revoir
+            </h1>
+            
+            <!-- Sous-titre -->
+            <p class="text-lg text-center text-white/70 mb-8">
+                Connecte-toi à ton compte <span class="font-semibold text-white">Cinq</span>
+            </p>
+            
+            <!-- Formulaire -->
+            <form id="login-form" onsubmit="CinqLogin.handleLogin(event)" class="space-y-5">
+                
+                <!-- Input email -->
+                <div>
+                    <label for="user-email" class="block text-sm font-medium text-white/80 mb-2">
+                        Email
+                    </label>
+                    <input 
+                        type="email" 
+                        id="user-email"
+                        name="email"
+                        class="input-field w-full px-4 py-4 bg-white/10 border-2 border-white/20 rounded-xl text-lg placeholder-white/40 transition-all"
+                        placeholder="ton@email.com"
+                        autocomplete="email"
+                        aria-describedby="email-error"
+                        required
+                    >
+                    <p id="email-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
+                </div>
+                
+                <!-- Input password -->
+                <div>
+                    <label for="user-password" class="block text-sm font-medium text-white/80 mb-2">
+                        Mot de passe
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="user-password"
+                            name="password"
+                            class="input-field w-full px-4 py-4 pr-12 bg-white/10 border-2 border-white/20 rounded-xl text-lg placeholder-white/40 transition-all"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                            aria-describedby="password-error"
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle text-white/60"
+                            onclick="CinqLogin.togglePassword()"
+                            aria-label="Afficher/masquer le mot de passe"
+                        >
+                            <span id="password-toggle-icon">👁️</span>
+                        </button>
+                    </div>
+                    <p id="password-error" class="hidden mt-2 text-sm text-red-400" role="alert"></p>
+                </div>
+                
+                <!-- Erreur générale -->
+                <div id="general-error" class="hidden bg-red-500/10 border border-red-400/30 rounded-xl p-4 text-red-300 text-sm" role="alert">
+                    <div class="flex gap-3">
+                        <span class="text-lg" aria-hidden="true">⚠️</span>
+                        <span id="general-error-text"></span>
+                    </div>
+                </div>
+                
+                <!-- Rate limit warning -->
+                <div id="rate-limit-warning" class="hidden bg-amber-500/10 border border-amber-400/30 rounded-xl p-4 text-amber-300 text-sm" role="alert">
+                    <div class="flex gap-3">
+                        <span class="text-lg" aria-hidden="true">⏳</span>
+                        <div>
+                            <p class="font-medium">Trop de tentatives</p>
+                            <p id="rate-limit-text" class="mt-1 text-amber-200/80"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bouton -->
+                <button 
+                    type="submit"
+                    id="login-btn"
+                    class="w-full py-4 px-6 bg-indigo-500 hover:bg-indigo-400 disabled:hover:bg-indigo-500 rounded-xl font-semibold text-lg transition transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                    <span id="login-btn-icon" aria-hidden="true">→</span>
+                    <span id="login-btn-text">Se connecter</span>
+                </button>
+                
+            </form>
+            
+            <!-- Lien mot de passe oublié (futur) -->
+            <!--
+            <div class="mt-4 text-center">
+                <a href="/forgot-password" class="text-white/50 hover:text-white/70 text-sm transition">
+                    Mot de passe oublié ?
+                </a>
+            </div>
+            -->
+            
+            <!-- Séparateur -->
+            <div class="flex items-center gap-4 my-8">
+                <div class="flex-1 h-px bg-white/20"></div>
+                <span class="text-white/40 text-sm">ou</span>
+                <div class="flex-1 h-px bg-white/20"></div>
+            </div>
+            
+            <!-- Lien inscription -->
+            <div class="text-center">
+                <p class="text-white/60 mb-3">Pas encore de compte ?</p>
+                <a href="/redeem" class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 rounded-xl text-white/90 transition">
+                    <span aria-hidden="true">🎁</span>
+                    <span>Tu dois recevoir un cadeau</span>
+                </a>
+            </div>
+            
+        </section>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        /**
+         * CinqLogin - Module de connexion
+         */
+        const CinqLogin = (function() {
+            'use strict';
+            
+            // ========================================
+            // Configuration
+            // ========================================
+            const API_BASE = '/.netlify/functions';
+            const SESSION_KEY = 'cinq_session';
+            const USER_KEY = 'cinq_user';
+            
+            // État
+            let _isLoading = false;
+            let _rateLimitCountdown = null;
+            
+            // ========================================
+            // Utilitaires
+            // ========================================
+            
+            function escapeHtml(str) {
+                if (typeof str !== 'string') return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+            
+            function announce(message) {
+                const el = document.getElementById('sr-announcements');
+                if (el) el.textContent = message;
+            }
+            
+            function showError(elementId, message) {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    if (elementId === 'general-error') {
+                        document.getElementById('general-error-text').textContent = escapeHtml(message);
+                    } else {
+                        el.textContent = escapeHtml(message);
+                    }
+                    el.classList.remove('hidden');
+                }
+            }
+            
+            function hideError(elementId) {
+                const el = document.getElementById(elementId);
+                if (el) el.classList.add('hidden');
+            }
+            
+            function hideAllErrors() {
+                hideError('email-error');
+                hideError('password-error');
+                hideError('general-error');
+                hideError('rate-limit-warning');
+            }
+            
+            function setButtonLoading(loading) {
+                const btn = document.getElementById('login-btn');
+                const icon = document.getElementById('login-btn-icon');
+                const text = document.getElementById('login-btn-text');
+                
+                _isLoading = loading;
+                btn.disabled = loading;
+                
+                if (loading) {
+                    icon.innerHTML = '<div class="flex gap-1"><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div><div class="loader-dot w-2 h-2 rounded-full bg-white"></div></div>';
+                    text.textContent = 'Connexion...';
+                } else {
+                    icon.textContent = '→';
+                    text.textContent = 'Se connecter';
+                }
+            }
+            
+            // ========================================
+            // Toggle Password
+            // ========================================
+            function togglePassword() {
+                const input = document.getElementById('user-password');
+                const icon = document.getElementById('password-toggle-icon');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = '👁️';
+                }
+            }
+            
+            // ========================================
+            // Rate Limit Countdown
+            // ========================================
+            function startRateLimitCountdown(seconds) {
+                if (_rateLimitCountdown) {
+                    clearInterval(_rateLimitCountdown);
+                }
+                
+                const warningEl = document.getElementById('rate-limit-warning');
+                const textEl = document.getElementById('rate-limit-text');
+                
+                warningEl.classList.remove('hidden');
+                
+                function updateText(secs) {
+                    const mins = Math.floor(secs / 60);
+                    const remaining = secs % 60;
+                    if (mins > 0) {
+                        textEl.textContent = `Réessaie dans ${mins}m ${remaining}s`;
+                    } else {
+                        textEl.textContent = `Réessaie dans ${secs}s`;
+                    }
+                }
+                
+                updateText(seconds);
+                
+                _rateLimitCountdown = setInterval(() => {
+                    seconds--;
+                    if (seconds <= 0) {
+                        clearInterval(_rateLimitCountdown);
+                        warningEl.classList.add('hidden');
+                        document.getElementById('login-btn').disabled = false;
+                    } else {
+                        updateText(seconds);
+                    }
+                }, 1000);
+                
+                // Désactiver le bouton
+                document.getElementById('login-btn').disabled = true;
+            }
+            
+            // ========================================
+            // Login Handler
+            // ========================================
+            async function handleLogin(event) {
+                event.preventDefault();
+                
+                if (_isLoading) return;
+                
+                const emailInput = document.getElementById('user-email');
+                const passwordInput = document.getElementById('user-password');
+                const email = emailInput.value.trim().toLowerCase();
+                const password = passwordInput.value;
+                
+                // Clear errors
+                hideAllErrors();
+                emailInput.classList.remove('error');
+                passwordInput.classList.remove('error');
+                
+                // Validation locale
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showError('email-error', 'Adresse email invalide');
+                    emailInput.classList.add('error');
+                    emailInput.focus();
+                    return;
+                }
+                
+                if (!password) {
+                    showError('password-error', 'Mot de passe requis');
+                    passwordInput.classList.add('error');
+                    passwordInput.focus();
+                    return;
+                }
+                
+                // UI loading
+                setButtonLoading(true);
+                announce('Connexion en cours...');
+                
+                try {
+                    // Appel API
+                    const response = await fetch(`${API_BASE}/auth-login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Handle rate limit
+                    if (response.status === 429) {
+                        const retryAfter = data.retryAfter || parseInt(response.headers.get('Retry-After')) || 60;
+                        startRateLimitCountdown(retryAfter);
+                        announce('Trop de tentatives. Veuillez patienter.');
+                        setButtonLoading(false);
+                        return;
+                    }
+                    
+                    // Handle error
+                    if (!response.ok) {
+                        const errorMsg = data.error || 'Erreur de connexion';
+                        
+                        // Erreur générique pour ne pas révéler si l'email existe
+                        if (response.status === 401) {
+                            showError('general-error', 'Email ou mot de passe incorrect');
+                            passwordInput.value = '';
+                            passwordInput.focus();
+                        } else {
+                            showError('general-error', errorMsg);
+                        }
+                        
+                        announce('Erreur: ' + errorMsg);
+                        setButtonLoading(false);
+                        return;
+                    }
+                    
+                    // ========================================
+                    // Succès ! Stocker la session et rediriger
+                    // ========================================
+                    
+                    // Stocker les tokens
+                    if (data.session) {
+                        localStorage.setItem(SESSION_KEY, JSON.stringify({
+                            access_token: data.session.access_token,
+                            refresh_token: data.session.refresh_token,
+                            expires_at: data.session.expires_at
+                        }));
+                    }
+                    
+                    // Stocker les infos user
+                    if (data.user) {
+                        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+                    }
+                    
+                    announce('Connexion réussie ! Redirection...');
+                    
+                    // Redirection vers l'app
+                    window.location.href = '/app';
+                    
+                } catch (err) {
+                    console.error('Login error:', err);
+                    showError('general-error', 'Erreur de connexion. Vérifie ta connexion internet.');
+                    announce('Erreur de connexion');
+                    setButtonLoading(false);
+                }
+            }
+            
+            // ========================================
+            // Check Existing Session
+            // ========================================
+            function checkSession() {
+                try {
+                    const session = localStorage.getItem(SESSION_KEY);
+                    if (session) {
+                        const parsed = JSON.parse(session);
+                        // Vérifier si le token n'est pas expiré
+                        if (parsed.expires_at && new Date(parsed.expires_at * 1000) > new Date()) {
+                            // Session valide, rediriger
+                            window.location.href = '/app';
+                            return true;
+                        } else {
+                            // Session expirée, nettoyer
+                            localStorage.removeItem(SESSION_KEY);
+                            localStorage.removeItem(USER_KEY);
+                        }
+                    }
+                } catch (e) {
+                    // Ignorer les erreurs de parsing
+                    localStorage.removeItem(SESSION_KEY);
+                    localStorage.removeItem(USER_KEY);
+                }
+                return false;
+            }
+            
+            // ========================================
+            // Initialisation
+            // ========================================
+            function init() {
+                // Vérifier si déjà connecté
+                if (checkSession()) return;
+                
+                // Focus sur l'email
+                document.getElementById('user-email').focus();
+                
+                // Pré-remplir email si dans l'URL (depuis register success)
+                const urlParams = new URLSearchParams(window.location.search);
+                const emailParam = urlParams.get('email');
+                if (emailParam) {
+                    document.getElementById('user-email').value = emailParam;
+                    document.getElementById('user-password').focus();
+                }
+            }
+            
+            // Lancer l'init au chargement
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+            
+            // ========================================
+            // API publique
+            // ========================================
+            return {
+                handleLogin,
+                togglePassword
+            };
+            
+        })();
+    </script>
+
+</body>
+</html>
