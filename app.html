@@ -372,6 +372,8 @@
         let selectedContact = null;
         let messages = [];
         let contactToRemove = null;
+        let unreadContacts = new Set(); // Track contacts with unread messages
+        let realtimeChannel = null; // Supabase realtime channel
         
         // ============================================
         // DOM
@@ -515,6 +517,9 @@
             
             // Load contacts
             await loadContacts();
+            
+            // Start realtime messaging 🔴
+            subscribeToMessages();
         }
         
         // ============================================
@@ -587,15 +592,21 @@
                 const email = contact.contact?.email || 'Contact';
                 const name = getEmailPrefix(email);
                 const initial = name.charAt(0).toUpperCase();
+                const contactUserId = contact.contact_user_id;
+                const hasUnread = unreadContacts.has(contactUserId);
                 
                 const slot = document.createElement('div');
-                slot.className = 'contact-slot flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl cursor-pointer';
+                slot.className = `contact-slot flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border ${hasUnread ? 'border-indigo-400' : 'border-white/10'} rounded-xl cursor-pointer`;
                 slot.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-indigo-500/30 flex items-center justify-center text-lg font-semibold">
+                    <div class="relative w-10 h-10 rounded-full bg-indigo-500/30 flex items-center justify-center text-lg font-semibold">
                         ${initial}
+                        ${hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>' : ''}
                     </div>
                     <div class="flex-1">
-                        <p class="font-medium">${name}</p>
+                        <p class="font-medium flex items-center gap-2">
+                            ${name}
+                            ${hasUnread ? '<span class="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">nouveau</span>' : ''}
+                        </p>
                         <p class="text-xs text-white/40">${email}</p>
                     </div>
                     <button class="btn-remove-contact p-2 text-white/30 hover:text-red-400 transition" data-id="${contact.id}" data-name="${name}">
@@ -762,6 +773,12 @@
             selectedContact = contact;
             const name = getEmailPrefix(contact.contact?.email || 'Contact');
             $('chat-contact-name').textContent = name;
+            
+            // Mark as read when opening conversation
+            if (unreadContacts.has(contact.contact_user_id)) {
+                unreadContacts.delete(contact.contact_user_id);
+                renderContacts(); // Update indicator
+            }
             
             $('section-contacts').classList.add('hidden');
             $('section-chat').classList.remove('hidden');
@@ -968,31 +985,82 @@
         });
         
         // ============================================
-        // REALTIME (optional - for live messages)
+        // REALTIME MESSAGING 🔴
         // ============================================
+        
+        // Subtle notification sound (base64 encoded short beep)
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ZkYJ1bW1+i5SVi4J6dnl9fHZwbG5ydHh7fH18e3p5eHd3eHl6e3t6eHZ1dXZ3eHl5eHd2dXV2d3h4eHd2dXV2d3d3d3Z2dnZ2d3d3d3Z2dnZ2dnZ2dnZ2dnZ2dnZ2');
+        notificationSound.volume = 0.3; // Subtle volume
+        
+        function playNotificationSound() {
+            try {
+                notificationSound.currentTime = 0;
+                notificationSound.play().catch(() => {}); // Ignore if autoplay blocked
+            } catch (e) {
+                // Silently fail - sound is optional
+            }
+        }
+        
         function subscribeToMessages() {
-            db.channel('messages')
+            if (!currentUser) return;
+            
+            // Unsubscribe from previous channel if exists
+            if (realtimeChannel) {
+                db.removeChannel(realtimeChannel);
+            }
+            
+            realtimeChannel = db.channel('messages-realtime')
                 .on('postgres_changes', 
-                    { event: 'INSERT', schema: 'public', table: 'messages' },
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'messages',
+                        filter: `receiver_id=eq.${currentUser.id}`
+                    },
                     (payload) => {
-                        if (selectedContact) {
-                            const msg = payload.new;
-                            // Check if message is for current conversation
-                            if ((msg.sender_id === currentUser.id && msg.receiver_id === selectedContact.contact_user_id) ||
-                                (msg.sender_id === selectedContact.contact_user_id && msg.receiver_id === currentUser.id)) {
-                                loadMessages();
+                        const msg = payload.new;
+                        
+                        // Only process messages TO me (not from me)
+                        if (msg.receiver_id !== currentUser.id) return;
+                        
+                        const senderId = msg.sender_id;
+                        
+                        // Check if we're currently viewing this conversation
+                        if (selectedContact && selectedContact.contact_user_id === senderId) {
+                            // Add message directly to the conversation
+                            const newMessage = {
+                                id: msg.id,
+                                sender_id: msg.sender_id,
+                                receiver_id: msg.receiver_id,
+                                content: msg.content,
+                                is_ping: msg.is_ping,
+                                created_at: msg.created_at,
+                                is_mine: false
+                            };
+                            
+                            // Avoid duplicates
+                            if (!messages.find(m => m.id === msg.id)) {
+                                messages.push(newMessage);
+                                renderMessages();
+                                playNotificationSound();
                             }
+                        } else {
+                            // Not viewing this conversation - mark contact as having unread
+                            unreadContacts.add(senderId);
+                            renderContacts(); // Re-render to show indicator
+                            playNotificationSound();
                         }
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('[Realtime] Status:', status);
+                });
         }
         
         // ============================================
         // INIT
         // ============================================
         initAuth();
-        subscribeToMessages();
     </script>
     
     <!-- PWA Service Worker Registration -->
