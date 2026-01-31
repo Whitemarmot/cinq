@@ -4,6 +4,37 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-BADGE/deploy-status)](https://app.netlify.com/sites/cinq-network/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
+
+---
+
+## 🆕 What's New in v2.0 (Night Sprint Edition)
+
+### ✨ UX & Interface
+- **Chat WhatsApp-style** — Bulles, timestamps, read receipts, typing indicator
+- **Infinite scroll** — Pagination cursor-based fluide
+- **Micro-animations** — Transitions premium sur tous les composants
+- **Onboarding complet** — Parcours guidé pour nouveaux utilisateurs
+- **Landing redesign** — Meilleur taux de conversion
+
+### 📱 PWA & Mobile
+- **Push notifications** — Notifications temps réel
+- **Mobile-first** — Touch targets 44px, viewport-fit, keyboard handling
+- **Offline support** — Service worker amélioré
+
+### 🎨 Design System v3.1
+- **WOW Effects** — Pentagon signature, particles, text reveal, gradient mesh
+- **Dark/Light mode** — Toggle fluide avec persistence
+- **WCAG AA** — Accessibilité complète
+
+### ⚡ Performance
+- **N+1 queries éliminées** — Backend optimisé
+- **Assets minifiés** — CSS/JS compressés
+- **Cursor pagination** — Plus de offset/limit
+
+### 📚 Documentation
+- Architecture review, Security audit, Design system docs
+- Voir [CHANGELOG.md](CHANGELOG.md) pour la liste complète
 
 ---
 
@@ -242,18 +273,39 @@ netlify deploy --prod
 
 ## 📖 Documentation
 
+### Architecture & Code
 | Document | Description |
 |----------|-------------|
-| [FLOW.md](FLOW.md) | 🆕 Parcours utilisateurs détaillés |
-| [docs/ENV.md](docs/ENV.md) | 🆕 Guide des variables d'environnement |
-| [FAQ.html](FAQ.html) | 🆕 Questions fréquentes (utilisateurs) |
+| [ARCHITECTURE-REVIEW.md](ARCHITECTURE-REVIEW.md) | 🆕 Analyse architecture complète |
+| [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md) | 🆕 Design System v3.1 |
+| [API-IMPROVEMENTS.md](API-IMPROVEMENTS.md) | 🆕 Optimisations backend |
+| [ERROR-HANDLING.md](ERROR-HANDLING.md) | 🆕 Gestion des erreurs |
+| [CHANGELOG.md](CHANGELOG.md) | 🆕 Historique des changements |
+
+### Sécurité & Qualité
+| Document | Description |
+|----------|-------------|
+| [SECURITY-AUDIT.md](SECURITY-AUDIT.md) | 🆕 Audit sécurité XSS/CSRF |
+| [QA-REPORT.md](QA-REPORT.md) | 🆕 Rapport qualité code |
+| [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) | 🆕 Documentation accessibilité |
+
+### Guides
+| Document | Description |
+|----------|-------------|
+| [FLOW.md](FLOW.md) | Parcours utilisateurs détaillés |
+| [docs/ENV.md](docs/ENV.md) | Guide des variables d'environnement |
 | [docs/API.md](docs/API.md) | Documentation complète de l'API |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Guide de déploiement Netlify + Supabase |
 | [docs/AUTH-SYSTEM.md](docs/AUTH-SYSTEM.md) | Système d'authentification |
-| [docs/security-audit.md](docs/security-audit.md) | Audit de sécurité |
 | [docs/launch-checklist.md](docs/launch-checklist.md) | Checklist pré-lancement |
+
+### Specs & Références
+| Document | Description |
+|----------|-------------|
+| [FAQ.html](FAQ.html) | Questions fréquentes (utilisateurs) |
 | [SPEC.md](SPEC.md) | Spécifications produit |
 | [PROGRESS.md](PROGRESS.md) | Journal de développement |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Guide de contribution |
 
 ---
 

@@ -39,27 +39,10 @@
     <link rel="stylesheet" href="/css/theme.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
-    <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta')||document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
-        
-        const THEMES = ['dark', 'light', 'auto'];
-        function getSystemPref() { return window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark'; }
-        function getEffective(p) { return p === 'auto' ? getSystemPref() : (p || 'dark'); }
-        function toggleTheme() {
-            var h = document.documentElement;
-            var curr = localStorage.getItem('cinq_theme') || 'dark';
-            var next = THEMES[(THEMES.indexOf(curr) + 1) % 3];
-            var eff = getEffective(next);
-            h.classList.add('theme-transitioning');
-            h.setAttribute('data-theme', eff);
-            h.setAttribute('data-theme-preference', next);
-            localStorage.setItem('cinq_theme', next);
-            var m = document.getElementById('theme-color-meta') || document.querySelector('meta[name="theme-color"]');
-            if(m) m.content = eff === 'light' ? '#faf9f7' : '#0e0e12';
-            setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
-        }
-        requestAnimationFrame(function() { requestAnimationFrame(function() { document.documentElement.classList.remove('theme-loading'); }); });
-    </script>
+    <script src="/js/theme.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="/js/shared.js"></script>
     
     <style>
         /* ===== FEED LAYOUT ===== */
@@ -1112,16 +1095,7 @@
         const PTR_THRESHOLD = 80;
 
         // ===== AUTH =====
-        function getToken() {
-            return session?.access_token;
-        }
-
-        function authHeaders() {
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            };
-        }
+        // getToken() and authHeaders() now provided by /js/shared.js
 
         // ===== INIT =====
         async function init() {
@@ -1849,45 +1823,7 @@
         }
 
         // ===== UTILS =====
-        function formatTime(dateStr) {
-            const date = new Date(dateStr);
-            const now = new Date();
-            const diff = Math.floor((now - date) / 1000);
-            
-            if (diff < 60) return 'À l\'instant';
-            if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
-            if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`;
-            if (diff < 604800) return `il y a ${Math.floor(diff / 86400)}j`;
-            
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-        }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-        
-        function showToast({ type = 'info', message, duration = 3000 }) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.setAttribute('role', 'alert');
-            toast.innerHTML = `
-                <span aria-hidden="true">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
-                <span>${message}</span>
-            `;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('toast-out');
-                setTimeout(() => toast.remove(), 300);
-            }, duration);
-        }
+        // formatTime(), escapeHtml(), and showToast() now provided by /js/shared.js
 
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', (e) => {
