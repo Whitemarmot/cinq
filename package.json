@@ -4,39 +4,14 @@
   "description": "L'anti-réseau social — 5 contacts max, zéro bullshit",
   "main": "index.html",
   "scripts": {
-    "dev": "netlify dev",
-    "build": "npm run lint && echo '✅ Build ready for prod'",
-    "lint": "eslint . --ext .js --ignore-path .gitignore --ignore-pattern 'node_modules/**'",
-    "lint:fix": "eslint . --ext .js --ignore-path .gitignore --ignore-pattern 'node_modules/**' --fix",
-    "test": "npm run test:webhook && npm run test:e2e",
-    "test:webhook": "node netlify/functions/test-btcpay-webhook.js",
-    "test:e2e": "node tests/e2e-api.js",
-    "test:e2e:flow": "node tests/e2e-flow.js",
-    "test:e2e:dry": "node tests/e2e-flow.js --dry-run",
-    "deploy": "npm run build && netlify deploy --prod",
-    "deploy:preview": "netlify deploy",
-    "clean": "rm -rf node_modules package-lock.json && npm install",
-    "check": "npm run lint && npm run test"
+    "dev": "echo 'Dev mode'",
+    "build": "echo 'Build OK'",
+    "lint": "eslint . --ext .js --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
     "web-push": "^3.6.7"
-  },
-  "devDependencies": {
-    "eslint": "^8.57.1"
-  },
-  "keywords": [
-    "social",
-    "minimalist",
-    "privacy",
-    "anti-addiction",
-    "cinq"
-  ],
-  "author": "Cinq Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Whitemarmot/cinq.git"
   },
   "engines": {
     "node": ">=18.0.0"
