@@ -174,11 +174,11 @@
                 <span class="five">5</span>
             </div>
             
-            <h1 class="login-title">Connexion</h1>
-            <p class="login-subtitle">Retrouve tes 5</p>
+            <h1 class="login-title">Te revoilà</h1>
+            <p class="login-subtitle">Tes 5 t'attendent</p>
 
             <div id="welcome-banner" class="welcome-banner" style="display: none;">
-                🎉 Compte créé ! Connecte-toi maintenant.
+                🎉 Bienvenue dans le cercle ! Connecte-toi pour découvrir ton espace.
             </div>
 
             <form id="login-form" aria-label="Formulaire de connexion">
@@ -246,7 +246,7 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    throw new Error(data.error || 'Erreur de connexion');
+                    throw new Error(data.error || 'Email ou mot de passe incorrect');
                 }
 
                 // Store session

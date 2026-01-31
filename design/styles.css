@@ -8,8 +8,9 @@
 
 /* ============================================
    FONTS — Plus de personnalité
+   Loaded via <link> in HTML for better performance
    ============================================ */
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Font-face fallback with font-display: swap for FOUT optimization */
 
 /* ============================================
    TOKENS — Refined Dark Palette

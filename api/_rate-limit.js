@@ -57,8 +57,11 @@ export function getClientIP(req) {
  * @returns {boolean} true if allowed, false if rate limited (response sent)
  */
 export function checkRateLimit(req, res, options = {}) {
-    // Bypass for automated tests
-    if (req.headers['x-test-bypass'] === process.env.TEST_BYPASS_SECRET) {
+    // SECURITY: Only allow test bypass if secret is explicitly set and non-empty
+    // This prevents bypass when TEST_BYPASS_SECRET is undefined or empty
+    const bypassSecret = process.env.TEST_BYPASS_SECRET;
+    const bypassHeader = req.headers['x-test-bypass'];
+    if (bypassSecret && bypassSecret.length >= 32 && bypassHeader === bypassSecret) {
         return true;
     }
     

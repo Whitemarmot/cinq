@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Accessibility: Viewport should allow user scaling for a11y -->
+    <!-- Note: user-scalable=no kept for app-like experience, but consider removing for better a11y -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cinq — Ton espace intime</title>
@@ -30,6 +32,61 @@
     <link rel="stylesheet" href="/design/styles.css">
     
     <style>
+        /* ===== ACCESSIBILITY: SKIP LINK ===== */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--cinq-gradient);
+            color: white;
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            z-index: calc(var(--z-toast) + 1);
+            transition: top 0.2s;
+        }
+        
+        .skip-link:focus {
+            top: var(--space-4);
+            outline: 2px solid white;
+            outline-offset: 2px;
+        }
+        
+        /* ===== ACCESSIBILITY: FOCUS STYLES ===== */
+        :focus-visible {
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
+        }
+        
+        /* Remove default focus for mouse users, keep for keyboard */
+        :focus:not(:focus-visible) {
+            outline: none;
+        }
+        
+        /* ===== ACCESSIBILITY: REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* ===== ACCESSIBILITY: SCREEN READER ONLY ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
         /* ===== APP SHELL ===== */
         .app-shell {
             min-height: 100vh;
@@ -999,7 +1056,7 @@
         }
         
         .chat-messages:empty::before {
-            content: 'Aucun message';
+            content: 'Premier message ? À toi de jouer 👋';
             text-align: center;
             color: var(--color-text-muted);
             margin: auto;
@@ -1309,140 +1366,158 @@
     </style>
 </head>
 <body>
+    <!-- Skip Link for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     
     <!-- Toast Container -->
-    <div class="toast-container" id="toast-container" role="region" aria-live="polite"></div>
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
     
     <!-- Image Modal -->
-    <div class="image-modal" id="image-modal" onclick="closeImageModal()">
-        <button class="image-modal-close" onclick="closeImageModal()">×</button>
+    <div class="image-modal" id="image-modal" role="dialog" aria-modal="true" aria-label="Image en plein écran" onclick="closeImageModal()">
+        <button class="image-modal-close" onclick="closeImageModal()" aria-label="Fermer l'image">
+            <span aria-hidden="true">×</span>
+        </button>
         <img id="modal-image" src="" alt="Image agrandie">
     </div>
     
     <div class="app-shell">
         <!-- HEADER -->
         <header class="app-header">
-            <div class="header-logo">5</div>
-            <div class="header-avatar" id="header-avatar" onclick="switchTab('profil')" title="Mon profil">
-                <span id="header-avatar-initial">?</span>
-            </div>
+            <div class="header-logo" aria-hidden="true">5</div>
+            <h1 class="sr-only">Cinq — Ton espace intime</h1>
+            <button class="header-avatar" id="header-avatar" onclick="switchTab('profil')" aria-label="Accéder à mon profil" type="button">
+                <span id="header-avatar-initial" aria-hidden="true">?</span>
+            </button>
         </header>
         
         <!-- MAIN CONTENT -->
-        <main class="app-content">
+        <main class="app-content" id="main-content">
             <!-- TAB: FEED (DEFAULT) -->
-            <section class="tab-panel active" id="tab-feed">
+            <section class="tab-panel active" id="tab-feed" role="tabpanel" aria-labelledby="nav-feed" tabindex="0">
                 <!-- Composer -->
-                <div class="composer">
+                <div class="composer" role="region" aria-label="Créer un nouveau post">
                     <div class="composer-header">
-                        <div class="composer-avatar" id="composer-avatar">?</div>
+                        <div class="composer-avatar" id="composer-avatar" aria-hidden="true">?</div>
                         <span class="composer-user" id="composer-user">Chargement...</span>
                     </div>
+                    <label for="post-content" class="sr-only">Contenu de votre post</label>
                     <textarea 
                         class="composer-textarea" 
                         id="post-content" 
-                        placeholder="Quoi de neuf ? Partage quelque chose avec tes 5..."
+                        placeholder="Un truc marrant ? Une pensée ? Un coup de gueule ? C'est entre vous..."
                         maxlength="1000"
+                        aria-describedby="char-count"
                     ></textarea>
-                    <div class="image-preview" id="image-preview">
-                        <img id="preview-img" src="" alt="Aperçu">
-                        <button class="image-preview-remove" onclick="removeImage()">×</button>
-                        <div id="upload-progress" style="display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:var(--space-2);text-align:center;font-size:var(--text-xs);">
-                            ⏳ Upload en cours...
+                    <div class="image-preview" id="image-preview" role="region" aria-label="Aperçu de l'image">
+                        <img id="preview-img" src="" alt="Aperçu de l'image à poster">
+                        <button class="image-preview-remove" onclick="removeImage()" aria-label="Supprimer l'image" type="button">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <div id="upload-progress" role="status" aria-live="polite" style="display:none;position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:var(--space-2);text-align:center;font-size:var(--text-xs);">
+                            <span aria-hidden="true">⏳</span> Upload en cours...
                         </div>
                     </div>
-                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleFileSelect(event)">
+                    <label for="file-input" class="sr-only">Ajouter une image au post</label>
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleFileSelect(event)" aria-describedby="file-input-desc">
+                    <span id="file-input-desc" class="sr-only">Formats acceptés: JPEG, PNG, GIF, WebP. Taille max: 5 Mo</span>
                     <div class="composer-footer">
                         <div class="composer-actions">
-                            <button class="composer-btn" onclick="triggerFileUpload()">📷 Photo</button>
+                            <button class="composer-btn" onclick="triggerFileUpload()" type="button" aria-label="Ajouter une photo">
+                                <span aria-hidden="true">📷</span> Photo
+                            </button>
                         </div>
                         <div style="display:flex;align-items:center;gap:var(--space-4);">
-                            <span class="char-count" id="char-count">0/1000</span>
-                            <button class="post-btn" id="post-btn" onclick="submitPost()" disabled>Poster</button>
+                            <span class="char-count" id="char-count" aria-live="polite" aria-atomic="true">0/1000</span>
+                            <button class="post-btn" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Posts List -->
-                <div class="posts-list" id="posts-list">
-                    <div class="loading-spinner" style="margin:var(--space-8) auto;"></div>
+                <div class="posts-list" id="posts-list" role="feed" aria-label="Fil d'actualités" aria-busy="true">
+                    <div class="loading-spinner" style="margin:var(--space-8) auto;" role="status" aria-label="Chargement des posts"></div>
                 </div>
             </section>
             
             <!-- TAB: TES 5 -->
-            <section class="tab-panel" id="tab-contacts">
+            <section class="tab-panel" id="tab-contacts" role="tabpanel" aria-labelledby="nav-contacts" tabindex="0" hidden>
                 <h2 class="section-title">
                     Tes 5
-                    <span class="contact-count" id="contact-count">0/5</span>
+                    <span class="contact-count" id="contact-count" aria-live="polite">0/5</span>
                 </h2>
-                <div class="contacts-grid" id="contacts-grid"></div>
+                <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste de tes 5 contacts"></div>
                 
-                <button class="action-btn" onclick="openGiftModal()">
-                    <span class="action-icon">🎁</span>
+                <button class="action-btn" onclick="openGiftModal()" type="button">
+                    <span class="action-icon" aria-hidden="true">🎁</span>
                     <div>
                         <div class="action-title">Offrir Cinq</div>
-                        <div class="action-subtitle">Génère un code pour inviter quelqu'un</div>
+                        <div class="action-subtitle">Invite quelqu'un qui compte vraiment</div>
                     </div>
                 </button>
             </section>
             
             <!-- TAB: PROFIL -->
-            <section class="tab-panel" id="tab-profil">
+            <section class="tab-panel" id="tab-profil" role="tabpanel" aria-labelledby="nav-profil" tabindex="0" hidden>
                 <div class="profile-header">
-                    <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()">
-                        <span id="profile-avatar-initial">?</span>
-                        <div class="profile-avatar-overlay">📷</div>
-                    </div>
-                    <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="uploadAvatar(this)">
-                    <div class="profile-name" id="profile-name">Chargement...</div>
-                    <div class="profile-bio" id="profile-bio-display"></div>
+                    <button class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" type="button" aria-label="Changer ma photo de profil">
+                        <span id="profile-avatar-initial" aria-hidden="true">?</span>
+                        <div class="profile-avatar-overlay" aria-hidden="true">📷</div>
+                    </button>
+                    <label for="avatar-input" class="sr-only">Choisir une nouvelle photo de profil</label>
+                    <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="uploadAvatar(this)" aria-describedby="avatar-input-desc">
+                    <span id="avatar-input-desc" class="sr-only">Formats acceptés: JPEG, PNG, GIF, WebP. Taille max: 2 Mo</span>
+                    <h2 class="profile-name" id="profile-name">Chargement...</h2>
+                    <p class="profile-bio" id="profile-bio-display"></p>
                 </div>
                 
                 <!-- Edit Profile -->
-                <div class="settings-card">
-                    <div class="settings-card-header">
-                        <span>✏️</span>
+                <div class="settings-card" role="region" aria-labelledby="settings-profile-title">
+                    <div class="settings-card-header" id="settings-profile-title">
+                        <span aria-hidden="true">✏️</span>
                         <span>Modifier mon profil</span>
                     </div>
                     <div class="settings-field">
                         <label class="settings-label" for="profile-display-name">Pseudo</label>
-                        <input type="text" id="profile-display-name" class="settings-input" placeholder="Ton pseudo..." maxlength="50">
+                        <input type="text" id="profile-display-name" class="settings-input" placeholder="Ton pseudo..." maxlength="50" autocomplete="nickname">
                     </div>
                     <div class="settings-field">
                         <label class="settings-label" for="profile-bio">Bio</label>
-                        <textarea id="profile-bio" class="settings-input" placeholder="Quelques mots sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
+                        <textarea id="profile-bio" class="settings-input" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
-                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn">💾 Enregistrer</button>
+                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn" type="button">
+                        <span aria-hidden="true">💾</span> Enregistrer
+                    </button>
                 </div>
                 
                 <!-- Data & Actions -->
-                <div class="settings-card">
-                    <div class="settings-card-header">
-                        <span>📦</span>
+                <div class="settings-card" role="region" aria-labelledby="settings-data-title">
+                    <div class="settings-card-header" id="settings-data-title">
+                        <span aria-hidden="true">📦</span>
                         <span>Mes données</span>
                     </div>
-                    <button onclick="exportData()" id="export-data-btn" class="settings-btn">
-                        <span>📥</span>
+                    <button onclick="exportData()" id="export-data-btn" class="settings-btn" type="button">
+                        <span aria-hidden="true">📥</span>
                         <div class="settings-btn-info">
-                            <span class="settings-btn-title">Exporter mes données</span>
-                            <span class="settings-btn-subtitle">Télécharge toutes tes données (RGPD)</span>
+                            <span class="settings-btn-title">Récupérer mes données</span>
+                            <span class="settings-btn-subtitle">Tout ce qu'on a sur toi, dans un fichier</span>
                         </div>
                     </button>
-                    <button onclick="logout()" class="settings-btn">
-                        <span>🚪</span>
+                    <button onclick="logout()" class="settings-btn" type="button">
+                        <span aria-hidden="true">🚪</span>
                         <div class="settings-btn-info">
                             <span class="settings-btn-title">Déconnexion</span>
-                            <span class="settings-btn-subtitle">Se déconnecter de Cinq</span>
+                            <span class="settings-btn-subtitle">À plus tard !</span>
                         </div>
                     </button>
-                    <button onclick="openDeleteAccountModal()" class="settings-btn settings-btn-danger">
-                        <span>🗑️</span>
+                    <button onclick="openDeleteAccountModal()" class="settings-btn settings-btn-danger" type="button">
+                        <span aria-hidden="true">🗑️</span>
                         <div class="settings-btn-info">
                             <span class="settings-btn-title">Supprimer mon compte</span>
-                            <span class="settings-btn-subtitle">Action définitive et irréversible</span>
+                            <span class="settings-btn-subtitle">On espère que tu reviendras</span>
                         </div>
                     </button>
                 </div>
@@ -1450,38 +1525,40 @@
         </main>
         
         <!-- BOTTOM NAV -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-tab="feed" onclick="switchTab('feed')">
-                <span class="nav-icon">📰</span>
+        <nav class="bottom-nav" role="tablist" aria-label="Navigation principale">
+            <button class="nav-item active" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="true" aria-controls="tab-feed" type="button">
+                <span class="nav-icon" aria-hidden="true">📰</span>
                 <span class="nav-label">Feed</span>
             </button>
-            <button class="nav-item" data-tab="contacts" onclick="switchTab('contacts')">
-                <span class="nav-icon">👥</span>
+            <button class="nav-item" id="nav-contacts" data-tab="contacts" onclick="switchTab('contacts')" role="tab" aria-selected="false" aria-controls="tab-contacts" type="button">
+                <span class="nav-icon" aria-hidden="true">👥</span>
                 <span class="nav-label">Tes 5</span>
             </button>
-            <button class="nav-item" data-tab="profil" onclick="switchTab('profil')">
-                <span class="nav-icon">👤</span>
+            <button class="nav-item" id="nav-profil" data-tab="profil" onclick="switchTab('profil')" role="tab" aria-selected="false" aria-controls="tab-profil" type="button">
+                <span class="nav-icon" aria-hidden="true">👤</span>
                 <span class="nav-label">Profil</span>
             </button>
         </nav>
     </div>
     
     <!-- Chat Overlay -->
-    <div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
+    <div class="chat-overlay" id="chat-overlay" onclick="closeChat()" aria-hidden="true"></div>
     
     <!-- Chat Panel -->
-    <div class="chat-panel" id="chat-panel">
+    <div class="chat-panel" id="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chat-contact-name" aria-hidden="true">
         <div class="chat-header">
             <div class="chat-contact-info">
-                <div class="chat-contact-avatar" id="chat-contact-avatar">?</div>
-                <span class="chat-contact-name" id="chat-contact-name"></span>
+                <div class="chat-contact-avatar" id="chat-contact-avatar" aria-hidden="true">?</div>
+                <h2 class="chat-contact-name" id="chat-contact-name"></h2>
             </div>
-            <button class="chat-close" onclick="closeChat()">×</button>
+            <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
+                <span aria-hidden="true">×</span>
+            </button>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
         <div class="chat-input-area">
             <button class="ping-btn" onclick="sendPing()">👋</button>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500">
             <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled>→</button>
         </div>
     </div>
@@ -1490,7 +1567,7 @@
     <div class="modal-overlay" id="gift-modal">
         <div class="modal">
             <h2 class="modal-title">🎁 Offrir Cinq</h2>
-            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Génère un code unique pour inviter quelqu'un sur Cinq.</p>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Choisis bien. Cinq n'est pas pour tout le monde.</p>
             <div id="gift-content">
                 <button class="save-btn" style="width:100%;" onclick="createGift()">Générer un code</button>
             </div>
@@ -1501,9 +1578,9 @@
     <!-- Add Contact Modal -->
     <div class="modal-overlay" id="add-contact-modal">
         <div class="modal">
-            <h2 class="modal-title">➕ Ajouter un contact</h2>
-            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Entre l'ID de la personne à ajouter</p>
-            <input type="text" id="contact-id-input" class="settings-input" placeholder="ID (ex: abc123-...)" style="margin-bottom:var(--space-4);">
+            <h2 class="modal-title">➕ Ajouter un·e proche</h2>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Demande-lui son ID (il l'a dans son profil)</p>
+            <input type="text" id="contact-id-input" class="settings-input" placeholder="Colle l'ID ici" style="margin-bottom:var(--space-4);">
             <div id="add-contact-error" style="color:var(--color-error);font-size:var(--text-sm);margin-bottom:var(--space-4);display:none;"></div>
             <button class="save-btn" style="width:100%;" onclick="addContact()" id="add-contact-btn">Ajouter</button>
             <div style="margin-top:var(--space-5);padding-top:var(--space-5);border-top:1px solid var(--color-border);">
@@ -1638,7 +1715,7 @@
                 
             } catch (e) {
                 console.error('Init error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger l\'app' });
+                showToast({ type: 'error', title: 'Aïe', message: 'L\'app n\'a pas voulu démarrer. Réessaie ?' });
             }
         }
 
@@ -1701,11 +1778,11 @@
             if (!file) return;
             
             if (file.size > 2 * 1024 * 1024) {
-                showToast({ type: 'error', title: 'Fichier trop gros', message: 'Max 2Mo' });
+                showToast({ type: 'error', title: 'Trop lourd !', message: 'Choisis une image de moins de 2 Mo' });
                 return;
             }
             
-            showToast({ type: 'info', title: 'Upload en cours...' });
+            showToast({ type: 'info', title: 'On télécharge ta photo...' });
             
             try {
                 const base64 = await new Promise((resolve, reject) => {
@@ -1726,7 +1803,7 @@
                 
                 const name = document.getElementById('profile-display-name').value || user?.email?.split('@')[0] || 'U';
                 updateAllAvatars(data.avatarUrl, name.charAt(0).toUpperCase());
-                showToast({ type: 'success', title: 'Photo mise à jour !' });
+                showToast({ type: 'success', title: 'Nouvelle tête ! 📸' });
             } catch (e) {
                 showToast({ type: 'error', title: 'Erreur', message: e.message });
             }
@@ -1753,7 +1830,7 @@
                 
                 document.getElementById('profile-name').textContent = displayName || user?.email?.split('@')[0] || 'Utilisateur';
                 document.getElementById('profile-bio-display').textContent = bio || '';
-                showToast({ type: 'success', title: 'Profil mis à jour !' });
+                showToast({ type: 'success', title: 'C\'est enregistré !' });
             } catch (e) {
                 showToast({ type: 'error', title: 'Erreur', message: e.message });
             } finally {
@@ -1795,12 +1872,12 @@
             
             const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!validTypes.includes(file.type)) {
-                showToast({ type: 'error', message: 'Format non supporté' });
+                showToast({ type: 'error', message: 'Ce format ne passe pas (essaie JPG, PNG ou GIF)' });
                 return;
             }
             
             if (file.size > 5 * 1024 * 1024) {
-                showToast({ type: 'error', message: 'Image trop grande (max 5 Mo)' });
+                showToast({ type: 'error', message: 'Image trop lourde ! Max 5 Mo' });
                 return;
             }
             
@@ -1879,7 +1956,7 @@
                 document.getElementById('char-count').textContent = '0/1000';
                 removeImage();
                 
-                showToast({ type: 'success', message: 'Posté ! 🎉' });
+                showToast({ type: 'success', message: 'Envoyé à tes 5 ! 🎉' });
             } catch (e) {
                 showToast({ type: 'error', message: e.message });
             } finally {
@@ -1898,9 +1975,9 @@
             } catch (e) {
                 document.getElementById('posts-list').innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">😢</div>
-                        <div class="empty-state-title">Erreur de chargement</div>
-                        <div style="color:var(--color-text-muted)">${e.message}</div>
+                        <div class="empty-state-icon">😵</div>
+                        <div class="empty-state-title">Oups, ça a planté</div>
+                        <div style="color:var(--color-text-muted)">Rafraîchis la page, ça devrait passer</div>
                     </div>
                 `;
             }
@@ -1912,10 +1989,10 @@
             if (posts.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">📭</div>
-                        <div class="empty-state-title">Rien ici pour l'instant</div>
+                        <div class="empty-state-icon">🌱</div>
+                        <div class="empty-state-title">C'est calme ici</div>
                         <div style="color:var(--color-text-muted);max-width:300px;margin:0 auto;">
-                            Sois le premier à poster quelque chose, ou ajoute des contacts pour voir leur feed !
+                            Brise la glace ! Poste un truc, ou ajoute tes proches pour voir ce qu'ils racontent.
                         </div>
                     </div>
                 `;
@@ -2027,7 +2104,7 @@
                 
                 renderContacts();
             } catch (e) {
-                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger les contacts' });
+                showToast({ type: 'error', title: 'Oups', message: 'Impossible de charger tes contacts. Réseau ?' });
             }
         }
 
@@ -2167,7 +2244,7 @@
                 input.value = '';
                 loadMessages();
             } catch (e) {
-                showToast({ type: 'error', message: 'Message non envoyé' });
+                showToast({ type: 'error', message: 'Message pas parti. Réessaie ?' });
             } finally {
                 btn.disabled = !input.value.trim();
             }
@@ -2187,7 +2264,7 @@
                 });
                 loadMessages();
             } catch (e) {
-                showToast({ type: 'error', message: 'Ping non envoyé' });
+                showToast({ type: 'error', message: 'Le ping n\'est pas passé 😕' });
             } finally {
                 setTimeout(() => btn.style.transform = '', 200);
             }
@@ -2320,7 +2397,7 @@
                 if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 closeAddContactModal();
-                showToast({ type: 'success', title: 'Contact ajouté !', message: 'Tu peux maintenant lui envoyer des messages' });
+                showToast({ type: 'success', title: 'Contact ajouté !', message: 'Dis-lui bonjour 👋' });
                 loadContacts();
             } catch (e) {
                 errorEl.textContent = e.message;
@@ -2495,7 +2572,7 @@
                     const permission = await Notification.requestPermission();
                     if (permission === 'granted') {
                         await subscribeToPush(registration);
-                        showToast({ type: 'success', title: 'Activé !', message: 'Tu recevras les notifications' });
+                        showToast({ type: 'success', title: 'Notifs activées !', message: 'Tu sauras quand tes proches t\'écrivent' });
                     }
                 }
             });
