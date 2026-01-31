@@ -571,3 +571,35 @@ h1, h2, h3, h4, h5, h6 {
     color: black;
   }
 }
+
+/* ==========================================================================
+   COMPATIBILITY LAYER (for app pages)
+   ========================================================================== */
+
+:root {
+  /* Background */
+  --color-bg-primary: var(--bg-dark);
+  --color-bg-secondary: var(--bg-dark-secondary);
+  --color-bg-elevated: var(--bg-dark-elevated);
+  --color-bg-hover: var(--bg-glass-hover);
+  
+  /* Text */
+  --color-text-primary: var(--text-white);
+  --color-text-muted: var(--text-white-50);
+  
+  /* Border */
+  --color-border: var(--border-white-10);
+  --color-border-active: var(--border-white-20);
+  
+  /* Brand */
+  --color-brand: var(--cinq-indigo);
+  --color-brand-muted: rgba(99, 102, 241, 0.2);
+  
+  /* Semantic */
+  --color-success: var(--success);
+  --color-error: var(--error);
+  
+  /* Radius */
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}

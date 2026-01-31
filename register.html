@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejoindre Cinq</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .register-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .register-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .register-logo .five {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-brand);
+        }
+        .register-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .register-subtitle {
+            color: var(--color-text-muted);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .gifter-info {
+            background: var(--color-bg-elevated);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .gifter-info .emoji { font-size: 1.5rem; }
+        .gifter-info .text { 
+            color: var(--color-text-muted); 
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .gifter-info .name { 
+            color: var(--color-text-primary); 
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 1rem;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        .form-input.error {
+            border-color: var(--color-error);
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--color-brand);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 0.75rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--color-error);
+        }
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--color-success);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        .login-link a {
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        .invalid-code {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .invalid-code .emoji { font-size: 3rem; }
+        .invalid-code h2 { margin: 1rem 0 0.5rem; }
+        .invalid-code p { color: var(--color-text-muted); }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <div class="register-container">
+        <div class="register-card" id="register-card">
+            <div class="register-logo">
+                <span class="five">5</span>
+            </div>
+            
+            <div id="loading" style="text-align: center;">
+                <p>Vérification du code...</p>
+            </div>
+
+            <div id="invalid-code" class="invalid-code" style="display: none;">
+                <div class="emoji">😕</div>
+                <h2>Code invalide</h2>
+                <p id="invalid-reason">Ce code n'existe pas ou a déjà été utilisé.</p>
+                <a href="/" style="color: var(--color-brand);">Retour à l'accueil</a>
+            </div>
+
+            <div id="register-form-container" style="display: none;">
+                <h1 class="register-title">Bienvenue sur Cinq</h1>
+                <p class="register-subtitle">Tu as reçu une invitation</p>
+
+                <div class="gifter-info" id="gifter-info">
+                    <div class="emoji">🎁</div>
+                    <div class="text">Offert par <span class="name" id="gifter-name">un ami</span></div>
+                </div>
+
+                <form id="register-form">
+                    <input type="hidden" id="gift-code" name="giftCode">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-input" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Mot de passe</label>
+                        <input type="password" id="password" name="password" class="form-input" required minlength="8" autocomplete="new-password">
+                        <small style="color: var(--color-text-muted); font-size: 0.75rem;">Min. 8 caractères, 1 lettre, 1 chiffre</small>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        Créer mon compte
+                    </button>
+
+                    <div id="message" class="message" style="display: none;"></div>
+                </form>
+
+                <div class="login-link">
+                    Déjà inscrit ? <a href="/login.html">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        const params = new URLSearchParams(window.location.search);
+        const giftCode = params.get('code');
+
+        async function init() {
+            if (!giftCode) {
+                showInvalid('Aucun code fourni');
+                return;
+            }
+
+            // Verify code
+            try {
+                const res = await fetch(`${API_URL}/gift?action=verify&code=${giftCode}`);
+                const data = await res.json();
+
+                if (!data.valid) {
+                    showInvalid(data.reason);
+                    return;
+                }
+
+                // Show form
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('register-form-container').style.display = 'block';
+                document.getElementById('gift-code').value = giftCode;
+                document.getElementById('gifter-name').textContent = data.gifter;
+
+            } catch (e) {
+                showInvalid('Erreur de vérification');
+            }
+        }
+
+        function showInvalid(reason) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('invalid-code').style.display = 'block';
+            document.getElementById('invalid-reason').textContent = reason;
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Création...';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const code = document.getElementById('gift-code').value;
+
+            try {
+                const res = await fetch(`${API_URL}/auth?action=register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, giftCode: code })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+
+                showMessage('Compte créé ! Redirection...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/login.html?registered=1';
+                }, 1500);
+
+            } catch (err) {
+                showMessage(err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Créer mon compte';
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

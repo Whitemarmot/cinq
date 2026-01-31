@@ -1,272 +1,121 @@
-/**
- * CINQ Messages - Netlify Function
- * SARAH Backend - Messaging System
- * 
- * GET /api/messages?contact_id=<uuid>
- *   - Returns messages between user and contact
- *   - Optionally: ?limit=50&before=<timestamp>
- * 
- * POST /api/messages
- *   - Send a message or ping to a contact
- *   - Body: { contact_id, content?, is_ping? }
- * 
- * Requires: Authorization: Bearer <access_token>
- */
+import { createClient } from '@supabase/supabase-js';
 
-const { createClient } = require('@supabase/supabase-js');
-const { success, error, headers } = require('./gift-utils');
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+);
 
-// ============================================
-// Supabase Clients
-// ============================================
-
-function getSupabaseAdmin() {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
-    
-    if (!url || !key) {
-        throw new Error('Missing Supabase configuration');
-    }
-    
-    return createClient(url, key, {
-        auth: { autoRefreshToken: false, persistSession: false }
-    });
+async function getUser(req) {
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith('Bearer ')) return null;
+    const { data: { user } } = await supabase.auth.getUser(auth.split(' ')[1]);
+    return user;
 }
 
-function getSupabaseWithToken(token) {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
-    if (!url || !key) {
-        throw new Error('Missing Supabase configuration');
-    }
-    
-    return createClient(url, key, {
-        global: {
-            headers: { Authorization: `Bearer ${token}` }
-        },
-        auth: { autoRefreshToken: false, persistSession: false }
-    });
-}
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-// ============================================
-// Auth Helper
-// ============================================
+    const user = await getUser(req);
+    if (!user) return res.status(401).json({ error: 'Non authentifié' });
 
-function getAuthToken(event) {
-    const authHeader = event.headers['authorization'] || event.headers['Authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return null;
-    }
-    return authHeader.slice(7);
-}
+    try {
+        // ============ GET - Fetch messages with a contact ============
+        if (req.method === 'GET') {
+            const { contact_id, limit = 50, before } = req.query;
 
-// ============================================
-// Validation
-// ============================================
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isValidUUID(str) {
-    return str && typeof str === 'string' && UUID_REGEX.test(str);
-}
-
-function sanitizeContent(content) {
-    if (!content || typeof content !== 'string') return '';
-    // Trim and limit length
-    return content.trim().slice(0, 500);
-}
-
-// ============================================
-// Verify Contact Relationship
-// ============================================
-
-async function verifyContactRelationship(supabaseAdmin, userId, contactUserId) {
-    // Check if there's a mutual contact relationship
-    // User must have added contactUserId as a contact
-    const { data: contact, error: contactError } = await supabaseAdmin
-        .from('contacts')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('contact_user_id', contactUserId)
-        .single();
-    
-    if (contactError || !contact) {
-        return false;
-    }
-    
-    return true;
-}
-
-// ============================================
-// Handler
-// ============================================
-
-exports.handler = async (event, context) => {
-    // CORS preflight
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 204, headers, body: '' };
-    }
-
-    // ========================================
-    // Authentication
-    // ========================================
-    
-    const token = getAuthToken(event);
-    if (!token) {
-        return error('Authorization required', 401);
-    }
-
-    const supabaseAdmin = getSupabaseAdmin();
-    const supabase = getSupabaseWithToken(token);
-
-    // Verify token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-        return error('Invalid or expired token', 401);
-    }
-
-    // ========================================
-    // GET - Fetch Messages
-    // ========================================
-    
-    if (event.httpMethod === 'GET') {
-        try {
-            const params = event.queryStringParameters || {};
-            const contactId = params.contact_id;
-            const limit = Math.min(parseInt(params.limit) || 50, 100);
-            const before = params.before; // ISO timestamp for pagination
-            
-            if (!isValidUUID(contactId)) {
-                return error('Valid contact_id is required', 400);
+            if (!contact_id) {
+                return res.status(400).json({ error: 'contact_id requis' });
             }
-            
-            // Verify contact relationship
-            const hasContact = await verifyContactRelationship(supabaseAdmin, user.id, contactId);
-            if (!hasContact) {
-                return error('Contact not found in your circle', 403);
+
+            // Verify contact relationship exists
+            const { data: contact } = await supabase
+                .from('contacts')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('contact_user_id', contact_id)
+                .single();
+
+            if (!contact) {
+                return res.status(403).json({ error: 'Pas dans tes contacts' });
             }
-            
-            // Build query for messages between user and contact (both directions)
-            let query = supabaseAdmin
+
+            // Build query
+            let query = supabase
                 .from('messages')
-                .select('id, sender_id, receiver_id, content, is_ping, created_at')
-                .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${user.id})`)
-                .order('created_at', { ascending: true })
-                .limit(limit);
-            
+                .select('*')
+                .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
+                .order('created_at', { ascending: false })
+                .limit(parseInt(limit));
+
             if (before) {
                 query = query.lt('created_at', before);
             }
-            
-            const { data: messages, error: msgError } = await query;
-            
-            if (msgError) {
-                // Table might not exist
-                if (msgError.code === '42P01') {
-                    return success({ messages: [], contact_id: contactId });
-                }
-                console.error('Error fetching messages:', msgError);
-                return error('Failed to fetch messages', 500);
-            }
-            
-            // Format messages for frontend
-            const formattedMessages = (messages || []).map(msg => ({
-                id: msg.id,
-                sender_id: msg.sender_id,
-                receiver_id: msg.receiver_id,
-                content: msg.content,
-                is_ping: msg.is_ping || false,
-                is_mine: msg.sender_id === user.id,
-                created_at: msg.created_at
-            }));
-            
-            return success({
-                messages: formattedMessages,
-                contact_id: contactId,
-                count: formattedMessages.length
-            });
-            
-        } catch (err) {
-            console.error('GET messages error:', err);
-            return error('Server error fetching messages', 500);
+
+            const { data, error } = await query;
+            if (error) throw error;
+
+            // Mark as read
+            await supabase
+                .from('messages')
+                .update({ read_at: new Date().toISOString() })
+                .eq('receiver_id', user.id)
+                .eq('sender_id', contact_id)
+                .is('read_at', null);
+
+            return res.json({ messages: data.reverse() });
         }
-    }
-    
-    // ========================================
-    // POST - Send Message
-    // ========================================
-    
-    if (event.httpMethod === 'POST') {
-        try {
-            const body = JSON.parse(event.body || '{}');
-            const { contact_id, content, is_ping } = body;
-            
-            // Validate contact_id
-            if (!isValidUUID(contact_id)) {
-                return error('Valid contact_id is required', 400);
+
+        // ============ POST - Send message or ping ============
+        if (req.method === 'POST') {
+            const { contact_id, content, is_ping = false } = req.body;
+
+            if (!contact_id) {
+                return res.status(400).json({ error: 'contact_id requis' });
             }
-            
-            // Validate content (required unless ping)
-            const isPingMessage = is_ping === true;
-            const messageContent = isPingMessage ? '💫' : sanitizeContent(content);
-            
-            if (!isPingMessage && !messageContent) {
-                return error('Message content is required', 400);
+
+            if (!is_ping && !content) {
+                return res.status(400).json({ error: 'content requis (ou is_ping: true)' });
             }
-            
-            // Verify contact relationship
-            const hasContact = await verifyContactRelationship(supabaseAdmin, user.id, contact_id);
-            if (!hasContact) {
-                return error('Contact not found in your circle', 403);
+
+            // Verify contact
+            const { data: contact } = await supabase
+                .from('contacts')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('contact_user_id', contact_id)
+                .single();
+
+            if (!contact) {
+                return res.status(403).json({ error: 'Pas dans tes contacts' });
             }
-            
-            // Insert message
-            const { data: newMessage, error: insertError } = await supabaseAdmin
+
+            // Create message
+            const { data, error } = await supabase
                 .from('messages')
                 .insert({
                     sender_id: user.id,
                     receiver_id: contact_id,
-                    content: messageContent,
-                    is_ping: isPingMessage
+                    content: is_ping ? '👋' : content,
+                    is_ping
                 })
-                .select('id, sender_id, receiver_id, content, is_ping, created_at')
+                .select()
                 .single();
-            
-            if (insertError) {
-                console.error('Error inserting message:', insertError);
-                
-                // Table might not exist
-                if (insertError.code === '42P01') {
-                    return error('Messaging not available yet', 503);
-                }
-                
-                return error('Failed to send message', 500);
-            }
-            
-            return success({
-                message: {
-                    id: newMessage.id,
-                    sender_id: newMessage.sender_id,
-                    receiver_id: newMessage.receiver_id,
-                    content: newMessage.content,
-                    is_ping: newMessage.is_ping,
-                    is_mine: true,
-                    created_at: newMessage.created_at
-                }
-            }, 201);
-            
-        } catch (err) {
-            console.error('POST message error:', err);
-            
-            if (err instanceof SyntaxError) {
-                return error('Invalid JSON body', 400);
-            }
-            
-            return error('Server error sending message', 500);
+
+            if (error) throw error;
+
+            // TODO: Send push notification to receiver
+
+            return res.status(201).json({ success: true, message: data });
         }
+
+        return res.status(405).json({ error: 'Method not allowed' });
+
+    } catch (e) {
+        console.error('Messages error:', e);
+        return res.status(500).json({ error: e.message });
     }
-    
-    return error('Method not allowed', 405);
-};
+}

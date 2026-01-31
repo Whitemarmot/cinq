@@ -3,1372 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cinq — Ton cercle</title>
-    
-    <!-- SEO -->
-    <meta name="description" content="Cinq — L'anti-réseau social. 5 personnes. Pas 500.">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
-    <meta name="theme-color" content="#0a0a0b">
-    
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Cinq">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
-    <script defer src="/analytics.js"></script>
-    
+    <title>Cinq — Tes 5</title>
+    <link rel="stylesheet" href="/styles.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        .app-container {
+            min-height: 100vh;
+            padding: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
         }
-        
-        .glow {
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 1.5rem;
         }
-        
-        .glow-soft {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        .app-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
         }
-        
-        /* Animation subtile pour les cercles */
-        .circle {
-            animation: breathe 6s ease-in-out infinite;
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); opacity: 0.4; }
-            50% { transform: scale(1.03); opacity: 0.6; }
+        .user-name {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
         }
-        
-        /* Screen transitions */
-        .screen {
-            animation: fadeIn 0.3s ease-out;
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .logout-btn:hover { color: var(--color-error); }
+
+        /* Contacts grid */
+        .contacts-section {
+            margin-bottom: 2rem;
         }
-        
-        /* Contact slot */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-count {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            font-weight: normal;
+        }
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+        }
         .contact-slot {
-            transition: all 0.2s ease;
+            aspect-ratio: 1;
+            border-radius: var(--radius-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .contact-slot:hover {
             transform: translateY(-2px);
         }
+        .contact-slot.filled {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+        }
         .contact-slot.empty {
-            border-style: dashed;
-            opacity: 0.5;
+            background: var(--color-bg-elevated);
+            border: 2px dashed var(--color-border);
         }
-        .contact-slot.empty:hover {
-            opacity: 0.8;
-            border-color: rgba(99, 102, 241, 0.5);
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            font-weight: 600;
         }
-        
-        /* Message bubble */
-        .message {
-            animation: messageIn 0.2s ease-out;
+        .contact-name {
+            font-size: 0.625rem;
+            margin-top: 0.25rem;
+            color: var(--color-text-muted);
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .empty-plus {
+            font-size: 1.5rem;
+            color: var(--color-border-active);
         }
-        
-        /* Zen scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+
+        /* Actions */
+        .actions-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
-        ::-webkit-scrollbar-track {
-            background: transparent;
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
+        .action-btn:hover {
+            background: var(--color-bg-hover);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .action-icon {
+            font-size: 1.5rem;
         }
-        
-        /* Ping animation */
-        @keyframes ping {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+        .action-text {
+            flex: 1;
         }
-        .ping-sent {
-            animation: ping 0.5s ease-out;
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 0.125rem;
         }
-        
-        /* Hide elements */
-        .hidden { display: none !important; }
+        .action-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Chat panel */
+        .chat-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-bg-primary);
+            border-top: 1px solid var(--color-border);
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-panel.open {
+            transform: translateY(0);
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .chat-contact-name {
+            font-weight: 600;
+        }
+        .chat-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-muted);
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            min-height: 200px;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.5rem;
+        }
+        .chat-message.sent {
+            background: var(--color-brand);
+            color: white;
+            margin-left: auto;
+        }
+        .chat-message.received {
+            background: var(--color-bg-secondary);
+        }
+        .chat-message.ping {
+            text-align: center;
+            max-width: 100%;
+            background: none;
+            font-size: 2rem;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+        }
+        .chat-send {
+            padding: 0.75rem 1rem;
+            background: var(--color-brand);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            cursor: pointer;
+        }
+        .ping-btn {
+            padding: 0.75rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 100;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .gift-code-display {
+            background: var(--color-bg-secondary);
+            border: 2px dashed var(--color-brand);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .gift-code {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            color: var(--color-brand);
+            letter-spacing: 0.1em;
+        }
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-brand);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
-    
-    <!-- Cercles décoratifs (zen) -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="circle absolute -top-20 -left-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        <div class="circle absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" style="animation-delay: -3s;"></div>
-    </div>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
 
-    <!-- ============================================ -->
-    <!-- ÉCRAN: Loading -->
-    <!-- ============================================ -->
-    <div id="screen-loading" class="screen relative z-10 min-h-screen flex items-center justify-center">
-        <div class="text-center">
-            <div class="w-16 h-16 rounded-full border-2 border-white/20 flex items-center justify-center mb-4 mx-auto">
-                <span class="text-2xl font-bold">5</span>
-            </div>
-            <p class="text-white/60 text-sm" id="loading-text">On compte jusqu'à 5...</p>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- ÉCRAN: Non connecté -->
-    <!-- ============================================ -->
-    <div id="screen-auth" class="screen hidden relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        <div class="w-full max-w-sm">
-            <!-- Logo -->
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center glow-soft bg-white/5 mx-auto mb-4">
-                    <span class="text-4xl font-bold">5</span>
-                </div>
-                <h1 class="text-xl font-semibold">Cinq</h1>
-                <p class="text-white/70 text-sm mt-1">Les vrais sont là</p>
-            </div>
-            
-            <!-- Login Form -->
-            <form id="auth-form" class="space-y-4">
-                <div>
-                    <input 
-                        type="email" 
-                        id="auth-email" 
-                        placeholder="ton@email.com"
-                        required
-                        autocomplete="email"
-                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
-                    >
-                </div>
-                <div id="auth-password-group" class="hidden">
-                    <input 
-                        type="password" 
-                        id="auth-password" 
-                        placeholder="Mot de passe"
-                        minlength="6"
-                        autocomplete="current-password"
-                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
-                    >
-                </div>
-                <button 
-                    type="submit"
-                    class="w-full px-4 py-3 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition"
-                >
-                    Continuer
-                </button>
-                <p id="auth-message" class="text-center text-sm text-white/60 hidden"></p>
-            </form>
-            
-            <p class="text-center text-white/50 text-xs mt-8">
-                Pas de compte ? <a href="redeem.html" class="text-indigo-400 hover:underline">Active un code cadeau</a>
-            </p>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- ÉCRAN: Dashboard principal -->
-    <!-- ============================================ -->
-    <div id="screen-app" class="screen hidden relative z-10 min-h-screen">
-        
-        <!-- Header -->
-        <header class="sticky top-0 z-20 bg-gradient-to-b from-[#1a1a2e] to-transparent pt-4 pb-8 px-4">
-            <div class="max-w-lg mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-white/5">
-                        <span class="text-lg font-bold">5</span>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium" id="user-greeting">Salut</p>
-                        <p class="text-xs text-white/60" id="contacts-count">0/5 contacts</p>
-                    </div>
-                </div>
-                <a 
-                    href="/settings"
-                    class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white/80 transition"
-                    title="Paramètres"
-                    aria-label="Paramètres"
-                >
-                    ⚙️
-                </a>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="app-logo">5</div>
+            <div class="user-menu">
+                <span class="user-name" id="user-name"></span>
+                <button class="logout-btn" onclick="logout()">Déconnexion</button>
             </div>
         </header>
-        
-        <!-- Main Content -->
-        <main class="px-4 pb-8">
-            <div class="max-w-lg mx-auto">
-                
-                <!-- Section: Ton Cercle -->
-                <section id="section-contacts">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <span>🎯</span> Ton cercle
-                    </h2>
-                    
-                    <!-- 5 Contact Slots -->
-                    <div id="contacts-grid" class="space-y-3">
-                        <!-- Slots générés dynamiquement -->
-                    </div>
-                </section>
-                
-                <!-- Section: Conversation (visible quand contact sélectionné) -->
-                <section id="section-chat" class="hidden mt-8">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold flex items-center gap-2">
-                            <button id="btn-back-contacts" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
-                                ←
-                            </button>
-                            <span id="chat-contact-name">Conversation</span>
-                        </h2>
-                        <div class="flex gap-2">
-                            <button 
-                                id="btn-ping"
-                                class="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-full transition flex items-center gap-1"
-                                title="Juste dire 'je pense à toi'"
-                            >
-                                <span>💫</span> Ping
-                            </button>
-                            <button 
-                                id="btn-propose"
-                                class="px-3 py-1.5 text-sm bg-indigo-500/30 hover:bg-indigo-500/50 rounded-full transition flex items-center gap-1"
-                                title="Proposer un moment"
-                            >
-                                <span>📅</span> Proposer
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Messages -->
-                    <div id="messages-container" class="bg-white/5 rounded-2xl p-4 min-h-[300px] max-h-[400px] overflow-y-auto mb-4">
-                        <div id="messages-list" class="space-y-3">
-                            <!-- Messages générés dynamiquement -->
-                        </div>
-                        <p id="messages-empty" class="text-center text-white/50 text-sm py-8">
-                            Pas encore de messages.<br>
-                            <span class="text-white/70">Le silence aussi a du sens. 🌙</span><br>
-                            <span class="text-white/50 text-xs mt-2 block">(C'est pas TikTok ici, on respire.)</span>
-                        </p>
-                    </div>
-                    
-                    <!-- Input -->
-                    <form id="message-form" class="flex gap-2">
-                        <input 
-                            type="text" 
-                            id="message-input"
-                            placeholder="Écris quelque chose..."
-                            maxlength="500"
-                            class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
-                        >
-                        <button 
-                            type="submit"
-                            class="px-4 py-3 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition"
-                        >
-                            →
-                        </button>
-                    </form>
-                </section>
-                
+
+        <section class="contacts-section">
+            <div class="section-title">
+                Tes 5
+                <span class="contact-count" id="contact-count">0/5</span>
             </div>
-        </main>
+            <div class="contacts-grid" id="contacts-grid">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <section class="actions-section">
+            <button class="action-btn" onclick="openGiftModal()">
+                <span class="action-icon">🎁</span>
+                <div class="action-text">
+                    <div class="action-title">Offrir Cinq</div>
+                    <div class="action-subtitle">Génère un code pour inviter quelqu'un</div>
+                </div>
+            </button>
+        </section>
     </div>
 
-    <!-- ============================================ -->
-    <!-- Modal: Ajouter un contact -->
-    <!-- ============================================ -->
-    <div id="modal-add-contact" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-sm glow-soft">
-            <h3 class="text-lg font-semibold mb-4">Ajouter un contact</h3>
-            <p class="text-white/70 text-sm mb-4">
-                Choisis comme si ta vie en dépendait.<br>
-                <span class="text-indigo-400">(Spoiler: un peu, quand même.)</span>
-            </p>
-            <form id="add-contact-form">
-                <input 
-                    type="email" 
-                    id="contact-email"
-                    placeholder="Email de ton contact"
-                    required
-                    class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition mb-4"
-                >
-                <div class="flex gap-2">
-                    <button 
-                        type="button"
-                        id="btn-cancel-add"
-                        class="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition"
-                    >
-                        Annuler
-                    </button>
-                    <button 
-                        type="submit"
-                        class="flex-1 px-4 py-3 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition"
-                    >
-                        Ajouter
-                    </button>
-                </div>
-                <p id="add-contact-error" class="text-center text-red-400 text-sm mt-3 hidden"></p>
-            </form>
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <span class="chat-contact-name" id="chat-contact-name"></span>
+            <button class="chat-close" onclick="closeChat()">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-area">
+            <button class="ping-btn" onclick="sendPing()">👋</button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Message...">
+            <button class="chat-send" onclick="sendMessage()">→</button>
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- Modal: Confirmer suppression -->
-    <!-- ============================================ -->
-    <div id="modal-remove-contact" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-sm glow-soft">
-            <h3 class="text-lg font-semibold mb-4">Retirer ce contact ?</h3>
-            <p class="text-white/50 text-sm mb-4" id="remove-contact-text">
-                Tu libères une place dans ton cercle.
+    <!-- Gift Modal -->
+    <div class="modal-overlay" id="gift-modal">
+        <div class="modal">
+            <h2 class="modal-title">🎁 Offrir Cinq</h2>
+            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
+                Génère un code unique pour inviter quelqu'un sur Cinq.
             </p>
-            <div class="flex gap-2">
-                <button 
-                    type="button"
-                    id="btn-cancel-remove"
-                    class="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition"
-                >
-                    Annuler
-                </button>
-                <button 
-                    type="button"
-                    id="btn-confirm-remove"
-                    class="flex-1 px-4 py-3 bg-red-500/80 hover:bg-red-500 rounded-xl font-semibold transition"
-                >
-                    Retirer
+            <div id="gift-content">
+                <button class="copy-btn" style="width: 100%;" onclick="createGift()">
+                    Générer un code
                 </button>
             </div>
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeGiftModal()">
+                Fermer
+            </button>
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- Modal: Proposer un moment -->
-    <!-- ============================================ -->
-    <div id="modal-propose" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-sm glow-soft">
-            <h3 class="text-lg font-semibold mb-2 flex items-center gap-2">
-                <span>📅</span> Proposer un moment
-            </h3>
-            <p class="text-white/50 text-sm mb-4">
-                On se voit quand ?
-            </p>
-            <form id="propose-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm text-white/70 mb-1">Date et heure *</label>
-                    <input 
-                        type="datetime-local" 
-                        id="propose-datetime"
-                        required
-                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:border-indigo-400 transition"
-                    >
-                </div>
-                <div>
-                    <label class="block text-sm text-white/70 mb-1">Lieu <span class="text-white/40">(optionnel)</span></label>
-                    <input 
-                        type="text" 
-                        id="propose-location"
-                        placeholder="Ex: Café du coin, chez moi..."
-                        maxlength="100"
-                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
-                    >
-                </div>
-                <div>
-                    <label class="block text-sm text-white/70 mb-1">Message <span class="text-white/40">(optionnel)</span></label>
-                    <input 
-                        type="text" 
-                        id="propose-message"
-                        placeholder="Un petit mot..."
-                        maxlength="200"
-                        class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 transition"
-                    >
-                </div>
-                <div class="flex gap-2">
-                    <button 
-                        type="button"
-                        id="btn-cancel-propose"
-                        class="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 rounded-xl transition"
-                    >
-                        Annuler
-                    </button>
-                    <button 
-                        type="submit"
-                        class="flex-1 px-4 py-3 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition"
-                    >
-                        Envoyer 📅
-                    </button>
-                </div>
-                <p id="propose-error" class="text-center text-red-400 text-sm hidden"></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- SCRIPTS -->
-    <!-- ============================================ -->
-    <script src="/fun.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // ============================================
-        // CONFIG
-        // ============================================
-        const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNnrT412YHQ';
-        
-        const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // ============================================
-        // STATE
-        // ============================================
-        let currentUser = null;
+        const API_URL = '/api';
+        let session = null;
+        let user = null;
         let contacts = [];
-        let selectedContact = null;
-        let messages = [];
-        let proposals = []; // Proposals for current conversation
-        let contactToRemove = null;
-        let unreadContacts = new Set(); // Track contacts with unread messages
-        let realtimeChannel = null; // Supabase realtime channel
-        
-        // ============================================
-        // DOM
-        // ============================================
-        const $ = (id) => document.getElementById(id);
-        
-        const screens = {
-            loading: $('screen-loading'),
-            auth: $('screen-auth'),
-            app: $('screen-app')
-        };
-        
-        // ============================================
-        // HELPERS
-        // ============================================
-        function showScreen(name) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[name].classList.remove('hidden');
+        let currentChatContact = null;
+
+        function getToken() {
+            return session?.access_token;
         }
-        
-        function showError(elementId, message) {
-            const el = $(elementId);
-            if (el) {
-                el.textContent = message;
-                el.classList.remove('hidden');
-            }
+
+        function authHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            };
         }
-        
-        function hideError(elementId) {
-            const el = $(elementId);
-            if (el) el.classList.add('hidden');
-        }
-        
-        function getEmailPrefix(email) {
-            return email.split('@')[0];
-        }
-        
-        function formatTime(date) {
-            const d = new Date(date);
-            const now = new Date();
-            const diffMs = now - d;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMs / 3600000);
-            const diffDays = Math.floor(diffMs / 86400000);
+
+        async function init() {
+            // Check auth
+            const sessionStr = localStorage.getItem('cinq_session');
+            const userStr = localStorage.getItem('cinq_user');
             
-            if (diffMins < 1) return "à l'instant";
-            if (diffMins < 60) return `il y a ${diffMins}min`;
-            if (diffHours < 24) return `il y a ${diffHours}h`;
-            if (diffDays < 7) return `il y a ${diffDays}j`;
-            return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-        }
-        
-        // ============================================
-        // AUTH
-        // ============================================
-        async function initAuth() {
-            // First check localStorage (set by login.html)
-            const storedSession = localStorage.getItem('cinq_session');
-            const storedUser = localStorage.getItem('cinq_user');
-            
-            if (storedSession && storedUser) {
-                try {
-                    const sessionData = JSON.parse(storedSession);
-                    const userData = JSON.parse(storedUser);
-                    
-                    // Set session in Supabase client
-                    await db.auth.setSession({
-                        access_token: sessionData.access_token,
-                        refresh_token: sessionData.refresh_token
-                    });
-                    
-                    currentUser = userData;
-                    await loadApp();
-                    return;
-                } catch (e) {
-                    console.error('Error restoring session:', e);
-                    localStorage.removeItem('cinq_session');
-                    localStorage.removeItem('cinq_user');
-                }
-            }
-            
-            // Fallback to Supabase native session
-            const { data: { session } } = await db.auth.getSession();
-            
-            if (session?.user) {
-                currentUser = session.user;
-                await loadApp();
-            } else {
-                showScreen('auth');
-            }
-            
-            // Listen for auth changes
-            db.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session?.user) {
-                    currentUser = session.user;
-                    await loadApp();
-                } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    showScreen('auth');
-                }
-            });
-        }
-        
-        // Auth form handling
-        let authStep = 'email'; // 'email' | 'password' | 'signup'
-        
-        $('auth-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = $('auth-email').value.trim().toLowerCase();
-            const password = $('auth-password').value;
-            
-            hideError('auth-message');
-            
-            if (authStep === 'email') {
-                // Check if user exists (try to sign in with magic link approach)
-                $('auth-password-group').classList.remove('hidden');
-                $('auth-password').required = true;
-                authStep = 'password';
-                $('auth-password').focus();
+            if (!sessionStr || !userStr) {
+                window.location.href = '/login.html';
                 return;
             }
-            
-            if (authStep === 'password') {
-                try {
-                    // Try to sign in
-                    const { data, error } = await db.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    
-                    if (error) {
-                        if (error.message.includes('Invalid login credentials')) {
-                            // Maybe new user? Try signup
-                            const { data: signupData, error: signupError } = await db.auth.signUp({
-                                email,
-                                password
-                            });
-                            
-                            if (signupError) {
-                                showError('auth-message', signupError.message);
-                            } else if (signupData.user && !signupData.session) {
-                                showError('auth-message', 'Vérifie ton email pour confirmer ton compte.');
-                                $('auth-message').classList.remove('text-red-400');
-                                $('auth-message').classList.add('text-indigo-400');
-                            }
-                        } else {
-                            showError('auth-message', error.message);
-                        }
-                    }
-                } catch (err) {
-                    showError('auth-message', 'Erreur de connexion');
-                }
-            }
-        });
-        
-        // Logout moved to /settings page
-        
-        // ============================================
-        // APP LOADING
-        // ============================================
-        async function loadApp() {
-            showScreen('app');
-            
-            // Set greeting
-            const name = getEmailPrefix(currentUser.email);
-            $('user-greeting').textContent = `Salut, ${name}`;
-            
-            // Load contacts
+
+            session = JSON.parse(sessionStr);
+            user = JSON.parse(userStr);
+
+            document.getElementById('user-name').textContent = user.email.split('@')[0];
+
             await loadContacts();
-            
-            // Start realtime messaging 🔴
-            subscribeToMessages();
         }
-        
-        // ============================================
-        // API HELPER
-        // ============================================
-        async function apiCall(endpoint, method = 'GET', body = null) {
-            const session = await db.auth.getSession();
-            const token = session.data?.session?.access_token;
-            
-            if (!token) {
-                throw new Error('Not authenticated');
-            }
-            
-            const options = {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            };
-            
-            if (body && method !== 'GET') {
-                options.body = JSON.stringify(body);
-            }
-            
-            const res = await fetch(`/api/${endpoint}`, options);
-            const data = await res.json();
-            
-            if (!res.ok || !data.success) {
-                const err = new Error(data.error || 'API error');
-                err.code = data.details?.code;
-                err.status = res.status;
-                throw err;
-            }
-            
-            return data;
-        }
-        
-        // ============================================
-        // CONTACTS
-        // ============================================
+
         async function loadContacts() {
             try {
-                const data = await apiCall('contacts');
+                const res = await fetch(`${API_URL}/contacts`, { headers: authHeaders() });
+                const data = await res.json();
                 
-                // Transform API response to match expected format
-                contacts = (data.contacts || []).map(c => ({
-                    id: c.id,
-                    contact_user_id: c.user_id,
-                    created_at: c.added_at,
-                    contact: { id: c.user_id, email: c.email }
-                }));
-                
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+
+                contacts = data.contacts || [];
                 renderContacts();
-            } catch (err) {
-                console.error('Error loading contacts:', err);
-                contacts = [];
-                renderContacts();
+            } catch (e) {
+                console.error('Load contacts error:', e);
             }
         }
-        
+
         function renderContacts() {
-            const grid = $('contacts-grid');
+            const grid = document.getElementById('contacts-grid');
             grid.innerHTML = '';
-            
-            $('contacts-count').textContent = `${contacts.length}/5 contacts`;
-            
-            // Render existing contacts
-            contacts.forEach((contact, index) => {
-                const email = contact.contact?.email || 'Contact';
-                const name = getEmailPrefix(email);
-                const initial = name.charAt(0).toUpperCase();
-                const contactUserId = contact.contact_user_id;
-                const hasUnread = unreadContacts.has(contactUserId);
-                
+
+            for (let i = 0; i < 5; i++) {
+                const contact = contacts[i];
                 const slot = document.createElement('div');
-                slot.className = `contact-slot flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border ${hasUnread ? 'border-indigo-400' : 'border-white/10'} rounded-xl cursor-pointer`;
-                slot.innerHTML = `
-                    <div class="relative w-10 h-10 rounded-full bg-indigo-500/30 flex items-center justify-center text-lg font-semibold">
-                        ${initial}
-                        ${hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span>' : ''}
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium flex items-center gap-2">
-                            ${name}
-                            ${hasUnread ? '<span class="text-xs bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full">nouveau</span>' : ''}
-                        </p>
-                        <p class="text-xs text-white/40">${email}</p>
-                    </div>
-                    <button class="btn-remove-contact p-2 text-white/30 hover:text-red-400 transition" data-id="${contact.id}" data-name="${name}">
-                        ✕
-                    </button>
-                `;
+                slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
                 
-                // Click to open chat
-                slot.addEventListener('click', (e) => {
-                    if (!e.target.closest('.btn-remove-contact')) {
-                        openChat(contact);
-                    }
-                });
+                if (contact) {
+                    const name = contact.nickname || contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                    const initial = name.charAt(0).toUpperCase();
+                    
+                    slot.innerHTML = `
+                        <div class="contact-avatar">${initial}</div>
+                        <div class="contact-name">${name}</div>
+                    `;
+                    slot.onclick = () => openChat(contact);
+                } else {
+                    slot.innerHTML = `<span class="empty-plus">+</span>`;
+                    slot.onclick = () => alert('Demande à un ami de t\'ajouter avec ton ID !');
+                }
                 
                 grid.appendChild(slot);
-            });
-            
-            // Render empty slots
-            for (let i = contacts.length; i < 5; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'contact-slot empty flex items-center justify-center gap-2 p-3 bg-white/5 border border-white/20 rounded-xl cursor-pointer';
-                slot.innerHTML = `
-                    <span class="text-white/30">+</span>
-                    <span class="text-white/30 text-sm">Slot ${i + 1}</span>
-                `;
-                slot.addEventListener('click', () => openAddContactModal());
-                grid.appendChild(slot);
             }
-            
-            // Attach remove handlers
-            document.querySelectorAll('.btn-remove-contact').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = btn.dataset.id;
-                    const name = btn.dataset.name;
-                    openRemoveContactModal(id, name);
-                });
-            });
+
+            document.getElementById('contact-count').textContent = `${contacts.length}/5`;
         }
-        
-        // ============================================
-        // ADD CONTACT MODAL
-        // ============================================
-        function openAddContactModal() {
-            if (contacts.length >= 5) {
-                alert('Tu as déjà 5 contacts. Retire quelqu'un d'abord.');
-                return;
-            }
-            $('modal-add-contact').classList.remove('hidden');
-            $('contact-email').focus();
-        }
-        
-        function closeAddContactModal() {
-            $('modal-add-contact').classList.add('hidden');
-            $('contact-email').value = '';
-            hideError('add-contact-error');
-        }
-        
-        $('btn-cancel-add').addEventListener('click', closeAddContactModal);
-        
-        $('add-contact-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = $('contact-email').value.trim().toLowerCase();
-            hideError('add-contact-error');
-            
-            // Disable button while loading
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = '...';
-            
-            try {
-                await apiCall('contacts', 'POST', { email });
-                
-                closeAddContactModal();
-                await loadContacts();
-                
-                // 🎉 Celebrate the 5th contact!
-                if (contacts.length === 5 && typeof celebrateFifthContact === 'function') {
-                    celebrateFifthContact();
-                }
-            } catch (err) {
-                console.error('Add contact error:', err);
-                
-                // User-friendly error messages based on error code
-                let message = err.message || 'Erreur lors de l\'ajout';
-                
-                if (err.code === 'SELF_ADD') {
-                    message = 'Tu ne peux pas t\'ajouter toi-même 😅 (on a tous essayé)';
-                } else if (err.code === 'USER_NOT_FOUND') {
-                    message = 'Cette personne n\'est pas encore sur Cinq. Offre-lui un accès ! 🎁';
-                } else if (err.code === 'ALREADY_CONTACT') {
-                    message = 'Cette personne est déjà dans ton cercle (tu l\'aimes vraiment bien hein)';
-                } else if (err.code === 'LIMIT_REACHED') {
-                    message = '5 contacts max. C\'est le concept ! 🎯 Qualité > Quantité.';
-                }
-                
-                showError('add-contact-error', message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }
-        });
-        
-        // ============================================
-        // REMOVE CONTACT MODAL
-        // ============================================
-        function openRemoveContactModal(contactId, contactName) {
-            contactToRemove = contactId;
-            $('remove-contact-text').textContent = `Retirer ${contactName} de ton cercle ?`;
-            $('modal-remove-contact').classList.remove('hidden');
-        }
-        
-        function closeRemoveContactModal() {
-            $('modal-remove-contact').classList.add('hidden');
-            contactToRemove = null;
-        }
-        
-        $('btn-cancel-remove').addEventListener('click', closeRemoveContactModal);
-        
-        $('btn-confirm-remove').addEventListener('click', async () => {
-            if (!contactToRemove) return;
-            
-            // Disable button while loading
-            const btn = $('btn-confirm-remove');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '...';
-            
-            try {
-                await apiCall(`contacts?id=${contactToRemove}`, 'DELETE');
-                
-                closeRemoveContactModal();
-                
-                // If we were in chat with this contact, go back
-                if (selectedContact?.id === contactToRemove) {
-                    closeChat();
-                }
-                
-                await loadContacts();
-            } catch (err) {
-                console.error('Error removing contact:', err);
-                alert('Erreur lors de la suppression');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
-        });
-        
-        // ============================================
-        // CHAT / MESSAGES (via API)
-        // ============================================
-        
-        // Get auth token for API calls
-        async function getAccessToken() {
-            const { data: { session } } = await db.auth.getSession();
-            return session?.access_token || null;
-        }
-        
-        // API base URL
-        const API_BASE = '/.netlify/functions';
-        
+
         function openChat(contact) {
-            selectedContact = contact;
-            const name = getEmailPrefix(contact.contact?.email || 'Contact');
-            $('chat-contact-name').textContent = name;
-            
-            // Mark as read when opening conversation
-            if (unreadContacts.has(contact.contact_user_id)) {
-                unreadContacts.delete(contact.contact_user_id);
-                renderContacts(); // Update indicator
-            }
-            
-            $('section-contacts').classList.add('hidden');
-            $('section-chat').classList.remove('hidden');
-            
+            currentChatContact = contact;
+            document.getElementById('chat-contact-name').textContent = 
+                contact.nickname || contact.contact?.display_name || 'Contact';
+            document.getElementById('chat-panel').classList.add('open');
             loadMessages();
         }
-        
+
         function closeChat() {
-            selectedContact = null;
-            messages = [];
-            $('section-chat').classList.add('hidden');
-            $('section-contacts').classList.remove('hidden');
+            document.getElementById('chat-panel').classList.remove('open');
+            currentChatContact = null;
         }
-        
-        $('btn-back-contacts').addEventListener('click', closeChat);
-        
+
         async function loadMessages() {
-            if (!selectedContact) return;
-            
-            const contactUserId = selectedContact.contact_user_id;
+            if (!currentChatContact) return;
             
             try {
-                const token = await getAccessToken();
-                if (!token) {
-                    console.error('No auth token');
-                    return;
-                }
-                
-                // Load messages and proposals in parallel
-                const [msgResponse, propResponse] = await Promise.all([
-                    fetch(`${API_BASE}/messages?contact_id=${contactUserId}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }),
-                    fetch(`${API_BASE}/proposals?contact_id=${contactUserId}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    })
-                ]);
-                
-                const msgResult = await msgResponse.json();
-                const propResult = await propResponse.json();
-                
-                if (msgResult.success) {
-                    messages = msgResult.messages || [];
-                } else {
-                    console.error('Error loading messages:', msgResult.error);
-                    messages = [];
-                }
-                
-                if (propResult.success) {
-                    proposals = propResult.proposals || [];
-                } else {
-                    console.error('Error loading proposals:', propResult.error);
-                    proposals = [];
-                }
-                
-                renderMessages();
-            } catch (err) {
-                console.error('Error loading messages:', err);
-                messages = [];
-                proposals = [];
-                renderMessages();
+                const res = await fetch(
+                    `${API_URL}/messages?contact_id=${currentChatContact.contact_user_id}`,
+                    { headers: authHeaders() }
+                );
+                const data = await res.json();
+                renderMessages(data.messages || []);
+            } catch (e) {
+                console.error('Load messages error:', e);
             }
         }
-        
-        function renderMessages() {
-            const list = $('messages-list');
-            const empty = $('messages-empty');
-            
-            // Combine messages and proposals, sort by created_at
-            const allItems = [
-                ...messages.map(m => ({ ...m, type: 'message' })),
-                ...proposals.map(p => ({ ...p, type: 'proposal' }))
-            ].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            
-            if (allItems.length === 0) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
+
+        function renderMessages(messages) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--color-text-muted);">Aucun message</p>';
                 return;
             }
-            
-            empty.classList.add('hidden');
-            list.innerHTML = allItems.map(item => {
-                if (item.type === 'proposal') {
-                    return renderProposal(item);
-                }
-                
-                const isMine = item.is_mine || item.sender_id === currentUser.id;
-                const isPing = item.is_ping;
-                
-                if (isPing) {
-                    return `
-                        <div class="message text-center">
-                            <span class="inline-block px-3 py-1 bg-indigo-500/20 rounded-full text-sm">
-                                💫 ${isMine ? 'Tu as envoyé un ping' : 'Ping reçu'}
-                            </span>
-                            <p class="text-xs text-white/30 mt-1">${formatTime(item.created_at)}</p>
-                        </div>
-                    `;
-                }
-                
-                return `
-                    <div class="message ${isMine ? 'text-right' : 'text-left'}">
-                        <div class="inline-block max-w-[80%] px-4 py-2 rounded-2xl ${isMine ? 'bg-indigo-500/30 rounded-br-sm' : 'bg-white/10 rounded-bl-sm'}">
-                            <p class="text-sm">${escapeHtml(item.content)}</p>
-                        </div>
-                        <p class="text-xs text-white/30 mt-1">${formatTime(item.created_at)}</p>
-                    </div>
-                `;
-            }).join('');
-            
-            // Scroll to bottom avec animation smooth
-            scrollToBottom();
-        }
-        
-        function renderProposal(prop) {
-            const isMine = prop.is_mine || prop.sender_id === currentUser.id;
-            const proposedDate = new Date(prop.proposed_at);
-            const dateStr = proposedDate.toLocaleDateString('fr-FR', { 
-                weekday: 'short', 
-                day: 'numeric', 
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
+
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                const isSent = msg.sender_id === user.id;
+                div.className = `chat-message ${isSent ? 'sent' : 'received'} ${msg.is_ping ? 'ping' : ''}`;
+                div.textContent = msg.content;
+                container.appendChild(div);
             });
-            
-            const statusBadge = {
-                'pending': '<span class="text-yellow-400">⏳ En attente</span>',
-                'accepted': '<span class="text-green-400">✅ Accepté</span>',
-                'declined': '<span class="text-red-400">❌ Décliné</span>',
-                'expired': '<span class="text-white/40">⏰ Expiré</span>'
-            }[prop.status] || '';
-            
-            const actionButtons = (!isMine && prop.status === 'pending') ? `
-                <div class="flex gap-2 mt-3">
-                    <button onclick="respondProposal('${prop.id}', 'accept')" class="flex-1 px-3 py-2 bg-green-500/30 hover:bg-green-500/50 rounded-lg text-sm transition">
-                        ✅ J'accepte
-                    </button>
-                    <button onclick="respondProposal('${prop.id}', 'decline')" class="flex-1 px-3 py-2 bg-red-500/30 hover:bg-red-500/50 rounded-lg text-sm transition">
-                        ❌ Pas dispo
-                    </button>
-                </div>
-            ` : '';
-            
-            return `
-                <div class="message ${isMine ? 'text-right' : 'text-left'}">
-                    <div class="inline-block max-w-[85%] px-4 py-3 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 ${isMine ? 'rounded-br-sm' : 'rounded-bl-sm'}">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-lg">📅</span>
-                            <span class="font-medium">${isMine ? 'Tu proposes' : 'Proposition reçue'}</span>
-                        </div>
-                        <div class="text-sm space-y-1">
-                            <p><strong>📆 ${dateStr}</strong></p>
-                            ${prop.location ? `<p>📍 ${escapeHtml(prop.location)}</p>` : ''}
-                            ${prop.message ? `<p class="text-white/70 italic">"${escapeHtml(prop.message)}"</p>` : ''}
-                        </div>
-                        <div class="mt-2 text-xs">${statusBadge}</div>
-                        ${actionButtons}
-                    </div>
-                    <p class="text-xs text-white/30 mt-1">${formatTime(prop.created_at)}</p>
-                </div>
-            `;
+
+            container.scrollTop = container.scrollHeight;
         }
-        
-        async function respondProposal(proposalId, action) {
-            try {
-                const token = await getAccessToken();
-                if (!token) {
-                    alert('Session expirée. Reconnecte-toi.');
-                    return;
-                }
-                
-                const response = await fetch(`${API_BASE}/proposals`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        proposal_id: proposalId,
-                        action: action
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Update local proposal
-                    const idx = proposals.findIndex(p => p.id === proposalId);
-                    if (idx >= 0) {
-                        proposals[idx] = result.proposal;
-                    }
-                    renderMessages();
-                } else {
-                    alert(result.error || 'Erreur');
-                }
-            } catch (err) {
-                console.error('Error responding to proposal:', err);
-                alert('Erreur lors de la réponse');
-            }
-        }
-        
-        function scrollToBottom() {
-            const container = $('messages-container');
-            // Use requestAnimationFrame for smooth scroll after DOM update
-            requestAnimationFrame(() => {
-                container.scrollTo({
-                    top: container.scrollHeight,
-                    behavior: 'smooth'
-                });
-            });
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // Send message via API
-        $('message-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = $('message-input');
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
             const content = input.value.trim();
-            
-            if (!content || !selectedContact) return;
-            
-            // Disable input while sending
-            input.disabled = true;
-            
+            if (!content || !currentChatContact) return;
+
             try {
-                const token = await getAccessToken();
-                if (!token) {
-                    alert('Session expirée. Reconnecte-toi.');
-                    return;
-                }
-                
-                const response = await fetch(`${API_BASE}/messages`, {
+                await fetch(`${API_URL}/messages`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
-                        contact_id: selectedContact.contact_user_id,
-                        content: content
+                        contact_id: currentChatContact.contact_user_id,
+                        content
                     })
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    input.value = '';
-                    // Add message locally for instant feedback
-                    messages.push(result.message);
-                    renderMessages();
-                } else {
-                    console.error('Error sending message:', result.error);
-                    if (result.error.includes('not available')) {
-                        alert('La messagerie sera bientôt disponible !');
-                    }
-                }
-            } catch (err) {
-                console.error('Error sending message:', err);
-            } finally {
-                input.disabled = false;
-                input.focus();
+                input.value = '';
+                loadMessages();
+            } catch (e) {
+                console.error('Send error:', e);
             }
-        });
-        
-        // Send ping via API 💫
-        $('btn-ping').addEventListener('click', async () => {
-            if (!selectedContact) return;
-            
-            const btn = $('btn-ping');
-            btn.disabled = true;
-            btn.classList.add('ping-sent');
+        }
+
+        async function sendPing() {
+            if (!currentChatContact) return;
             
             try {
-                const token = await getAccessToken();
-                if (!token) {
-                    alert('Session expirée. Reconnecte-toi.');
-                    return;
-                }
-                
-                const response = await fetch(`${API_BASE}/messages`, {
+                await fetch(`${API_URL}/messages`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
-                        contact_id: selectedContact.contact_user_id,
+                        contact_id: currentChatContact.contact_user_id,
                         is_ping: true
                     })
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Add ping locally for instant feedback
-                    messages.push(result.message);
-                    renderMessages();
-                } else {
-                    console.error('Error sending ping:', result.error);
-                }
-            } catch (err) {
-                console.error('Error sending ping:', err);
+                loadMessages();
+            } catch (e) {
+                console.error('Ping error:', e);
             }
-            
-            setTimeout(() => {
-                btn.classList.remove('ping-sent');
-                btn.disabled = false;
-            }, 500);
+        }
+
+        // Enter to send
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
-        
-        // ============================================
-        // PROPOSE MODAL 📅
-        // ============================================
-        
-        function openProposeModal() {
-            if (!selectedContact) return;
-            
-            // Set minimum datetime to now
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset() + 30);
-            $('propose-datetime').min = now.toISOString().slice(0, 16);
-            $('propose-datetime').value = '';
-            $('propose-location').value = '';
-            $('propose-message').value = '';
-            hideError('propose-error');
-            
-            $('modal-propose').classList.remove('hidden');
-            $('propose-datetime').focus();
+
+        function openGiftModal() {
+            document.getElementById('gift-modal').classList.add('open');
+            document.getElementById('gift-content').innerHTML = `
+                <button class="copy-btn" style="width: 100%;" onclick="createGift()">
+                    Générer un code
+                </button>
+            `;
         }
-        
-        function closeProposeModal() {
-            $('modal-propose').classList.add('hidden');
+
+        function closeGiftModal() {
+            document.getElementById('gift-modal').classList.remove('open');
         }
-        
-        $('btn-propose').addEventListener('click', openProposeModal);
-        $('btn-cancel-propose').addEventListener('click', closeProposeModal);
-        
-        $('propose-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError('propose-error');
-            
-            const datetime = $('propose-datetime').value;
-            const location = $('propose-location').value.trim();
-            const message = $('propose-message').value.trim();
-            
-            if (!datetime) {
-                showError('propose-error', 'Choisis une date et heure');
-                return;
-            }
-            
-            const proposedDate = new Date(datetime);
-            if (proposedDate <= new Date()) {
-                showError('propose-error', 'La date doit être dans le futur');
-                return;
-            }
-            
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '...';
-            
+
+        async function createGift() {
             try {
-                const token = await getAccessToken();
-                if (!token) {
-                    alert('Session expirée. Reconnecte-toi.');
+                const res = await fetch(`${API_URL}/gift?action=create`, {
+                    method: 'POST',
+                    headers: authHeaders()
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.error);
                     return;
                 }
-                
-                const response = await fetch(`${API_BASE}/proposals`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contact_id: selectedContact.contact_user_id,
-                        proposed_at: proposedDate.toISOString(),
-                        location: location || null,
-                        message: message || null
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    closeProposeModal();
-                    // Add proposal locally
-                    proposals.push(result.proposal);
-                    renderMessages();
-                } else {
-                    showError('propose-error', result.error || 'Erreur');
-                }
-            } catch (err) {
-                console.error('Error creating proposal:', err);
-                showError('propose-error', 'Erreur lors de l\'envoi');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Envoyer 📅';
-            }
-        });
-        
-        // ============================================
-        // REALTIME MESSAGING 🔴
-        // ============================================
-        
-        // Subtle notification sound (base64 encoded short beep)
-        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ZkYJ1bW1+i5SVi4J6dnl9fHZwbG5ydHh7fH18e3p5eHd3eHl6e3t6eHZ1dXZ3eHl5eHd2dXV2d3h4eHd2dXV2d3d3d3Z2dnZ2d3d3d3Z2dnZ2dnZ2dnZ2dnZ2dnZ2');
-        notificationSound.volume = 0.3; // Subtle volume
-        
-        function playNotificationSound() {
-            try {
-                notificationSound.currentTime = 0;
-                notificationSound.play().catch(() => {}); // Ignore if autoplay blocked
+
+                document.getElementById('gift-content').innerHTML = `
+                    <div class="gift-code-display">
+                        <div class="gift-code">${data.gift.code}</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyGift('${data.gift.shareUrl}')">
+                        📋 Copier le lien
+                    </button>
+                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; text-align: center;">
+                        Valable 30 jours
+                    </p>
+                `;
             } catch (e) {
-                // Silently fail - sound is optional
+                alert('Erreur lors de la création');
             }
         }
-        
-        function subscribeToMessages() {
-            if (!currentUser) return;
-            
-            // Unsubscribe from previous channel if exists
-            if (realtimeChannel) {
-                db.removeChannel(realtimeChannel);
-            }
-            
-            realtimeChannel = db.channel('messages-realtime')
-                .on('postgres_changes', 
-                    { 
-                        event: 'INSERT', 
-                        schema: 'public', 
-                        table: 'messages',
-                        filter: `receiver_id=eq.${currentUser.id}`
-                    },
-                    (payload) => {
-                        const msg = payload.new;
-                        
-                        // Only process messages TO me (not from me)
-                        if (msg.receiver_id !== currentUser.id) return;
-                        
-                        const senderId = msg.sender_id;
-                        
-                        // Check if we're currently viewing this conversation
-                        if (selectedContact && selectedContact.contact_user_id === senderId) {
-                            // Add message directly to the conversation
-                            const newMessage = {
-                                id: msg.id,
-                                sender_id: msg.sender_id,
-                                receiver_id: msg.receiver_id,
-                                content: msg.content,
-                                is_ping: msg.is_ping,
-                                created_at: msg.created_at,
-                                is_mine: false
-                            };
-                            
-                            // Avoid duplicates
-                            if (!messages.find(m => m.id === msg.id)) {
-                                messages.push(newMessage);
-                                renderMessages();
-                                playNotificationSound();
-                            }
-                        } else {
-                            // Not viewing this conversation - mark contact as having unread
-                            unreadContacts.add(senderId);
-                            renderContacts(); // Re-render to show indicator
-                            playNotificationSound();
-                        }
-                    }
-                )
-                .subscribe((status) => {
-                    console.log('[Realtime] Status:', status);
-                });
+
+        function copyGift(url) {
+            navigator.clipboard.writeText(url);
+            alert('Lien copié !');
         }
-        
-        // ============================================
-        // INIT
-        // ============================================
-        initAuth();
-    </script>
-    
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-                    .catch(err => console.log('[PWA] Service Worker registration failed:', err));
-            });
+
+        function logout() {
+            localStorage.removeItem('cinq_session');
+            localStorage.removeItem('cinq_user');
+            window.location.href = '/login.html';
         }
+
+        init();
     </script>
 </body>
 </html>
