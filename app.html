@@ -310,7 +310,17 @@
         }
         
         .nav-icon {
-            font-size: 1.5rem;
+            width: 22px;
+            height: 22px;
+            transition: stroke 0.2s, transform 0.2s;
+        }
+        
+        .nav-item:hover .nav-icon {
+            transform: scale(1.1);
+        }
+        
+        .nav-item.active .nav-icon {
+            stroke: var(--color-brand);
         }
         
         .nav-label {
@@ -1755,7 +1765,10 @@
                     <div class="composer-footer">
                         <div class="composer-actions">
                             <button class="composer-btn" onclick="triggerFileUpload()" type="button" aria-label="Ajouter une photo">
-                                <span aria-hidden="true">📷</span> Photo
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                                <span>Photo</span>
                             </button>
                         </div>
                         <div style="display:flex;align-items:center;gap:var(--space-4);">
@@ -1780,7 +1793,9 @@
                 <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste de tes 5 contacts"></div>
                 
                 <button class="action-btn" onclick="openGiftModal()" type="button">
-                    <span class="action-icon" aria-hidden="true">🎁</span>
+                    <svg class="action-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    </svg>
                     <div>
                         <div class="action-title">Offrir Cinq</div>
                         <div class="action-subtitle">Invite quelqu'un qui compte vraiment</div>
@@ -1793,7 +1808,11 @@
                 <div class="profile-header">
                     <button class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" type="button" aria-label="Changer ma photo de profil">
                         <span id="profile-avatar-initial" aria-hidden="true">?</span>
-                        <div class="profile-avatar-overlay" aria-hidden="true">📷</div>
+                        <div class="profile-avatar-overlay" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                        </div>
                     </button>
                     <label for="avatar-input" class="sr-only">Choisir une nouvelle photo de profil</label>
                     <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="uploadAvatar(this)" aria-describedby="avatar-input-desc">
@@ -1855,15 +1874,21 @@
         <!-- BOTTOM NAV -->
         <nav class="bottom-nav" role="tablist" aria-label="Navigation principale">
             <button class="nav-item active" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="true" aria-controls="tab-feed" type="button">
-                <span class="nav-icon" aria-hidden="true">📰</span>
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+                </svg>
                 <span class="nav-label">Feed</span>
             </button>
             <button class="nav-item" id="nav-contacts" data-tab="contacts" onclick="switchTab('contacts')" role="tab" aria-selected="false" aria-controls="tab-contacts" type="button">
-                <span class="nav-icon" aria-hidden="true">👥</span>
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2L22 9L18 21H6L2 9L12 2Z"/>
+                </svg>
                 <span class="nav-label">Tes 5</span>
             </button>
             <button class="nav-item" id="nav-profil" data-tab="profil" onclick="switchTab('profil')" role="tab" aria-selected="false" aria-controls="tab-profil" type="button">
-                <span class="nav-icon" aria-hidden="true">👤</span>
+                <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
                 <span class="nav-label">Profil</span>
             </button>
         </nav>
@@ -1886,7 +1911,9 @@
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
         <div class="chat-input-area">
             <button class="ping-btn" onclick="sendPing()" type="button" aria-label="Envoyer un coucou">
-                <span aria-hidden="true">👋</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2L22 9L18 21H6L2 9L12 2Z"/>
+                </svg>
             </button>
             <label for="chat-input" class="sr-only">Écrire un message</label>
             <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500" autocomplete="off">
@@ -1899,7 +1926,12 @@
     <!-- Gift Modal -->
     <div class="modal-overlay" id="gift-modal" role="dialog" aria-modal="true" aria-labelledby="gift-modal-title" aria-hidden="true">
         <div class="modal">
-            <h2 class="modal-title" id="gift-modal-title"><span aria-hidden="true">🎁</span> Offrir Cinq</h2>
+            <h2 class="modal-title" id="gift-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 8px;">
+                    <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                </svg>
+                Offrir Cinq
+            </h2>
             <p style="color:var(--color-text-muted);margin-bottom:var(--space-4);">Choisis bien. Cinq n'est pas pour tout le monde.</p>
             <div id="gift-content">
                 <button class="save-btn" style="width:100%;" onclick="createGift()" type="button">Générer un code</button>
