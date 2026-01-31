@@ -134,6 +134,93 @@
         
         /* Hide elements */
         .hidden { display: none !important; }
+        
+        /* Theme toggle */
+        .theme-toggle-settings {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        .theme-toggle-settings:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+        .theme-toggle-settings .icon-sun,
+        .theme-toggle-settings .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .theme-toggle-settings .icon-sun {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+        .theme-toggle-settings .icon-moon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.5);
+        }
+        [data-theme="light"] .theme-toggle-settings .icon-sun {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.5);
+        }
+        [data-theme="light"] .theme-toggle-settings .icon-moon {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+        [data-theme="light"] .theme-toggle-settings {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        [data-theme="light"] .theme-toggle-settings .icon-sun,
+        [data-theme="light"] .theme-toggle-settings .icon-moon {
+            color: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Light mode adjustments for settings */
+        [data-theme="light"] .gradient-bg {
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%);
+        }
+        [data-theme="light"] .text-white {
+            color: #1a202c !important;
+        }
+        [data-theme="light"] .text-white\/50,
+        [data-theme="light"] .text-white\/60,
+        [data-theme="light"] .text-white\/70 {
+            color: rgba(26, 32, 44, 0.6) !important;
+        }
+        [data-theme="light"] .text-white\/30,
+        [data-theme="light"] .text-white\/40 {
+            color: rgba(26, 32, 44, 0.4) !important;
+        }
+        [data-theme="light"] .border-white\/10,
+        [data-theme="light"] .border-white\/20 {
+            border-color: rgba(26, 32, 44, 0.1) !important;
+        }
+        [data-theme="light"] .bg-white\/5,
+        [data-theme="light"] .bg-white\/10 {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+        }
+        [data-theme="light"] .settings-card {
+            background: rgba(255, 255, 255, 0.7) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        [data-theme="light"] input {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+            color: #1a202c !important;
+        }
+        [data-theme="light"] input::placeholder {
+            color: rgba(26, 32, 44, 0.4) !important;
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-white">
@@ -185,10 +272,14 @@
                 <a href="/app" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition" aria-label="Retour">
                     ←
                 </a>
-                <div>
+                <div class="flex-1">
                     <h1 class="text-lg font-semibold">Paramètres</h1>
                     <p class="text-xs text-white/60" id="user-email-display">Chargement...</p>
                 </div>
+                <button class="theme-toggle-settings" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
             </div>
         </header>
         
