@@ -93,8 +93,8 @@ Rendre Cinq complet et parfait pour le matin. ✅ ON TRACK!
 ```
 
 ## 🔜 Prochaines tâches
-- [ ] Accessibility audit complet
-- [ ] Notifications polish
-- [ ] Final QA pass
-- [ ] Documentation finale
+- [x] Accessibility audit complet ✅
+- [x] Notifications polish ✅
+- [x] Final QA pass ✅
+- [x] Documentation finale ✅ (CHANGELOG.md créé, README.md mis à jour)
 - [ ] Performance metrics

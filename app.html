@@ -46,9 +46,10 @@
     <link rel="stylesheet" href="/css/theme.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
-    <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
-    </script>
+    <script src="/js/theme.js"></script>
+    
+    <!-- Shared utilities (escapeHtml, authHeaders, showToast, etc.) -->
+    <script src="/js/shared.js"></script>
     
     <style>
         /* ===== ACCESSIBILITY: SKIP LINK ===== */
@@ -3514,63 +3515,8 @@
             }
         });
 
-        // ===== TOAST =====
-        function showToast(options) {
-            const { type = 'info', title, message, duration = 4000, onClick } = options;
-            const container = document.getElementById('toast-container');
-            const icons = { success: '✓', error: '✕', notification: '💬', info: 'ℹ' };
-            
-            // Haptic feedback based on toast type
-            if (type === 'success') triggerHaptic('success');
-            else if (type === 'error') triggerHaptic('error');
-            else if (type === 'notification') triggerHaptic('tap');
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
-            const iconSpan = document.createElement('span');
-            iconSpan.className = 'toast-icon';
-            iconSpan.textContent = icons[type] || icons.info;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'toast-content';
-            
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'toast-title';
-            titleDiv.textContent = title || '';
-            contentDiv.appendChild(titleDiv);
-            
-            if (message) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'toast-message';
-                messageDiv.textContent = message;
-                contentDiv.appendChild(messageDiv);
-            }
-            
-            toast.appendChild(iconSpan);
-            toast.appendChild(contentDiv);
-            
-            if (onClick) {
-                toast.style.cursor = 'pointer';
-                toast.onclick = () => { onClick(); removeToast(toast); };
-            }
-            
-            container.appendChild(toast);
-            setTimeout(() => removeToast(toast), duration);
-        }
-        
-        function removeToast(toast) {
-            if (!toast.parentNode) return;
-            toast.classList.add('toast-out');
-            setTimeout(() => toast.remove(), 300);
-        }
-
-        // ===== AUTH =====
-        function getToken() { return session?.access_token; }
-        function authHeaders() {
-            return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` };
-        }
+        // ===== TOAST & AUTH =====
+        // showToast(), getToken(), and authHeaders() now provided by /js/shared.js
 
         // ===== INIT =====
         async function init() {
@@ -4818,18 +4764,7 @@
         }
 
         // ===== UTILS =====
-        function formatTime(dateStr) {
-            const date = new Date(dateStr);
-            const now = new Date();
-            const diff = Math.floor((now - date) / 1000);
-            
-            if (diff < 60) return 'À l\'instant';
-            if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
-            if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`;
-            if (diff < 604800) return `il y a ${Math.floor(diff / 86400)}j`;
-            
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-        }
+        // formatTime() now provided by /js/shared.js
         
         // Smart time formatting for chat messages
         function formatMessageTime(dateStr) {
@@ -4878,10 +4813,7 @@
             return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined });
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-        }
+        // escapeHtml() now provided by /js/shared.js
 
         // ===== KEYBOARD =====
         document.addEventListener('keydown', (e) => {
@@ -4917,25 +4849,8 @@
             setTimeout(() => btn.classList.remove('rippling'), 600);
         });
         
-        // ===== HAPTIC FEEDBACK (VIBRATION API) =====
-        function triggerHaptic(pattern = 'tap') {
-            if (!navigator.vibrate) return;
-            
-            switch (pattern) {
-                case 'tap':
-                    navigator.vibrate(10);
-                    break;
-                case 'success':
-                    navigator.vibrate([10, 50, 20]);
-                    break;
-                case 'error':
-                    navigator.vibrate([30, 50, 30, 50, 30]);
-                    break;
-                case 'ping':
-                    navigator.vibrate([20, 30, 40]);
-                    break;
-            }
-        }
+        // ===== HAPTIC FEEDBACK =====
+        // triggerHaptic() now provided by /js/shared.js
         
         // Close menus on outside click
         document.addEventListener('click', (e) => {

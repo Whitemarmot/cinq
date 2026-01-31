@@ -133,48 +133,61 @@ Tables Supabase:
 
 ```
 cinq/
-├── index.html              # Landing page
-├── gift.html               # Flow achat cadeau (4 écrans)
-├── redeem.html             # Activation code + création compte
-├── login.html              # Page de connexion
-├── app.html                # Dashboard utilisateur (5 contacts)
-├── 404.html                # Page d'erreur personnalisée
-├── error.html              # Page d'erreur générique
+├── 📄 Pages HTML
+│   ├── index.html              # Landing page (redesign v2.0)
+│   ├── app.html                # Dashboard utilisateur (5 contacts)
+│   ├── feed.html               # Feed des posts (infinite scroll)
+│   ├── gift.html               # Flow achat cadeau
+│   ├── redeem.html             # Activation code + création compte
+│   ├── login.html              # Page de connexion
+│   ├── register.html           # Inscription (onboarding amélioré)
+│   ├── settings.html           # Paramètres utilisateur
+│   ├── 404.html, error.html    # Pages d'erreur
+│   ├── offline.html            # Page offline PWA
+│   ├── FAQ.html                # Questions fréquentes
+│   └── privacy.html, terms.html # Pages légales
 │
-├── netlify/
-│   └── functions/          # API serverless
-│       ├── waitlist.js     # Inscriptions waitlist
-│       ├── gift-create.js  # Création codes cadeaux
-│       ├── gift-verify.js  # Vérification codes
-│       ├── gift-redeem.js  # Activation codes
-│       ├── auth-register.js # Inscription avec code
-│       ├── auth-login.js   # Connexion
-│       ├── user-profile.js # Profil & contacts
-│       ├── contacts.js     # API contacts (CRUD)
-│       ├── messages.js     # API messages
-│       └── btcpay-webhook.js # Webhook paiements
+├── 🎨 Assets & Styles
+│   ├── css/                    # CSS minifiés
+│   ├── js/                     # JavaScript minifiés
+│   ├── design/                 # Design system source
+│   ├── assets/                 # Images, icônes, splash screens
+│   ├── animations.css/.js      # Micro-animations
+│   └── styles.css/.min.css     # Styles principaux
 │
-├── supabase/
-│   ├── FULL_SCHEMA.sql     # Schema complet (à exécuter)
-│   └── migrations/         # Migrations individuelles
+├── ⚙️ API Backend
+│   ├── api/                    # Vercel/Netlify Functions
+│   │   ├── auth.js             # Authentification
+│   │   ├── posts.js            # Feed & Posts (cursor pagination)
+│   │   ├── contacts.js         # Gestion contacts (optimisé)
+│   │   ├── messages.js         # Messagerie
+│   │   ├── gift.js             # Codes cadeaux
+│   │   └── _*.js               # Helpers (validation, rate-limit, etc.)
+│   └── netlify/functions/      # Backup Netlify functions
 │
-├── infra/
-│   └── docker-compose.yml  # BTCPay Server config
+├── 🗄️ Database
+│   ├── supabase/               # Migrations Supabase
+│   └── supabase-schema.sql     # Schema complet
 │
-├── design/
-│   └── app-design.md       # Specs UX anti-addiction
+├── 📚 Documentation
+│   ├── CHANGELOG.md            # 🆕 Historique des versions
+│   ├── ARCHITECTURE-REVIEW.md  # 🆕 Analyse architecture
+│   ├── DESIGN-SYSTEM.md        # 🆕 Design system v3.1
+│   ├── API-IMPROVEMENTS.md     # 🆕 Optimisations backend
+│   ├── SECURITY-AUDIT.md       # 🆕 Audit sécurité
+│   ├── QA-REPORT.md            # 🆕 Rapport qualité
+│   ├── ERROR-HANDLING.md       # 🆕 Gestion erreurs
+│   └── docs/                   # Documentation détaillée
 │
-├── docs/
-│   ├── API.md              # Documentation API
-│   ├── DEPLOYMENT.md       # Guide de déploiement
-│   ├── AUTH-SYSTEM.md      # Système d'authentification
-│   └── security-audit.md   # Audit de sécurité
+├── 🔧 Config
+│   ├── vercel.json             # Configuration Vercel
+│   ├── netlify.toml            # Configuration Netlify
+│   ├── manifest.json           # PWA manifest
+│   ├── service-worker.js       # Service worker (cache)
+│   └── package.json            # Dépendances Node.js
 │
-├── netlify.toml            # Configuration Netlify
-├── package.json            # Dépendances Node.js
-├── .env.example            # Template variables d'environnement
-├── SPEC.md                 # Spécifications produit
-└── PROGRESS.md             # Journal de bord
+└── 🧪 Tests
+    └── tests/                  # Tests E2E (35 tests)
 ```
 
 ---
@@ -429,11 +442,21 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les règles complètes.
 - [x] Ping / Présence
 - [x] **Feed & Posts** — Partage des posts avec tes 5 contacts
 
-### 🔲 Phase 4 — Polish
+### ✅ Phase 4 — Polish (v2.0) 🆕
+- [x] **Chat UX** — WhatsApp-style avec read receipts
+- [x] **Infinite scroll** — Cursor-based pagination
+- [x] **Push notifications** — Temps réel
+- [x] **PWA améliorée** — Offline support, install prompt
+- [x] **Design System v3.1** — Dark/light mode, animations premium
+- [x] **Accessibilité WCAG AA** — Audit complet
+- [x] **Performance backend** — N+1 queries éliminées
+
+### 🔲 Phase 5 — Expansion
 - [ ] Apps mobiles (React Native ou Flutter)
 - [ ] Vault chiffré (premium)
 - [ ] Fédération multi-pods
 - [ ] Chiffrement E2E (Signal Protocol)
+- [ ] WebSockets temps réel (remplacer polling)
 
 ---
 

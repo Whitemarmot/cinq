@@ -435,7 +435,7 @@ Intervalle: `50ms` entre chaque élément.
 
 ## 🔄 Changelog
 
-### v3.1 (2025-02-01)
+### v3.1 (2025-02-01) — Night Sprint Edition
 - ✅ Amélioration contraste WCAG AA pour `--color-text-muted` en light mode
 - ✅ Ajout tokens d'accessibilité (`--touch-target-*`, `--focus-ring-*`)
 - ✅ Ajout tokens de line-height (`--leading-*`)
