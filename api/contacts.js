@@ -6,11 +6,7 @@ const supabase = createClient(
 );
 
 const MAX_CONTACTS = 5;
-
-// Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function getUser(req) {
@@ -26,6 +22,12 @@ async function getUser(req) {
     }
 }
 
+// Helper to get user info from auth.users (not public.users)
+async function getUserEmail(userId) {
+    const { data } = await supabase.auth.admin.getUserById(userId);
+    return data?.user?.email || null;
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -35,50 +37,34 @@ export default async function handler(req, res) {
 
     const user = await getUser(req);
     if (!user) {
-        return res.status(401).json({ 
-            error: 'Non authentifié',
-            hint: 'Ajoute le header Authorization: Bearer <token>'
-        });
+        return res.status(401).json({ error: 'Non authentifié' });
     }
 
     try {
-        // ============ GET - List contacts, search by email, or get followers ============
+        // ============ GET ============
         if (req.method === 'GET') {
             const { action, search } = req.query;
 
-            // -------- Search user by email --------
+            // Search user by email
             if (action === 'search') {
                 if (!search) {
-                    return res.status(400).json({ 
-                        error: 'Paramètre search requis',
-                        hint: 'GET /api/contacts?action=search&search=email@example.com'
-                    });
+                    return res.status(400).json({ error: 'Paramètre search requis' });
                 }
 
                 const email = search.toLowerCase().trim();
-                
                 if (!EMAIL_REGEX.test(email)) {
-                    return res.status(400).json({ 
-                        error: 'Format email invalide',
-                        hint: 'Vérifie que l\'adresse est bien formée (ex: nom@domaine.com)'
-                    });
+                    return res.status(400).json({ error: 'Format email invalide' });
                 }
 
-                // Don't let users search for themselves
                 if (email === user.email?.toLowerCase()) {
-                    return res.status(400).json({ 
-                        error: 'Tu ne peux pas t\'ajouter toi-même !',
-                        hint: 'Cherche l\'email d\'un ami'
-                    });
+                    return res.status(400).json({ error: 'Tu ne peux pas t\'ajouter toi-même !' });
                 }
 
-                const { data: foundUser, error } = await supabase
-                    .from('users')
-                    .select('id, email, display_name, avatar_url')
-                    .eq('email', email)
-                    .single();
+                // Search in auth.users via admin API
+                const { data: { users }, error } = await supabase.auth.admin.listUsers();
+                const foundUser = users?.find(u => u.email?.toLowerCase() === email);
 
-                if (error || !foundUser) {
+                if (!foundUser) {
                     return res.status(404).json({ 
                         error: 'Utilisateur non trouvé',
                         hint: 'Cet email n\'est pas inscrit sur Cinq. Invite-le avec un code cadeau !'
@@ -94,166 +80,122 @@ export default async function handler(req, res) {
                     .single();
 
                 return res.json({ 
-                    user: {
-                        id: foundUser.id,
-                        email: foundUser.email,
-                        display_name: foundUser.display_name,
-                        avatar_url: foundUser.avatar_url
-                    },
+                    user: { id: foundUser.id, email: foundUser.email },
                     alreadyContact: !!existing
                 });
             }
 
-            // -------- Get who added you (followers) --------
+            // Get followers
             if (action === 'followers') {
                 const { data, error } = await supabase
                     .from('contacts')
-                    .select(`
-                        id,
-                        user_id,
-                        created_at,
-                        follower:users!contacts_user_id_fkey(id, email, display_name, avatar_url)
-                    `)
+                    .select('id, user_id, created_at')
                     .eq('contact_user_id', user.id)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
-                // Check which ones you follow back
-                const followerIds = data.map(f => f.user_id);
-                const { data: following } = await supabase
-                    .from('contacts')
-                    .select('contact_user_id')
-                    .eq('user_id', user.id)
-                    .in('contact_user_id', followerIds);
+                // Enrich with emails
+                const followers = await Promise.all(data.map(async (f) => {
+                    const email = await getUserEmail(f.user_id);
+                    
+                    // Check if you follow back
+                    const { data: reverse } = await supabase
+                        .from('contacts')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('contact_user_id', f.user_id)
+                        .single();
 
-                const followingSet = new Set(following?.map(f => f.contact_user_id) || []);
-
-                const followers = data.map(f => ({
-                    ...f,
-                    youFollowBack: followingSet.has(f.user_id)
+                    return {
+                        ...f,
+                        email,
+                        youFollowBack: !!reverse
+                    };
                 }));
 
-                return res.json({ 
-                    followers,
-                    count: data.length,
-                    message: data.length === 0 
-                        ? 'Personne ne t\'a encore ajouté' 
-                        : `${data.length} personne(s) t'ont ajouté`
-                });
+                return res.json({ followers, count: data.length });
             }
 
-            // -------- Default: List your contacts --------
+            // Default: List contacts
             const { data, error } = await supabase
                 .from('contacts')
-                .select(`
-                    id,
-                    contact_user_id,
-                    created_at,
-                    contact:users!contacts_contact_user_id_fkey(id, email, display_name, avatar_url)
-                `)
+                .select('id, contact_user_id, created_at')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
 
-            // Check if each contact follows you back
-            const contactIds = data.map(c => c.contact_user_id);
-            const { data: mutuals } = await supabase
-                .from('contacts')
-                .select('user_id')
-                .eq('contact_user_id', user.id)
-                .in('user_id', contactIds);
+            // Enrich with emails and mutual status
+            const contacts = await Promise.all(data.map(async (c) => {
+                const email = await getUserEmail(c.contact_user_id);
+                
+                // Check if mutual
+                const { data: reverse } = await supabase
+                    .from('contacts')
+                    .select('id')
+                    .eq('user_id', c.contact_user_id)
+                    .eq('contact_user_id', user.id)
+                    .single();
 
-            const mutualSet = new Set(mutuals?.map(m => m.user_id) || []);
-
-            const contacts = data.map(c => ({
-                ...c,
-                mutual: mutualSet.has(c.contact_user_id)
+                return {
+                    ...c,
+                    contact: { id: c.contact_user_id, email },
+                    mutual: !!reverse
+                };
             }));
 
-            return res.json({ 
-                contacts, 
-                count: data.length, 
-                max: MAX_CONTACTS,
-                slotsAvailable: MAX_CONTACTS - data.length
-            });
+            return res.json({ contacts, count: data.length, max: MAX_CONTACTS });
         }
 
-        // ============ POST - Add contact (by ID or email) ============
+        // ============ POST - Add contact ============
         if (req.method === 'POST') {
             const { contactId, email } = req.body;
 
-            // Validate input
             if (!contactId && !email) {
-                return res.status(400).json({ 
-                    error: 'contactId ou email requis',
-                    hint: 'Envoie soit {contactId: "uuid"} soit {email: "user@example.com"}'
-                });
+                return res.status(400).json({ error: 'contactId ou email requis' });
             }
 
             let targetUserId = contactId;
+            let targetEmail = null;
 
             // If email provided, look up the user
             if (email) {
                 const cleanEmail = email.toLowerCase().trim();
-                
                 if (!EMAIL_REGEX.test(cleanEmail)) {
-                    return res.status(400).json({ 
-                        error: 'Format email invalide',
-                        hint: 'Vérifie que l\'adresse est bien formée'
-                    });
+                    return res.status(400).json({ error: 'Format email invalide' });
                 }
 
                 if (cleanEmail === user.email?.toLowerCase()) {
-                    return res.status(400).json({ 
-                        error: 'Tu ne peux pas t\'ajouter toi-même !'
-                    });
+                    return res.status(400).json({ error: 'Tu ne peux pas t\'ajouter toi-même !' });
                 }
 
-                const { data: foundUser, error } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('email', cleanEmail)
-                    .single();
+                const { data: { users } } = await supabase.auth.admin.listUsers();
+                const foundUser = users?.find(u => u.email?.toLowerCase() === cleanEmail);
 
-                if (error || !foundUser) {
-                    return res.status(404).json({ 
-                        error: 'Utilisateur non trouvé',
-                        hint: 'Cet email n\'est pas inscrit sur Cinq'
-                    });
+                if (!foundUser) {
+                    return res.status(404).json({ error: 'Utilisateur non trouvé' });
                 }
 
                 targetUserId = foundUser.id;
+                targetEmail = foundUser.email;
             }
 
-            // Validate UUID format
+            // Validate UUID
             if (!UUID_REGEX.test(targetUserId)) {
-                return res.status(400).json({ 
-                    error: 'Format contactId invalide',
-                    hint: 'Le contactId doit être un UUID valide'
-                });
+                return res.status(400).json({ error: 'Format contactId invalide' });
             }
 
-            // Can't add yourself
             if (targetUserId === user.id) {
-                return res.status(400).json({ 
-                    error: 'Tu ne peux pas t\'ajouter toi-même !'
-                });
+                return res.status(400).json({ error: 'Tu ne peux pas t\'ajouter toi-même !' });
             }
 
-            // Check if target user exists
-            const { data: targetUser, error: userError } = await supabase
-                .from('users')
-                .select('id, email')
-                .eq('id', targetUserId)
-                .single();
-
-            if (userError || !targetUser) {
-                return res.status(404).json({ 
-                    error: 'Utilisateur non trouvé',
-                    hint: 'Cet ID ne correspond à aucun utilisateur'
-                });
+            // Verify user exists
+            if (!targetEmail) {
+                targetEmail = await getUserEmail(targetUserId);
+                if (!targetEmail) {
+                    return res.status(404).json({ error: 'Utilisateur non trouvé' });
+                }
             }
 
             // Check limit
@@ -264,10 +206,7 @@ export default async function handler(req, res) {
 
             if (count >= MAX_CONTACTS) {
                 return res.status(400).json({ 
-                    error: `Limite atteinte ! Tu as déjà ${MAX_CONTACTS} contacts.`,
-                    hint: 'Supprime un contact pour en ajouter un nouveau.',
-                    current: count,
-                    max: MAX_CONTACTS
+                    error: `Limite atteinte ! Tu as déjà ${MAX_CONTACTS} contacts.`
                 });
             }
 
@@ -280,74 +219,29 @@ export default async function handler(req, res) {
                 .single();
 
             if (existing) {
-                return res.status(409).json({ 
-                    error: 'Déjà dans tes contacts',
-                    hint: 'Cette personne est déjà dans ta liste'
-                });
+                return res.status(409).json({ error: 'Déjà dans tes contacts' });
             }
 
             // Add contact
             const { data, error } = await supabase
                 .from('contacts')
-                .insert({
-                    user_id: user.id,
-                    contact_user_id: targetUserId
-                })
-                .select(`
-                    id,
-                    contact_user_id,
-                    created_at,
-                    contact:users!contacts_contact_user_id_fkey(id, email, display_name)
-                `)
+                .insert({ user_id: user.id, contact_user_id: targetUserId })
+                .select()
                 .single();
 
             if (error) throw error;
 
-            // Check if mutual
-            const { data: reverse } = await supabase
-                .from('contacts')
-                .select('id')
-                .eq('user_id', targetUserId)
-                .eq('contact_user_id', user.id)
-                .single();
-
             return res.status(201).json({ 
                 success: true, 
-                contact: {
-                    ...data,
-                    mutual: !!reverse
-                },
-                message: reverse 
-                    ? `${targetUser.email} ajouté ! Vous êtes maintenant mutuels 🤝`
-                    : `${targetUser.email} ajouté à tes contacts !`,
-                slotsRemaining: MAX_CONTACTS - count - 1
+                contact: { ...data, contact: { id: targetUserId, email: targetEmail } }
             });
         }
 
-        // ============ DELETE - Remove contact ============
+        // ============ DELETE ============
         if (req.method === 'DELETE') {
             const contactId = req.query.id;
-            
             if (!contactId) {
-                return res.status(400).json({ 
-                    error: 'id requis',
-                    hint: 'DELETE /api/contacts?id=<contact_row_id>'
-                });
-            }
-
-            // Verify ownership before delete
-            const { data: existing } = await supabase
-                .from('contacts')
-                .select('id, contact:users!contacts_contact_user_id_fkey(email)')
-                .eq('id', contactId)
-                .eq('user_id', user.id)
-                .single();
-
-            if (!existing) {
-                return res.status(404).json({ 
-                    error: 'Contact non trouvé',
-                    hint: 'Ce contact n\'existe pas ou ne t\'appartient pas'
-                });
+                return res.status(400).json({ error: 'id requis' });
             }
 
             const { error } = await supabase
@@ -357,24 +251,13 @@ export default async function handler(req, res) {
                 .eq('user_id', user.id);
 
             if (error) throw error;
-
-            return res.json({ 
-                success: true, 
-                message: `Contact ${existing.contact?.email || ''} supprimé`,
-                hint: 'Tu as maintenant une place libre dans tes contacts'
-            });
+            return res.json({ success: true });
         }
 
-        return res.status(405).json({ 
-            error: 'Method not allowed',
-            hint: 'Méthodes supportées: GET, POST, DELETE'
-        });
+        return res.status(405).json({ error: 'Method not allowed' });
 
     } catch (e) {
         console.error('Contacts error:', e);
-        return res.status(500).json({ 
-            error: 'Erreur serveur',
-            details: process.env.NODE_ENV === 'development' ? e.message : undefined
-        });
+        return res.status(500).json({ error: 'Erreur serveur', debug: e.message });
     }
 }
