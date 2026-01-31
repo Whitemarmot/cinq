@@ -1,0 +1,203 @@
+# =============================================================================
+# BTCPay Server - Configuration Docker Compose pour Cinq
+# =============================================================================
+# Composants:
+#   - BTCPay Server (serveur de paiement Bitcoin)
+#   - PostgreSQL (base de données)
+#   - LND (Lightning Network Daemon)
+#   - NBXplorer (indexeur blockchain)
+#   - Bitcoin Core (nœud Bitcoin)
+#
+# Support USDC via le plugin USDt/Tether (compatible ERC-20/stablecoins)
+# =============================================================================
+
+version: "3.9"
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL - Base de données principale
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: cinq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: btcpay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+      POSTGRES_DB: btcpayserver
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - btcpay_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U btcpay -d btcpayserver"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Bitcoin Core - Nœud Bitcoin complet
+  # ---------------------------------------------------------------------------
+  bitcoind:
+    image: btcpayserver/bitcoin:26.0
+    container_name: cinq-bitcoind
+    restart: unless-stopped
+    environment:
+      BITCOIN_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      BITCOIN_WALLETDIR: /walletdata
+      BITCOIN_EXTRA_ARGS: |
+        server=1
+        rpcuser=${BITCOIN_RPC_USER:-btcrpc}
+        rpcpassword=${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
+        rpcallowip=0.0.0.0/0
+        rpcbind=0.0.0.0
+        whitelist=0.0.0.0/0
+        txindex=1
+        zmqpubrawblock=tcp://0.0.0.0:28332
+        zmqpubrawtx=tcp://0.0.0.0:28333
+    volumes:
+      - bitcoin_data:/data
+      - bitcoin_wallet:/walletdata
+    networks:
+      - btcpay_network
+    ports:
+      - "8333:8333"   # Port P2P Bitcoin (mainnet)
+
+  # ---------------------------------------------------------------------------
+  # NBXplorer - Indexeur blockchain pour BTCPay
+  # ---------------------------------------------------------------------------
+  nbxplorer:
+    image: nicolasdorier/nbxplorer:2.5.0
+    container_name: cinq-nbxplorer
+    restart: unless-stopped
+    environment:
+      NBXPLORER_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      NBXPLORER_BIND: 0.0.0.0:32838
+      NBXPLORER_CHAINS: btc
+      NBXPLORER_SIGNALFILESDIR: /datadir
+      NBXPLORER_BTCRPCURL: http://bitcoind:43782
+      NBXPLORER_BTCRPCUSER: ${BITCOIN_RPC_USER:-btcrpc}
+      NBXPLORER_BTCRPCPASSWORD: ${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
+      NBXPLORER_BTCNODEENDPOINT: bitcoind:8333
+      NBXPLORER_POSTGRES: Host=postgres;Database=nbxplorer;Username=btcpay;Password=${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+    volumes:
+      - nbxplorer_data:/datadir
+    depends_on:
+      postgres:
+        condition: service_healthy
+      bitcoind:
+        condition: service_started
+    networks:
+      - btcpay_network
+
+  # ---------------------------------------------------------------------------
+  # LND - Lightning Network Daemon
+  # ---------------------------------------------------------------------------
+  lnd:
+    image: btcpayserver/lnd:v0.17.4-beta
+    container_name: cinq-lnd
+    restart: unless-stopped
+    environment:
+      LND_CHAIN: btc
+      LND_ENVIRONMENT: ${BITCOIN_NETWORK:-mainnet}
+      LND_ALIAS: ${LND_ALIAS:-CinqLightning}
+      LND_EXTERNALIP: ${LND_EXTERNAL_IP:-}
+      LND_EXTRA_ARGS: |
+        bitcoin.active=1
+        bitcoin.${BITCOIN_NETWORK:-mainnet}=1
+        bitcoin.node=bitcoind
+        bitcoind.rpchost=bitcoind:43782
+        bitcoind.rpcuser=${BITCOIN_RPC_USER:-btcrpc}
+        bitcoind.rpcpass=${BITCOIN_RPC_PASSWORD:-btcrpc_secret_change_me}
+        bitcoind.zmqpubrawblock=tcp://bitcoind:28332
+        bitcoind.zmqpubrawtx=tcp://bitcoind:28333
+        tlsextradomain=lnd
+        restlisten=0.0.0.0:8080
+        rpclisten=0.0.0.0:10009
+    volumes:
+      - lnd_data:/data
+    depends_on:
+      - bitcoind
+    networks:
+      - btcpay_network
+    ports:
+      - "9735:9735"   # Port P2P Lightning
+
+  # ---------------------------------------------------------------------------
+  # BTCPay Server - Serveur de paiement principal
+  # ---------------------------------------------------------------------------
+  btcpayserver:
+    image: btcpayserver/btcpayserver:1.12.5
+    container_name: cinq-btcpay
+    restart: unless-stopped
+    environment:
+      # Configuration réseau
+      BTCPAY_NETWORK: ${BITCOIN_NETWORK:-mainnet}
+      BTCPAY_ROOTPATH: /
+      BTCPAY_BIND: 0.0.0.0:49392
+      
+      # Base de données PostgreSQL
+      BTCPAY_POSTGRES: Host=postgres;Database=btcpayserver;Username=btcpay;Password=${POSTGRES_PASSWORD:-btcpay_secret_change_me}
+      
+      # Connexion NBXplorer
+      BTCPAY_BTCEXPLORERURL: http://nbxplorer:32838
+      
+      # Connexion LND Lightning
+      BTCPAY_BTCLIGHTNING: "type=lnd-rest;server=https://lnd:8080;macaroonfilepath=/lnd/data/chain/bitcoin/${BITCOIN_NETWORK:-mainnet}/admin.macaroon;certthumbprint="
+      
+      # Plugins activés (USDC/stablecoins via Tether plugin)
+      BTCPAY_PLUGINS: "BTCPayServer.Plugins.Tether"
+      
+      # Configuration HTTPS/domaine
+      BTCPAY_PROTOCOL: ${BTCPAY_PROTOCOL:-https}
+      VIRTUAL_HOST: ${BTCPAY_HOST:-btcpay.localhost}
+      VIRTUAL_PORT: 49392
+      
+      # Options supplémentaires
+      BTCPAY_SSHCONNECTION: ""
+      BTCPAY_UPDATEURL: ""
+      BTCPAY_DOCKERDEPLOYMENT: "true"
+    volumes:
+      - btcpay_data:/datadir
+      - lnd_data:/lnd:ro  # Accès lecture seule aux données LND
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nbxplorer:
+        condition: service_started
+      lnd:
+        condition: service_started
+    networks:
+      - btcpay_network
+    ports:
+      - "49392:49392"  # Interface web BTCPay
+    labels:
+      # Labels pour reverse proxy (Traefik/nginx-proxy)
+      - "traefik.enable=true"
+      - "traefik.http.routers.btcpay.rule=Host(`${BTCPAY_HOST:-btcpay.localhost}`)"
+      - "traefik.http.routers.btcpay.tls.certresolver=letsencrypt"
+
+# =============================================================================
+# Volumes persistants
+# =============================================================================
+volumes:
+  postgres_data:
+    name: cinq_postgres_data
+  bitcoin_data:
+    name: cinq_bitcoin_data
+  bitcoin_wallet:
+    name: cinq_bitcoin_wallet
+  nbxplorer_data:
+    name: cinq_nbxplorer_data
+  lnd_data:
+    name: cinq_lnd_data
+  btcpay_data:
+    name: cinq_btcpay_data
+
+# =============================================================================
+# Réseau isolé
+# =============================================================================
+networks:
+  btcpay_network:
+    name: cinq_btcpay_network
+    driver: bridge
