@@ -31,6 +31,7 @@ const PRECACHE_ASSETS = [
   '/animations.css',
   '/animations.js',
   '/fun.js',
+  '/pwa-install.js',
   '/assets/icons/icon-192x192.png',
   '/assets/icons/icon-512x512.png',
   '/assets/icons/icon.svg'
