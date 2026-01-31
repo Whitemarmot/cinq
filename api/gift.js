@@ -27,28 +27,29 @@ export default async function handler(req, res) {
     const action = req.query.action || req.body?.action;
 
     try {
-        // ============ CREATE (authenticated user creates gift) ============
+        // ============ CREATE (auth optional for MVP/simulation) ============
         if (action === 'create') {
+            let userId = null;
+            
+            // Try to get user if auth provided
             const authHeader = req.headers.authorization;
-            if (!authHeader?.startsWith('Bearer ')) {
-                return res.status(401).json({ error: 'Non authentifié' });
+            if (authHeader?.startsWith('Bearer ')) {
+                const token = authHeader.split(' ')[1];
+                const { data: { user } } = await supabase.auth.getUser(token);
+                userId = user?.id;
             }
 
-            const token = authHeader.split(' ')[1];
-            const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-            if (authErr || !user) {
-                return res.status(401).json({ error: 'Token invalide' });
-            }
+            // If authenticated, check limit
+            if (userId) {
+                const { count } = await supabase
+                    .from('gift_codes')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('created_by', userId)
+                    .eq('status', 'active');
 
-            // Check how many active gifts user has
-            const { count } = await supabase
-                .from('gift_codes')
-                .select('*', { count: 'exact', head: true })
-                .eq('created_by', user.id)
-                .eq('status', 'active');
-
-            if (count >= 5) {
-                return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
+                if (count >= 5) {
+                    return res.status(400).json({ error: 'Tu as déjà 5 invitations actives' });
+                }
             }
 
             // Create gift code
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
                 .from('gift_codes')
                 .insert({
                     code,
-                    created_by: user.id,
+                    created_by: userId,
                     status: 'active',
                     expires_at: expiresAt.toISOString()
                 })
@@ -71,10 +72,11 @@ export default async function handler(req, res) {
 
             return res.json({
                 success: true,
+                code: data.code,
                 gift: {
                     code: data.code,
                     expiresAt: data.expires_at,
-                    shareUrl: `https://cinq-three.vercel.app/gift.html?code=${data.code}`
+                    shareUrl: `https://cinq-three.vercel.app/register.html?code=${data.code}`
                 }
             });
         }

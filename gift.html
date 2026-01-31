@@ -1429,7 +1429,7 @@
                 try {
                     const session = SIMULATION_MODE 
                         ? generateSimulationData(_state.selectedPayment)
-                        : await fetch(`${API_BASE}/payment-create`, {
+                        : await fetch(`${API_BASE}/api/gift?action=create`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
@@ -1703,7 +1703,7 @@
                 statusEl.innerHTML = '<span>⏳ Génération du code cadeau...</span>';
                 
                 try {
-                    const response = await fetch('/.netlify/functions/gift-create', {
+                    const response = await fetch('/api/gift?action=create', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
