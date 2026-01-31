@@ -1,146 +1,50 @@
-// Netlify Function pour la waitlist
 const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 
-                     process.env.SUPABASE_SERVICE_KEY || 
-                     process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabase = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.error('Missing Supabase configuration');
-}
+module.exports = async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-const supabase = SUPABASE_URL && SUPABASE_KEY 
-    ? createClient(SUPABASE_URL, SUPABASE_KEY)
-    : null;
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-exports.handler = async (event, context) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Content-Type': 'application/json'
-    };
-
-    // CORS preflight
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 200, headers, body: '' };
+    if (!supabase) {
+        return res.status(500).json({ error: 'Database not configured', count: 0 });
     }
 
-    // GET - Obtenir le compte
-    if (event.httpMethod === 'GET') {
-        try {
-            if (!supabase) {
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: 'Database not configured', count: 0 })
-                };
-            }
-            
-            const { count, error } = await supabase
-                .from('waitlist')
-                .select('*', { count: 'exact', head: true });
+    if (req.method === 'GET') {
+        const { count, error } = await supabase
+            .from('waitlist')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ count });
+    }
 
-            if (error) throw error;
-
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({ count })
-            };
-        } catch (error) {
-            console.error('Error:', error);
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ error: 'Erreur serveur' })
-            };
+    if (req.method === 'POST') {
+        const { email } = req.body || {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!email || !emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Email invalide' });
         }
-    }
 
-    // POST - Ajouter un email
-    if (event.httpMethod === 'POST') {
-        try {
-            if (!supabase) {
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({ error: 'Database not configured' })
-                };
+        const { error } = await supabase
+            .from('waitlist')
+            .insert({ email: email.toLowerCase().trim() });
+
+        if (error) {
+            if (error.code === '23505') {
+                return res.status(200).json({ success: true, message: 'Déjà inscrit' });
             }
-            
-            const body = JSON.parse(event.body || '{}');
-            const { email, referrer, utm_source, utm_medium, utm_campaign } = body;
-
-            // Validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email || !emailRegex.test(email)) {
-                return {
-                    statusCode: 400,
-                    headers,
-                    body: JSON.stringify({ error: 'Email invalide' })
-                };
-            }
-
-            // Honeypot check (anti-bot)
-            if (body.website) {
-                return {
-                    statusCode: 200,
-                    headers,
-                    body: JSON.stringify({ success: true, count: 42 })
-                };
-            }
-
-            const { data, error } = await supabase
-                .from('waitlist')
-                .insert([{
-                    email: email.toLowerCase().trim(),
-                    referrer,
-                    utm_source,
-                    utm_medium,
-                    utm_campaign
-                }])
-                .select();
-
-            if (error) {
-                if (error.code === '23505') {
-                    return {
-                        statusCode: 409,
-                        headers,
-                        body: JSON.stringify({ error: 'already_registered' })
-                    };
-                }
-                throw error;
-            }
-
-            // Nouveau compte
-            const { count } = await supabase
-                .from('waitlist')
-                .select('*', { count: 'exact', head: true });
-
-            return {
-                statusCode: 201,
-                headers,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Bienvenue dans le cercle !',
-                    count
-                })
-            };
-        } catch (error) {
-            console.error('Error:', error);
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ error: 'Erreur serveur' })
-            };
+            return res.status(500).json({ error: error.message });
         }
+
+        return res.status(200).json({ success: true });
     }
 
-    return {
-        statusCode: 405,
-        headers,
-        body: JSON.stringify({ error: 'Method not allowed' })
-    };
+    return res.status(405).json({ error: 'Method not allowed' });
 };
