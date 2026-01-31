@@ -425,6 +425,60 @@
             inset: 0;
         }
         
+        /* ===== NOTIFICATION BUTTON ===== */
+        .notification-btn {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s var(--ease-spring), background 0.2s;
+            color: var(--text-secondary);
+        }
+        
+        .notification-btn:hover {
+            transform: scale(1.08);
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+        
+        .notification-btn:active {
+            transform: scale(0.92);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            background: var(--error);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: badge-pop 0.35s var(--ease-spring);
+        }
+        
+        .notification-badge.hidden {
+            display: none;
+        }
+        
+        @keyframes badge-pop {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
         /* ===== MAIN CONTENT ===== */
         .app-content {
             flex: 1;
