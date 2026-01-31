@@ -219,6 +219,158 @@ const CinqApp = (function() {
     
     // Start realtime subscription
     subscribeToMessages();
+    
+    // Initialize notification system
+    initNotifications();
+  }
+  
+  /**
+   * Initialize the notification system
+   * - Request push permission after a delay
+   * - Set up notification handlers
+   */
+  async function initNotifications() {
+    // Check if CinqNotifications is available
+    if (typeof window.CinqNotifications === 'undefined') {
+      console.warn('[App] CinqNotifications not loaded');
+      return;
+    }
+    
+    // Initialize notifications module
+    await window.CinqNotifications.init();
+    
+    // Prompt for push notifications after user has been in app for 30 seconds
+    // This gives them time to understand the app first
+    setTimeout(async () => {
+      if (window.CinqNotifications.isPushSupported()) {
+        const permission = window.CinqNotifications.getPushPermission();
+        
+        if (permission === 'default') {
+          // Show a subtle prompt to enable notifications
+          showNotificationPrompt();
+        }
+      }
+    }, 30000);
+    
+    // Clear unread when user views messages
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#section-chat')) {
+        window.CinqNotifications.clearUnread();
+      }
+    });
+  }
+  
+  /**
+   * Show a subtle prompt to enable push notifications
+   */
+  function showNotificationPrompt() {
+    // Don't show if already dismissed recently
+    const dismissed = localStorage.getItem('cinq_notif_prompt_dismissed');
+    if (dismissed && Date.now() - parseInt(dismissed) < 7 * 24 * 60 * 60 * 1000) {
+      return;
+    }
+    
+    const prompt = document.createElement('div');
+    prompt.id = 'notification-prompt';
+    prompt.className = 'notification-prompt';
+    prompt.innerHTML = `
+      <div class="notification-prompt-content">
+        <span class="notification-prompt-icon">🔔</span>
+        <div>
+          <p class="notification-prompt-title">Rester connecté ?</p>
+          <p class="notification-prompt-text">Active les notifications pour savoir quand tes proches t'envoient un message.</p>
+        </div>
+      </div>
+      <div class="notification-prompt-actions">
+        <button id="notif-prompt-dismiss" class="notif-prompt-btn secondary">Plus tard</button>
+        <button id="notif-prompt-enable" class="notif-prompt-btn primary">Activer</button>
+      </div>
+    `;
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .notification-prompt {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 16px;
+        padding: 16px;
+        z-index: 10000;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        animation: slideUp 0.3s ease-out;
+      }
+      @keyframes slideUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .notification-prompt-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .notification-prompt-icon {
+        font-size: 28px;
+      }
+      .notification-prompt-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: white;
+        margin: 0 0 4px 0;
+      }
+      .notification-prompt-text {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+      }
+      .notification-prompt-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .notif-prompt-btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+      }
+      .notif-prompt-btn.primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+      }
+      .notif-prompt-btn.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+      }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(prompt);
+    
+    // Handle enable
+    document.getElementById('notif-prompt-enable').addEventListener('click', async () => {
+      const result = await window.CinqNotifications.subscribeToPush();
+      prompt.remove();
+      
+      if (result.success) {
+        window.Cinq.showToast(result.message, { type: 'success', icon: '🔔' });
+      } else {
+        window.Cinq.showToast(result.message, { type: 'warning' });
+      }
+    });
+    
+    // Handle dismiss
+    document.getElementById('notif-prompt-dismiss').addEventListener('click', () => {
+      localStorage.setItem('cinq_notif_prompt_dismissed', Date.now().toString());
+      prompt.remove();
+    });
   }
   
   // ============================================
@@ -679,13 +831,36 @@ const CinqApp = (function() {
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload) => {
-          if (selectedContact && currentUser) {
-            const msg = payload.new;
-            // Check if message is for current conversation
-            if ((msg.sender_id === currentUser.id && msg.receiver_id === selectedContact.contact_user_id) ||
-                (msg.sender_id === selectedContact.contact_user_id && msg.receiver_id === currentUser.id)) {
-              loadMessages();
-            }
+          const msg = payload.new;
+          
+          // Skip messages we sent
+          if (msg.sender_id === currentUser?.id) return;
+          
+          // Check if message is for us
+          if (msg.receiver_id !== currentUser?.id) return;
+          
+          // If we're in the right chat, just reload messages
+          if (selectedContact && msg.sender_id === selectedContact.contact_user_id) {
+            loadMessages();
+            // Don't show notification if chat is open and visible
+            if (!document.hidden) return;
+          }
+          
+          // Show in-app notification for messages from other chats or when hidden
+          if (window.CinqNotifications) {
+            // Find sender name from contacts
+            const sender = contacts.find(c => c.contact_user_id === msg.sender_id);
+            const senderName = sender 
+              ? getEmailPrefix(sender.contact?.email || 'Contact')
+              : 'Quelqu\'un';
+            
+            window.CinqNotifications.showInAppNotification({
+              title: senderName,
+              body: msg.is_ping ? '💫 T\'a envoyé un ping !' : (msg.content || 'Nouveau message'),
+              type: msg.is_ping ? 'ping' : 'message',
+              url: '/app.html',
+              avatar: senderName.charAt(0).toUpperCase()
+            });
           }
         }
       )
