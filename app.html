@@ -3551,6 +3551,9 @@
                 startPolling();
                 initPushNotifications();
                 
+                // Check if new user and show onboarding
+                initOnboarding();
+                
             } catch (e) {
                 console.error('Init error:', e);
                 showToast({ type: 'error', title: 'Aïe', message: 'L\'app n\'a pas voulu démarrer. Réessaie ?' });
