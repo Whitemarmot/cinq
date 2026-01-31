@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinq — L'anti-réseau social</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment. Rejoins l'anti-réseau social.">
+    <meta name="keywords" content="réseau social, anti social, minimaliste, vie privée, slow social">
+    <meta name="author" content="Cinq">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Cinq — L'anti-réseau social">
+    <meta property="og:description" content="5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cinq — L'anti-réseau social">
+    <meta name="twitter:description" content="5 proches. Pas de likes. Zéro algorithme.">
+    <meta name="twitter:image" content="https://cinq.app/og-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>5️⃣</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .glow {
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        }
+        .circle {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- Cercles décoratifs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
+        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
+    </div>
+
+    <div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
+        
+        <!-- Logo -->
+        <div class="mb-8">
+            <div class="w-24 h-24 rounded-full border-4 border-white/20 flex items-center justify-center glow bg-white/5 backdrop-blur">
+                <span class="text-5xl font-bold">5</span>
+            </div>
+        </div>
+
+        <!-- Titre -->
+        <h1 class="text-5xl md:text-7xl font-bold mb-4 text-center">
+            Cinq
+        </h1>
+        
+        <!-- Tagline -->
+        <p class="text-xl md:text-2xl text-white/70 mb-2 text-center">
+            L'anti-réseau social
+        </p>
+        <p class="text-lg text-white/50 mb-12 text-center max-w-md">
+            5 proches. Pas de likes. Pas d'algorithme.<br>
+            Juste les gens qui comptent vraiment.
+        </p>
+
+        <!-- Features -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12 max-w-2xl">
+            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
+                👥 Maximum 5 contacts
+            </div>
+            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
+                🚫 Zéro like, zéro métrique
+            </div>
+            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
+                ⏱️ Interactions limitées
+            </div>
+            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
+                🔒 Chiffré de bout en bout
+            </div>
+        </div>
+
+        <!-- Waitlist Form -->
+        <div class="w-full max-w-md">
+            <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3">
+                <input 
+                    type="email" 
+                    id="email"
+                    placeholder="ton@email.com" 
+                    required
+                    class="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 focus:bg-white/15 transition"
+                >
+                <button 
+                    type="submit"
+                    class="px-8 py-4 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold transition transform hover:scale-105 active:scale-95"
+                >
+                    Rejoindre
+                </button>
+            </form>
+            <p id="form-message" class="text-center mt-4 text-white/60 hidden"></p>
+            <p class="text-center mt-4 text-white/40 text-sm">
+                Rejoins la liste d'attente. Pas de spam, promis.
+            </p>
+        </div>
+
+        <!-- Counter -->
+        <div class="mt-16 text-center">
+            <div class="text-4xl font-bold text-indigo-400" id="counter">0</div>
+            <div class="text-white/40 text-sm">personnes en attente</div>
+        </div>
+
+        <!-- Footer quote -->
+        <div class="mt-16 text-center max-w-lg">
+            <p class="text-white/30 text-sm italic">
+                "L'app qui veut que tu la fermes."
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = '/api/waitlist';
+        const form = document.getElementById('waitlist-form');
+        const message = document.getElementById('form-message');
+        const counter = document.getElementById('counter');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        // Charger le compteur au démarrage
+        async function loadCount() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                animateCounter(data.count || 0);
+            } catch (e) {
+                console.log('Count loading...');
+            }
+        }
+        
+        // Animation du compteur
+        function animateCounter(target) {
+            const duration = 1000;
+            const start = parseInt(counter.textContent) || 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                counter.textContent = Math.floor(start + (target - start) * eased);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+        
+        // Récupérer UTM params
+        function getUtmParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                utm_source: params.get('utm_source'),
+                utm_medium: params.get('utm_medium'),
+                utm_campaign: params.get('utm_campaign'),
+                referrer: document.referrer || null
+            };
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = '...';
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, ...getUtmParams() })
+                });
+                
+                const data = await res.json();
+                
+                if (res.status === 409) {
+                    showMessage("Tu es déjà sur la liste ! 🙌", false);
+                } else if (res.ok) {
+                    showMessage("Bienvenue dans le cercle ! ✨", true);
+                    document.getElementById('email').value = '';
+                    if (data.count) animateCounter(data.count);
+                } else {
+                    showMessage("Oups, réessaie ! 🙏", false);
+                }
+            } catch (error) {
+                showMessage("Erreur réseau, réessaie ! 🙏", false);
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Rejoindre';
+        });
+        
+        function showMessage(text, success) {
+            message.textContent = text;
+            message.classList.remove('hidden', 'text-indigo-400', 'text-red-400');
+            message.classList.add(success ? 'text-indigo-400' : 'text-white/60');
+        }
+        
+        // Init
+        loadCount();
+    </script>
+
+</body>
+</html>

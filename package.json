@@ -1,0 +1,15 @@
+{
+  "name": "cinq",
+  "version": "1.0.0",
+  "description": "L'anti-réseau social",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "keywords": ["social", "minimalist", "privacy"],
+  "author": "Cinq",
+  "license": "MIT"
+}
