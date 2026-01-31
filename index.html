@@ -131,8 +131,11 @@
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const API_URL = '/api/waitlist';
+        const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNnrT412YHQ';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const form = document.getElementById('waitlist-form');
         const message = document.getElementById('form-message');
         const counter = document.getElementById('counter');
@@ -141,9 +144,10 @@
         // Charger le compteur au démarrage
         async function loadCount() {
             try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                animateCounter(data.count || 0);
+                const { count, error } = await supabase
+                    .from('waitlist')
+                    .select('*', { count: 'exact', head: true });
+                if (!error) animateCounter(count || 0);
             } catch (e) {
                 console.log('Count loading...');
             }
@@ -185,22 +189,24 @@
             submitBtn.textContent = '...';
             
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, ...getUtmParams() })
-                });
+                const { data, error } = await supabase
+                    .from('waitlist')
+                    .insert([{ 
+                        email: email.toLowerCase().trim(),
+                        referrer: document.referrer || null,
+                        utm_source: new URLSearchParams(window.location.search).get('utm_source')
+                    }]);
                 
-                const data = await res.json();
-                
-                if (res.status === 409) {
-                    showMessage("Tu es déjà sur la liste ! 🙌", false);
-                } else if (res.ok) {
+                if (error) {
+                    if (error.code === '23505') {
+                        showMessage("Tu es déjà sur la liste ! 🙌", false);
+                    } else {
+                        showMessage("Oups, réessaie ! 🙏", false);
+                    }
+                } else {
                     showMessage("Bienvenue dans le cercle ! ✨", true);
                     document.getElementById('email').value = '';
-                    if (data.count) animateCounter(data.count);
-                } else {
-                    showMessage("Oups, réessaie ! 🙏", false);
+                    loadCount();
                 }
             } catch (error) {
                 showMessage("Erreur réseau, réessaie ! 🙏", false);
