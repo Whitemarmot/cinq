@@ -69,9 +69,17 @@ CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT UNIQUE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     gift_code_used TEXT DEFAULT NULL,
     
-    CONSTRAINT users_email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+    -- Profile fields (added in migration 005)
+    display_name TEXT,
+    bio TEXT,
+    avatar_url TEXT,
+    
+    CONSTRAINT users_email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    CONSTRAINT users_display_name_length CHECK (char_length(display_name) <= 50),
+    CONSTRAINT users_bio_length CHECK (char_length(bio) <= 500)
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
