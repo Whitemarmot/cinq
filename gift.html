@@ -33,7 +33,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
@@ -41,21 +41,18 @@
     <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         .gift-container {
-            min-height: 100vh;
-            min-height: 100dvh;
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 2rem;
-            padding-bottom: calc(2rem + 60px); /* Space for fixed footer */
             text-align: center;
         }
         
         @media (max-width: 380px) {
             .gift-container {
                 padding: 1rem;
-                padding-bottom: calc(1rem + 70px);
             }
         }
         .gift-card {
@@ -66,22 +63,122 @@
             width: 100%;
             max-width: 400px;
         }
-        .gift-logo { font-size: 3rem; margin-bottom: 1rem; }
-        .gift-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .gift-logo { 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px rgba(255, 107, 74, 0.35));
+            position: relative;
+            display: inline-block;
+        }
+        
+        .gift-logo::before {
+            content: '';
+            position: absolute;
+            inset: -25px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 107, 74, 0.3) 0deg,
+                rgba(255, 138, 106, 0.2) 72deg,
+                rgba(251, 191, 36, 0.15) 144deg,
+                rgba(167, 139, 250, 0.2) 216deg,
+                rgba(255, 107, 74, 0.3) 288deg
+            );
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            opacity: 0.4;
+            z-index: -1;
+            filter: blur(18px);
+        }
+        
+        .gift-icon {
+            width: 40px;
+            height: 40px;
+            stroke: currentColor;
+        }
+        .gift-title { 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+        }
         .gift-subtitle { color: var(--color-text-muted); margin-bottom: 2rem; }
         .generate-btn {
             width: 100%;
             padding: 1rem;
-            background: var(--color-brand);
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(255, 107, 74, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        .generate-btn:hover { opacity: 0.9; }
-        .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .generate-btn:hover:not(:disabled)::before { left: 100%; }
+        .generate-btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.35);
+        }
+        .generate-btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+        .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        
+        /* Pentagon pattern */
+        .pentagon-pattern {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+        
+        /* Gradient orbs */
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .gradient-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #ff6b4a;
+            top: -100px;
+            right: -100px;
+        }
+        
+        .gradient-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #a78bfa;
+            bottom: -50px;
+            left: -50px;
+        }
         .result { margin-top: 2rem; display: none; }
         .result.show { display: block; }
         .code-box {
@@ -116,16 +213,19 @@
         .error { color: var(--color-error); margin-top: 1rem; }
     </style>
 </head>
-<body>
+<body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
     <!-- Skip to content link -->
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
     
     <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="pentagon-pattern" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     
-    <main id="main-content">
+    <main id="main-content" style="flex: 1; display: flex;">
     <div class="gift-container">
         <div class="gift-card">
-            <div class="gift-logo">🎁</div>
+            <div class="gift-logo">5</div>
             <h1 class="gift-title">Offrir Cinq</h1>
             <p class="gift-subtitle">Génère un code pour inviter quelqu'un sur Cinq</p>
             
@@ -141,7 +241,10 @@
                 </div>
                 <div class="share-link" id="share-link" aria-label="Lien de partage"></div>
                 <button class="copy-btn" onclick="copyLink()" aria-label="Copier le lien de partage dans le presse-papiers">
-                    <span aria-hidden="true">📋</span> Copier le lien
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    Copier le lien
                 </button>
             </div>
             
@@ -196,14 +299,14 @@
         }
     </script>
 
-    <!-- Footer -->
-    <footer role="contentinfo" style="position: fixed; bottom: 0; left: 0; right: 0; padding: 0.75rem 1rem; padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px)); text-align: center; font-size: 0.75rem; color: var(--color-text-muted); background: linear-gradient(to top, var(--color-bg-primary) 0%, var(--color-bg-primary) 80%, transparent 100%); z-index: 50;">
-        <nav aria-label="Liens légaux" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.25rem;">
-            <a href="/privacy.html" style="color: var(--color-text-muted); padding: 0.5rem; min-height: 44px; display: inline-flex; align-items: center;">Confidentialité</a>
-            <span aria-hidden="true" style="opacity: 0.5;">·</span>
-            <a href="/terms.html" style="color: var(--color-text-muted); padding: 0.5rem; min-height: 44px; display: inline-flex; align-items: center;">CGU</a>
-            <span aria-hidden="true" style="opacity: 0.5;">·</span>
-            <span style="padding: 0.5rem;">© 2025 Cinq</span>
+    <!-- Footer - part of page flow -->
+    <footer role="contentinfo" style="padding: 1.5rem; padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1rem)); text-align: center; font-size: 0.75rem; color: var(--color-text-muted); margin-top: auto;">
+        <nav aria-label="Liens légaux" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <a href="/privacy.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">Confidentialité</a>
+            <span aria-hidden="true" style="opacity: 0.3;">·</span>
+            <a href="/terms.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">CGU</a>
+            <span aria-hidden="true" style="opacity: 0.3;">·</span>
+            <span style="padding: 0 0.5rem;">© 2026 Cinq</span>
         </nav>
     </footer>
 </body>
