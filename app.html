@@ -1412,6 +1412,23 @@
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+                    <!-- Photo de profil -->
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <div id="avatar-preview" style="width: 72px; height: 72px; border-radius: 50%; background: var(--cinq-gradient); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white; font-weight: 600; overflow: hidden; cursor: pointer; position: relative;" onclick="document.getElementById('avatar-input').click()">
+                            <span id="avatar-initial">?</span>
+                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="uploadAvatar(this)">
+                            <button onclick="document.getElementById('avatar-input').click()" class="account-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                📷 Changer la photo
+                            </button>
+                            <button id="remove-avatar-btn" onclick="removeAvatar()" class="account-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; display: none; color: var(--color-error);">
+                                ✕ Supprimer
+                            </button>
+                            <p style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">JPG, PNG, GIF, WebP • Max 2Mo</p>
+                        </div>
+                    </div>
                     <div>
                         <label class="account-label" for="profile-display-name">Pseudo</label>
                         <input type="text" id="profile-display-name" class="account-input" placeholder="Ton pseudo..." maxlength="50">
@@ -2160,9 +2177,94 @@
                     if (data.profile.display_name) {
                         document.getElementById('user-name').textContent = data.profile.display_name;
                     }
+                    // Avatar
+                    updateAvatarPreview(data.profile.avatar_url, data.profile.display_name || user?.email);
                 }
             } catch (e) {
                 console.error('Load profile error:', e);
+            }
+        }
+        
+        function updateAvatarPreview(avatarUrl, name) {
+            const preview = document.getElementById('avatar-preview');
+            const initial = document.getElementById('avatar-initial');
+            const removeBtn = document.getElementById('remove-avatar-btn');
+            const firstChar = (name || '?').charAt(0).toUpperCase();
+            
+            if (avatarUrl) {
+                preview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>`;
+                removeBtn.style.display = 'inline-block';
+            } else {
+                preview.innerHTML = `<span id="avatar-initial">${firstChar}</span><div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">📷</div>`;
+                removeBtn.style.display = 'none';
+            }
+        }
+        
+        async function uploadAvatar(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                showToast({ type: 'error', title: 'Fichier trop gros', message: 'Max 2Mo' });
+                return;
+            }
+            
+            if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+                showToast({ type: 'error', title: 'Format non supporté', message: 'JPG, PNG, GIF ou WebP' });
+                return;
+            }
+            
+            showToast({ type: 'info', title: 'Upload en cours...' });
+            
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                const res = await fetch(`${API_URL}/upload-avatar`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        image: base64,
+                        contentType: file.type
+                    })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur upload');
+                
+                updateAvatarPreview(data.avatarUrl, document.getElementById('profile-display-name').value || user?.email);
+                showToast({ type: 'success', title: 'Photo mise à jour !' });
+            } catch (e) {
+                console.error('Upload error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            }
+            
+            input.value = '';
+        }
+        
+        async function removeAvatar() {
+            if (!confirm('Supprimer ta photo de profil ?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/upload-avatar`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                updateAvatarPreview(null, document.getElementById('profile-display-name').value || user?.email);
+                showToast({ type: 'success', title: 'Photo supprimée' });
+            } catch (e) {
+                console.error('Remove avatar error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
             }
         }
 
