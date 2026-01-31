@@ -2,7 +2,7 @@
  * Push notification helper for Cinq API routes
  */
 import webpush from 'web-push';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './_supabase.js';
 
 // Configure web-push on module load
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -28,11 +28,6 @@ export async function sendPushNotification(userId, notification) {
         console.log('[Push] VAPID not configured, skipping');
         return { sent: 0, failed: 0 };
     }
-
-    const supabase = createClient(
-        process.env.SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-    );
 
     try {
         // Get user's push subscriptions

@@ -5,12 +5,7 @@
  * Stores events in Supabase for admin dashboard
  */
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-);
+import { supabase } from './_supabase.js';
 
 // Event types enum
 export const EventType = {
@@ -77,7 +72,6 @@ export function logStructured(level, message, context = {}) {
         service: 'cinq-api'
     };
     
-    // Output as JSON for structured logging
     const output = JSON.stringify(log);
     
     switch (level) {
@@ -163,31 +157,14 @@ export async function getStats(period = 'week') {
         counts[event.event_type] = (counts[event.event_type] || 0) + 1;
     }
 
-    // Get total users
-    const { count: userCount } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-
-    // Get total messages
-    const { count: messageCount } = await supabase
-        .from('messages')
-        .select('*', { count: 'exact', head: true });
-
-    // Get total gift codes
-    const { count: giftCount } = await supabase
-        .from('gift_codes')
-        .select('*', { count: 'exact', head: true });
-
-    // Get active gift codes
-    const { count: activeGiftCount } = await supabase
-        .from('gift_codes')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-
-    // Get waitlist count
-    const { count: waitlistCount } = await supabase
-        .from('waitlist')
-        .select('*', { count: 'exact', head: true });
+    // Get totals from various tables
+    const [userCount, messageCount, giftCount, activeGiftCount, waitlistCount] = await Promise.all([
+        supabase.from('users').select('*', { count: 'exact', head: true }),
+        supabase.from('messages').select('*', { count: 'exact', head: true }),
+        supabase.from('gift_codes').select('*', { count: 'exact', head: true }),
+        supabase.from('gift_codes').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        supabase.from('waitlist').select('*', { count: 'exact', head: true })
+    ]);
 
     // Daily breakdown for charts
     const dailyStats = {};
@@ -201,11 +178,11 @@ export async function getStats(period = 'week') {
         period,
         since: since.toISOString(),
         totals: {
-            users: userCount || 0,
-            messages: messageCount || 0,
-            gift_codes: giftCount || 0,
-            active_gift_codes: activeGiftCount || 0,
-            waitlist: waitlistCount || 0
+            users: userCount.count || 0,
+            messages: messageCount.count || 0,
+            gift_codes: giftCount.count || 0,
+            active_gift_codes: activeGiftCount.count || 0,
+            waitlist: waitlistCount.count || 0
         },
         events: counts,
         daily: dailyStats
