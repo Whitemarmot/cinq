@@ -284,10 +284,22 @@
                     throw new Error(data.error || 'Erreur');
                 }
 
-                showMessage('Compte créé ! Redirection...', 'success');
-                setTimeout(() => {
-                    window.location.href = '/login.html?registered=1';
-                }, 1500);
+                // Auto-login: store session and go to app
+                if (data.session && data.user) {
+                    localStorage.setItem('cinq_session', JSON.stringify(data.session));
+                    localStorage.setItem('cinq_user', JSON.stringify(data.user));
+                    localStorage.setItem('cinq_new_user', 'true'); // Flag for onboarding
+                    showMessage('Bienvenue sur Cinq ! 🎉', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/app.html';
+                    }, 800);
+                } else {
+                    // Fallback: manual login required
+                    showMessage('Compte créé ! Connecte-toi maintenant.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login.html?registered=1';
+                    }, 1500);
+                }
 
             } catch (err) {
                 showMessage(err.message, 'error');

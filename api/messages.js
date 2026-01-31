@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { sendPushNotification } from './_push-helper.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -107,7 +108,14 @@ export default async function handler(req, res) {
 
             if (error) throw error;
 
-            // TODO: Send push notification to receiver
+            // Send push notification to receiver
+            const senderName = user.email?.split('@')[0] || 'Quelqu\'un';
+            sendPushNotification(contact_id, {
+                title: is_ping ? '👋 Ping !' : `Message de ${senderName}`,
+                body: is_ping ? `${senderName} te fait coucou` : content.substring(0, 100),
+                tag: `msg-${data.id}`,
+                data: { messageId: data.id, senderId: user.id }
+            });
 
             return res.status(201).json({ success: true, message: data });
         }

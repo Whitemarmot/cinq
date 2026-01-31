@@ -691,6 +691,242 @@
                 padding: 1.5rem;
             }
         }
+
+        /* ===== ONBOARDING ===== */
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--color-bg-primary);
+            z-index: calc(var(--z-modal) + 10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .onboarding-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .onboarding-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .onboarding-step {
+            display: none;
+            animation: step-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .onboarding-step.active {
+            display: block;
+        }
+        
+        @keyframes step-in {
+            0% { 
+                opacity: 0; 
+                transform: translateX(30px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+        
+        .onboarding-logo {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            margin-bottom: 1rem;
+            animation: logo-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes logo-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .onboarding-emoji {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: emoji-bounce 0.6s ease-out;
+        }
+        
+        @keyframes emoji-bounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .onboarding-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .onboarding-text {
+            color: var(--color-text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        
+        .onboarding-highlight {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+        
+        .onboarding-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            text-align: left;
+        }
+        
+        .onboarding-feature-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .onboarding-feature-text {
+            font-size: 0.95rem;
+        }
+        
+        .onboarding-feature-text strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .onboarding-feature-text span {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .onboarding-demo {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .onboarding-demo-slots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .onboarding-demo-slot {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .onboarding-demo-slot.filled {
+            background: var(--cinq-gradient);
+            color: white;
+        }
+        
+        .onboarding-demo-slot.empty {
+            background: var(--color-bg-elevated);
+            border: 2px dashed var(--color-border);
+            color: var(--color-text-muted);
+        }
+        
+        .onboarding-demo-slot.highlight {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .onboarding-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--cinq-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .onboarding-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .onboarding-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .onboarding-btn-secondary {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+        }
+        
+        .onboarding-btn-secondary:hover {
+            background: var(--color-bg-hover);
+            box-shadow: none;
+        }
+        
+        .onboarding-progress {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .onboarding-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-border);
+            transition: all 0.3s;
+        }
+        
+        .onboarding-dot.active {
+            background: var(--color-brand);
+            width: 24px;
+            border-radius: 4px;
+        }
+        
+        .onboarding-skip {
+            margin-top: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+        
+        .onboarding-skip:hover {
+            color: var(--color-text-primary);
+        }
     </style>
 </head>
 <body>
@@ -698,6 +934,139 @@
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboarding-overlay">
+        <div class="onboarding-container">
+            <!-- Step 1: Welcome -->
+            <div class="onboarding-step active" id="onboarding-step-1">
+                <div class="onboarding-logo">5</div>
+                <h1 class="onboarding-title">Bienvenue sur Cinq !</h1>
+                <p class="onboarding-text">
+                    Tu viens de rejoindre un réseau <span class="onboarding-highlight">intime et intentionnel</span>.
+                    <br><br>
+                    Ici, pas de scroll infini ni de likes. Juste toi et <span class="onboarding-highlight">5 personnes</span> qui comptent vraiment.
+                </p>
+                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                    Découvrir →
+                </button>
+                <div class="onboarding-progress">
+                    <div class="onboarding-dot active"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                </div>
+                <button class="onboarding-skip" onclick="skipOnboarding()">Passer l'intro</button>
+            </div>
+
+            <!-- Step 2: The Concept -->
+            <div class="onboarding-step" id="onboarding-step-2">
+                <div class="onboarding-emoji">✨</div>
+                <h1 class="onboarding-title">Le concept</h1>
+                <p class="onboarding-text">
+                    <span class="onboarding-highlight">5 contacts maximum.</span>
+                    <br>
+                    C'est tout. C'est le but.
+                </p>
+                <div class="onboarding-demo">
+                    <div class="onboarding-demo-slots" id="demo-slots">
+                        <div class="onboarding-demo-slot filled">A</div>
+                        <div class="onboarding-demo-slot filled">M</div>
+                        <div class="onboarding-demo-slot filled">J</div>
+                        <div class="onboarding-demo-slot empty">+</div>
+                        <div class="onboarding-demo-slot empty">+</div>
+                    </div>
+                    <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Choisis avec soin. Chaque place compte.
+                    </p>
+                </div>
+                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                    Continuer →
+                </button>
+                <div class="onboarding-progress">
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot active"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                </div>
+                <button class="onboarding-skip" onclick="skipOnboarding()">Passer</button>
+            </div>
+
+            <!-- Step 3: The Ping -->
+            <div class="onboarding-step" id="onboarding-step-3">
+                <div class="onboarding-emoji">👋</div>
+                <h1 class="onboarding-title">Le Ping</h1>
+                <p class="onboarding-text">
+                    Un ping, c'est simple : <span class="onboarding-highlight">"Je pense à toi"</span>.
+                    <br><br>
+                    Pas de pression de répondre. Juste un petit signe pour dire que tu es là.
+                </p>
+                <div class="onboarding-feature">
+                    <span class="onboarding-feature-icon">💬</span>
+                    <div class="onboarding-feature-text">
+                        <strong>Messages courts</strong>
+                        <span>Tu peux aussi écrire, mais l'essentiel tient en un geste</span>
+                    </div>
+                </div>
+                <div class="onboarding-feature">
+                    <span class="onboarding-feature-icon">🔔</span>
+                    <div class="onboarding-feature-text">
+                        <strong>Notifications douces</strong>
+                        <span>Pas de spam. Juste ce qui compte.</span>
+                    </div>
+                </div>
+                <button class="onboarding-btn" onclick="nextOnboardingStep()">
+                    Presque fini →
+                </button>
+                <div class="onboarding-progress">
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot active"></div>
+                    <div class="onboarding-dot"></div>
+                </div>
+                <button class="onboarding-skip" onclick="skipOnboarding()">Passer</button>
+            </div>
+
+            <!-- Step 4: Getting Started -->
+            <div class="onboarding-step" id="onboarding-step-4">
+                <div class="onboarding-emoji">🚀</div>
+                <h1 class="onboarding-title">C'est parti !</h1>
+                <p class="onboarding-text">
+                    Voilà comment commencer :
+                </p>
+                <div class="onboarding-feature">
+                    <span class="onboarding-feature-icon">➕</span>
+                    <div class="onboarding-feature-text">
+                        <strong>Ajoute un contact</strong>
+                        <span>Clique sur un slot vide et entre l'ID de ton ami</span>
+                    </div>
+                </div>
+                <div class="onboarding-feature">
+                    <span class="onboarding-feature-icon">🎁</span>
+                    <div class="onboarding-feature-text">
+                        <strong>Invite des amis</strong>
+                        <span>Génère un code cadeau pour inviter quelqu'un sur Cinq</span>
+                    </div>
+                </div>
+                <div class="onboarding-feature">
+                    <span class="onboarding-feature-icon">📋</span>
+                    <div class="onboarding-feature-text">
+                        <strong>Partage ton ID</strong>
+                        <span>Pour que tes amis puissent t'ajouter</span>
+                    </div>
+                </div>
+                <button class="onboarding-btn" onclick="finishOnboarding()">
+                    Commencer 🎉
+                </button>
+                <div class="onboarding-progress">
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot"></div>
+                    <div class="onboarding-dot active"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="app-container">
         <header class="app-header">
@@ -804,6 +1173,8 @@
         let contactPollingInterval = null;
         let lastMessageIds = {};
         let unreadCounts = {};
+        let currentOnboardingStep = 1;
+        const totalOnboardingSteps = 4;
 
         // ===== TOAST SYSTEM =====
         function showToast(options) {
@@ -875,8 +1246,85 @@
 
             document.getElementById('user-name').textContent = user.email.split('@')[0];
 
+            // Check if new user and show onboarding
+            const isNewUser = localStorage.getItem('cinq_new_user');
+            if (isNewUser === 'true') {
+                showOnboarding();
+            }
+
             await loadContacts();
             startPolling();
+        }
+
+        // ===== ONBOARDING =====
+        function showOnboarding() {
+            document.getElementById('onboarding-overlay').classList.add('open');
+            currentOnboardingStep = 1;
+            showOnboardingStep(1);
+            animateDemoSlots();
+        }
+
+        function showOnboardingStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalOnboardingSteps; i++) {
+                const stepEl = document.getElementById(`onboarding-step-${i}`);
+                if (stepEl) stepEl.classList.remove('active');
+            }
+            // Show current step
+            const currentStepEl = document.getElementById(`onboarding-step-${step}`);
+            if (currentStepEl) currentStepEl.classList.add('active');
+        }
+
+        function nextOnboardingStep() {
+            if (currentOnboardingStep < totalOnboardingSteps) {
+                currentOnboardingStep++;
+                showOnboardingStep(currentOnboardingStep);
+            }
+        }
+
+        function skipOnboarding() {
+            finishOnboarding();
+        }
+
+        function finishOnboarding() {
+            localStorage.removeItem('cinq_new_user');
+            const overlay = document.getElementById('onboarding-overlay');
+            overlay.style.transition = 'opacity 0.5s';
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.remove('open');
+                overlay.style.opacity = '';
+                overlay.style.transition = '';
+                // Show a welcome toast
+                showToast({
+                    type: 'success',
+                    title: 'Bienvenue ! 🎉',
+                    message: 'Commence par ajouter ton premier contact'
+                });
+            }, 500);
+        }
+
+        function animateDemoSlots() {
+            // Animate demo slots on step 2
+            const slots = document.querySelectorAll('#demo-slots .onboarding-demo-slot');
+            if (slots.length === 0) return;
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                slots.forEach(s => s.classList.remove('highlight'));
+                if (slots[i]) slots[i].classList.add('highlight');
+                i = (i + 1) % slots.length;
+            }, 800);
+            
+            // Clear when onboarding closes
+            const overlay = document.getElementById('onboarding-overlay');
+            const observer = new MutationObserver(() => {
+                if (!overlay.classList.contains('open')) {
+                    clearInterval(interval);
+                    observer.disconnect();
+                }
+            });
+            observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });
         }
 
         function startPolling() {
@@ -1319,8 +1767,106 @@
             }
         });
 
+        // ===== PUSH NOTIFICATIONS =====
+        const VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';
+
+        async function initPushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('[Push] Not supported');
+                return;
+            }
+
+            try {
+                // Register service worker
+                const registration = await navigator.serviceWorker.register('/service-worker.js');
+                console.log('[Push] Service Worker registered');
+
+                // Check if already subscribed
+                const existingSubscription = await registration.pushManager.getSubscription();
+                if (existingSubscription) {
+                    console.log('[Push] Already subscribed');
+                    return;
+                }
+
+                // Ask for permission after a delay (better UX)
+                setTimeout(() => askForNotificationPermission(registration), 3000);
+            } catch (err) {
+                console.error('[Push] SW registration failed:', err);
+            }
+        }
+
+        async function askForNotificationPermission(registration) {
+            // Don't ask if already denied
+            if (Notification.permission === 'denied') {
+                console.log('[Push] Permission denied');
+                return;
+            }
+
+            // Already granted? Subscribe directly
+            if (Notification.permission === 'granted') {
+                await subscribeToPush(registration);
+                return;
+            }
+
+            // Show a friendly toast first
+            showToast({
+                type: 'info',
+                title: '🔔 Notifications',
+                message: 'Active les notifs pour ne rien manquer',
+                duration: 6000,
+                onClick: async () => {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        await subscribeToPush(registration);
+                        showToast({ type: 'success', title: 'Activé !', message: 'Tu recevras les notifications' });
+                    }
+                }
+            });
+        }
+
+        async function subscribeToPush(registration) {
+            try {
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+
+                // Send subscription to server
+                const res = await fetch(`${API_URL}/push-subscribe`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ subscription: subscription.toJSON() })
+                });
+
+                if (!res.ok) throw new Error('Subscribe failed');
+                console.log('[Push] Subscribed successfully');
+            } catch (err) {
+                console.error('[Push] Subscribe error:', err);
+            }
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        // Listen for messages from service worker
+        navigator.serviceWorker?.addEventListener('message', (event) => {
+            if (event.data?.type === 'NOTIFICATION_CLICKED') {
+                // Handle notification click - could open specific chat
+                console.log('[Push] Notification clicked:', event.data);
+            }
+        });
+
         // ===== INIT =====
         init();
+        initPushNotifications();
     </script>
 </body>
 </html>

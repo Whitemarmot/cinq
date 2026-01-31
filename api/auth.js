@@ -156,10 +156,28 @@ export default async function handler(req, res) {
                 gift_code_used: code
             });
 
+            // Auto-login: create a session for the new user
+            const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
+                email: emailResult.email,
+                password
+            });
+
+            if (loginErr) {
+                // User created but login failed - they can login manually
+                return res.json({ 
+                    success: true, 
+                    message: 'Bienvenue sur Cinq ! 🎉',
+                    user: { id: authData.user.id, email: authData.user.email },
+                    autoLoginFailed: true
+                });
+            }
+
             return res.json({ 
                 success: true, 
                 message: 'Bienvenue sur Cinq ! 🎉',
-                user: { id: authData.user.id, email: authData.user.email }
+                user: loginData.user,
+                session: loginData.session,
+                isNewUser: true
             });
         }
 
