@@ -24,6 +24,9 @@ const {
     headers,
 } = require('./gift-utils');
 
+// Email service
+const { sendEmail } = require('./email-send');
+
 // Supabase Admin Client (service role)
 function getSupabaseAdmin() {
     const url = process.env.SUPABASE_URL;
@@ -203,7 +206,23 @@ exports.handler = async (event, context) => {
         await supabase.rpc('reset_gift_code_rate_limit', { client_ip: clientIP });
 
         // ========================================
-        // 7. Generate Session Token
+        // 7. Send Welcome Email
+        // ========================================
+        
+        try {
+            await sendEmail({
+                to: email.toLowerCase().trim(),
+                template: 'welcome',
+                data: { email: email.toLowerCase().trim() }
+            });
+            console.log('Welcome email sent to:', email);
+        } catch (emailErr) {
+            // Don't fail registration if email fails
+            console.error('Failed to send welcome email:', emailErr.message);
+        }
+
+        // ========================================
+        // 8. Generate Session Token
         // ========================================
         
         // Sign in the user to get a session
@@ -213,7 +232,7 @@ exports.handler = async (event, context) => {
         });
 
         // ========================================
-        // 8. Return Success
+        // 9. Return Success
         // ========================================
         
         return success({
