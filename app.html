@@ -1606,7 +1606,11 @@
                 } else {
                     slot.setAttribute('aria-label', `Emplacement ${i + 1} vide. Cliquer pour ajouter un contact.`);
                     slot.innerHTML = `<span class="empty-plus" aria-hidden="true">+</span>`;
-                    slot.onclick = () => openAddContactModal();
+                    slot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log('Slot clicked!');
+                        openAddContactModal();
+                    });
                     slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAddContactModal(); } };
                 }
                 
@@ -1833,10 +1837,17 @@
 
         // ===== ADD CONTACT MODAL =====
         function openAddContactModal() {
-            document.getElementById('add-contact-modal').classList.add('open');
+            console.log('Opening add contact modal');
+            const modal = document.getElementById('add-contact-modal');
+            if (!modal) {
+                console.error('Modal not found!');
+                alert('Erreur: modal non trouvé');
+                return;
+            }
+            modal.classList.add('open');
             document.getElementById('contact-id-input').value = '';
             document.getElementById('add-contact-error').style.display = 'none';
-            document.getElementById('my-id').textContent = user.id;
+            document.getElementById('my-id').textContent = user?.id || 'Non disponible';
         }
 
         function closeAddContactModal() {
