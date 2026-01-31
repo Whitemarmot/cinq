@@ -54,6 +54,73 @@
     <script defer src="/analytics.js"></script>
     
     <style>
+        /* Header styles */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .header-logo-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-brand);
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-login-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .header-login-btn:hover {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            color: white;
+        }
+        
+        @media (max-width: 480px) {
+            .site-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .header-login-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8125rem;
+            }
+        }
+
         /* Hero section specific styles */
         .hero {
             position: relative;
@@ -63,6 +130,7 @@
             align-items: center;
             justify-content: center;
             padding: var(--space-8) var(--space-6);
+            padding-top: calc(var(--space-8) + 60px); /* Compense le header fixe */
             overflow: hidden;
         }
         
@@ -408,6 +476,18 @@
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-3" aria-hidden="true"></div>
+
+    <!-- Header avec lien connexion -->
+    <header class="site-header" role="banner">
+        <a href="/" class="header-logo" aria-label="Cinq - Accueil">
+            <span class="header-logo-number">5</span>
+        </a>
+        <nav class="header-nav" aria-label="Navigation principale">
+            <a href="/login.html" class="header-login-btn">
+                <span>Se connecter</span>
+            </a>
+        </nav>
+    </header>
 
     <main id="main-content">
     <section class="hero" role="region" aria-label="Présentation de Cinq">
