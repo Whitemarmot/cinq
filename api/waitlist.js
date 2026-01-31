@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     // POST = signup
     if (req.method === 'POST') {
         try {
-            const { email, utm_source, utm_medium, utm_campaign } = req.body;
+            const { email } = req.body;
             
             if (!email) {
                 return res.status(400).json({ error: 'Email requis' });
@@ -40,13 +40,7 @@ export default async function handler(req, res) {
 
             const { data, error } = await supabase
                 .from('waitlist')
-                .insert([{ 
-                    email, 
-                    utm_source, 
-                    utm_medium, 
-                    utm_campaign,
-                    created_at: new Date().toISOString()
-                }])
+                .insert([{ email }])
                 .select();
 
             if (error) {
