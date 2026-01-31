@@ -164,7 +164,7 @@
             
             <!-- Titre -->
             <h1 id="login-title" class="text-2xl md:text-3xl font-bold mb-4 text-center leading-tight">
-                Content de te revoir
+                Tiens, te revoilà 👋
             </h1>
             
             <!-- Sous-titre -->
@@ -273,14 +273,18 @@
                 <p class="text-white/60 mb-3">Pas encore de compte ?</p>
                 <a href="/redeem" class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 rounded-xl text-white/90 transition">
                     <span aria-hidden="true">🎁</span>
-                    <span>Tu dois recevoir un cadeau</span>
+                    <span>Faut qu'on t'offre un accès d'abord</span>
                 </a>
+                <p class="text-white/30 text-xs mt-2">(C'est le concept. On n'entre pas, on est invité.)</p>
             </div>
             
         </section>
 
     </main>
 
+    <!-- Fun Script -->
+    <script src="/fun.js"></script>
+    
     <!-- JavaScript -->
     <script>
         /**
@@ -476,7 +480,7 @@
                         
                         // Erreur générique pour ne pas révéler si l'email existe
                         if (response.status === 401) {
-                            showError('general-error', 'Email ou mot de passe incorrect');
+                            showError('general-error', 'Email ou mot de passe incorrect. Ça arrive aux meilleurs. 🤷');
                             passwordInput.value = '';
                             passwordInput.focus();
                         } else {

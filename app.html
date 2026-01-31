@@ -122,7 +122,7 @@
             <div class="w-16 h-16 rounded-full border-2 border-white/20 flex items-center justify-center mb-4 mx-auto">
                 <span class="text-2xl font-bold">5</span>
             </div>
-            <p class="text-white/40 text-sm">Chargement...</p>
+            <p class="text-white/40 text-sm" id="loading-text">On compte jusqu'à 5...</p>
         </div>
     </div>
 
@@ -137,7 +137,7 @@
                     <span class="text-4xl font-bold">5</span>
                 </div>
                 <h1 class="text-xl font-semibold">Cinq</h1>
-                <p class="text-white/50 text-sm mt-1">Ton cercle t'attend</p>
+                <p class="text-white/50 text-sm mt-1">Les vrais sont là</p>
             </div>
             
             <!-- Login Form -->
@@ -244,7 +244,8 @@
                         </div>
                         <p id="messages-empty" class="text-center text-white/30 text-sm py-8">
                             Pas encore de messages.<br>
-                            <span class="text-white/50">Le silence aussi a du sens. 🌙</span>
+                            <span class="text-white/50">Le silence aussi a du sens. 🌙</span><br>
+                            <span class="text-white/30 text-xs mt-2 block">(C'est pas TikTok ici, on respire.)</span>
                         </p>
                     </div>
                     
@@ -277,7 +278,8 @@
         <div class="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 w-full max-w-sm glow-soft">
             <h3 class="text-lg font-semibold mb-4">Ajouter un contact</h3>
             <p class="text-white/50 text-sm mb-4">
-                Choisis bien. 5 places, c'est tout.
+                Choisis comme si ta vie en dépendait.<br>
+                <span class="text-indigo-400/70">(Spoiler: un peu, quand même.)</span>
             </p>
             <form id="add-contact-form">
                 <input 
@@ -338,6 +340,7 @@
     <!-- ============================================ -->
     <!-- SCRIPTS -->
     <!-- ============================================ -->
+    <script src="/fun.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         // ============================================
@@ -659,6 +662,11 @@
                 
                 closeAddContactModal();
                 await loadContacts();
+                
+                // 🎉 Celebrate the 5th contact!
+                if (contacts.length === 5 && typeof celebrateFifthContact === 'function') {
+                    celebrateFifthContact();
+                }
             } catch (err) {
                 console.error('Add contact error:', err);
                 
@@ -666,13 +674,13 @@
                 let message = err.message || 'Erreur lors de l\'ajout';
                 
                 if (err.code === 'SELF_ADD') {
-                    message = 'Tu ne peux pas t\'ajouter toi-même 😅';
+                    message = 'Tu ne peux pas t\'ajouter toi-même 😅 (on a tous essayé)';
                 } else if (err.code === 'USER_NOT_FOUND') {
-                    message = 'Cette personne n\'est pas encore sur Cinq. Offre-lui un accès !';
+                    message = 'Cette personne n\'est pas encore sur Cinq. Offre-lui un accès ! 🎁';
                 } else if (err.code === 'ALREADY_CONTACT') {
-                    message = 'Cette personne est déjà dans ton cercle';
+                    message = 'Cette personne est déjà dans ton cercle (tu l\'aimes vraiment bien hein)';
                 } else if (err.code === 'LIMIT_REACHED') {
-                    message = '5 contacts max. C\'est le concept !';
+                    message = '5 contacts max. C\'est le concept ! 🎯 Qualité > Quantité.';
                 }
                 
                 showError('add-contact-error', message);

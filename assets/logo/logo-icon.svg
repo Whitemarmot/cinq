@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="cinq-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main circle with gradient -->
+  <circle cx="50" cy="50" r="46" fill="url(#cinq-gradient)" filter="url(#glow)"/>
+  
+  <!-- Inner ring - subtle premium detail -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  
+  <!-- The "5" - the hero -->
+  <text x="50" y="67" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="54" font-weight="800" fill="white" letter-spacing="-2">5</text>
+</svg>

@@ -71,6 +71,7 @@
             }
         }
     </style>
+    <script src="/fun.js"></script>
 </head>
 <body class="gradient-bg min-h-screen text-white">
     
@@ -92,16 +93,17 @@
 
         <!-- Message principal -->
         <h1 class="text-2xl md:text-4xl font-bold mb-4">
-            Oups, quelque chose s'est cassé
+            Oups. C'est cassé. 🔧
         </h1>
         
         <p class="text-lg md:text-xl text-white/70 mb-4 max-w-md">
-            Même les anti-réseaux ont parfois des bugs.<br>
-            <span class="text-indigo-400">Au moins, on n'a que 5 utilisateurs à décevoir.</span>
+            Même les anti-réseaux ont des bugs.<br>
+            <span class="text-indigo-400">La différence ? On en a honte. (Un peu.)</span>
         </p>
         
         <p class="text-white/40 mb-8 max-w-sm">
-            Notre équipe de 1 personne est probablement déjà dessus. Ou en train de dormir. C'est 50/50.
+            Notre équipe de 1 personne est probablement dessus.<br>
+            <span class="text-white/30">Ou en train de pleurer. Ou de boire. C'est 33/33/33.</span>
         </p>
 
         <!-- Code d'erreur (optionnel, injecté par le serveur) -->
@@ -129,14 +131,15 @@
         <div class="mt-12 p-6 bg-white/5 rounded-xl border border-white/10 max-w-md">
             <p class="text-white/60 text-sm mb-3">En attendant, tu peux :</p>
             <ul class="text-white/40 text-sm space-y-2">
-                <li>📱 Appeler un de tes 5 (IRL, pas sur l'app)</li>
-                <li>☕ Te faire un café</li>
-                <li>🧘 Profiter de cette pause forcée</li>
+                <li>📱 Appeler un de tes 5 (IRL, genre avec ta voix)</li>
+                <li>☕ Te faire un café (ou quelque chose de plus fort)</li>
+                <li>🧘 Profiter de cette pause forcée (c'est gratuit)</li>
+                <li>🤔 Réfléchir à qui tu ajouterais si t'avais 6 places (spoiler: t'en as pas)</li>
             </ul>
         </div>
 
         <!-- Easter egg -->
-        <p class="mt-12 text-white/20 text-sm italic">
+        <p class="mt-12 text-white/20 text-sm italic cursor-pointer" onclick="if(typeof showToast === 'function') showToast('🔧 On bosse dessus. Promis.')">
             "La friction est le feature" — même quand c'est pas voulu.
         </p>
 

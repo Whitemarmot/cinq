@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" fill="none">
+  <defs>
+    <linearGradient id="cinq-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Icon circle -->
+  <circle cx="40" cy="40" r="36" fill="url(#cinq-gradient)" filter="url(#glow)"/>
+  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- The "5" -->
+  <text x="40" y="53" text-anchor="middle" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="42" font-weight="800" fill="white" letter-spacing="-1">5</text>
+  
+  <!-- Wordmark "Cinq" - dark text for light backgrounds -->
+  <text x="100" y="52" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="38" font-weight="700" fill="#0f172a" letter-spacing="-0.5">Cinq</text>
+</svg>

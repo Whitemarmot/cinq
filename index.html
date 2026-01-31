@@ -27,137 +27,471 @@
     <meta name="twitter:title" content="Cinq — L'anti-réseau social">
     <meta name="twitter:description" content="5 proches. Pas de likes. Zéro algorithme.">
     <meta name="twitter:image" content="https://cinq.app/og-image.png">
-    <meta name="twitter:site" content="@cinqapp">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <meta name="theme-color" content="#1a1a2e">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.css">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        /* Hero section specific styles */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8) var(--space-6);
+            overflow: hidden;
         }
-        .glow {
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 720px;
+            text-align: center;
         }
-        .circle {
-            animation: pulse 4s ease-in-out infinite;
+        
+        /* Iconic 5 */
+        .hero-logo {
+            margin-bottom: var(--space-12);
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+        
+        .five {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
         }
-        #counter-value {
-            transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        
+        .five-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid var(--color-border);
+            opacity: 0;
+            animation: ring-expand 3s ease-out infinite;
+        }
+        
+        .five-ring:nth-child(2) { animation-delay: 1s; }
+        .five-ring:nth-child(3) { animation-delay: 2s; }
+        
+        @keyframes ring-expand {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .five-core {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(
+                135deg,
+                var(--color-bg-secondary) 0%,
+                var(--color-bg-tertiary) 100%
+            );
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .five-number {
+            font-size: 72px;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            background: linear-gradient(
+                180deg,
+                var(--color-text-primary) 0%,
+                var(--color-text-secondary) 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Hero headline */
+        .hero-headline {
+            font-size: var(--text-hero);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: var(--space-6);
+            text-wrap: balance;
+        }
+        
+        .hero-headline .accent {
+            display: block;
+            background: linear-gradient(
+                135deg,
+                var(--color-brand) 0%,
+                #a855f7 50%,
+                var(--color-brand) 100%
+            );
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 5s ease infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hero-sub {
+            font-size: var(--text-xl);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-10);
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-sub strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+        
+        /* Feature pills */
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-12);
+        }
+        
+        .feature-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            transition: 
+                border-color var(--transition-base),
+                background var(--transition-base);
+        }
+        
+        .feature-pill:hover {
+            border-color: var(--color-border-active);
+            background: var(--color-bg-tertiary);
+        }
+        
+        .feature-icon {
+            font-size: 14px;
+        }
+        
+        /* CTA section */
+        .cta-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-4);
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-5) var(--space-10);
+            background: var(--color-brand);
+            color: white;
+            font-size: var(--text-lg);
+            font-weight: 600;
+            border-radius: var(--radius-xl);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 
+                background var(--transition-fast),
+                transform var(--transition-fast),
+                box-shadow var(--transition-base);
+        }
+        
+        .cta-button:hover {
+            background: var(--color-brand-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+            color: white;
+        }
+        
+        .cta-button:active {
+            transform: translateY(0);
+        }
+        
+        .cta-note {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            text-align: center;
+            max-width: 320px;
+        }
+        
+        /* Waitlist section */
+        .waitlist-section {
+            margin-top: var(--space-16);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--color-border-subtle);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .waitlist-label {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            text-align: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .waitlist-form {
+            display: flex;
+            gap: var(--space-3);
+        }
+        
+        .waitlist-input {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            transition: 
+                border-color var(--transition-fast),
+                box-shadow var(--transition-fast);
+        }
+        
+        .waitlist-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .waitlist-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .waitlist-submit {
+            padding: var(--space-3) var(--space-6);
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: 
+                background var(--transition-fast),
+                border-color var(--transition-fast);
+        }
+        
+        .waitlist-submit:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+        }
+        
+        .waitlist-message {
+            text-align: center;
+            margin-top: var(--space-4);
+            font-size: var(--text-sm);
+        }
+        
+        .waitlist-message.success {
+            color: var(--color-success);
+        }
+        
+        .waitlist-message.error {
+            color: var(--color-error);
+        }
+        
+        /* Counter */
+        .counter-section {
+            margin-top: var(--space-12);
+            text-align: center;
+        }
+        
+        .counter-value {
+            font-size: var(--text-4xl);
+            font-weight: 700;
+            color: var(--color-brand);
+            letter-spacing: -0.02em;
+        }
+        
+        .counter-label {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-top: var(--space-1);
+        }
+        
+        /* Footer quote */
+        .footer-quote {
+            margin-top: var(--space-16);
+            text-align: center;
+        }
+        
+        .quote-text {
+            font-size: var(--text-sm);
+            font-style: italic;
+            color: var(--color-text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hero-headline {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+            
+            .five {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .five-number {
+                font-size: 48px;
+            }
+            
+            .waitlist-form {
+                flex-direction: column;
+            }
+            
+            .features {
+                gap: var(--space-2);
+            }
+            
+            .feature-pill {
+                padding: var(--space-2) var(--space-3);
+                font-size: var(--text-xs);
+            }
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body>
+    <!-- Noise overlay for texture -->
+    <div class="noise-overlay" aria-hidden="true"></div>
     
-    <!-- Cercles décoratifs -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
-        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
-        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
-    </div>
+    <!-- Gradient orbs -->
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-3" aria-hidden="true"></div>
 
-    <div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        
-        <!-- Logo -->
-        <div class="mb-8">
-            <div class="w-24 h-24 rounded-full border-4 border-white/20 flex items-center justify-center glow bg-white/5 backdrop-blur">
-                <span class="text-5xl font-bold">5</span>
+    <section class="hero">
+        <div class="hero-content">
+            
+            <!-- The iconic 5 logo -->
+            <div class="hero-logo animate-fade-in-up">
+                <div class="five">
+                    <div class="five-ring"></div>
+                    <div class="five-ring"></div>
+                    <div class="five-ring"></div>
+                    <div class="five-core">
+                        <span class="five-number">5</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Titre -->
-        <h1 class="text-3xl md:text-5xl font-bold mb-6 text-center max-w-3xl leading-tight">
-            Tu as 847 amis Facebook.<br>
-            <span class="text-indigo-400">Combien t'appelleraient à 3h du mat' ?</span>
-        </h1>
-        
-        <!-- Tagline -->
-        <p class="text-xl md:text-2xl text-white/70 mb-12 text-center max-w-xl">
-            Les réseaux sociaux t'ont vendu l'illusion de la connexion.<br>
-            <strong class="text-white">Cinq te rend la réalité.</strong>
-        </p>
-
-        <!-- Features -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12 max-w-2xl">
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
-                🎯 5 slots. C'est tout.
-            </div>
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
-                🎁 Offrir > S'inscrire
-            </div>
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
-                🚫 Zéro likes, zéro validation
-            </div>
-            <div class="bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm">
-                ⚡ La friction est le feature
-            </div>
-        </div>
-
-        <!-- CTA Principal -->
-        <div class="w-full max-w-md text-center">
-            <a 
-                href="gift.html"
-                class="inline-block px-10 py-5 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold text-xl transition transform hover:scale-105 active:scale-95 glow"
-            >
-                🎁 Offrir Cinq
-            </a>
-            <p class="mt-4 text-white/50 text-sm max-w-sm mx-auto">
-                Tu ne télécharges pas Cinq. Tu l'offres.<br>
-                Pas de compte à créer. Pas de spam. Juste un geste.
+            <!-- Headline -->
+            <h1 class="hero-headline animate-fade-in-up animate-delay-1">
+                Tu as 847 amis Facebook.
+                <span class="accent">Combien t'appelleraient à 3h du mat' ?</span>
+            </h1>
+            
+            <!-- Sub-headline -->
+            <p class="hero-sub animate-fade-in-up animate-delay-2">
+                Les réseaux sociaux t'ont vendu l'illusion de la connexion.<br>
+                <strong>Cinq te rend la réalité.</strong>
             </p>
-        </div>
-        
-        <!-- Waitlist Form (secondaire) -->
-        <div class="w-full max-w-md mt-12 pt-8 border-t border-white/10">
-            <p class="text-center text-white/40 text-sm mb-4">Ou rejoins la waitlist</p>
-            <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3">
-                <label for="email" class="sr-only">Adresse email</label>
-                <input 
-                    type="email" 
-                    id="email"
-                    name="email"
-                    placeholder="ton@email.com" 
-                    required
-                    autocomplete="email"
-                    class="flex-1 px-5 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-indigo-400 focus:bg-white/15 transition"
-                >
-                <button 
-                    type="submit"
-                    class="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold transition transform hover:scale-105 active:scale-95"
-                >
-                    Rejoindre
-                </button>
-            </form>
-            <p id="form-message" class="text-center mt-4 text-white/60 hidden"></p>
-        </div>
 
-        <!-- Counter -->
-        <div class="mt-16 text-center" role="status" aria-live="polite">
-            <div class="text-4xl font-bold text-indigo-400 transition-all duration-300" id="counter" aria-label="Nombre de personnes inscrites">
-                <span class="inline-block opacity-0 scale-75" id="counter-value">0</span>
+            <!-- Feature pills -->
+            <div class="features animate-fade-in-up animate-delay-3">
+                <span class="feature-pill">
+                    <span class="feature-icon">🎯</span>
+                    <span>5 slots. C'est tout.</span>
+                </span>
+                <span class="feature-pill">
+                    <span class="feature-icon">🎁</span>
+                    <span>Offrir > S'inscrire</span>
+                </span>
+                <span class="feature-pill">
+                    <span class="feature-icon">🚫</span>
+                    <span>Zéro likes, zéro validation</span>
+                </span>
+                <span class="feature-pill">
+                    <span class="feature-icon">⚡</span>
+                    <span>La friction est le feature</span>
+                </span>
             </div>
-            <div class="text-white/40 text-sm">personnes en attente</div>
+
+            <!-- CTA -->
+            <div class="cta-section animate-fade-in-up animate-delay-4">
+                <a href="gift.html" class="cta-button">
+                    <span>🎁</span>
+                    <span>Offrir Cinq</span>
+                </a>
+                <p class="cta-note">
+                    Tu ne télécharges pas Cinq. Tu l'offres.<br>
+                    Pas de compte à créer. Pas de spam. Juste un geste.
+                </p>
+            </div>
+
+            <!-- Waitlist -->
+            <div class="waitlist-section animate-fade-in-up animate-delay-5">
+                <p class="waitlist-label">Ou rejoins la waitlist</p>
+                <form id="waitlist-form" class="waitlist-form">
+                    <input 
+                        type="email" 
+                        id="email"
+                        name="email"
+                        placeholder="ton@email.com" 
+                        required
+                        autocomplete="email"
+                        class="waitlist-input"
+                    >
+                    <button type="submit" class="waitlist-submit">
+                        Rejoindre
+                    </button>
+                </form>
+                <p id="form-message" class="waitlist-message hidden"></p>
+            </div>
+
+            <!-- Counter -->
+            <div class="counter-section" role="status" aria-live="polite">
+                <div class="counter-value" id="counter">
+                    <span id="counter-value">—</span>
+                </div>
+                <div class="counter-label">personnes en attente</div>
+            </div>
+
+            <!-- Footer quote -->
+            <div class="footer-quote">
+                <p class="quote-text">
+                    "L'app qui refuse de scaler. Et c'est le point. 🎯"
+                </p>
+            </div>
+
         </div>
+    </section>
 
-        <!-- Footer quote -->
-        <div class="mt-16 text-center max-w-lg">
-            <p class="text-white/30 text-sm italic">
-                "L'app qui ne scale pas. Et c'est le point."
-            </p>
-        </div>
-
-    </div>
-
+    <script src="/fun.js"></script>
     <script>
         const API_URL = '/.netlify/functions/waitlist';
         const form = document.getElementById('waitlist-form');
@@ -165,7 +499,7 @@
         const counterValue = document.getElementById('counter-value');
         const submitBtn = form.querySelector('button[type="submit"]');
         
-        // Charger le compteur au démarrage
+        // Load counter on startup
         async function loadCount() {
             try {
                 const res = await fetch(API_URL);
@@ -174,50 +508,31 @@
                     animateCounter(data.count);
                 }
             } catch (e) {
-                console.log('Count loading...');
                 counterValue.textContent = '—';
-                counterValue.classList.remove('opacity-0', 'scale-75');
-                counterValue.classList.add('opacity-100', 'scale-100');
             }
         }
         
-        // Animation du compteur avec effet pop-in
+        // Animate counter with smooth easing
         function animateCounter(target) {
-            const duration = 1200;
+            const duration = 1500;
             const start = parseInt(counterValue.textContent) || 0;
             const startTime = performance.now();
-            
-            // Pop-in effect
-            counterValue.classList.remove('opacity-0', 'scale-75');
-            counterValue.classList.add('opacity-100', 'scale-100');
             
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Elastic easing for bouncy effect
-                const eased = progress < 1 
-                    ? 1 - Math.pow(1 - progress, 4) 
-                    : 1;
+                const eased = 1 - Math.pow(1 - progress, 4);
                 const current = Math.floor(start + (target - start) * eased);
                 counterValue.textContent = current.toLocaleString('fr-FR');
                 
-                // Subtle scale pulse on each number change
                 if (progress < 1) {
-                    counterValue.style.transform = `scale(${1 + Math.sin(progress * Math.PI * 4) * 0.03})`;
                     requestAnimationFrame(update);
-                } else {
-                    counterValue.style.transform = 'scale(1)';
-                    // Final bounce
-                    counterValue.animate([
-                        { transform: 'scale(1.1)' },
-                        { transform: 'scale(1)' }
-                    ], { duration: 200, easing: 'ease-out' });
                 }
             }
             requestAnimationFrame(update);
         }
         
-        // Récupérer UTM params
+        // Get UTM params
         function getUtmParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -232,7 +547,6 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
             
-            // Disable button
             submitBtn.disabled = true;
             submitBtn.textContent = '...';
             
@@ -250,31 +564,32 @@
                 const data = await res.json();
                 
                 if (res.status === 409) {
-                    showMessage("Tu es déjà sur la liste ! 🙌", false);
+                    showMessage("Tu es déjà sur la liste ! 🙌 (On t'a pas oublié)", 'success');
                 } else if (!res.ok) {
-                    showMessage("Oups, réessaie ! 🙏", false);
+                    showMessage("Oups, réessaie ! 🙏 (Même les anti-réseaux ont des bugs)", 'error');
                 } else {
-                    showMessage("Bienvenue dans le cercle ! ✨", true);
+                    showMessage("Bienvenue dans le cercle ! ✨", 'success');
                     document.getElementById('email').value = '';
                     if (data.count) animateCounter(data.count);
+                    // Petit confetti pour célébrer
+                    if (typeof launchConfetti === 'function') launchConfetti({ particleCount: 50 });
                 }
             } catch (error) {
-                showMessage("Erreur réseau, réessaie ! 🙏", false);
+                showMessage("Erreur réseau, réessaie ! 🙏", 'error');
             }
             
             submitBtn.disabled = false;
             submitBtn.textContent = 'Rejoindre';
         });
         
-        function showMessage(text, success) {
+        function showMessage(text, type) {
             message.textContent = text;
-            message.classList.remove('hidden', 'text-indigo-400', 'text-red-400');
-            message.classList.add(success ? 'text-indigo-400' : 'text-white/60');
+            message.className = `waitlist-message ${type}`;
+            message.classList.remove('hidden');
         }
         
-        // Init - léger délai pour l'effet d'arrivée
+        // Init
         setTimeout(loadCount, 300);
     </script>
-
 </body>
 </html>
