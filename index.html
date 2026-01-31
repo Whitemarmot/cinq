@@ -43,6 +43,9 @@
             0%, 100% { transform: scale(1); opacity: 0.5; }
             50% { transform: scale(1.05); opacity: 0.8; }
         }
+        #counter-value {
+            transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen text-white">
@@ -131,7 +134,9 @@
 
         <!-- Counter -->
         <div class="mt-16 text-center" role="status" aria-live="polite">
-            <div class="text-4xl font-bold text-indigo-400" id="counter" aria-label="Nombre de personnes inscrites">0</div>
+            <div class="text-4xl font-bold text-indigo-400 transition-all duration-300" id="counter" aria-label="Nombre de personnes inscrites">
+                <span class="inline-block opacity-0 scale-75" id="counter-value">0</span>
+            </div>
             <div class="text-white/40 text-sm">personnes en attente</div>
         </div>
 
@@ -144,41 +149,61 @@
 
     </div>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNnrT412YHQ';
-        const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const API_URL = '/.netlify/functions/waitlist';
         const form = document.getElementById('waitlist-form');
         const message = document.getElementById('form-message');
-        const counter = document.getElementById('counter');
+        const counterValue = document.getElementById('counter-value');
         const submitBtn = form.querySelector('button[type="submit"]');
         
         // Charger le compteur au démarrage
         async function loadCount() {
             try {
-                const { count, error } = await db
-                    .from('waitlist')
-                    .select('*', { count: 'exact', head: true });
-                if (!error) animateCounter(count || 0);
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                if (data.count !== undefined) {
+                    animateCounter(data.count);
+                }
             } catch (e) {
                 console.log('Count loading...');
+                counterValue.textContent = '—';
+                counterValue.classList.remove('opacity-0', 'scale-75');
+                counterValue.classList.add('opacity-100', 'scale-100');
             }
         }
         
-        // Animation du compteur
+        // Animation du compteur avec effet pop-in
         function animateCounter(target) {
-            const duration = 1000;
-            const start = parseInt(counter.textContent) || 0;
+            const duration = 1200;
+            const start = parseInt(counterValue.textContent) || 0;
             const startTime = performance.now();
+            
+            // Pop-in effect
+            counterValue.classList.remove('opacity-0', 'scale-75');
+            counterValue.classList.add('opacity-100', 'scale-100');
             
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                counter.textContent = Math.floor(start + (target - start) * eased);
-                if (progress < 1) requestAnimationFrame(update);
+                // Elastic easing for bouncy effect
+                const eased = progress < 1 
+                    ? 1 - Math.pow(1 - progress, 4) 
+                    : 1;
+                const current = Math.floor(start + (target - start) * eased);
+                counterValue.textContent = current.toLocaleString('fr-FR');
+                
+                // Subtle scale pulse on each number change
+                if (progress < 1) {
+                    counterValue.style.transform = `scale(${1 + Math.sin(progress * Math.PI * 4) * 0.03})`;
+                    requestAnimationFrame(update);
+                } else {
+                    counterValue.style.transform = 'scale(1)';
+                    // Final bounce
+                    counterValue.animate([
+                        { transform: 'scale(1.1)' },
+                        { transform: 'scale(1)' }
+                    ], { duration: 200, easing: 'ease-out' });
+                }
             }
             requestAnimationFrame(update);
         }
@@ -204,26 +229,25 @@
             
             try {
                 const utmData = getUtmParams();
-                const { data, error } = await db
-                    .from('waitlist')
-                    .insert([{ 
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
                         email: email.toLowerCase().trim(),
-                        utm_source: utmData.utm_source,
-                        utm_medium: utmData.utm_medium,
-                        utm_campaign: utmData.utm_campaign,
-                        referrer: utmData.referrer
-                    }]);
+                        ...utmData
+                    })
+                });
                 
-                if (error) {
-                    if (error.code === '23505') {
-                        showMessage("Tu es déjà sur la liste ! 🙌", false);
-                    } else {
-                        showMessage("Oups, réessaie ! 🙏", false);
-                    }
+                const data = await res.json();
+                
+                if (res.status === 409) {
+                    showMessage("Tu es déjà sur la liste ! 🙌", false);
+                } else if (!res.ok) {
+                    showMessage("Oups, réessaie ! 🙏", false);
                 } else {
                     showMessage("Bienvenue dans le cercle ! ✨", true);
                     document.getElementById('email').value = '';
-                    loadCount();
+                    if (data.count) animateCounter(data.count);
                 }
             } catch (error) {
                 showMessage("Erreur réseau, réessaie ! 🙏", false);
@@ -239,8 +263,8 @@
             message.classList.add(success ? 'text-indigo-400' : 'text-white/60');
         }
         
-        // Init
-        loadCount();
+        // Init - léger délai pour l'effet d'arrivée
+        setTimeout(loadCount, 300);
     </script>
 
 </body>
