@@ -222,7 +222,7 @@ self.addEventListener('pushsubscriptionchange', (event) => {
     self.registration.pushManager.subscribe(event.oldSubscription.options)
       .then((subscription) => {
         // Re-register with server
-        return fetch('/.netlify/functions/push-subscribe', {
+        return fetch('/api/push-subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription })
