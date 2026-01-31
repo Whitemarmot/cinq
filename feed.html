@@ -650,19 +650,38 @@
             <div class="image-preview" id="image-preview" style="display: none;">
                 <img id="preview-img" src="" alt="Aperçu de l'image">
                 <button class="image-preview-remove" onclick="removeImage()">×</button>
+                <div id="upload-progress" style="display: none; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 0.5rem; text-align: center; font-size: 0.75rem;">
+                    ⏳ Upload en cours...
+                </div>
             </div>
-            <div id="image-url-container" style="display: none;">
-                <input 
-                    type="url" 
-                    class="image-url-input" 
-                    id="image-url" 
-                    placeholder="URL de l'image (https://...)"
-                >
+            <!-- Hidden file input -->
+            <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleFileSelect(event)">
+            <!-- AI Generation input -->
+            <div id="ai-prompt-container" style="display: none; margin-top: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem;">
+                    <input 
+                        type="text" 
+                        class="image-url-input" 
+                        id="ai-prompt" 
+                        placeholder="Décris l'image à générer... (ex: un chat sur la lune)"
+                        maxlength="500"
+                        style="flex: 1;"
+                    >
+                    <button class="composer-btn" onclick="generateAIImage()" id="generate-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: white; border: none;">
+                        ✨ Générer
+                    </button>
+                </div>
+                <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">
+                    🤖 Génération IA (5 par heure max)
+                </div>
             </div>
             <div class="composer-footer">
                 <div class="composer-actions">
-                    <button class="composer-btn" id="add-image-btn" onclick="toggleImageInput()">
-                        🖼️ Image
+                    <button class="composer-btn" id="upload-image-btn" onclick="triggerFileUpload()">
+                        📷 Photo
+                    </button>
+                    <button class="composer-btn" id="ai-image-btn" onclick="toggleAIPrompt()">
+                        ✨ IA
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -756,16 +775,6 @@
                 postBtn.disabled = len === 0 || len > 1000;
             });
             
-            // Image URL preview
-            imageUrl.addEventListener('input', () => {
-                const url = imageUrl.value.trim();
-                if (url && isValidUrl(url)) {
-                    showImagePreview(url);
-                } else {
-                    hideImagePreview();
-                }
-            });
-            
             // Submit on Ctrl+Enter
             textarea.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -774,6 +783,9 @@
                 }
             });
         }
+        
+        // Current uploaded image URL (stored after upload)
+        let currentImageUrl = null;
         
         function isValidUrl(string) {
             try {
@@ -784,19 +796,124 @@
             }
         }
         
-        function toggleImageInput() {
-            const container = document.getElementById('image-url-container');
-            const btn = document.getElementById('add-image-btn');
+        // ===== FILE UPLOAD =====
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showToast({ type: 'error', message: 'Format non supporté (JPEG, PNG, GIF, WebP)' });
+                return;
+            }
+            
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast({ type: 'error', message: 'Image trop grande (max 5 Mo)' });
+                return;
+            }
+            
+            // Show local preview immediately
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                showImagePreview(e.target.result);
+                
+                // Upload to server
+                await uploadImage(e.target.result, file.type);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function uploadImage(base64Data, contentType) {
+            const progress = document.getElementById('upload-progress');
+            progress.style.display = 'block';
+            
+            try {
+                const res = await fetch(`${API_URL}/upload-image`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        image: base64Data, 
+                        contentType 
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur upload');
+                
+                currentImageUrl = data.url;
+                showToast({ type: 'success', message: '📷 Image prête !' });
+                
+            } catch (e) {
+                console.error('Upload error:', e);
+                showToast({ type: 'error', message: e.message });
+                removeImage();
+            } finally {
+                progress.style.display = 'none';
+            }
+        }
+        
+        // ===== AI IMAGE GENERATION =====
+        function toggleAIPrompt() {
+            const container = document.getElementById('ai-prompt-container');
+            const btn = document.getElementById('ai-image-btn');
             
             if (container.style.display === 'none') {
                 container.style.display = 'block';
                 btn.classList.add('active');
-                document.getElementById('image-url').focus();
+                document.getElementById('ai-prompt').focus();
             } else {
                 container.style.display = 'none';
                 btn.classList.remove('active');
-                document.getElementById('image-url').value = '';
-                hideImagePreview();
+                document.getElementById('ai-prompt').value = '';
+            }
+        }
+        
+        async function generateAIImage() {
+            const prompt = document.getElementById('ai-prompt').value.trim();
+            if (!prompt) {
+                showToast({ type: 'error', message: 'Entre une description pour l\'image' });
+                return;
+            }
+            
+            const generateBtn = document.getElementById('generate-btn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳...';
+            
+            try {
+                const res = await fetch(`${API_URL}/upload-image`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        action: 'generate',
+                        prompt 
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur génération');
+                
+                currentImageUrl = data.url;
+                showImagePreview(data.url);
+                showToast({ type: 'success', message: '✨ Image générée !' });
+                
+                // Hide AI prompt after success
+                document.getElementById('ai-prompt-container').style.display = 'none';
+                document.getElementById('ai-image-btn').classList.remove('active');
+                
+            } catch (e) {
+                console.error('AI generation error:', e);
+                showToast({ type: 'error', message: e.message });
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Générer';
             }
         }
         
@@ -811,17 +928,18 @@
         function hideImagePreview() {
             document.getElementById('image-preview').style.display = 'none';
             document.getElementById('preview-img').src = '';
+            currentImageUrl = null;
         }
         
         function removeImage() {
-            document.getElementById('image-url').value = '';
             hideImagePreview();
+            document.getElementById('file-input').value = '';
+            document.getElementById('ai-prompt').value = '';
         }
 
         // ===== SUBMIT POST =====
         async function submitPost() {
             const content = document.getElementById('post-content').value.trim();
-            const imageUrl = document.getElementById('image-url').value.trim();
             
             if (!content) return;
             
@@ -831,8 +949,8 @@
             
             try {
                 const body = { content };
-                if (imageUrl && isValidUrl(imageUrl)) {
-                    body.image_url = imageUrl;
+                if (currentImageUrl) {
+                    body.image_url = currentImageUrl;
                 }
                 
                 const res = await fetch(`${API_URL}/posts`, {
@@ -851,11 +969,13 @@
                 
                 // Reset composer
                 document.getElementById('post-content').value = '';
-                document.getElementById('image-url').value = '';
                 document.getElementById('char-count').textContent = '0/1000';
+                document.getElementById('file-input').value = '';
+                document.getElementById('ai-prompt').value = '';
+                document.getElementById('ai-prompt-container').style.display = 'none';
+                document.getElementById('ai-image-btn').classList.remove('active');
+                document.getElementById('upload-image-btn').classList.remove('active');
                 hideImagePreview();
-                document.getElementById('image-url-container').style.display = 'none';
-                document.getElementById('add-image-btn').classList.remove('active');
                 
                 showToast({ type: 'success', message: 'Posté ! 🎉' });
                 
