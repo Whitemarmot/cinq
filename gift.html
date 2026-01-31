@@ -26,7 +26,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="theme-color" content="#0a0a0b">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
     
@@ -40,7 +40,7 @@
     <link rel="stylesheet" href="/css/a11y.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
-    <!-- Theme initialization (before body to prevent flash) -->
+    <!-- Theme initialization -->
     <script>
         (function() {
             const saved = localStorage.getItem('cinq_theme');
@@ -57,44 +57,94 @@
             const next = current === 'light' ? 'dark' : 'light';
             html.setAttribute('data-theme', next);
             localStorage.setItem('cinq_theme', next);
+            
+            const meta = document.getElementById('theme-color-meta');
+            meta.content = next === 'light' ? '#f8f8fc' : '#0e0e12';
         }
     </script>
     <style>
+        /* ===== LAYOUT ===== */
         .gift-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: var(--space-5);
             text-align: center;
         }
         
         @media (max-width: 380px) {
             .gift-container {
-                padding: 1rem;
+                padding: var(--space-4);
             }
         }
+        
+        /* ===== CARD ===== */
         .gift-card {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            animation: card-enter 0.4s var(--ease-out-expo);
         }
+        
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .gift-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: var(--cinq-gradient);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            padding: 1px;
+        }
+        
+        .gift-card:hover::before {
+            opacity: 0.4;
+        }
+        
+        .gift-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: var(--space-6);
+            right: var(--space-6);
+            height: 1px;
+            background: var(--glass-highlight);
+            pointer-events: none;
+        }
+        
+        /* ===== LOGO ===== */
         .gift-logo { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 4rem;
+            font-family: var(--font-display);
+            font-size: 4.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            margin-bottom: var(--space-5);
+            background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 4px 12px rgba(255, 107, 74, 0.35));
+            filter: drop-shadow(0 4px 12px var(--color-brand-glow));
             position: relative;
             display: inline-block;
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        .gift-logo:hover {
+            transform: scale(1.05) rotate(-3deg);
         }
         
         .gift-logo::before {
@@ -113,36 +163,54 @@
             opacity: 0.4;
             z-index: -1;
             filter: blur(18px);
+            animation: pentagon-pulse 4s ease-in-out infinite;
         }
         
-        .gift-icon {
-            width: 40px;
-            height: 40px;
-            stroke: currentColor;
+        @keyframes pentagon-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
         }
+        
+        /* ===== TITLES ===== */
         .gift-title { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem; 
+            font-family: var(--font-display);
+            font-size: var(--text-2xl); 
             font-weight: 600; 
-            margin-bottom: 0.5rem; 
+            margin-bottom: var(--space-2);
+            letter-spacing: -0.02em;
         }
-        .gift-subtitle { color: var(--color-text-muted); margin-bottom: 2rem; }
+        
+        .gift-subtitle { 
+            color: var(--color-text-muted); 
+            margin-bottom: var(--space-6);
+            font-size: var(--text-sm);
+        }
+        
+        /* ===== GENERATE BUTTON ===== */
         .generate-btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            padding: var(--space-4);
+            background: var(--cinq-gradient);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1rem;
+            font-family: var(--font-display);
+            font-size: var(--text-base);
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-            box-shadow: 0 2px 12px rgba(255, 107, 74, 0.3);
+            transition: 
+                transform 0.15s var(--ease-spring),
+                box-shadow 0.2s,
+                opacity 0.15s;
+            box-shadow: var(--shadow-glow-sm);
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
         }
+        
         .generate-btn::before {
             content: '';
             position: absolute;
@@ -153,21 +221,210 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
-        .generate-btn:hover:not(:disabled)::before { left: 100%; }
-        .generate-btn:hover:not(:disabled) { 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.35);
+        
+        .generate-btn:hover:not(:disabled)::before { 
+            left: 100%; 
         }
+        
+        .generate-btn:hover:not(:disabled) { 
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: var(--shadow-glow);
+        }
+        
         .generate-btn:active:not(:disabled) {
             transform: translateY(0) scale(0.98);
         }
-        .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         
-        /* Theme toggle */
+        .generate-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            transform: none !important; 
+        }
+        
+        /* Loading state */
+        .generate-btn .loading-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===== RESULT ===== */
+        .result { 
+            margin-top: var(--space-6); 
+            display: none;
+            animation: result-enter 0.4s var(--ease-out-expo);
+        }
+        
+        @keyframes result-enter {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result.show { 
+            display: block; 
+        }
+        
+        .code-box {
+            background: var(--color-bg-elevated);
+            border: 2px dashed var(--color-brand);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            margin: var(--space-4) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--cinq-gradient);
+            opacity: 0.05;
+        }
+        
+        .code-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .code {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            color: var(--color-brand);
+            letter-spacing: 0.1em;
+            word-break: break-all;
+            position: relative;
+        }
+        
+        .share-section {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .share-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+        
+        .share-link {
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            word-break: break-all;
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+        }
+        
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+        
+        .copy-btn, .share-btn {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s var(--ease-spring);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+        
+        .copy-btn:hover, .share-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+            transform: translateY(-1px);
+        }
+        
+        .copy-btn:active, .share-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .copy-btn.copied {
+            background: var(--color-success-muted);
+            border-color: var(--color-success);
+            color: var(--color-success);
+        }
+        
+        .share-btn {
+            background: var(--cinq-gradient);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        /* ===== ERROR ===== */
+        .error-message { 
+            color: var(--color-error); 
+            margin-top: var(--space-4);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-error-muted);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            animation: error-enter 0.3s var(--ease-out-expo);
+        }
+        
+        @keyframes error-enter {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error-message.hidden {
+            display: none;
+        }
+        
+        /* ===== LINKS ===== */
+        .back-link {
+            margin-top: var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        .back-link a {
+            color: var(--color-brand);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .back-link a:hover {
+            color: var(--color-brand-hover);
+            text-decoration: underline;
+        }
+        
+        /* ===== THEME TOGGLE ===== */
         .theme-toggle {
             position: fixed;
-            top: 1rem;
-            right: 1rem;
+            top: var(--space-4);
+            right: var(--space-4);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -176,55 +433,46 @@
             height: 40px;
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             cursor: pointer;
             transition: all 0.2s ease;
             overflow: hidden;
         }
+        
         .theme-toggle:hover {
             background: var(--color-bg-elevated);
             transform: scale(1.05);
         }
+        
         .theme-toggle .icon-sun,
         .theme-toggle .icon-moon {
             position: absolute;
-            transition: all 0.3s ease;
+            transition: all 0.3s var(--ease-spring);
             color: var(--color-text-secondary);
         }
-        .theme-toggle .icon-sun {
-            opacity: 1;
-            transform: rotate(0) scale(1);
-        }
-        .theme-toggle .icon-moon {
-            opacity: 0;
-            transform: rotate(-90deg) scale(0.5);
-        }
-        [data-theme="light"] .theme-toggle .icon-sun {
-            opacity: 0;
-            transform: rotate(90deg) scale(0.5);
-        }
-        [data-theme="light"] .theme-toggle .icon-moon {
-            opacity: 1;
-            transform: rotate(0) scale(1);
-        }
         
-        /* Pentagon pattern */
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+        
+        /* ===== BACKGROUND ===== */
         .pentagon-pattern {
             position: fixed;
             inset: 0;
             pointer-events: none;
             z-index: -2;
-            opacity: 0.025;
+            opacity: 0.02;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
             background-size: 60px 60px;
         }
         
-        /* Gradient orbs */
         .gradient-orb {
             position: fixed;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.2;
+            opacity: 0.15;
             pointer-events: none;
             z-index: -1;
         }
@@ -232,7 +480,7 @@
         .gradient-orb-1 {
             width: 400px;
             height: 400px;
-            background: #ff6b4a;
+            background: var(--color-brand);
             top: -100px;
             right: -100px;
         }
@@ -244,38 +492,65 @@
             bottom: -50px;
             left: -50px;
         }
-        .result { margin-top: 2rem; display: none; }
-        .result.show { display: block; }
-        .code-box {
-            background: var(--color-bg-elevated);
-            border: 2px dashed var(--color-brand);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin: 1rem 0;
-        }
-        .code {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: monospace;
-            color: var(--color-brand);
-            letter-spacing: 0.1em;
-        }
-        .share-link {
-            font-size: 0.875rem;
+        
+        /* ===== FOOTER ===== */
+        .auth-footer {
+            padding: var(--space-5);
+            padding-bottom: max(var(--space-5), calc(env(safe-area-inset-bottom, 0px) + var(--space-4)));
+            text-align: center;
+            font-size: var(--text-xs);
             color: var(--color-text-muted);
-            word-break: break-all;
-            margin-top: 1rem;
+            margin-top: auto;
         }
-        .copy-btn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            color: var(--color-text-primary);
-            cursor: pointer;
+        
+        .auth-footer nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-2);
         }
-        .error { color: var(--color-error); margin-top: 1rem; }
+        
+        .auth-footer a {
+            color: var(--color-text-muted);
+            padding: var(--space-2) var(--space-3);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--radius-md);
+            transition: color 0.2s, background 0.2s;
+        }
+        
+        .auth-footer a:hover {
+            color: var(--color-text-secondary);
+            background: var(--color-bg-tertiary);
+        }
+        
+        /* ===== SUCCESS ANIMATION ===== */
+        @keyframes success-pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-icon {
+            animation: success-pop 0.4s var(--ease-spring);
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            .gift-card,
+            .result,
+            .error-message,
+            .gift-logo::before,
+            .success-icon {
+                animation: none !important;
+            }
+            
+            .generate-btn::before {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
@@ -295,49 +570,81 @@
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     
     <main id="main-content" style="flex: 1; display: flex;">
-    <div class="gift-container">
-        <div class="gift-card">
-            <div class="gift-logo">5</div>
-            <h1 class="gift-title">Offrir Cinq</h1>
-            <p class="gift-subtitle">Génère un code pour inviter quelqu'un sur Cinq</p>
-            
-            <button class="generate-btn" id="generate-btn" onclick="generateGift()" aria-label="Générer un nouveau code cadeau d'invitation">
-                Générer un code cadeau
-            </button>
-            
-            <div class="error" id="error" role="alert" aria-live="polite"></div>
-            
-            <div class="result" id="result" role="region" aria-label="Code cadeau généré">
-                <div class="code-box">
-                    <div class="code" id="gift-code" aria-label="Code cadeau"></div>
-                </div>
-                <div class="share-link" id="share-link" aria-label="Lien de partage"></div>
-                <button class="copy-btn" onclick="copyLink()" aria-label="Copier le lien de partage dans le presse-papiers">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        <div class="gift-container">
+            <div class="gift-card">
+                <div class="gift-logo" aria-hidden="true">5</div>
+                <h1 class="gift-title">Offrir Cinq</h1>
+                <p class="gift-subtitle">Génère un code pour inviter quelqu'un dans ton cercle</p>
+                
+                <button class="generate-btn" id="generate-btn" onclick="generateGift()" aria-label="Générer un nouveau code cadeau d'invitation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
                     </svg>
-                    Copier le lien
+                    <span id="btn-text">Générer un code cadeau</span>
                 </button>
+                
+                <div class="error-message hidden" id="error" role="alert" aria-live="polite">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span id="error-text"></span>
+                </div>
+                
+                <div class="result" id="result" role="region" aria-label="Code cadeau généré">
+                    <div class="code-box">
+                        <p class="code-label">Code cadeau</p>
+                        <p class="code" id="gift-code" aria-label="Code cadeau"></p>
+                    </div>
+                    
+                    <div class="share-section">
+                        <p class="share-label">Lien de partage</p>
+                        <p class="share-link" id="share-link" aria-label="Lien de partage"></p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="copy-btn" id="copy-btn" onclick="copyLink()" aria-label="Copier le lien de partage">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="copy-icon">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="check-icon" style="display: none;">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            <span id="copy-text">Copier le lien</span>
+                        </button>
+                        
+                        <button class="share-btn" id="share-native-btn" onclick="shareNative()" aria-label="Partager via le système" style="display: none;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                            </svg>
+                            <span>Partager</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <p class="back-link">
+                    <a href="/" aria-label="Retour à la page d'accueil">← Retour à l'accueil</a>
+                </p>
             </div>
-            
-            <p style="margin-top: 2rem; font-size: 0.75rem; color: var(--color-text-muted);">
-                <a href="/" style="color: var(--color-brand);" aria-label="Retour à la page d'accueil">← Retour à l'accueil</a>
-            </p>
         </div>
-    </div>
     </main>
 
     <script>
         let shareUrl = '';
+        let generatedCode = '';
+        
+        // Check if Web Share API is available
+        if (navigator.share) {
+            document.getElementById('share-native-btn').style.display = 'flex';
+        }
         
         async function generateGift() {
             const btn = document.getElementById('generate-btn');
+            const btnText = document.getElementById('btn-text');
             const error = document.getElementById('error');
+            const errorText = document.getElementById('error-text');
             const result = document.getElementById('result');
             
             btn.disabled = true;
-            btn.textContent = 'Génération...';
-            error.textContent = '';
+            btnText.innerHTML = '<span class="loading-spinner"></span>Génération...';
+            error.classList.add('hidden');
             
             try {
                 const res = await fetch('/api/gift?action=create', {
@@ -348,37 +655,120 @@
                 
                 const data = await res.json();
                 
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la génération');
+                }
+                
                 if (data.code) {
+                    generatedCode = data.code;
                     document.getElementById('gift-code').textContent = data.code;
-                    shareUrl = data.gift?.shareUrl || `https://cinq-three.vercel.app/register.html?code=${data.code}`;
+                    shareUrl = data.gift?.shareUrl || `${window.location.origin}/register.html?code=${data.code}`;
                     document.getElementById('share-link').textContent = shareUrl;
                     result.classList.add('show');
-                    btn.textContent = 'Générer un autre code';
+                    
+                    // Reset copy button
+                    resetCopyButton();
+                    
+                    // Update button text
+                    btnText.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                        </svg>
+                        Générer un autre code
+                    `;
                 } else {
-                    throw new Error(data.error || 'Erreur');
+                    throw new Error(data.error || 'Réponse invalide du serveur');
                 }
             } catch (e) {
-                error.textContent = e.message;
-                btn.textContent = 'Réessayer';
+                errorText.textContent = e.message;
+                error.classList.remove('hidden');
+                
+                btnText.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    </svg>
+                    Réessayer
+                `;
             }
             
             btn.disabled = false;
         }
         
-        function copyLink() {
-            navigator.clipboard.writeText(shareUrl);
-            alert('Lien copié !');
+        function resetCopyButton() {
+            const btn = document.getElementById('copy-btn');
+            const copyIcon = document.getElementById('copy-icon');
+            const checkIcon = document.getElementById('check-icon');
+            const copyText = document.getElementById('copy-text');
+            
+            btn.classList.remove('copied');
+            copyIcon.style.display = 'block';
+            checkIcon.style.display = 'none';
+            copyText.textContent = 'Copier le lien';
+        }
+        
+        async function copyLink() {
+            const btn = document.getElementById('copy-btn');
+            const copyIcon = document.getElementById('copy-icon');
+            const checkIcon = document.getElementById('check-icon');
+            const copyText = document.getElementById('copy-text');
+            
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                
+                // Success state
+                btn.classList.add('copied');
+                copyIcon.style.display = 'none';
+                checkIcon.style.display = 'block';
+                copyText.textContent = 'Copié !';
+                
+                // Reset after 2 seconds
+                setTimeout(resetCopyButton, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = shareUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                btn.classList.add('copied');
+                copyIcon.style.display = 'none';
+                checkIcon.style.display = 'block';
+                copyText.textContent = 'Copié !';
+                
+                setTimeout(resetCopyButton, 2000);
+            }
+        }
+        
+        async function shareNative() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Rejoins-moi sur Cinq',
+                        text: `Tu as reçu une invitation pour Cinq, l'anti-réseau social ! Code: ${generatedCode}`,
+                        url: shareUrl
+                    });
+                } catch (err) {
+                    // User cancelled or error
+                    if (err.name !== 'AbortError') {
+                        console.error('Share failed:', err);
+                    }
+                }
+            }
         }
     </script>
 
-    <!-- Footer - part of page flow -->
-    <footer role="contentinfo" style="padding: 1.5rem; padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1rem)); text-align: center; font-size: 0.75rem; color: var(--color-text-muted); margin-top: auto;">
-        <nav aria-label="Liens légaux" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-            <a href="/privacy.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">Confidentialité</a>
+    <!-- Footer -->
+    <footer class="auth-footer" role="contentinfo">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html">Confidentialité</a>
             <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <a href="/terms.html" style="color: var(--color-text-muted); padding: 0.5rem 0.75rem; min-height: 44px; display: inline-flex; align-items: center; border-radius: 8px; transition: color 0.2s, background 0.2s;">CGU</a>
+            <a href="/terms.html">CGU</a>
             <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <span style="padding: 0 0.5rem;">© 2026 Cinq</span>
+            <span style="padding: 0 var(--space-2);">© 2025 Cinq</span>
         </nav>
     </footer>
 </body>

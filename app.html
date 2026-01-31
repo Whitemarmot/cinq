@@ -5199,19 +5199,51 @@
             }
         }
         
+        const THEMES = ['dark', 'light', 'auto'];
+        
+        function getSystemPreference() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        
+        function getEffectiveTheme(pref) {
+            return pref === 'auto' ? getSystemPreference() : (pref || 'dark');
+        }
+        
         function toggleTheme() {
             const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            const currentPref = localStorage.getItem('cinq_theme') || 'dark';
+            const currentIndex = THEMES.indexOf(currentPref);
+            const nextPref = THEMES[(currentIndex + 1) % THEMES.length];
+            const effective = getEffectiveTheme(nextPref);
             
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('cinq_theme', newTheme);
-            updateThemeColor(newTheme);
+            // Add transition class for smooth animation
+            html.classList.add('theme-transitioning');
+            
+            html.setAttribute('data-theme', effective);
+            html.setAttribute('data-theme-preference', nextPref);
+            localStorage.setItem('cinq_theme', nextPref);
+            updateThemeColor(effective);
+            
+            // Remove transition class after animation
+            setTimeout(() => html.classList.remove('theme-transitioning'), 400);
             
             // Haptic feedback on mobile (if supported)
             if ('vibrate' in navigator) {
                 navigator.vibrate(10);
             }
+        }
+        
+        function setTheme(theme) {
+            if (!THEMES.includes(theme)) return;
+            const html = document.documentElement;
+            const effective = getEffectiveTheme(theme);
+            
+            html.classList.add('theme-transitioning');
+            html.setAttribute('data-theme', effective);
+            html.setAttribute('data-theme-preference', theme);
+            localStorage.setItem('cinq_theme', theme);
+            updateThemeColor(effective);
+            setTimeout(() => html.classList.remove('theme-transitioning'), 400);
         }
         
         function updateThemeColor(theme) {
@@ -5221,19 +5253,27 @@
             }
         }
         
-        // Listen for system theme changes
+        // Listen for system theme changes (affects auto mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
-                // Only auto-switch if user hasn't manually set a preference
-                if (!localStorage.getItem('cinq_theme')) {
-                    document.documentElement.setAttribute('data-theme', e.matches ? 'light' : 'dark');
-                    updateThemeColor(e.matches ? 'light' : 'dark');
+                const pref = localStorage.getItem('cinq_theme');
+                if (pref === 'auto' || !pref) {
+                    const html = document.documentElement;
+                    const effective = e.matches ? 'light' : 'dark';
+                    html.classList.add('theme-transitioning');
+                    html.setAttribute('data-theme', effective);
+                    updateThemeColor(effective);
+                    setTimeout(() => html.classList.remove('theme-transitioning'), 400);
                 }
             });
         }
         
-        // Initialize theme ASAP (before page renders)
-        initTheme();
+        // Remove theme-loading class after initial render
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.classList.remove('theme-loading');
+            });
+        });
         
         // ===== MOBILE KEYBOARD HANDLING =====
         function initMobileKeyboard() {
