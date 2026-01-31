@@ -36,6 +36,8 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    <link rel="stylesheet" href="/css/a11y.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         /* ===== APP LAYOUT ===== */
         .app-container {
@@ -961,10 +963,13 @@
     </style>
 </head>
 <body>
+    <!-- Skip to content link -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
 
     <!-- Toast Container -->
-    <div class="toast-container" id="toast-container"></div>
+    <div class="toast-container" id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
     <!-- Onboarding Overlay -->
     <div class="onboarding-overlay" id="onboarding-overlay">
@@ -1099,22 +1104,25 @@
         </div>
     </div>
 
-    <div class="app-container">
-        <header class="app-header">
-            <div class="app-logo">5</div>
+    <div class="app-container" id="main-content">
+        <header class="app-header" role="banner">
+            <div class="app-logo" aria-label="Cinq logo">5</div>
             <div class="user-menu">
-                <span class="user-name" id="user-name"></span>
-                <a href="/settings.html" class="settings-link" title="Paramètres">⚙️</a>
-                <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                <span class="user-name" id="user-name" aria-label="Utilisateur connecté"></span>
+                <a href="/settings.html" class="settings-link" aria-label="Paramètres du compte">
+                    <span aria-hidden="true">⚙️</span>
+                    <span class="sr-only">Paramètres</span>
+                </a>
+                <button class="logout-btn" onclick="logout()" aria-label="Se déconnecter">Déconnexion</button>
             </div>
         </header>
 
-        <section class="contacts-section">
-            <div class="section-title">
+        <section class="contacts-section" role="region" aria-label="Vos contacts">
+            <h2 class="section-title">
                 Tes 5
-                <span class="contact-count" id="contact-count">0/5</span>
-            </div>
-            <div class="contacts-grid" id="contacts-grid">
+                <span class="contact-count" id="contact-count" aria-label="Nombre de contacts">0/5</span>
+            </h2>
+            <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste des contacts">
                 <!-- Filled by JS -->
             </div>
         </section>
@@ -1128,68 +1136,172 @@
                 </div>
             </button>
         </section>
+
+        <!-- Mon Compte Section -->
+        <section class="account-section" style="margin-top: 2rem;">
+            <div class="section-title" style="margin-bottom: 1rem;">
+                Mon compte
+            </div>
+            
+            <!-- Profile Edit -->
+            <div class="account-card" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <span style="font-size: 1.25rem;">👤</span>
+                    <span style="font-weight: 600;">Mon profil</span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Pseudo</label>
+                        <input type="text" id="profile-display-name" placeholder="Ton pseudo..." maxlength="50"
+                            style="width: 100%; padding: 0.625rem 0.75rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Bio</label>
+                        <textarea id="profile-bio" placeholder="Quelques mots sur toi..." maxlength="500" rows="2"
+                            style="width: 100%; padding: 0.625rem 0.75rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: 0.9rem; resize: vertical; min-height: 60px;"></textarea>
+                    </div>
+                    <button onclick="saveProfile()" id="save-profile-btn"
+                        style="padding: 0.625rem 1rem; background: var(--cinq-gradient); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: transform 0.2s, box-shadow 0.2s;">
+                        💾 Enregistrer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data & Account Actions -->
+            <div class="account-card" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <span style="font-size: 1.25rem;">📦</span>
+                    <span style="font-weight: 600;">Mes données</span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button onclick="exportData()" id="export-data-btn"
+                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; color: var(--color-text-primary); font-size: 0.875rem; transition: all 0.2s;">
+                        <span>📥</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 600;">Exporter mes données</div>
+                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Télécharge toutes tes données (RGPD)</div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="openDeleteAccountModal()" 
+                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); border-radius: var(--radius-md); cursor: pointer; color: var(--color-error); font-size: 0.875rem; transition: all 0.2s;">
+                        <span>🗑️</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 600;">Supprimer mon compte</div>
+                            <div style="font-size: 0.75rem; opacity: 0.8;">Action définitive et irréversible</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
     </div>
 
     <!-- Chat Overlay -->
     <div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
 
     <!-- Chat Panel -->
-    <div class="chat-panel" id="chat-panel">
+    <div class="chat-panel" id="chat-panel" role="dialog" aria-labelledby="chat-contact-name" aria-modal="true">
         <div class="chat-header">
             <div class="chat-contact-info">
-                <div class="chat-contact-avatar" id="chat-contact-avatar">?</div>
+                <div class="chat-contact-avatar" id="chat-contact-avatar" aria-hidden="true">?</div>
                 <span class="chat-contact-name" id="chat-contact-name"></span>
             </div>
-            <button class="chat-close" onclick="closeChat()" aria-label="Fermer">×</button>
+            <button class="chat-close" onclick="closeChat()" aria-label="Fermer la conversation">×</button>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-messages" id="chat-messages" role="log" aria-label="Messages de la conversation" aria-live="polite"></div>
         <div class="chat-input-area">
-            <button class="ping-btn" onclick="sendPing()" title="Envoyer un ping">👋</button>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500">
-            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled>→</button>
+            <button class="ping-btn" onclick="sendPing()" aria-label="Envoyer un ping pour dire que tu penses à cette personne">
+                <span aria-hidden="true">👋</span>
+                <span class="sr-only">Ping</span>
+            </button>
+            <label for="chat-input" class="sr-only">Écrire un message</label>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500" aria-label="Écrire un message">
+            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled aria-label="Envoyer le message">
+                <span aria-hidden="true">→</span>
+                <span class="sr-only">Envoyer</span>
+            </button>
         </div>
     </div>
 
     <!-- Gift Modal -->
-    <div class="modal-overlay" id="gift-modal">
+    <div class="modal-overlay" id="gift-modal" role="dialog" aria-labelledby="gift-modal-title" aria-modal="true">
         <div class="modal">
-            <h2 class="modal-title">🎁 Offrir Cinq</h2>
+            <h2 class="modal-title" id="gift-modal-title"><span aria-hidden="true">🎁</span> Offrir Cinq</h2>
             <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
                 Génère un code unique pour inviter quelqu'un sur Cinq.
             </p>
             <div id="gift-content">
-                <button class="copy-btn" style="width: 100%;" onclick="createGift()">
+                <button class="copy-btn" style="width: 100%;" onclick="createGift()" aria-label="Générer un code cadeau">
                     Générer un code
                 </button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeGiftModal()">
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeGiftModal()" aria-label="Fermer la fenêtre">
                 Fermer
             </button>
         </div>
     </div>
 
     <!-- Add Contact Modal -->
-    <div class="modal-overlay" id="add-contact-modal">
+    <div class="modal-overlay" id="add-contact-modal" role="dialog" aria-labelledby="add-contact-modal-title" aria-modal="true">
         <div class="modal">
-            <h2 class="modal-title">➕ Ajouter un contact</h2>
+            <h2 class="modal-title" id="add-contact-modal-title"><span aria-hidden="true">➕</span> Ajouter un contact</h2>
             <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
                 Entre l'ID de la personne à ajouter
             </p>
+            <label for="contact-id-input" class="sr-only">ID du contact à ajouter</label>
             <input type="text" id="contact-id-input" placeholder="ID (ex: abc123-...)" 
-                   style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem;">
-            <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;"></div>
-            <button class="copy-btn" style="width: 100%;" onclick="addContact()" id="add-contact-btn">
+                   style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem;"
+                   aria-describedby="add-contact-error"
+                   aria-label="Identifiant du contact">
+            <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;" role="alert" aria-live="polite"></div>
+            <button class="copy-btn" style="width: 100%;" onclick="addContact()" id="add-contact-btn" aria-label="Ajouter ce contact">
                 Ajouter
             </button>
             <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
                 <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Ton ID (à partager) :</p>
                 <code id="my-id" style="font-size: 0.7rem; color: var(--color-brand); word-break: break-all; display: block; background: var(--color-bg-secondary); padding: 0.5rem; border-radius: var(--radius-sm);"></code>
-                <button onclick="copyMyId()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <span>📋</span> <span id="copy-id-text">Copier mon ID</span>
+                <button onclick="copyMyId()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;" aria-label="Copier mon identifiant dans le presse-papiers">
+                    <span aria-hidden="true">📋</span> <span id="copy-id-text">Copier mon ID</span>
                 </button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeAddContactModal()">
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeAddContactModal()" aria-label="Fermer la fenêtre">
                 Fermer
+            </button>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal-overlay" id="delete-account-modal">
+        <div class="modal">
+            <h2 class="modal-title" style="color: var(--color-error);">🗑️ Supprimer mon compte</h2>
+            <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
+                Cette action est <strong style="color: var(--color-error);">définitive et irréversible</strong>.
+            </p>
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem;">
+                <p style="font-size: 0.875rem; color: var(--color-text-primary); margin-bottom: 0.5rem;">
+                    <strong>Seront supprimés :</strong>
+                </p>
+                <ul style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0; padding-left: 1.25rem;">
+                    <li>Ton profil et toutes tes infos</li>
+                    <li>Tes 5 contacts</li>
+                    <li>Tous tes messages envoyés et reçus</li>
+                    <li>Tes propositions de rendez-vous</li>
+                </ul>
+            </div>
+            <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">
+                Pour confirmer, tape <strong style="color: var(--color-error);">SUPPRIMER</strong> :
+            </p>
+            <input type="text" id="delete-confirmation-input" placeholder="SUPPRIMER" autocomplete="off"
+                style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem; text-align: center; letter-spacing: 0.1em;">
+            <div id="delete-account-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;"></div>
+            <button onclick="deleteAccount()" id="delete-account-btn"
+                style="width: 100%; padding: 0.75rem; background: var(--color-error); color: white; border: none; border-radius: var(--radius-lg); cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                Supprimer définitivement
+            </button>
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeDeleteAccountModal()">
+                Annuler
             </button>
         </div>
     </div>
@@ -1284,6 +1396,7 @@
             }
 
             await loadContacts();
+            await loadProfile();
             startPolling();
         }
 
@@ -1474,21 +1587,27 @@
                 const contact = contacts[i];
                 const slot = document.createElement('div');
                 slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
+                slot.setAttribute('role', 'listitem');
+                slot.setAttribute('tabindex', '0');
                 
                 if (contact) {
                     const name = contact.contact?.email?.split('@')[0] || '?';
                     const initial = name.charAt(0).toUpperCase();
                     const unread = unreadCounts[contact.contact_user_id] || 0;
                     
+                    slot.setAttribute('aria-label', `Contact ${name}${unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : ''}. Cliquer pour ouvrir la conversation.`);
                     slot.innerHTML = `
-                        <div class="contact-avatar">${initial}</div>
+                        <div class="contact-avatar" aria-hidden="true">${initial}</div>
                         <div class="contact-name">${name}</div>
-                        ${unread > 0 ? `<div class="unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
+                        ${unread > 0 ? `<div class="unread-badge" aria-label="${unread} messages non lus">${unread > 9 ? '9+' : unread}</div>` : ''}
                     `;
                     slot.onclick = () => openChat(contact);
+                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(contact); } };
                 } else {
-                    slot.innerHTML = `<span class="empty-plus">+</span>`;
+                    slot.setAttribute('aria-label', `Emplacement ${i + 1} vide. Cliquer pour ajouter un contact.`);
+                    slot.innerHTML = `<span class="empty-plus" aria-hidden="true">+</span>`;
                     slot.onclick = () => openAddContactModal();
+                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAddContactModal(); } };
                 }
                 
                 grid.appendChild(slot);
@@ -1795,8 +1914,164 @@
                 if (currentChatContact) closeChat();
                 else if (document.getElementById('gift-modal').classList.contains('open')) closeGiftModal();
                 else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
+                else if (document.getElementById('delete-account-modal').classList.contains('open')) closeDeleteAccountModal();
             }
         });
+
+        // ===== PROFILE MANAGEMENT =====
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (data.profile) {
+                    document.getElementById('profile-display-name').value = data.profile.display_name || '';
+                    document.getElementById('profile-bio').value = data.profile.bio || '';
+                    
+                    // Update header with display name if set
+                    if (data.profile.display_name) {
+                        document.getElementById('user-name').textContent = data.profile.display_name;
+                    }
+                }
+            } catch (e) {
+                console.error('Load profile error:', e);
+            }
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('save-profile-btn');
+            const displayName = document.getElementById('profile-display-name').value.trim();
+            const bio = document.getElementById('profile-bio').value.trim();
+            
+            btn.disabled = true;
+            btn.textContent = 'Enregistrement...';
+            
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        display_name: displayName || null,
+                        bio: bio || null
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                showToast({ type: 'success', title: 'Profil mis à jour !', message: 'Tes modifications ont été enregistrées' });
+                
+                // Update displayed name in header if display_name was set
+                if (displayName) {
+                    document.getElementById('user-name').textContent = displayName;
+                }
+            } catch (e) {
+                console.error('Save profile error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Enregistrer';
+            }
+        }
+
+        // ===== DATA EXPORT (GDPR) =====
+        async function exportData() {
+            const btn = document.getElementById('export-data-btn');
+            btn.disabled = true;
+            btn.querySelector('div > div:first-child').textContent = 'Export en cours...';
+            
+            try {
+                const res = await fetch(`${API_URL}/user-profile?action=export`, { 
+                    headers: authHeaders() 
+                });
+                
+                if (!res.ok) {
+                    throw new Error('Erreur lors de l\'export');
+                }
+                
+                const data = await res.json();
+                
+                // Create and download JSON file
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cinq-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast({ type: 'success', title: 'Export terminé !', message: 'Tes données ont été téléchargées' });
+            } catch (e) {
+                console.error('Export error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            } finally {
+                btn.disabled = false;
+                btn.querySelector('div > div:first-child').textContent = 'Exporter mes données';
+            }
+        }
+
+        // ===== DELETE ACCOUNT =====
+        function openDeleteAccountModal() {
+            document.getElementById('delete-account-modal').classList.add('open');
+            document.getElementById('delete-confirmation-input').value = '';
+            document.getElementById('delete-account-error').style.display = 'none';
+        }
+
+        function closeDeleteAccountModal() {
+            document.getElementById('delete-account-modal').classList.remove('open');
+        }
+
+        async function deleteAccount() {
+            const confirmation = document.getElementById('delete-confirmation-input').value.trim();
+            const errorEl = document.getElementById('delete-account-error');
+            const btn = document.getElementById('delete-account-btn');
+            
+            if (confirmation !== 'SUPPRIMER') {
+                errorEl.textContent = 'Tape exactement SUPPRIMER pour confirmer';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            errorEl.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Suppression...';
+            
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, {
+                    method: 'DELETE',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ confirmation: 'SUPPRIMER' })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Clear session and redirect
+                stopPolling();
+                localStorage.removeItem('cinq_session');
+                localStorage.removeItem('cinq_user');
+                
+                showToast({ type: 'success', title: 'Compte supprimé', message: 'Adieu ! 👋', duration: 3000 });
+                
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } catch (e) {
+                console.error('Delete account error:', e);
+                errorEl.textContent = e.message;
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Supprimer définitivement';
+            }
+        }
 
         // ===== PUSH NOTIFICATIONS =====
         const VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';

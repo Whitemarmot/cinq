@@ -30,6 +30,8 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <link rel="stylesheet" href="/css/a11y.css">
     <style>
         .login-container {
             min-height: 100vh;
@@ -160,8 +162,12 @@
     </style>
 </head>
 <body>
+    <!-- Skip to content link -->
+    <a href="#login-form" class="skip-link">Aller au formulaire de connexion</a>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
 
+    <main id="main-content">
     <div class="login-container">
         <div class="login-card">
             <div class="login-logo">
@@ -175,29 +181,30 @@
                 🎉 Compte créé ! Connecte-toi maintenant.
             </div>
 
-            <form id="login-form">
+            <form id="login-form" aria-label="Formulaire de connexion">
                 <div class="form-group">
                     <label class="form-label" for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" required autocomplete="email">
+                    <input type="email" id="email" name="email" class="form-input" required autocomplete="email" aria-required="true">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="password">Mot de passe</label>
-                    <input type="password" id="password" name="password" class="form-input" required autocomplete="current-password">
+                    <input type="password" id="password" name="password" class="form-input" required autocomplete="current-password" aria-required="true">
                 </div>
 
-                <button type="submit" class="submit-btn" id="submit-btn">
+                <button type="submit" class="submit-btn" id="submit-btn" aria-label="Se connecter à mon compte">
                     Se connecter
                 </button>
 
-                <div id="message" class="message" style="display: none;"></div>
+                <div id="message" class="message" style="display: none;" role="alert" aria-live="polite"></div>
             </form>
 
             <div class="home-link">
-                <a href="/">← Retour à l'accueil</a>
+                <a href="/" aria-label="Retour à la page d'accueil">← Retour à l'accueil</a>
             </div>
         </div>
     </div>
+    </main>
 
     <script>
         const API_URL = '/api';
@@ -258,11 +265,13 @@
     </script>
 
     <!-- Footer -->
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
-        <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
-        <span>·</span>
-        <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
-        <span>·</span>
+    <footer role="contentinfo" style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
+            <span aria-hidden="true">·</span>
+            <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
+        </nav>
+        <span aria-hidden="true">·</span>
         <span style="margin: 0 0.5rem;">© 2025 Cinq</span>
     </footer>
     

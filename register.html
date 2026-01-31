@@ -30,6 +30,8 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
+    <link rel="stylesheet" href="/css/a11y.css">
     <style>
         .register-container {
             min-height: 100vh;
@@ -184,8 +186,12 @@
     </style>
 </head>
 <body>
+    <!-- Skip to content link -->
+    <a href="#register-form" class="skip-link">Aller au formulaire d'inscription</a>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
 
+    <main id="main-content">
     <div class="register-container">
         <div class="register-card" id="register-card">
             <div class="register-logo">
@@ -212,33 +218,34 @@
                     <div class="text">Offert par <span class="name" id="gifter-name">un ami</span></div>
                 </div>
 
-                <form id="register-form">
+                <form id="register-form" aria-label="Formulaire d'inscription">
                     <input type="hidden" id="gift-code" name="giftCode">
                     
                     <div class="form-group">
                         <label class="form-label" for="email">Email</label>
-                        <input type="email" id="email" name="email" class="form-input" required autocomplete="email">
+                        <input type="email" id="email" name="email" class="form-input" required autocomplete="email" aria-required="true">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="password">Mot de passe</label>
-                        <input type="password" id="password" name="password" class="form-input" required minlength="8" autocomplete="new-password">
-                        <small style="color: var(--color-text-muted); font-size: 0.75rem;">Min. 8 caractères, 1 lettre, 1 chiffre</small>
+                        <input type="password" id="password" name="password" class="form-input" required minlength="8" autocomplete="new-password" aria-required="true" aria-describedby="password-hint">
+                        <small id="password-hint" style="color: var(--color-text-muted); font-size: 0.75rem;">Min. 8 caractères, 1 lettre, 1 chiffre</small>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submit-btn">
+                    <button type="submit" class="submit-btn" id="submit-btn" aria-label="Créer mon compte Cinq">
                         Créer mon compte
                     </button>
 
-                    <div id="message" class="message" style="display: none;"></div>
+                    <div id="message" class="message" style="display: none;" role="alert" aria-live="polite"></div>
                 </form>
 
                 <div class="login-link">
-                    Déjà inscrit ? <a href="/login.html">Se connecter</a>
+                    Déjà inscrit ? <a href="/login.html" aria-label="Se connecter à un compte existant">Se connecter</a>
                 </div>
             </div>
         </div>
     </div>
+    </main>
 
     <script>
         const API_URL = '/api';
@@ -337,11 +344,13 @@
     </script>
 
     <!-- Footer -->
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
-        <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
-        <span>·</span>
-        <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
-        <span>·</span>
+    <footer role="contentinfo" style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
+            <span aria-hidden="true">·</span>
+            <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
+        </nav>
+        <span aria-hidden="true">·</span>
         <span style="margin: 0 0.5rem;">© 2025 Cinq</span>
     </footer>
 </body>

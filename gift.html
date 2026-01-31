@@ -37,6 +37,8 @@
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
+    <link rel="stylesheet" href="/css/a11y.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         .gift-container {
             min-height: 100vh;
@@ -106,33 +108,40 @@
     </style>
 </head>
 <body>
+    <!-- Skip to content link -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
     
+    <main id="main-content">
     <div class="gift-container">
         <div class="gift-card">
             <div class="gift-logo">🎁</div>
             <h1 class="gift-title">Offrir Cinq</h1>
             <p class="gift-subtitle">Génère un code pour inviter quelqu'un sur Cinq</p>
             
-            <button class="generate-btn" id="generate-btn" onclick="generateGift()">
+            <button class="generate-btn" id="generate-btn" onclick="generateGift()" aria-label="Générer un nouveau code cadeau d'invitation">
                 Générer un code cadeau
             </button>
             
-            <div class="error" id="error"></div>
+            <div class="error" id="error" role="alert" aria-live="polite"></div>
             
-            <div class="result" id="result">
+            <div class="result" id="result" role="region" aria-label="Code cadeau généré">
                 <div class="code-box">
-                    <div class="code" id="gift-code"></div>
+                    <div class="code" id="gift-code" aria-label="Code cadeau"></div>
                 </div>
-                <div class="share-link" id="share-link"></div>
-                <button class="copy-btn" onclick="copyLink()">📋 Copier le lien</button>
+                <div class="share-link" id="share-link" aria-label="Lien de partage"></div>
+                <button class="copy-btn" onclick="copyLink()" aria-label="Copier le lien de partage dans le presse-papiers">
+                    <span aria-hidden="true">📋</span> Copier le lien
+                </button>
             </div>
             
             <p style="margin-top: 2rem; font-size: 0.75rem; color: var(--color-text-muted);">
-                <a href="/" style="color: var(--color-brand);">← Retour à l'accueil</a>
+                <a href="/" style="color: var(--color-brand);" aria-label="Retour à la page d'accueil">← Retour à l'accueil</a>
             </p>
         </div>
     </div>
+    </main>
 
     <script>
         let shareUrl = '';
@@ -179,11 +188,13 @@
     </script>
 
     <!-- Footer -->
-    <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
-        <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
-        <span>·</span>
-        <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
-        <span>·</span>
+    <footer role="contentinfo" style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border-subtle);">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">Confidentialité</a>
+            <span aria-hidden="true">·</span>
+            <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.5rem;">CGU</a>
+        </nav>
+        <span aria-hidden="true">·</span>
         <span style="margin: 0 0.5rem;">© 2025 Cinq</span>
     </footer>
 </body>
