@@ -39,7 +39,7 @@
     <!-- Design System (async load for non-critical CSS) -->
     <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
-    <link rel="stylesheet" href="/animations.css">
+    <link rel="stylesheet" href="/animations.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
@@ -3841,6 +3841,9 @@
                 removeImage();
                 
                 showToast({ type: 'success', message: 'Envoyé à tes 5 !' });
+                
+                // Onboarding: check progress after posting
+                setTimeout(checkOnboardingProgress, 500);
             } catch (e) {
                 showToast({ type: 'error', message: e.message });
             } finally {
@@ -4644,6 +4647,14 @@
                 closeAddContactModal();
                 showToast({ type: 'success', title: 'Contact ajouté !', message: 'Dis-lui bonjour 👋' });
                 loadContacts();
+                
+                // Onboarding: check progress after adding contact
+                setTimeout(() => {
+                    checkOnboardingProgress();
+                    if (!onboardingState.hasPost && localStorage.getItem('cinq_onboarding_completed') !== 'true') {
+                        showToast({ type: 'info', title: '🎯 Bien joué !', message: 'Plus qu\'à poster ton premier message !' });
+                    }
+                }, 500);
             } catch (e) {
                 errorEl.textContent = e.message;
                 errorEl.style.display = 'block';
@@ -4937,6 +4948,241 @@
             return outputArray;
         }
 
+        // ===== ONBOARDING SYSTEM =====
+        let onboardingState = {
+            hasPhoto: false,
+            hasContact: false,
+            hasPost: false,
+            completed: false
+        };
+        
+        function initOnboarding() {
+            const isNewUser = localStorage.getItem('cinq_new_user') === 'true';
+            const onboardingCompleted = localStorage.getItem('cinq_onboarding_completed') === 'true';
+            
+            if (isNewUser && !onboardingCompleted) {
+                // Show welcome overlay
+                setTimeout(() => {
+                    showOnboardingOverlay();
+                }, 500);
+            } else if (!onboardingCompleted) {
+                // Check progress and show checklist if not complete
+                checkOnboardingProgress();
+            }
+        }
+        
+        function showOnboardingOverlay() {
+            const overlay = document.getElementById('onboarding-overlay');
+            overlay.classList.add('open');
+            
+            // Trap focus in overlay
+            const firstBtn = overlay.querySelector('.onboarding-btn');
+            if (firstBtn) firstBtn.focus();
+        }
+        
+        function hideOnboardingOverlay() {
+            document.getElementById('onboarding-overlay').classList.remove('open');
+        }
+        
+        function startOnboarding() {
+            hideOnboardingOverlay();
+            localStorage.removeItem('cinq_new_user');
+            
+            // Show the floating checklist
+            setTimeout(() => {
+                showOnboardingChecklist();
+                checkOnboardingProgress();
+            }, 300);
+            
+            // Guide user to add photo first
+            setTimeout(() => {
+                showTooltipHint('profile-avatar', 'Commence par ajouter ta photo ! 📸', 'bottom');
+                switchTab('profil');
+            }, 800);
+        }
+        
+        function skipOnboarding() {
+            hideOnboardingOverlay();
+            localStorage.removeItem('cinq_new_user');
+            localStorage.setItem('cinq_onboarding_completed', 'true');
+            showToast({ type: 'info', title: '👍 Pas de souci !', message: 'Tu peux explorer librement.' });
+        }
+        
+        function showOnboardingChecklist() {
+            const checklist = document.getElementById('onboarding-checklist');
+            if (localStorage.getItem('cinq_onboarding_completed') !== 'true') {
+                checklist.classList.add('visible');
+            }
+        }
+        
+        function hideOnboardingChecklist() {
+            document.getElementById('onboarding-checklist').classList.remove('visible');
+        }
+        
+        function checkOnboardingProgress() {
+            // Check if user has avatar
+            const avatarImg = document.querySelector('#profile-avatar img');
+            onboardingState.hasPhoto = avatarImg && avatarImg.src && !avatarImg.src.includes('undefined');
+            
+            // Check if user has contacts
+            onboardingState.hasContact = contacts.length > 0;
+            
+            // Check if user has posts (own posts)
+            onboardingState.hasPost = posts.some(p => p.user_id === user?.id);
+            
+            // Update UI
+            updateOnboardingUI();
+            
+            // Check completion
+            if (onboardingState.hasPhoto && onboardingState.hasContact && onboardingState.hasPost) {
+                completeOnboarding();
+            }
+        }
+        
+        function updateOnboardingUI() {
+            const photoEl = document.getElementById('checklist-photo');
+            const contactEl = document.getElementById('checklist-contact');
+            const postEl = document.getElementById('checklist-post');
+            
+            if (onboardingState.hasPhoto) photoEl.classList.add('completed');
+            else photoEl.classList.remove('completed');
+            
+            if (onboardingState.hasContact) contactEl.classList.add('completed');
+            else contactEl.classList.remove('completed');
+            
+            if (onboardingState.hasPost) postEl.classList.add('completed');
+            else postEl.classList.remove('completed');
+            
+            // Update progress
+            const completed = [onboardingState.hasPhoto, onboardingState.hasContact, onboardingState.hasPost].filter(Boolean).length;
+            const progressFill = document.getElementById('onboarding-progress-fill');
+            const progressText = document.getElementById('onboarding-progress-text');
+            
+            progressFill.style.width = `${(completed / 3) * 100}%`;
+            progressText.textContent = `${completed}/3 complétés`;
+        }
+        
+        function completeOnboarding() {
+            if (onboardingState.completed) return;
+            onboardingState.completed = true;
+            localStorage.setItem('cinq_onboarding_completed', 'true');
+            
+            // Hide checklist with celebration
+            setTimeout(() => {
+                hideOnboardingChecklist();
+                showToast({ 
+                    type: 'success', 
+                    title: '🎉 Bravo !', 
+                    message: 'Tu as terminé ton setup. Profite de ton espace !',
+                    duration: 5000
+                });
+            }, 500);
+        }
+        
+        // Navigation helpers for onboarding
+        function goToProfileForPhoto() {
+            switchTab('profil');
+            setTimeout(() => {
+                const profileAvatar = document.getElementById('profile-avatar');
+                if (profileAvatar) {
+                    profileAvatar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    profileAvatar.classList.add('pulse-indicator');
+                    setTimeout(() => profileAvatar.classList.remove('pulse-indicator'), 3000);
+                }
+            }, 300);
+        }
+        
+        function goToContactsForAdd() {
+            switchTab('contacts');
+            setTimeout(() => {
+                const emptySlot = document.querySelector('.contact-slot.empty');
+                if (emptySlot) {
+                    emptySlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    emptySlot.classList.add('pulse-indicator');
+                    setTimeout(() => emptySlot.classList.remove('pulse-indicator'), 3000);
+                }
+            }, 300);
+        }
+        
+        function goToFeedForPost() {
+            switchTab('feed');
+            setTimeout(() => {
+                const composer = document.querySelector('.composer-textarea');
+                if (composer) {
+                    composer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    composer.focus();
+                    composer.parentElement.classList.add('pulse-indicator');
+                    setTimeout(() => composer.parentElement.classList.remove('pulse-indicator'), 3000);
+                }
+            }, 300);
+        }
+        
+        // Tooltip hints system
+        let activeTooltip = null;
+        
+        function showTooltipHint(elementId, message, position = 'bottom') {
+            hideTooltipHint();
+            
+            const targetEl = document.getElementById(elementId);
+            if (!targetEl) return;
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = `tooltip-hint ${position}`;
+            tooltip.innerHTML = `
+                ${message}
+                <button class="tooltip-hint-close" onclick="hideTooltipHint()" aria-label="Fermer">&times;</button>
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            // Position the tooltip
+            const rect = targetEl.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            if (position === 'bottom') {
+                tooltip.style.top = `${rect.bottom + 12}px`;
+                tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltipRect.width / 2)}px`;
+            } else if (position === 'top') {
+                tooltip.style.top = `${rect.top - tooltipRect.height - 12}px`;
+                tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltipRect.width / 2)}px`;
+            }
+            
+            // Show with animation
+            requestAnimationFrame(() => {
+                tooltip.classList.add('visible');
+            });
+            
+            activeTooltip = tooltip;
+            
+            // Auto-hide after 8 seconds
+            setTimeout(() => hideTooltipHint(), 8000);
+        }
+        
+        function hideTooltipHint() {
+            if (activeTooltip) {
+                activeTooltip.classList.remove('visible');
+                setTimeout(() => {
+                    if (activeTooltip && activeTooltip.parentNode) {
+                        activeTooltip.parentNode.removeChild(activeTooltip);
+                    }
+                    activeTooltip = null;
+                }, 300);
+            }
+        }
+        
+        // Hook into existing functions to track progress
+        const originalUploadAvatar = uploadAvatar;
+        uploadAvatar = async function(input) {
+            await originalUploadAvatar.call(this, input);
+            // Check progress after avatar upload
+            setTimeout(() => {
+                checkOnboardingProgress();
+                if (!onboardingState.hasContact && localStorage.getItem('cinq_onboarding_completed') !== 'true') {
+                    showToast({ type: 'info', title: '👍 Photo ajoutée !', message: 'Maintenant, invite tes proches !' });
+                }
+            }, 1000);
+        };
+
         // ===== THEME TOGGLE =====
         function initTheme() {
             // Check localStorage first
@@ -5036,7 +5282,7 @@
         init();
     </script>
     
-    <script src="/pwa-install.js" defer></script>
-    <script src="/animations.js" defer></script>
+    <script src="/pwa-install.min.js" defer></script>
+    <script src="/animations.min.js" defer></script>
 </body>
 </html>

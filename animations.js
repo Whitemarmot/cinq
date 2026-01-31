@@ -628,13 +628,30 @@ const CinqAnimations = (function() {
       default: 'ℹ️'
     };
     
-    toast.innerHTML = `
-      <span class="toast-icon">${icon || icons[type] || icons.default}</span>
-      <div class="toast-content">
-        ${title ? `<div class="toast-title">${title}</div>` : ''}
-        ${message ? `<div class="toast-message">${message}</div>` : ''}
-      </div>
-    `;
+    // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.textContent = icon || icons[type] || icons.default;
+    toast.appendChild(iconSpan);
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'toast-content';
+    
+    if (title) {
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'toast-title';
+      titleDiv.textContent = title;  // textContent = XSS safe
+      contentDiv.appendChild(titleDiv);
+    }
+    
+    if (message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'toast-message';
+      messageDiv.textContent = message;  // textContent = XSS safe
+      contentDiv.appendChild(messageDiv);
+    }
+    
+    toast.appendChild(contentDiv);
     
     if (onClick) {
       toast.style.cursor = 'pointer';
