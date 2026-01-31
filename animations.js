@@ -801,8 +801,6 @@ const CinqAnimations = (function() {
     if (mainContent && !isReducedMotion) {
       mainContent.classList.add('page-enter');
     }
-
-    console.log('🎨 Cinq Animations initialized');
   }
 
   // Cleanup on page unload

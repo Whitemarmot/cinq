@@ -11,7 +11,7 @@ import { supabase, requireAuth, handleCors } from './_supabase.js';
 import { sendPushNotification } from './_push-helper.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, validateMessageContent, validateLocation } from './_validation.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['GET', 'POST', 'PATCH', 'OPTIONS'])) return;
@@ -95,6 +95,18 @@ async function handleCreateProposal(req, res, user) {
     const proposedDate = new Date(proposed_at);
     if (isNaN(proposedDate.getTime())) {
         return res.status(400).json({ error: 'Format proposed_at invalide' });
+    }
+    
+    // Date must be in the future (with 5min tolerance for clock drift)
+    const minDate = new Date(Date.now() - 5 * 60 * 1000);
+    if (proposedDate < minDate) {
+        return res.status(400).json({ error: 'La date proposée doit être dans le futur' });
+    }
+    
+    // Date cannot be more than 1 year in the future
+    const maxDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+    if (proposedDate > maxDate) {
+        return res.status(400).json({ error: 'La date proposée ne peut pas dépasser 1 an' });
     }
 
     // Validate location

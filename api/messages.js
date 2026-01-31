@@ -10,7 +10,7 @@ import { supabase, requireAuth, handleCors } from './_supabase.js';
 import { sendPushNotification } from './_push-helper.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, validateMessageContent } from './_validation.js';
-import { logError, createErrorResponse } from './_error-logger.js';
+import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_FETCH_LIMIT = 100;
@@ -167,6 +167,13 @@ async function handleSendMessage(req, res, user) {
         .single();
 
     if (error) throw error;
+
+    logInfo('Message sent', { 
+        messageId: data.id, 
+        senderId: user.id, 
+        receiverId: contact_id,
+        isPing: is_ping 
+    });
 
     // Send push notification (fire and forget)
     sendPushToReceiver(contact_id, user, data, is_ping, safeContent);

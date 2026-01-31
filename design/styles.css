@@ -1433,4 +1433,11 @@ a:hover {
     padding-right: var(--space-3);
   }
 }
-/* deployed 2026-01-31T15:02:52Z */
+/* 
+ * Last updated: Design System v3.1 — Accessibility improvements
+ * - WCAG AA contrast compliance for all text colors
+ * - 44px minimum touch targets (WCAG 2.2)
+ * - Focus ring tokens and high contrast mode support
+ * - Reduced motion and forced-colors media queries
+ * - Additional semantic tokens for line-height and borders
+ */

@@ -2,7 +2,7 @@
   "name": "Cinq — L'anti-réseau social",
   "short_name": "Cinq",
   "description": "5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment.",
-  "start_url": "/app.html",
+  "start_url": "/app.html?source=pwa",
   "id": "/app.html",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -13,31 +13,37 @@
   "lang": "fr",
   "dir": "ltr",
   "categories": ["social", "lifestyle"],
+  "iarc_rating_id": "",
   "icons": [
     {
       "src": "/assets/icons/icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-96x96.png",
       "sizes": "96x96",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-144x144.png",
       "sizes": "144x144",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-152x152.png",
       "sizes": "152x152",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-192x192.png",
@@ -48,7 +54,8 @@
     {
       "src": "/assets/icons/icon-384x384.png",
       "sizes": "384x384",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/icon-512x512.png",
@@ -67,6 +74,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ],
   "screenshots": [
@@ -75,16 +88,63 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Cinq - Feed principal"
+      "label": "Cinq - Feed principal sur desktop"
+    },
+    {
+      "src": "/assets/screenshots/mobile-feed.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Cinq - Feed principal sur mobile"
+    },
+    {
+      "src": "/assets/screenshots/mobile-chat.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Cinq - Chat avec un proche"
     }
   ],
   "shortcuts": [
     {
       "name": "Envoyer un Ping",
       "short_name": "Ping",
-      "description": "Envoie un ping à tes proches",
+      "description": "Envoie un ping rapide à tes proches",
       "url": "/app.html?action=ping",
-      "icons": [{ "src": "/assets/icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        { "src": "/assets/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }
+      ]
+    },
+    {
+      "name": "Écrire un message",
+      "short_name": "Message",
+      "description": "Écris un nouveau message",
+      "url": "/app.html?action=compose",
+      "icons": [
+        { "src": "/assets/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/app.html",
+    "method": "GET",
+    "params": {
+      "title": "share_title",
+      "text": "share_text",
+      "url": "share_url"
+    }
+  },
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+cinq",
+      "url": "/app.html?action=%s"
     }
   ],
   "related_applications": [],

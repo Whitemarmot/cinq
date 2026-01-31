@@ -63,15 +63,19 @@ export default async function handler(req, res) {
 // ===== GET - List posts =====
 
 async function handleGetPosts(req, res, user) {
-    const { limit = 50, offset = 0, user_id } = req.query;
+    const { limit, offset, user_id } = req.query;
+    
+    // Parse and validate pagination params
+    const safeLimit = Math.min(Math.max(1, parseInt(limit) || DEFAULT_FETCH_LIMIT), MAX_FETCH_LIMIT);
+    const safeOffset = Math.max(0, parseInt(offset) || 0);
     
     // Specific user's posts
     if (user_id) {
-        return getSpecificUserPosts(res, user, user_id, parseInt(limit), parseInt(offset));
+        return getSpecificUserPosts(res, user, user_id, safeLimit, safeOffset);
     }
     
     // Default: feed (self + contacts)
-    return getFeed(res, user, parseInt(limit), parseInt(offset));
+    return getFeed(res, user, safeLimit, safeOffset);
 }
 
 async function getSpecificUserPosts(res, user, userId, limit, offset) {
