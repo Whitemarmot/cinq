@@ -1637,20 +1637,60 @@
 
         // ===== TAB SWITCHING =====
         function switchTab(tabName) {
-            // Update nav
+            // Update nav with ARIA
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.tab === tabName);
+                const isActive = item.dataset.tab === tabName;
+                item.classList.toggle('active', isActive);
+                item.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
             
-            // Update panels
+            // Update panels with ARIA
             document.querySelectorAll('.tab-panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `tab-${tabName}`);
+                const isActive = panel.id === `tab-${tabName}`;
+                panel.classList.toggle('active', isActive);
+                panel.hidden = !isActive;
+                if (isActive) {
+                    panel.removeAttribute('aria-hidden');
+                } else {
+                    panel.setAttribute('aria-hidden', 'true');
+                }
             });
             
             // Load data if needed
             if (tabName === 'contacts') loadContacts();
             if (tabName === 'feed') loadPosts();
         }
+        
+        // ===== KEYBOARD NAVIGATION FOR TABS =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const tablist = document.querySelector('[role="tablist"]');
+            if (tablist) {
+                tablist.addEventListener('keydown', (e) => {
+                    const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+                    const currentIndex = tabs.findIndex(tab => tab === document.activeElement);
+                    
+                    let newIndex = currentIndex;
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        newIndex = (currentIndex + 1) % tabs.length;
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                        e.preventDefault();
+                    } else if (e.key === 'Home') {
+                        newIndex = 0;
+                        e.preventDefault();
+                    } else if (e.key === 'End') {
+                        newIndex = tabs.length - 1;
+                        e.preventDefault();
+                    }
+                    
+                    if (newIndex !== currentIndex) {
+                        tabs[newIndex].focus();
+                        tabs[newIndex].click();
+                    }
+                });
+            }
+        });
 
         // ===== TOAST =====
         function showToast(options) {
@@ -1660,13 +1700,29 @@
             
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <span class="toast-icon">${icons[type] || icons.info}</span>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    ${message ? `<div class="toast-message">${message}</div>` : ''}
-                </div>
-            `;
+            
+            // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'toast-icon';
+            iconSpan.textContent = icons[type] || icons.info;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'toast-content';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'toast-title';
+            titleDiv.textContent = title || '';
+            contentDiv.appendChild(titleDiv);
+            
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'toast-message';
+                messageDiv.textContent = message;
+                contentDiv.appendChild(messageDiv);
+            }
+            
+            toast.appendChild(iconSpan);
+            toast.appendChild(contentDiv);
             
             if (onClick) {
                 toast.style.cursor = 'pointer';
@@ -1972,6 +2028,9 @@
         }
 
         async function loadPosts() {
+            const container = document.getElementById('posts-list');
+            container.setAttribute('aria-busy', 'true');
+            
             try {
                 const res = await fetch(`${API_URL}/posts`, { headers: authHeaders() });
                 const data = await res.json();
@@ -1979,23 +2038,26 @@
                 posts = data.posts || [];
                 renderPosts();
             } catch (e) {
-                document.getElementById('posts-list').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">😵</div>
+                container.innerHTML = `
+                    <div class="empty-state" role="status">
+                        <div class="empty-state-icon" aria-hidden="true">😵</div>
                         <div class="empty-state-title">Oups, ça a planté</div>
                         <div style="color:var(--color-text-muted)">Rafraîchis la page, ça devrait passer</div>
                     </div>
                 `;
+            } finally {
+                container.setAttribute('aria-busy', 'false');
             }
         }
 
         function renderPosts() {
             const container = document.getElementById('posts-list');
+            container.setAttribute('aria-busy', 'false');
             
             if (posts.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🌱</div>
+                    <div class="empty-state" role="status">
+                        <div class="empty-state-icon" aria-hidden="true">🌱</div>
                         <div class="empty-state-title">C'est calme ici</div>
                         <div style="color:var(--color-text-muted);max-width:300px;margin:0 auto;">
                             Brise la glace ! Poste un truc, ou ajoute tes proches pour voir ce qu'ils racontent.
@@ -2005,7 +2067,7 @@
                 return;
             }
             
-            container.innerHTML = posts.map(post => {
+            container.innerHTML = posts.map((post, index) => {
                 const author = post.author || {};
                 const isOwn = post.user_id === user.id;
                 const avatarUrl = author.avatar_url;
@@ -2014,33 +2076,33 @@
                 const time = formatTime(post.created_at);
                 
                 const avatarHtml = avatarUrl 
-                    ? `<img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(displayName)}">`
-                    : initial;
+                    ? `<img src="${escapeHtml(avatarUrl)}" alt="">`
+                    : `<span aria-hidden="true">${initial}</span>`;
                 
                 const imageHtml = post.image_url ? `
                     <div class="post-image">
-                        <img src="${escapeHtml(post.image_url)}" alt="Image" onclick="openImageModal('${escapeHtml(post.image_url)}')">
+                        <img src="${escapeHtml(post.image_url)}" alt="Image partagée par ${escapeHtml(displayName)}" onclick="openImageModal('${escapeHtml(post.image_url)}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')openImageModal('${escapeHtml(post.image_url)}')">
                     </div>
                 ` : '';
                 
                 const menuHtml = isOwn ? `
-                    <button class="post-menu-btn" onclick="togglePostMenu('${post.id}')">⋮</button>
-                    <div class="post-menu" id="menu-${post.id}">
-                        <button class="post-menu-item" onclick="deletePost('${post.id}')">🗑️ Supprimer</button>
+                    <button class="post-menu-btn" onclick="togglePostMenu('${post.id}')" type="button" aria-label="Options du post" aria-haspopup="menu" aria-expanded="false"><span aria-hidden="true">⋮</span></button>
+                    <div class="post-menu" id="menu-${post.id}" role="menu">
+                        <button class="post-menu-item" onclick="deletePost('${post.id}')" type="button" role="menuitem"><span aria-hidden="true">🗑️</span> Supprimer</button>
                     </div>
                 ` : '';
                 
                 return `
-                    <article class="post-card">
+                    <article class="post-card" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
                         <div class="post-header">
                             <div class="post-author">
-                                <div class="post-avatar ${isOwn ? 'own' : ''}">${avatarHtml}</div>
+                                <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${avatarHtml}</div>
                                 <div>
                                     <span class="post-author-name">
                                         ${escapeHtml(displayName)}
                                         ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
                                     </span>
-                                    <div class="post-time">${time}</div>
+                                    <div class="post-time"><time datetime="${post.created_at}">${time}</time></div>
                                 </div>
                             </div>
                             ${menuHtml}
@@ -2123,6 +2185,7 @@
                 const slot = document.createElement('div');
                 slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
                 slot.tabIndex = 0;
+                slot.setAttribute('role', 'listitem');
                 
                 if (contact) {
                     const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
@@ -2130,19 +2193,52 @@
                     const avatarUrl = contact.contact?.avatar_url;
                     const unread = unreadCounts[contact.contact_user_id] || 0;
                     
-                    const avatarContent = avatarUrl 
-                        ? `<img src="${avatarUrl}" alt="${name}">` 
-                        : initial;
+                    const unreadText = unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : '';
+                    slot.setAttribute('aria-label', `${escapeHtml(name)}${unreadText}. Appuie pour ouvrir la conversation`);
                     
-                    slot.innerHTML = `
-                        <div class="contact-avatar-slot">${avatarContent}</div>
-                        <div class="contact-name">${name}</div>
-                        ${unread > 0 ? `<div class="unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
-                    `;
+                    // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
+                    const avatarSlot = document.createElement('div');
+                    avatarSlot.className = 'contact-avatar-slot';
+                    avatarSlot.setAttribute('aria-hidden', 'true');
+                    if (avatarUrl) {
+                        const img = document.createElement('img');
+                        img.src = avatarUrl;
+                        img.alt = '';
+                        avatarSlot.appendChild(img);
+                    } else {
+                        const span = document.createElement('span');
+                        span.setAttribute('aria-hidden', 'true');
+                        span.textContent = initial;
+                        avatarSlot.appendChild(span);
+                    }
+                    
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'contact-name';
+                    nameDiv.setAttribute('aria-hidden', 'true');
+                    nameDiv.textContent = name;
+                    
+                    slot.appendChild(avatarSlot);
+                    slot.appendChild(nameDiv);
+                    
+                    if (unread > 0) {
+                        const badge = document.createElement('div');
+                        badge.className = 'unread-badge';
+                        badge.setAttribute('aria-hidden', 'true');
+                        badge.textContent = unread > 9 ? '9+' : unread;
+                        slot.appendChild(badge);
+                    }
+                    
                     slot.onclick = () => openChat(contact);
+                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(contact); } };
                 } else {
-                    slot.innerHTML = `<span class="empty-plus">+</span>`;
+                    slot.setAttribute('aria-label', `Emplacement ${i + 1} vide. Appuie pour ajouter un contact`);
+                    const plusSpan = document.createElement('span');
+                    plusSpan.className = 'empty-plus';
+                    plusSpan.setAttribute('aria-hidden', 'true');
+                    plusSpan.textContent = '+';
+                    slot.appendChild(plusSpan);
                     slot.onclick = () => openAddContactModal();
+                    slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAddContactModal(); } };
                 }
                 
                 grid.appendChild(slot);
@@ -2168,7 +2264,10 @@
             });
         }
         
+        let lastFocusedElement = null;
+        
         function openChat(contact) {
+            lastFocusedElement = document.activeElement;
             currentChatContact = contact;
             unreadCounts[contact.contact_user_id] = 0;
             renderContacts();
@@ -2181,25 +2280,66 @@
             
             const chatAvatar = document.getElementById('chat-contact-avatar');
             chatAvatar.innerHTML = avatarUrl 
-                ? `<img src="${avatarUrl}" alt="${name}">`
-                : initial;
+                ? `<img src="${avatarUrl}" alt="">`
+                : `<span aria-hidden="true">${initial}</span>`;
             
-            document.getElementById('chat-panel').classList.add('open');
-            document.getElementById('chat-overlay').classList.add('open');
-            document.getElementById('chat-input').focus();
+            const chatPanel = document.getElementById('chat-panel');
+            const chatOverlay = document.getElementById('chat-overlay');
+            
+            chatPanel.classList.add('open');
+            chatPanel.setAttribute('aria-hidden', 'false');
+            chatOverlay.classList.add('open');
+            
+            // Focus on chat input
+            setTimeout(() => document.getElementById('chat-input').focus(), 100);
+            
+            // Setup focus trap
+            setupFocusTrap(chatPanel);
             
             loadMessages();
             messagePollingInterval = setInterval(loadMessages, 3000);
         }
 
         function closeChat() {
-            document.getElementById('chat-panel').classList.remove('open');
-            document.getElementById('chat-overlay').classList.remove('open');
+            const chatPanel = document.getElementById('chat-panel');
+            const chatOverlay = document.getElementById('chat-overlay');
+            
+            chatPanel.classList.remove('open');
+            chatPanel.setAttribute('aria-hidden', 'true');
+            chatOverlay.classList.remove('open');
+            
             currentChatContact = null;
             if (messagePollingInterval) {
                 clearInterval(messagePollingInterval);
                 messagePollingInterval = null;
             }
+            
+            // Restore focus
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+                lastFocusedElement = null;
+            }
+        }
+        
+        // ===== FOCUS TRAP FOR MODALS =====
+        function setupFocusTrap(container) {
+            const focusableSelectors = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+            
+            container.addEventListener('keydown', function trapFocus(e) {
+                if (e.key !== 'Tab') return;
+                
+                const focusableElements = container.querySelectorAll(focusableSelectors);
+                const firstFocusable = focusableElements[0];
+                const lastFocusable = focusableElements[focusableElements.length - 1];
+                
+                if (e.shiftKey && document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            });
         }
 
         async function loadMessages() {
@@ -2318,15 +2458,43 @@
         }
 
         // ===== MODALS =====
+        function openModal(modalId, focusSelector) {
+            const modal = document.getElementById(modalId);
+            lastFocusedElement = document.activeElement;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            setupFocusTrap(modal);
+            
+            // Focus first focusable element or specified selector
+            setTimeout(() => {
+                const focusTarget = focusSelector ? modal.querySelector(focusSelector) : modal.querySelector('button, input, [tabindex="0"]');
+                if (focusTarget) focusTarget.focus();
+            }, 100);
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+                lastFocusedElement = null;
+            }
+        }
+        
         function openGiftModal() {
-            document.getElementById('gift-modal').classList.add('open');
-            document.getElementById('gift-content').innerHTML = `<button class="save-btn" style="width:100%;" onclick="createGift()">Générer un code</button>`;
+            document.getElementById('gift-content').innerHTML = `<button class="save-btn" style="width:100%;" onclick="createGift()" type="button">Générer un code</button>`;
+            openModal('gift-modal', '.save-btn');
         }
         
         function closeGiftModal() {
-            document.getElementById('gift-modal').classList.remove('open');
+            closeModal('gift-modal');
         }
 
+        // Store last gift URL for copy function (avoids inline onclick with URL)
+        let lastGiftUrl = null;
+        
         async function createGift() {
             const contentEl = document.getElementById('gift-content');
             contentEl.innerHTML = '<div class="loading-spinner" style="margin:var(--space-8) auto;"></div>';
@@ -2336,18 +2504,49 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Erreur');
 
-                contentEl.innerHTML = `
-                    <div class="gift-code-display">
-                        <div class="gift-code">${data.gift.code}</div>
-                    </div>
-                    <button class="save-btn" style="width:100%;" onclick="copyGift('${data.gift.shareUrl}')">📋 Copier le lien</button>
-                    <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-4);text-align:center;">Valable 30 jours</p>
-                `;
+                // SECURITY: Store URL in variable, use DOM methods to prevent XSS
+                lastGiftUrl = data.gift.shareUrl;
+                
+                contentEl.innerHTML = '';
+                
+                const codeDisplay = document.createElement('div');
+                codeDisplay.className = 'gift-code-display';
+                const codeDiv = document.createElement('div');
+                codeDiv.className = 'gift-code';
+                codeDiv.textContent = data.gift.code; // Safe: textContent escapes
+                codeDisplay.appendChild(codeDiv);
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'save-btn';
+                copyBtn.style.width = '100%';
+                copyBtn.type = 'button';
+                copyBtn.setAttribute('aria-label', 'Copier le lien d\'invitation');
+                copyBtn.innerHTML = '<span aria-hidden="true">📋</span> Copier le lien';
+                copyBtn.onclick = () => copyGift(lastGiftUrl);
+                
+                const expiryP = document.createElement('p');
+                expiryP.style.cssText = 'font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-4);text-align:center;';
+                expiryP.textContent = 'Valable 30 jours';
+                
+                contentEl.appendChild(codeDisplay);
+                contentEl.appendChild(copyBtn);
+                contentEl.appendChild(expiryP);
             } catch (e) {
-                contentEl.innerHTML = `
-                    <p style="color:var(--color-error);text-align:center;">${e.message}</p>
-                    <button class="save-btn" style="width:100%;margin-top:var(--space-4);" onclick="createGift()">Réessayer</button>
-                `;
+                // SECURITY: Use DOM methods to prevent XSS from error messages
+                contentEl.innerHTML = '';
+                
+                const errorP = document.createElement('p');
+                errorP.style.cssText = 'color:var(--color-error);text-align:center;';
+                errorP.textContent = e.message; // Safe: textContent escapes
+                
+                const retryBtn = document.createElement('button');
+                retryBtn.className = 'save-btn';
+                retryBtn.style.cssText = 'width:100%;margin-top:var(--space-4);';
+                retryBtn.textContent = 'Réessayer';
+                retryBtn.onclick = createGift;
+                
+                contentEl.appendChild(errorP);
+                contentEl.appendChild(retryBtn);
             }
         }
 
@@ -2361,14 +2560,14 @@
         }
 
         function openAddContactModal() {
-            document.getElementById('add-contact-modal').classList.add('open');
             document.getElementById('contact-id-input').value = '';
             document.getElementById('add-contact-error').style.display = 'none';
             document.getElementById('my-id').textContent = user?.id || 'Non disponible';
+            openModal('add-contact-modal', '#contact-id-input');
         }
         
         function closeAddContactModal() {
-            document.getElementById('add-contact-modal').classList.remove('open');
+            closeModal('add-contact-modal');
         }
 
         async function addContact() {
@@ -2426,13 +2625,13 @@
         }
 
         function openDeleteAccountModal() {
-            document.getElementById('delete-account-modal').classList.add('open');
             document.getElementById('delete-confirmation-input').value = '';
             document.getElementById('delete-account-error').style.display = 'none';
+            openModal('delete-account-modal', '#delete-confirmation-input');
         }
         
         function closeDeleteAccountModal() {
-            document.getElementById('delete-account-modal').classList.remove('open');
+            closeModal('delete-account-modal');
         }
 
         async function deleteAccount() {

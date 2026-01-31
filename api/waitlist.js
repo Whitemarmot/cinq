@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidEmail } from './_validation.js';
 import { logError, createErrorResponse } from './_error-logger.js';
+import { cors } from './_cors.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -9,14 +10,8 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-    // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    // SECURITY: Validate CORS origin
+    if (!cors(req, res)) return;
 
     // Rate limiting for public endpoint
     if (!checkRateLimit(req, res, { ...RATE_LIMITS.PUBLIC, keyPrefix: 'waitlist' })) {

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Build script for Cinq - Minification & Optimization
- * Run: node scripts/build.js
+ * Uses esbuild for fast CSS/JS minification
+ * Run: npm run build
  */
 
 const { execSync } = require('child_process');
@@ -16,61 +17,67 @@ const CSS_FILES = [
   'css/mobile-responsive.css',
   'css/a11y.css',
   'animations.css',
-  'styles.css'
+  'styles.css',
+  'css/base.css',
+  'css/components.css',
+  'css/utilities.css'
 ];
 
 const JS_FILES = [
   'animations.js',
   'fun.js',
   'analytics.js',
-  'pwa-install.js',
-  'service-worker.js'
+  'pwa-install.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');
 
-// Create dist folder if it doesn't exist
-const distDir = path.join(ROOT, 'dist');
-if (!fs.existsSync(distDir)) {
-  fs.mkdirSync(distDir, { recursive: true });
-}
+let totalSaved = 0;
 
-// Minify CSS files
-console.log('📦 Minifying CSS...');
+// Minify CSS files with esbuild
+console.log('📦 Minifying CSS with esbuild...');
 CSS_FILES.forEach(file => {
   const inputPath = path.join(ROOT, file);
   const outputPath = path.join(ROOT, file.replace('.css', '.min.css'));
   
   if (fs.existsSync(inputPath)) {
     try {
-      execSync(`npx csso ${inputPath} -o ${outputPath}`, { cwd: ROOT });
+      execSync(`npx esbuild "${inputPath}" --minify --outfile="${outputPath}"`, { 
+        cwd: ROOT,
+        stdio: 'pipe' 
+      });
       const originalSize = fs.statSync(inputPath).size;
       const minSize = fs.statSync(outputPath).size;
       const savings = ((1 - minSize / originalSize) * 100).toFixed(1);
-      console.log(`  ✓ ${file} → ${path.basename(outputPath)} (${savings}% smaller)`);
+      totalSaved += originalSize - minSize;
+      console.log(`  ✓ ${file} (${(originalSize/1024).toFixed(1)}KB → ${(minSize/1024).toFixed(1)}KB, -${savings}%)`);
     } catch (e) {
-      console.log(`  ⚠ ${file} - minification failed`);
+      console.log(`  ⚠ ${file} - skipped (file error)`);
     }
   }
 });
 
-// Minify JS files
-console.log('\n📦 Minifying JS...');
+// Minify JS files with terser (better compression than esbuild for JS)
+console.log('\n📦 Minifying JS with terser...');
 JS_FILES.forEach(file => {
   const inputPath = path.join(ROOT, file);
   const outputPath = path.join(ROOT, file.replace('.js', '.min.js'));
   
   if (fs.existsSync(inputPath)) {
     try {
-      execSync(`npx terser ${inputPath} -o ${outputPath} -c -m`, { cwd: ROOT });
+      execSync(`npx terser "${inputPath}" -o "${outputPath}" -c -m`, { 
+        cwd: ROOT,
+        stdio: 'pipe' 
+      });
       const originalSize = fs.statSync(inputPath).size;
       const minSize = fs.statSync(outputPath).size;
       const savings = ((1 - minSize / originalSize) * 100).toFixed(1);
-      console.log(`  ✓ ${file} → ${path.basename(outputPath)} (${savings}% smaller)`);
+      totalSaved += originalSize - minSize;
+      console.log(`  ✓ ${file} (${(originalSize/1024).toFixed(1)}KB → ${(minSize/1024).toFixed(1)}KB, -${savings}%)`);
     } catch (e) {
-      console.log(`  ⚠ ${file} - minification failed`);
+      console.log(`  ⚠ ${file} - skipped (file error)`);
     }
   }
 });
 
-console.log('\n✅ Build complete!');
+console.log(`\n✅ Build complete! Total savings: ${(totalSaved/1024).toFixed(1)}KB`);

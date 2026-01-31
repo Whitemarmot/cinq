@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
+import { cors } from './_cors.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -15,11 +16,8 @@ async function getUser(req) {
 }
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
-    if (req.method === 'OPTIONS') return res.status(200).end();
+    // SECURITY: Validate CORS origin
+    if (!cors(req, res)) return;
 
     const user = await getUser(req);
     if (!user) return res.status(401).json({ error: 'Non authentifié' });

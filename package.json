@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "echo 'Dev mode'",
-    "build": "echo 'Build OK'",
+    "build": "node scripts/build.js",
     "lint": "eslint . --ext .js --ignore-path .gitignore",
     "lint:fix": "eslint . --ext .js --fix"
   },
@@ -17,7 +17,9 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
+    "clean-css-cli": "^5.6.3",
     "csso-cli": "^4.0.2",
+    "esbuild": "^0.27.2",
     "terser": "^5.46.0"
   }
 }
