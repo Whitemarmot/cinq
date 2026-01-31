@@ -116,7 +116,7 @@ function extractPrefix(code) {
 const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-IP',
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
