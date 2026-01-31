@@ -1,10 +1,18 @@
 // Netlify Function pour la waitlist
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                     process.env.SUPABASE_SERVICE_KEY || 
+                     process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Missing Supabase configuration');
+}
+
+const supabase = SUPABASE_URL && SUPABASE_KEY 
+    ? createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
 
 exports.handler = async (event, context) => {
     const headers = {
@@ -22,6 +30,14 @@ exports.handler = async (event, context) => {
     // GET - Obtenir le compte
     if (event.httpMethod === 'GET') {
         try {
+            if (!supabase) {
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: 'Database not configured', count: 0 })
+                };
+            }
+            
             const { count, error } = await supabase
                 .from('waitlist')
                 .select('*', { count: 'exact', head: true });
@@ -46,6 +62,14 @@ exports.handler = async (event, context) => {
     // POST - Ajouter un email
     if (event.httpMethod === 'POST') {
         try {
+            if (!supabase) {
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: 'Database not configured' })
+                };
+            }
+            
             const body = JSON.parse(event.body || '{}');
             const { email, referrer, utm_source, utm_medium, utm_campaign } = body;
 
