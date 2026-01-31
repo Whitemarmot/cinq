@@ -60,6 +60,9 @@
             max-width: 600px;
             margin: 0 auto;
             padding-bottom: calc(80px + env(safe-area-inset-bottom, 1rem));
+            /* Optimize for scroll performance */
+            will-change: scroll-position;
+            -webkit-overflow-scrolling: touch;
         }
         
         .feed-header {
@@ -156,6 +159,49 @@
         [data-theme="light"] .theme-toggle .icon-moon {
             opacity: 1;
             transform: rotate(0) scale(1);
+        }
+
+        /* ===== PULL TO REFRESH ===== */
+        .pull-to-refresh {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .pull-to-refresh.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .pull-to-refresh.refreshing .ptr-spinner {
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .ptr-spinner {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s;
+        }
+        
+        .ptr-arrow {
+            transition: transform 0.2s;
+        }
+        
+        .pull-to-refresh.ready .ptr-arrow {
+            transform: rotate(180deg);
         }
 
         /* ===== COMPOSER ===== */
@@ -352,12 +398,51 @@
             gap: 1rem;
         }
         
+        /* ===== POST CARD ANIMATIONS ===== */
         .post-card {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             padding: 1rem;
             transition: all 0.2s;
+            /* Animation on appear */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: post-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            /* Optimize rendering */
+            will-change: opacity, transform;
+            contain: layout style paint;
+        }
+        
+        @keyframes post-fade-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Staggered animation delay for initial load */
+        .post-card:nth-child(1) { animation-delay: 0.05s; }
+        .post-card:nth-child(2) { animation-delay: 0.1s; }
+        .post-card:nth-child(3) { animation-delay: 0.15s; }
+        .post-card:nth-child(4) { animation-delay: 0.2s; }
+        .post-card:nth-child(5) { animation-delay: 0.25s; }
+        .post-card:nth-child(n+6) { animation-delay: 0.3s; }
+        
+        /* New post animation (instant) */
+        .post-card.new-post {
+            animation: post-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        @keyframes post-slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .post-card:hover {
@@ -369,6 +454,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 0.75rem;
+            position: relative;
         }
         
         .post-author {
@@ -437,10 +523,14 @@
             word-break: break-word;
         }
         
+        /* ===== LAZY LOADING IMAGES ===== */
         .post-image {
             margin-top: 0.75rem;
             border-radius: var(--radius-lg);
             overflow: hidden;
+            position: relative;
+            min-height: 100px;
+            background: var(--color-bg-elevated);
         }
         
         .post-image img {
@@ -448,11 +538,37 @@
             max-height: 400px;
             object-fit: cover;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            /* Lazy loading states */
+            opacity: 0;
+        }
+        
+        .post-image img.loaded {
+            opacity: 1;
         }
         
         .post-image img:hover {
-            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        /* Image loading placeholder */
+        .post-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                var(--color-bg-elevated) 25%,
+                var(--color-bg-tertiary) 50%,
+                var(--color-bg-elevated) 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            z-index: 0;
+        }
+        
+        .post-image.loaded::before {
+            display: none;
         }
         
         /* ===== EMPTY STATE ===== */
@@ -460,6 +576,7 @@
             text-align: center;
             padding: 3rem 1rem;
             color: var(--color-text-muted);
+            animation: post-fade-in 0.5s ease forwards;
         }
         
         .empty-state-icon {
@@ -481,7 +598,7 @@
             margin: 0 auto;
         }
 
-        /* ===== LOADING ===== */
+        /* ===== LOADING & SKELETON ===== */
         .loading {
             display: flex;
             justify-content: center;
@@ -501,11 +618,22 @@
             to { transform: rotate(360deg); }
         }
         
+        /* Enhanced skeleton loading */
         .skeleton-post {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             padding: 1rem;
+            opacity: 0;
+            animation: skeleton-fade-in 0.3s ease forwards;
+        }
+        
+        .skeleton-post:nth-child(1) { animation-delay: 0s; }
+        .skeleton-post:nth-child(2) { animation-delay: 0.1s; }
+        .skeleton-post:nth-child(3) { animation-delay: 0.2s; }
+        
+        @keyframes skeleton-fade-in {
+            to { opacity: 1; }
         }
         
         .skeleton {
@@ -523,6 +651,67 @@
         @keyframes skeleton-loading {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
+        }
+        
+        /* Skeleton variations */
+        .skeleton.skeleton-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .skeleton.skeleton-title {
+            height: 16px;
+            width: 60%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skeleton.skeleton-text {
+            height: 12px;
+            width: 40%;
+        }
+        
+        .skeleton.skeleton-body {
+            height: 60px;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+        
+        .skeleton.skeleton-image {
+            height: 200px;
+            width: 100%;
+            margin-top: 0.75rem;
+            border-radius: var(--radius-lg);
+        }
+
+        /* ===== INFINITE SCROLL LOADER ===== */
+        .infinite-scroll-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .infinite-scroll-loader .loading-spinner {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .infinite-scroll-end {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        
+        /* Sentinel element for IntersectionObserver */
+        .scroll-sentinel {
+            height: 1px;
+            width: 100%;
         }
 
         /* ===== TOAST ===== */
@@ -586,6 +775,18 @@
         
         .post-menu.open {
             display: block;
+            animation: menu-in 0.2s ease;
+        }
+        
+        @keyframes menu-in {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .post-menu-item {
@@ -605,10 +806,6 @@
         
         .post-menu-item:hover {
             background: var(--color-bg-hover);
-        }
-        
-        .post-header {
-            position: relative;
         }
 
         /* ===== IMAGE MODAL ===== */
@@ -636,6 +833,12 @@
             max-height: 95%;
             object-fit: contain;
             border-radius: var(--radius-lg);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .image-modal.open img {
+            transform: scale(1);
         }
         
         .image-modal-close {
@@ -674,17 +877,46 @@
                 padding: 0.75rem;
             }
         }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            .post-card,
+            .skeleton-post,
+            .skeleton,
+            .post-image img,
+            .image-modal img {
+                animation: none;
+                transition: none;
+                opacity: 1;
+                transform: none;
+            }
+            
+            .pull-to-refresh {
+                transition: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="noise-overlay" aria-hidden="true"></div>
     
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-to-refresh" id="pull-to-refresh" aria-live="polite" aria-label="Tirer pour rafraîchir">
+        <svg class="ptr-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <svg class="ptr-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        <span class="ptr-text">Tirer pour rafraîchir</span>
+    </div>
+    
     <!-- Toast Container -->
-    <div class="toast-container" id="toast-container"></div>
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
     
     <!-- Image Modal -->
-    <div class="image-modal" id="image-modal" onclick="closeImageModal()">
-        <button class="image-modal-close" onclick="closeImageModal()">×</button>
+    <div class="image-modal" id="image-modal" role="dialog" aria-modal="true" aria-label="Image agrandie" onclick="closeImageModal()">
+        <button class="image-modal-close" onclick="closeImageModal()" aria-label="Fermer">×</button>
         <img id="modal-image" src="" alt="Image agrandie">
     </div>
 
@@ -702,14 +934,14 @@
                     <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                     <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
-                <a href="/app.html" class="back-btn">← Retour</a>
+                <a href="/app.html" class="back-btn" aria-label="Retour à l'application">← Retour</a>
             </div>
         </header>
 
         <!-- Composer -->
-        <div class="composer" id="composer">
+        <div class="composer" id="composer" role="form" aria-label="Créer un nouveau post">
             <div class="composer-header">
-                <div class="composer-avatar" id="composer-avatar">?</div>
+                <div class="composer-avatar" id="composer-avatar" aria-hidden="true">?</div>
                 <span class="composer-user" id="composer-user">Chargement...</span>
             </div>
             <textarea 
@@ -717,16 +949,17 @@
                 id="post-content" 
                 placeholder="Quoi de neuf ? Partage quelque chose avec tes 5..."
                 maxlength="1000"
+                aria-label="Contenu du post"
             ></textarea>
-            <div class="image-preview" id="image-preview" style="display: none;">
-                <img id="preview-img" src="" alt="Aperçu de l'image">
-                <button class="image-preview-remove" onclick="removeImage()">×</button>
-                <div id="upload-progress" style="display: none; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 0.5rem; text-align: center; font-size: 0.75rem;">
+            <div class="image-preview" id="image-preview" style="display: none;" aria-label="Aperçu de l'image">
+                <img id="preview-img" src="" alt="Aperçu de l'image à poster">
+                <button class="image-preview-remove" onclick="removeImage()" aria-label="Supprimer l'image">×</button>
+                <div id="upload-progress" style="display: none; position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 0.5rem; text-align: center; font-size: 0.75rem;" role="status" aria-live="polite">
                     ⏳ Upload en cours...
                 </div>
             </div>
             <!-- Hidden file input -->
-            <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleFileSelect(event)">
+            <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleFileSelect(event)" aria-label="Sélectionner une image">
             <!-- AI Generation input -->
             <div id="ai-prompt-container" style="display: none; margin-top: 0.5rem;">
                 <div style="display: flex; gap: 0.5rem;">
@@ -737,8 +970,9 @@
                         placeholder="Décris l'image à générer... (ex: un chat sur la lune)"
                         maxlength="500"
                         style="flex: 1;"
+                        aria-label="Description de l'image à générer"
                     >
-                    <button class="composer-btn" onclick="generateAIImage()" id="generate-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: white; border: none;">
+                    <button class="composer-btn" onclick="generateAIImage()" id="generate-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: white; border: none;" aria-label="Générer l'image">
                         ✨ Générer
                     </button>
                 </div>
@@ -748,13 +982,13 @@
             </div>
             <div class="composer-footer">
                 <div class="composer-actions">
-                    <button class="composer-btn" id="upload-image-btn" onclick="triggerFileUpload()">
+                    <button class="composer-btn" id="upload-image-btn" onclick="triggerFileUpload()" aria-label="Ajouter une photo">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
                         </svg>
                         Photo
                     </button>
-                    <button class="composer-btn" id="ai-image-btn" onclick="toggleAIPrompt()">
+                    <button class="composer-btn" id="ai-image-btn" onclick="toggleAIPrompt()" aria-label="Générer une image par IA">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
@@ -762,8 +996,8 @@
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span class="char-count" id="char-count">0/1000</span>
-                    <button class="post-btn" id="post-btn" onclick="submitPost()" disabled>
+                    <span class="char-count" id="char-count" aria-live="polite">0/1000</span>
+                    <button class="post-btn" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post">
                         Poster
                     </button>
                 </div>
@@ -771,19 +1005,43 @@
         </div>
 
         <!-- Posts List -->
-        <div class="posts-list" id="posts-list">
-            <!-- Loading skeleton -->
-            <div class="skeleton-post" id="loading-skeleton">
+        <div class="posts-list" id="posts-list" role="feed" aria-label="Liste des posts">
+            <!-- Loading skeletons -->
+            <div class="skeleton-post" id="skeleton-1" aria-hidden="true">
                 <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
-                    <div class="skeleton" style="width: 40px; height: 40px; border-radius: 50%;"></div>
+                    <div class="skeleton skeleton-avatar"></div>
                     <div style="flex: 1;">
-                        <div class="skeleton" style="width: 120px; height: 16px; margin-bottom: 0.5rem;"></div>
-                        <div class="skeleton" style="width: 80px; height: 12px;"></div>
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
                     </div>
                 </div>
-                <div class="skeleton" style="width: 100%; height: 60px;"></div>
+                <div class="skeleton skeleton-body"></div>
+            </div>
+            <div class="skeleton-post" id="skeleton-2" aria-hidden="true">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 45%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body" style="height: 40px;"></div>
+                <div class="skeleton skeleton-image"></div>
+            </div>
+            <div class="skeleton-post" id="skeleton-3" aria-hidden="true">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 70%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 25%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body" style="height: 80px;"></div>
             </div>
         </div>
+        
+        <!-- Scroll sentinel for infinite scroll -->
+        <div class="scroll-sentinel" id="scroll-sentinel" aria-hidden="true"></div>
     </div>
 
     <script>
@@ -792,6 +1050,20 @@
         let user = null;
         let posts = [];
         let openMenuPostId = null;
+        
+        // ===== PAGINATION STATE =====
+        let currentPage = 0;
+        let pageSize = 10;
+        let hasMorePosts = true;
+        let isLoadingMore = false;
+        let infiniteScrollObserver = null;
+        
+        // ===== PULL TO REFRESH STATE =====
+        let ptrStartY = 0;
+        let ptrCurrentY = 0;
+        let isPulling = false;
+        let isRefreshing = false;
+        const PTR_THRESHOLD = 80;
 
         // ===== AUTH =====
         function getToken() {
@@ -824,6 +1096,15 @@
                 
                 // Setup textarea listeners
                 setupComposer();
+                
+                // Setup Pull to Refresh
+                setupPullToRefresh();
+                
+                // Setup Infinite Scroll
+                setupInfiniteScroll();
+                
+                // Setup Lazy Loading
+                setupLazyLoading();
                 
                 // Load posts
                 await loadPosts();
@@ -1040,9 +1321,9 @@
                 
                 if (!res.ok) throw new Error(data.error || 'Erreur lors de la publication');
                 
-                // Add to list
+                // Add to list with special animation class
                 posts.unshift(data.post);
-                renderPosts();
+                renderPosts(true); // true = new post added
                 
                 // Reset composer
                 document.getElementById('post-content').value = '';
@@ -1065,10 +1346,222 @@
             }
         }
 
+        // ===== PULL TO REFRESH =====
+        function setupPullToRefresh() {
+            const container = document.querySelector('.feed-container');
+            const ptr = document.getElementById('pull-to-refresh');
+            const ptrText = ptr.querySelector('.ptr-text');
+            const ptrArrow = ptr.querySelector('.ptr-arrow');
+            const ptrSpinner = ptr.querySelector('.ptr-spinner');
+            
+            // Touch events
+            container.addEventListener('touchstart', (e) => {
+                // Only trigger at top of page
+                if (window.scrollY > 10 || isRefreshing) return;
+                ptrStartY = e.touches[0].clientY;
+                isPulling = true;
+            }, { passive: true });
+            
+            container.addEventListener('touchmove', (e) => {
+                if (!isPulling || isRefreshing) return;
+                
+                ptrCurrentY = e.touches[0].clientY;
+                const pullDistance = ptrCurrentY - ptrStartY;
+                
+                // Only show if pulling down and at top
+                if (pullDistance > 0 && window.scrollY <= 0) {
+                    const progress = Math.min(pullDistance / PTR_THRESHOLD, 1);
+                    
+                    // Show indicator
+                    ptr.classList.add('visible');
+                    ptr.style.transform = `translateX(-50%) translateY(${Math.min(pullDistance * 0.5, 60)}px)`;
+                    
+                    // Update state
+                    if (pullDistance >= PTR_THRESHOLD) {
+                        ptr.classList.add('ready');
+                        ptrText.textContent = 'Relâche pour rafraîchir';
+                    } else {
+                        ptr.classList.remove('ready');
+                        ptrText.textContent = 'Tirer pour rafraîchir';
+                    }
+                }
+            }, { passive: true });
+            
+            container.addEventListener('touchend', async () => {
+                if (!isPulling) return;
+                isPulling = false;
+                
+                const pullDistance = ptrCurrentY - ptrStartY;
+                
+                if (pullDistance >= PTR_THRESHOLD && !isRefreshing) {
+                    // Trigger refresh
+                    isRefreshing = true;
+                    ptr.classList.add('refreshing');
+                    ptrArrow.style.display = 'none';
+                    ptrSpinner.style.display = 'block';
+                    ptrText.textContent = 'Rafraîchissement...';
+                    
+                    try {
+                        await refreshPosts();
+                        showToast({ type: 'success', message: '✓ Feed mis à jour' });
+                    } catch (e) {
+                        showToast({ type: 'error', message: 'Erreur de rafraîchissement' });
+                    }
+                    
+                    // Reset
+                    setTimeout(() => {
+                        ptr.classList.remove('visible', 'ready', 'refreshing');
+                        ptr.style.transform = '';
+                        ptrArrow.style.display = 'block';
+                        ptrSpinner.style.display = 'none';
+                        ptrText.textContent = 'Tirer pour rafraîchir';
+                        isRefreshing = false;
+                    }, 300);
+                } else {
+                    // Cancel
+                    ptr.classList.remove('visible', 'ready');
+                    ptr.style.transform = '';
+                }
+                
+                ptrStartY = 0;
+                ptrCurrentY = 0;
+            }, { passive: true });
+        }
+        
+        async function refreshPosts() {
+            currentPage = 0;
+            hasMorePosts = true;
+            posts = [];
+            await loadPosts();
+        }
+
+        // ===== INFINITE SCROLL =====
+        function setupInfiniteScroll() {
+            const sentinel = document.getElementById('scroll-sentinel');
+            
+            infiniteScrollObserver = new IntersectionObserver(
+                (entries) => {
+                    const entry = entries[0];
+                    if (entry.isIntersecting && hasMorePosts && !isLoadingMore) {
+                        loadMorePosts();
+                    }
+                },
+                {
+                    root: null,
+                    rootMargin: '100px',
+                    threshold: 0
+                }
+            );
+            
+            infiniteScrollObserver.observe(sentinel);
+        }
+        
+        async function loadMorePosts() {
+            if (isLoadingMore || !hasMorePosts) return;
+            
+            isLoadingMore = true;
+            
+            // Show loading indicator
+            const container = document.getElementById('posts-list');
+            const loaderId = 'infinite-loader';
+            
+            if (!document.getElementById(loaderId)) {
+                const loader = document.createElement('div');
+                loader.id = loaderId;
+                loader.className = 'infinite-scroll-loader';
+                loader.setAttribute('aria-label', 'Chargement de plus de posts');
+                loader.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <span>Chargement...</span>
+                `;
+                container.appendChild(loader);
+            }
+            
+            try {
+                const nextPage = currentPage + 1;
+                const res = await fetch(`${API_URL}/posts?page=${nextPage}&limit=${pageSize}`, {
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur de chargement');
+                
+                const newPosts = data.posts || [];
+                
+                if (newPosts.length < pageSize) {
+                    hasMorePosts = false;
+                }
+                
+                if (newPosts.length > 0) {
+                    currentPage = nextPage;
+                    posts = [...posts, ...newPosts];
+                    renderPosts();
+                }
+                
+            } catch (e) {
+                console.error('Load more error:', e);
+                showToast({ type: 'error', message: 'Erreur de chargement' });
+            } finally {
+                isLoadingMore = false;
+                
+                // Remove loader
+                const loader = document.getElementById('infinite-loader');
+                if (loader) loader.remove();
+                
+                // Show end message if no more posts
+                if (!hasMorePosts) {
+                    const endMsg = document.createElement('div');
+                    endMsg.className = 'infinite-scroll-end';
+                    endMsg.textContent = '🎉 Tu as tout vu !';
+                    container.appendChild(endMsg);
+                }
+            }
+        }
+
+        // ===== LAZY LOADING IMAGES =====
+        let lazyLoadObserver = null;
+        
+        function setupLazyLoading() {
+            lazyLoadObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            
+                            if (src) {
+                                img.src = src;
+                                img.onload = () => {
+                                    img.classList.add('loaded');
+                                    img.closest('.post-image')?.classList.add('loaded');
+                                };
+                                img.onerror = () => {
+                                    img.closest('.post-image')?.classList.add('loaded');
+                                };
+                                lazyLoadObserver.unobserve(img);
+                            }
+                        }
+                    });
+                },
+                {
+                    root: null,
+                    rootMargin: '50px',
+                    threshold: 0
+                }
+            );
+        }
+        
+        function observeLazyImages() {
+            document.querySelectorAll('.post-image img[data-src]').forEach(img => {
+                lazyLoadObserver.observe(img);
+            });
+        }
+
         // ===== LOAD POSTS =====
         async function loadPosts() {
             try {
-                const res = await fetch(`${API_URL}/posts`, {
+                const res = await fetch(`${API_URL}/posts?page=${currentPage}&limit=${pageSize}`, {
                     headers: authHeaders()
                 });
                 
@@ -1077,11 +1570,16 @@
                 if (!res.ok) throw new Error(data.error || 'Erreur de chargement');
                 
                 posts = data.posts || [];
+                
+                if (posts.length < pageSize) {
+                    hasMorePosts = false;
+                }
+                
                 renderPosts();
                 
             } catch (e) {
                 console.error('Load error:', e);
-                document.getElementById('loading-skeleton').innerHTML = `
+                document.getElementById('posts-list').innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">😢</div>
                         <div class="empty-state-title">Erreur de chargement</div>
@@ -1092,8 +1590,11 @@
         }
 
         // ===== RENDER POSTS =====
-        function renderPosts() {
+        function renderPosts(isNewPost = false) {
             const container = document.getElementById('posts-list');
+            
+            // Remove skeletons
+            document.querySelectorAll('.skeleton-post').forEach(el => el.remove());
             
             if (posts.length === 0) {
                 container.innerHTML = `
@@ -1108,42 +1609,57 @@
                 return;
             }
             
-            container.innerHTML = posts.map(post => renderPost(post)).join('');
+            container.innerHTML = posts.map((post, index) => 
+                renderPost(post, isNewPost && index === 0)
+            ).join('');
+            
+            // Setup lazy loading for new images
+            requestAnimationFrame(() => {
+                observeLazyImages();
+            });
         }
         
-        function renderPost(post) {
+        function renderPost(post, isNew = false) {
             const author = post.author || {};
             const isOwn = post.user_id === user.id;
             const initial = (author.display_name || author.email || '?')[0].toUpperCase();
             const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
             const time = formatTime(post.created_at);
             
+            // Lazy load images
             const imageHtml = post.image_url ? `
-                <div class="post-image">
-                    <img src="${escapeHtml(post.image_url)}" alt="Image du post" onclick="openImageModal('${escapeHtml(post.image_url)}')">
+                <div class="post-image" role="img" aria-label="Image du post">
+                    <img 
+                        data-src="${escapeHtml(post.image_url)}" 
+                        alt="Image partagée par ${escapeHtml(displayName)}" 
+                        onclick="openImageModal('${escapeHtml(post.image_url)}')"
+                        loading="lazy"
+                    >
                 </div>
             ` : '';
             
             const menuHtml = isOwn ? `
-                <button class="post-menu-btn" onclick="toggleMenu('${post.id}')" aria-label="Menu">⋮</button>
-                <div class="post-menu" id="menu-${post.id}">
-                    <button class="post-menu-item" onclick="deletePost('${post.id}')">
+                <button class="post-menu-btn" onclick="toggleMenu('${post.id}')" aria-label="Menu du post" aria-expanded="false" aria-haspopup="true">⋮</button>
+                <div class="post-menu" id="menu-${post.id}" role="menu">
+                    <button class="post-menu-item" onclick="deletePost('${post.id}')" role="menuitem">
                         🗑️ Supprimer
                     </button>
                 </div>
             ` : '';
             
+            const newPostClass = isNew ? 'new-post' : '';
+            
             return `
-                <article class="post-card">
+                <article class="post-card ${newPostClass}" aria-label="Post de ${escapeHtml(displayName)}">
                     <div class="post-header">
                         <div class="post-author">
-                            <div class="post-avatar ${isOwn ? 'own' : ''}">${initial}</div>
+                            <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${initial}</div>
                             <div class="post-author-info">
                                 <span class="post-author-name">
                                     ${escapeHtml(displayName)}
                                     ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
                                 </span>
-                                <span class="post-time">${time}</span>
+                                <time class="post-time" datetime="${post.created_at}">${time}</time>
                             </div>
                         </div>
                         ${menuHtml}
@@ -1181,18 +1697,24 @@
         function toggleMenu(postId) {
             // Close other menus
             document.querySelectorAll('.post-menu.open').forEach(m => {
-                if (m.id !== `menu-${postId}`) m.classList.remove('open');
+                if (m.id !== `menu-${postId}`) {
+                    m.classList.remove('open');
+                    m.previousElementSibling?.setAttribute('aria-expanded', 'false');
+                }
             });
             
             const menu = document.getElementById(`menu-${postId}`);
-            menu.classList.toggle('open');
+            const btn = menu.previousElementSibling;
+            const isOpen = menu.classList.toggle('open');
+            btn?.setAttribute('aria-expanded', isOpen);
             
             // Close on outside click
-            if (menu.classList.contains('open')) {
+            if (isOpen) {
                 setTimeout(() => {
                     document.addEventListener('click', function closeMenu(e) {
                         if (!e.target.closest('.post-menu') && !e.target.closest('.post-menu-btn')) {
                             menu.classList.remove('open');
+                            btn?.setAttribute('aria-expanded', 'false');
                             document.removeEventListener('click', closeMenu);
                         }
                     });
@@ -1205,10 +1727,12 @@
             event.stopPropagation();
             document.getElementById('modal-image').src = url;
             document.getElementById('image-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
         
         function closeImageModal() {
             document.getElementById('image-modal').classList.remove('open');
+            document.body.style.overflow = '';
         }
 
         // ===== UTILS =====
@@ -1239,8 +1763,9 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
+            toast.setAttribute('role', 'alert');
             toast.innerHTML = `
-                <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+                <span aria-hidden="true">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
                 <span>${message}</span>
             `;
             container.appendChild(toast);
@@ -1255,7 +1780,10 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeImageModal();
-                document.querySelectorAll('.post-menu.open').forEach(m => m.classList.remove('open'));
+                document.querySelectorAll('.post-menu.open').forEach(m => {
+                    m.classList.remove('open');
+                    m.previousElementSibling?.setAttribute('aria-expanded', 'false');
+                });
             }
         });
 
