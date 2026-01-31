@@ -31,7 +31,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
-    <meta name="theme-color" content="#121218">
+    <meta name="theme-color" content="#0c0c0f">
     
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -40,21 +40,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cinq">
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
     <link rel="stylesheet" href="/css/a11y.css">
     
-    <!-- Analytics (Plausible - RGPD compliant, no cookies) -->
+    <!-- Analytics -->
     <script defer src="/analytics.js"></script>
     
     <style>
-        /* Header styles */
+        /* ===== HEADER ===== */
         .site-header {
             position: fixed;
             top: 0;
@@ -65,9 +60,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 1.5rem;
-            background: rgba(18, 18, 24, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(12, 12, 15, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--color-border-subtle);
         }
         
@@ -78,9 +73,13 @@
         }
         
         .header-logo-number {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--color-brand);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 8px var(--color-brand-glow));
         }
         
         .header-nav {
@@ -94,20 +93,23 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.625rem 1.25rem;
-            background: var(--color-bg-elevated);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             color: var(--color-text-primary);
             font-size: 0.875rem;
             font-weight: 500;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.2s var(--ease-out-expo);
         }
         
         .header-login-btn:hover {
             background: var(--color-brand);
             border-color: var(--color-brand);
             color: white;
+            box-shadow: var(--shadow-glow-sm);
         }
         
         @media (max-width: 480px) {
@@ -121,35 +123,36 @@
             }
         }
 
-        /* Hero section specific styles */
+        /* ===== HERO ===== */
         .hero {
             position: relative;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: var(--space-8) var(--space-6);
-            padding-top: calc(var(--space-8) + 60px); /* Compense le header fixe */
+            padding-top: calc(var(--space-8) + 70px);
             overflow: hidden;
         }
         
         .hero-content {
             position: relative;
             z-index: 10;
-            max-width: 720px;
+            max-width: 680px;
             text-align: center;
         }
         
-        /* Iconic 5 */
+        /* ===== THE FIVE — Signature Element ===== */
         .hero-logo {
             margin-bottom: var(--space-12);
         }
         
         .five {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 160px;
+            height: 160px;
             margin: 0 auto;
         }
         
@@ -157,21 +160,21 @@
             position: absolute;
             inset: 0;
             border-radius: 50%;
-            border: 3px solid var(--color-border);
+            border: 2px solid var(--color-brand);
             opacity: 0;
-            animation: ring-expand 3s ease-out infinite;
+            animation: ring-expand 3.5s ease-out infinite;
         }
         
-        .five-ring:nth-child(2) { animation-delay: 1s; }
-        .five-ring:nth-child(3) { animation-delay: 2s; }
+        .five-ring:nth-child(2) { animation-delay: 1.15s; }
+        .five-ring:nth-child(3) { animation-delay: 2.3s; }
         
         @keyframes ring-expand {
             0% {
-                transform: scale(0.8);
-                opacity: 0.6;
+                transform: scale(0.9);
+                opacity: 0.5;
             }
             100% {
-                transform: scale(2);
+                transform: scale(2.2);
                 opacity: 0;
             }
         }
@@ -181,32 +184,55 @@
             inset: 0;
             border-radius: 50%;
             background: linear-gradient(
-                135deg,
+                145deg,
                 var(--color-bg-secondary) 0%,
                 var(--color-bg-tertiary) 100%
             );
-            border: 2px solid var(--color-border);
+            border: 1px solid var(--color-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-glow);
+            box-shadow: 
+                var(--shadow-glow),
+                inset 0 1px 1px rgba(255, 255, 255, 0.06);
+            animation: core-breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes core-breathe {
+            0%, 100% {
+                box-shadow: 
+                    var(--shadow-glow),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.06);
+            }
+            50% {
+                box-shadow: 
+                    var(--shadow-glow-lg),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            }
         }
         
         .five-number {
-            font-size: 72px;
+            font-size: 80px;
             font-weight: 700;
             letter-spacing: -0.05em;
-            background: linear-gradient(
-                180deg,
-                var(--color-text-primary) 0%,
-                var(--color-text-secondary) 100%
-            );
+            background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            filter: drop-shadow(0 4px 12px var(--color-brand-glow));
+            animation: number-pulse 3s ease-in-out infinite;
         }
         
-        /* Hero headline */
+        @keyframes number-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 4px 12px var(--color-brand-glow));
+            }
+            50% {
+                filter: drop-shadow(0 6px 20px var(--color-brand-glow));
+            }
+        }
+        
+        /* ===== HEADLINE ===== */
         .hero-headline {
             font-size: var(--text-hero);
             font-weight: 700;
@@ -218,12 +244,8 @@
         
         .hero-headline .accent {
             display: block;
-            background: linear-gradient(
-                135deg,
-                var(--color-brand) 0%,
-                #a855f7 50%,
-                var(--color-brand) 100%
-            );
+            margin-top: var(--space-2);
+            background: var(--cinq-gradient);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -240,17 +262,18 @@
             font-size: var(--text-xl);
             color: var(--color-text-secondary);
             margin-bottom: var(--space-10);
-            max-width: 480px;
+            max-width: 460px;
             margin-left: auto;
             margin-right: auto;
+            line-height: 1.6;
         }
         
         .hero-sub strong {
             color: var(--color-text-primary);
             font-weight: 600;
         }
-        
-        /* Feature pills */
+
+        /* ===== FEATURE PILLS ===== */
         .features {
             display: flex;
             flex-wrap: wrap;
@@ -264,26 +287,30 @@
             align-items: center;
             gap: var(--space-2);
             padding: var(--space-2) var(--space-4);
-            background: var(--color-bg-secondary);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-full);
             font-size: var(--text-sm);
             color: var(--color-text-secondary);
             transition: 
-                border-color var(--transition-base),
-                background var(--transition-base);
+                border-color 0.2s,
+                background 0.2s,
+                transform 0.3s var(--ease-out-expo);
         }
         
         .feature-pill:hover {
-            border-color: var(--color-border-active);
-            background: var(--color-bg-tertiary);
+            border-color: var(--color-brand);
+            background: var(--color-brand-muted);
+            transform: translateY(-2px);
         }
         
         .feature-icon {
             font-size: 14px;
         }
-        
-        /* CTA section */
+
+        /* ===== CTA SECTION ===== */
         .cta-section {
             display: flex;
             flex-direction: column;
@@ -292,49 +319,68 @@
         }
         
         .cta-button {
+            position: relative;
             display: inline-flex;
             align-items: center;
             gap: var(--space-3);
             padding: var(--space-5) var(--space-10);
-            background: var(--color-brand);
+            background: var(--cinq-gradient);
             color: white;
             font-size: var(--text-lg);
             font-weight: 600;
-            border-radius: var(--radius-xl);
+            letter-spacing: 0.01em;
+            border-radius: var(--radius-full);
             border: none;
             cursor: pointer;
             text-decoration: none;
+            overflow: hidden;
             transition: 
-                background var(--transition-fast),
-                transform var(--transition-fast),
-                box-shadow var(--transition-base);
+                transform 0.2s var(--ease-out-expo),
+                box-shadow 0.3s var(--ease-out-expo);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.2) 0%,
+                transparent 50%
+            );
+            opacity: 0;
+            transition: opacity 0.2s;
         }
         
         .cta-button:hover {
-            background: var(--color-brand-hover);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-glow);
             color: white;
         }
         
+        .cta-button:hover::before {
+            opacity: 1;
+        }
+        
         .cta-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
         
         .cta-note {
             font-size: var(--text-sm);
             color: var(--color-text-muted);
             text-align: center;
-            max-width: 320px;
+            max-width: 300px;
+            line-height: 1.5;
         }
-        
-        /* Waitlist section */
+
+        /* ===== WAITLIST ===== */
         .waitlist-section {
             margin-top: var(--space-16);
             padding-top: var(--space-8);
             border-top: 1px solid var(--color-border-subtle);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
         
         .waitlist-label {
@@ -354,12 +400,12 @@
             padding: var(--space-3) var(--space-4);
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             color: var(--color-text-primary);
             font-size: var(--text-base);
             transition: 
-                border-color var(--transition-fast),
-                box-shadow var(--transition-fast);
+                border-color 0.15s,
+                box-shadow 0.15s;
         }
         
         .waitlist-input::placeholder {
@@ -369,25 +415,32 @@
         .waitlist-input:focus {
             outline: none;
             border-color: var(--color-brand);
-            box-shadow: 0 0 0 3px var(--color-brand-muted);
+            box-shadow: 
+                0 0 0 3px var(--color-brand-muted),
+                var(--shadow-glow-sm);
         }
         
         .waitlist-submit {
-            padding: var(--space-3) var(--space-6);
+            padding: var(--space-3) var(--space-5);
             background: var(--color-bg-elevated);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             color: var(--color-text-primary);
             font-weight: 500;
             cursor: pointer;
             transition: 
-                background var(--transition-fast),
-                border-color var(--transition-fast);
+                background 0.15s,
+                border-color 0.15s,
+                transform 0.1s;
         }
         
         .waitlist-submit:hover {
-            background: var(--color-bg-hover);
+            background: var(--color-bg-tertiary);
             border-color: var(--color-border-active);
+        }
+        
+        .waitlist-submit:active {
+            transform: scale(0.97);
         }
         
         .waitlist-message {
@@ -403,8 +456,8 @@
         .waitlist-message.error {
             color: var(--color-error);
         }
-        
-        /* Counter */
+
+        /* ===== COUNTER ===== */
         .counter-section {
             margin-top: var(--space-12);
             text-align: center;
@@ -413,7 +466,10 @@
         .counter-value {
             font-size: var(--text-4xl);
             font-weight: 700;
-            color: var(--color-brand);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             letter-spacing: -0.02em;
         }
         
@@ -422,8 +478,8 @@
             color: var(--color-text-muted);
             margin-top: var(--space-1);
         }
-        
-        /* Footer quote */
+
+        /* ===== FOOTER QUOTE ===== */
         .footer-quote {
             margin-top: var(--space-16);
             text-align: center;
@@ -434,8 +490,8 @@
             font-style: italic;
             color: var(--color-text-muted);
         }
-        
-        /* Responsive - Tablet */
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .hero {
                 padding-top: calc(var(--space-6) + 60px);
@@ -452,7 +508,6 @@
             }
         }
         
-        /* Responsive - Mobile */
         @media (max-width: 640px) {
             .hero {
                 padding-top: calc(var(--space-4) + 56px);
@@ -461,6 +516,15 @@
             
             .hero-logo {
                 margin-bottom: var(--space-8);
+            }
+            
+            .five {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .five-number {
+                font-size: 56px;
             }
             
             .hero-headline {
@@ -473,32 +537,18 @@
                 margin-bottom: var(--space-6);
             }
             
-            .five {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .five-number {
-                font-size: 48px;
-            }
-            
-            /* Features - flex wrap proprement */
             .features {
                 gap: var(--space-2);
                 margin-bottom: var(--space-8);
-                padding: 0 var(--space-2);
             }
             
             .feature-pill {
                 padding: var(--space-2) var(--space-3);
                 font-size: 0.75rem;
-                flex-shrink: 0;
             }
             
-            /* CTA responsive */
             .cta-section {
                 width: 100%;
-                padding: 0 var(--space-2);
             }
             
             .cta-button {
@@ -511,10 +561,8 @@
                 font-size: var(--text-xs);
             }
             
-            /* Waitlist form - stack verticalement */
             .waitlist-section {
                 margin-top: var(--space-10);
-                padding: 0 var(--space-2);
             }
             
             .waitlist-form {
@@ -527,7 +575,6 @@
                 width: 100%;
             }
             
-            /* Counter plus petit */
             .counter-section {
                 margin-top: var(--space-8);
             }
@@ -536,60 +583,67 @@
                 font-size: var(--text-2xl);
             }
             
-            /* Footer quote */
             .footer-quote {
                 margin-top: var(--space-10);
             }
         }
         
-        /* Responsive - Très petit mobile */
         @media (max-width: 375px) {
             .hero-headline {
                 font-size: 1.5rem;
-                line-height: 1.2;
-            }
-            
-            .hero-headline .accent {
-                font-size: 1.375rem;
-            }
-            
-            .hero-sub {
-                font-size: 0.9375rem;
-            }
-            
-            .features {
-                gap: 0.375rem;
-            }
-            
-            .feature-pill {
-                padding: 0.375rem 0.625rem;
-                font-size: 0.6875rem;
             }
             
             .five {
-                width: 80px;
-                height: 80px;
+                width: 100px;
+                height: 100px;
             }
             
             .five-number {
-                font-size: 40px;
+                font-size: 48px;
             }
+        }
+        
+        /* ===== LEGAL FOOTER ===== */
+        .legal-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .legal-footer a {
+            color: var(--color-text-muted);
+            margin: 0 0.75rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .legal-footer a:hover {
+            color: var(--color-text-secondary);
+        }
+        
+        .legal-footer span {
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
-    <!-- Skip to content link for keyboard/screen reader users -->
+    <!-- Skip to content -->
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
     
-    <!-- Noise overlay for texture -->
+    <!-- Noise overlay -->
     <div class="noise-overlay" aria-hidden="true"></div>
     
-    <!-- Gradient orbs -->
+    <!-- Ambient orbs -->
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-3" aria-hidden="true"></div>
 
-    <!-- Header avec lien connexion -->
+    <!-- Header -->
     <header class="site-header" role="banner">
         <a href="/" class="header-logo" aria-label="Cinq - Accueil">
             <span class="header-logo-number">5</span>
@@ -605,14 +659,14 @@
     <section class="hero" role="region" aria-label="Présentation de Cinq">
         <div class="hero-content">
             
-            <!-- The iconic 5 logo - AWWWARDS LEVEL -->
-            <div class="hero-logo">
-                <div class="five animate-hero-logo">
-                    <div class="five-ring animate-ring"></div>
-                    <div class="five-ring animate-ring"></div>
-                    <div class="five-ring animate-ring"></div>
+            <!-- The iconic 5 -->
+            <div class="hero-logo animate-fade-in-up">
+                <div class="five">
+                    <div class="five-ring"></div>
+                    <div class="five-ring"></div>
+                    <div class="five-ring"></div>
                     <div class="five-core">
-                        <span class="five-number animate-hero-number">5</span>
+                        <span class="five-number">5</span>
                     </div>
                 </div>
             </div>
@@ -629,29 +683,29 @@
                 <strong>Cinq te rend la réalité.</strong>
             </p>
 
-            <!-- Feature pills - Floating animation -->
+            <!-- Feature pills -->
             <div class="features animate-fade-in-up animate-delay-3" data-stagger>
-                <span class="feature-pill tag-animated card-hover">
+                <span class="feature-pill">
                     <span class="feature-icon">🎯</span>
                     <span>5 slots. C'est tout.</span>
                 </span>
-                <span class="feature-pill tag-animated card-hover">
+                <span class="feature-pill">
                     <span class="feature-icon">🎁</span>
                     <span>Offrir > S'inscrire</span>
                 </span>
-                <span class="feature-pill tag-animated card-hover">
+                <span class="feature-pill">
                     <span class="feature-icon">🚫</span>
                     <span>Zéro likes, zéro validation</span>
                 </span>
-                <span class="feature-pill tag-animated card-hover">
+                <span class="feature-pill">
                     <span class="feature-icon">⚡</span>
                     <span>La friction est le feature</span>
                 </span>
             </div>
 
-            <!-- CTA - Magnetic + Glow -->
+            <!-- CTA -->
             <div class="cta-section animate-fade-in-up animate-delay-4">
-                <a href="gift.html" class="cta-button btn-ripple btn-glow btn-magnetic" aria-label="Offrir Cinq à un proche">
+                <a href="gift.html" class="cta-button" aria-label="Offrir Cinq à un proche">
                     <span aria-hidden="true">🎁</span>
                     <span>Offrir Cinq</span>
                 </a>
@@ -661,7 +715,7 @@
                 </p>
             </div>
 
-            <!-- Waitlist - Enhanced interactions -->
+            <!-- Waitlist -->
             <div class="waitlist-section animate-fade-in-up animate-delay-5">
                 <p class="waitlist-label" id="waitlist-label">Ou rejoins la waitlist</p>
                 <form id="waitlist-form" class="waitlist-form" aria-labelledby="waitlist-label">
@@ -673,10 +727,10 @@
                         placeholder="ton@email.com" 
                         required
                         autocomplete="email"
-                        class="waitlist-input input"
+                        class="waitlist-input"
                         aria-describedby="form-message"
                     >
-                    <button type="submit" class="waitlist-submit btn-ripple btn-magnetic" aria-label="Rejoindre la liste d'attente">
+                    <button type="submit" class="waitlist-submit" aria-label="Rejoindre la liste d'attente">
                         Rejoindre
                     </button>
                 </form>
@@ -703,17 +757,17 @@
     </main>
 
     <!-- Legal Footer -->
-    <footer role="contentinfo" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--color-text-muted);">
+    <footer class="legal-footer" role="contentinfo">
         <nav aria-label="Liens légaux">
-            <a href="/privacy.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">Confidentialité</a>
-            <span aria-hidden="true" style="opacity: 0.5;">·</span>
-            <a href="/terms.html" style="color: var(--color-text-muted); margin: 0 0.75rem; text-decoration: none; transition: color 0.2s;">CGU</a>
-            <span aria-hidden="true" style="opacity: 0.5;">·</span>
+            <a href="/privacy.html">Confidentialité</a>
+            <span aria-hidden="true">·</span>
+            <a href="/terms.html">CGU</a>
+            <span aria-hidden="true">·</span>
+            <span>© 2025 Cinq</span>
         </nav>
-        <span style="margin: 0 0.75rem;">© 2025 Cinq</span>
     </footer>
 
-    <!-- Elite Animations -->
+    <!-- Scripts -->
     <script src="/animations.js"></script>
     <script src="/fun.js"></script>
     <script>
@@ -723,7 +777,7 @@
         const counterValue = document.getElementById('counter-value');
         const submitBtn = form.querySelector('button[type="submit"]');
         
-        // Load counter on startup
+        // Load counter
         async function loadCount() {
             try {
                 const res = await fetch(API_URL);
@@ -736,37 +790,28 @@
             }
         }
         
-        // Animate counter with smooth easing & visual flair
+        // Animate counter with smooth easing
         function animateCounter(target) {
-            const duration = 1500;
+            const duration = 1200;
             const start = parseInt(counterValue.textContent) || 0;
             const startTime = performance.now();
             
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Smooth ease-out quart
+                // Ease out quart
                 const eased = 1 - Math.pow(1 - progress, 4);
                 const current = Math.floor(start + (target - start) * eased);
                 counterValue.textContent = current.toLocaleString('fr-FR');
                 
-                // Subtle scale pulse during animation
-                const scale = 1 + Math.sin(progress * Math.PI * 6) * 0.03;
-                counterValue.style.transform = `scale(${scale})`;
-                
                 if (progress < 1) {
                     requestAnimationFrame(update);
-                } else {
-                    // Final bounce
-                    counterValue.style.transform = 'scale(1)';
-                    counterValue.classList.add('animate-counter');
-                    setTimeout(() => counterValue.classList.remove('animate-counter'), 500);
                 }
             }
             requestAnimationFrame(update);
         }
         
-        // Get UTM params
+        // UTM params
         function getUtmParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -798,16 +843,13 @@
                 const data = await res.json();
                 
                 if (res.status === 409) {
-                    showMessage("Tu es déjà sur la liste ! 🙌 (On t'a pas oublié)", 'success');
+                    showMessage("Tu es déjà sur la liste ! 🙌", 'success');
                 } else if (!res.ok) {
-                    showMessage("Oups, réessaie ! 🙏 (Même les anti-réseaux ont des bugs)", 'error');
+                    showMessage("Oups, réessaie ! 🙏", 'error');
                 } else {
                     showMessage("Bienvenue dans le cercle ! ✨", 'success');
                     document.getElementById('email').value = '';
                     if (data.count) animateCounter(data.count);
-                    // Petit confetti pour célébrer
-                    if (typeof launchConfetti === 'function') launchConfetti({ particleCount: 50 });
-                    // Track waitlist signup
                     if (window.CinqAnalytics) {
                         CinqAnalytics.trackWaitlistSignup(utmData);
                     }
@@ -830,18 +872,16 @@
         setTimeout(loadCount, 300);
     </script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- PWA -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-                    .catch(err => console.log('[PWA] Service Worker registration failed:', err));
+                    .then(reg => console.log('[PWA] SW registered'))
+                    .catch(err => console.log('[PWA] SW failed:', err));
             });
         }
     </script>
-    
-    <!-- PWA Install Prompt -->
     <script src="/pwa-install.js" defer></script>
 </body>
 </html>

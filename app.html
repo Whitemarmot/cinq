@@ -20,7 +20,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
-    <meta name="theme-color" content="#121218">
+    <meta name="theme-color" content="#0c0c0f">
     
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
@@ -29,39 +29,38 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cinq">
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.css">
     <link rel="stylesheet" href="/css/a11y.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
+    
     <style>
         /* ===== APP LAYOUT ===== */
         .app-container {
             min-height: 100vh;
             min-height: 100dvh;
-            padding: 1rem;
-            max-width: 500px;
+            padding: 1.25rem;
+            max-width: 520px;
             margin: 0 auto;
-            padding-bottom: env(safe-area-inset-bottom, 1rem);
+            padding-bottom: env(safe-area-inset-bottom, 1.25rem);
         }
         
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--color-border);
-            margin-bottom: 1.5rem;
+            padding: 1.25rem 0;
+            margin-bottom: 2rem;
         }
         
         .app-logo {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: var(--color-brand);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 8px var(--color-brand-glow));
         }
         
         .user-menu {
@@ -70,30 +69,10 @@
             gap: 1rem;
         }
         
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--cinq-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            color: white;
-            font-weight: 600;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
         .user-name {
             font-size: 0.875rem;
-            color: var(--color-text-muted);
+            color: var(--color-text-tertiary);
+            font-weight: 500;
         }
         
         .logout-btn {
@@ -101,84 +80,102 @@
             border: none;
             color: var(--color-text-muted);
             cursor: pointer;
-            font-size: 0.875rem;
-            transition: color var(--transition-fast);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            transition: all 0.15s;
         }
         
         .logout-btn:hover { 
-            color: var(--color-error); 
+            color: var(--color-error);
+            background: var(--color-error-muted);
         }
 
         /* ===== CONTACTS GRID ===== */
         .contacts-section {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
         .section-title {
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            letter-spacing: -0.01em;
         }
         
         .contact-count {
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
             color: var(--color-text-muted);
-            font-weight: normal;
+            font-weight: 500;
+            background: var(--color-bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--color-border);
         }
         
         .contacts-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 0.75rem;
+            gap: 0.875rem;
         }
         
-        @media (max-width: 380px) {
+        @media (max-width: 400px) {
             .contacts-grid {
-                gap: 0.5rem;
+                gap: 0.625rem;
             }
         }
         
         .contact-slot {
             aspect-ratio: 1;
-            border-radius: var(--radius-xl);
+            border-radius: var(--radius-2xl);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            transition: 
+                transform 0.25s var(--ease-out-expo),
+                box-shadow 0.25s var(--ease-out-expo),
+                border-color 0.15s;
             position: relative;
         }
         
         .contact-slot:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
         }
         
         .contact-slot:active {
-            transform: translateY(-2px) scale(0.98);
+            transform: translateY(-3px) scale(0.97);
         }
         
         .contact-slot.filled {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .contact-slot.filled:hover {
+            border-color: var(--color-border-active);
+            box-shadow: var(--shadow-md);
         }
         
         .contact-slot.empty {
-            background: var(--color-bg-elevated);
+            background: var(--color-bg-tertiary);
             border: 2px dashed var(--color-border);
         }
         
         .contact-slot.empty:hover {
             border-color: var(--color-brand);
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--color-brand-muted);
         }
         
         .contact-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: var(--cinq-gradient);
             display: flex;
@@ -187,144 +184,52 @@
             font-size: 1.25rem;
             color: white;
             font-weight: 600;
-            transition: transform 0.2s;
-            overflow: hidden;
-            flex-shrink: 0;
+            transition: transform 0.2s var(--ease-out-expo);
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
         .contact-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%;
         }
         
-        @media (max-width: 380px) {
+        @media (max-width: 400px) {
             .contact-avatar {
-                width: 32px;
-                height: 32px;
+                width: 36px;
+                height: 36px;
                 font-size: 1rem;
             }
         }
         
         .contact-slot:hover .contact-avatar {
-            transform: scale(1.1);
-        }
-        
-        /* Avatar Upload Styles */
-        .avatar-upload-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .avatar-preview {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: var(--cinq-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            color: white;
-            font-weight: 600;
-            overflow: hidden;
-            flex-shrink: 0;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .avatar-preview:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 3px var(--color-brand-muted);
-        }
-        
-        .avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .avatar-preview-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.2s;
-            border-radius: 50%;
-        }
-        
-        .avatar-preview:hover .avatar-preview-overlay {
-            opacity: 1;
-        }
-        
-        .avatar-upload-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .avatar-upload-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.875rem;
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            color: var(--color-text-primary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .avatar-upload-btn:hover {
-            background: var(--color-bg-hover);
-            border-color: var(--color-brand);
-        }
-        
-        .avatar-upload-btn.danger {
-            color: var(--color-error);
-            border-color: transparent;
-            background: var(--color-error-muted);
-        }
-        
-        .avatar-upload-btn.danger:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--color-error);
-        }
-        
-        .avatar-upload-hint {
-            font-size: 0.7rem;
-            color: var(--color-text-muted);
+            transform: scale(1.08);
         }
         
         .contact-name {
-            font-size: 0.625rem;
-            margin-top: 0.25rem;
+            font-size: 0.6875rem;
+            margin-top: 0.375rem;
             color: var(--color-text-muted);
             text-align: center;
             max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding: 0 2px;
+            padding: 0 4px;
+            font-weight: 500;
         }
         
         .empty-plus {
-            font-size: 1.5rem;
-            color: var(--color-border-active);
-            transition: color 0.2s, transform 0.2s;
+            font-size: 1.75rem;
+            color: var(--color-text-muted);
+            font-weight: 300;
+            transition: all 0.2s var(--ease-out-expo);
         }
         
         .contact-slot.empty:hover .empty-plus {
             color: var(--color-brand);
-            transform: rotate(90deg);
+            transform: rotate(90deg) scale(1.1);
         }
 
         /* ===== UNREAD BADGE ===== */
@@ -332,19 +237,19 @@
             position: absolute;
             top: -4px;
             right: -4px;
-            min-width: 18px;
-            height: 18px;
-            background: var(--color-error);
-            border-radius: 9px;
+            min-width: 20px;
+            height: 20px;
+            background: var(--cinq-gradient);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.625rem;
+            font-size: 0.6875rem;
             font-weight: 700;
             color: white;
-            padding: 0 4px;
-            animation: badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+            padding: 0 5px;
+            animation: badge-pop 0.35s var(--ease-spring);
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
         @keyframes badge-pop {
@@ -356,23 +261,34 @@
         .actions-section {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.875rem;
         }
         
         .action-btn {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem;
+            padding: 1.125rem 1.25rem;
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-xl);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+            pointer-events: none;
         }
         
         .action-btn:hover {
-            background: var(--color-bg-hover);
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-active);
             transform: translateX(4px);
         }
         
@@ -391,6 +307,7 @@
         .action-title {
             font-weight: 600;
             margin-bottom: 0.125rem;
+            font-size: 0.9375rem;
         }
         
         .action-subtitle {
@@ -407,13 +324,14 @@
             background: var(--color-bg-primary);
             border-top: 1px solid var(--color-border);
             transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 80vh;
-            max-height: 80dvh;
+            transition: transform 0.35s var(--ease-out-expo);
+            max-height: 85vh;
+            max-height: 85dvh;
             display: flex;
             flex-direction: column;
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
             z-index: var(--z-modal);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
         }
         
         .chat-panel.open {
@@ -424,56 +342,67 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
+            padding: 1.25rem;
             border-bottom: 1px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
         
         .chat-contact-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.875rem;
         }
         
         .chat-contact-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: var(--cinq-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
             color: white;
             font-weight: 600;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
         .chat-contact-name {
             font-weight: 600;
+            font-size: 1rem;
         }
         
         .chat-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            font-size: 1.25rem;
             cursor: pointer;
             color: var(--color-text-muted);
-            transition: color 0.2s, transform 0.2s;
+            transition: all 0.2s;
             padding: 0.5rem;
+            border-radius: var(--radius-lg);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .chat-close:hover {
             color: var(--color-text-primary);
+            background: var(--color-bg-elevated);
             transform: rotate(90deg);
         }
         
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
-            min-height: 250px;
+            padding: 1.25rem;
+            min-height: 280px;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.625rem;
             scroll-behavior: smooth;
         }
         
@@ -482,20 +411,23 @@
             text-align: center;
             color: var(--color-text-muted);
             margin: auto;
+            font-size: 0.9375rem;
         }
         
         .chat-message {
-            max-width: 80%;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-lg);
-            animation: message-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 75%;
+            padding: 0.875rem 1.125rem;
+            border-radius: var(--radius-xl);
+            animation: message-in 0.25s var(--ease-out-expo);
             word-wrap: break-word;
+            font-size: 0.9375rem;
+            line-height: 1.5;
         }
         
         @keyframes message-in {
             0% { 
                 opacity: 0; 
-                transform: translateY(10px) scale(0.95);
+                transform: translateY(12px) scale(0.96);
             }
             100% { 
                 opacity: 1; 
@@ -507,50 +439,53 @@
             background: var(--cinq-gradient);
             color: white;
             margin-left: auto;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: var(--radius-sm);
+            box-shadow: 0 2px 12px var(--color-brand-glow);
         }
         
         .chat-message.received {
-            background: var(--color-bg-secondary);
-            border-bottom-left-radius: 4px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-bottom-left-radius: var(--radius-sm);
         }
         
         .chat-message.ping {
             text-align: center;
             max-width: 100%;
             background: none;
-            font-size: 2.5rem;
-            animation: ping-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 2.75rem;
+            animation: ping-bounce 0.5s var(--ease-spring);
         }
         
         @keyframes ping-bounce {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+            50% { transform: scale(1.25); }
         }
         
         .chat-message-time {
-            font-size: 0.625rem;
+            font-size: 0.6875rem;
             opacity: 0.7;
             margin-top: 0.25rem;
         }
         
         .chat-input-area {
             display: flex;
-            gap: 0.5rem;
-            padding: 1rem;
+            gap: 0.625rem;
+            padding: 1.25rem;
             border-top: 1px solid var(--color-border);
-            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+            padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+            background: var(--color-bg-secondary);
         }
         
         .chat-input {
             flex: 1;
-            padding: 0.75rem 1rem;
-            background: var(--color-bg-secondary);
+            padding: 0.875rem 1.125rem;
+            background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             color: var(--color-text-primary);
             font-size: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.15s;
         }
         
         .chat-input:focus {
@@ -560,58 +495,62 @@
         }
         
         .chat-send {
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1.125rem;
             background: var(--cinq-gradient);
             border: none;
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             color: white;
             cursor: pointer;
-            font-size: 1.25rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1.125rem;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
-        .chat-send:hover {
+        .chat-send:hover:not(:disabled) {
             transform: scale(1.05);
             box-shadow: var(--shadow-glow-sm);
         }
         
-        .chat-send:active {
+        .chat-send:active:not(:disabled) {
             transform: scale(0.95);
         }
         
         .chat-send:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
         
         .ping-btn {
-            padding: 0.75rem;
-            background: var(--color-bg-secondary);
+            padding: 0.875rem;
+            background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-full);
             cursor: pointer;
             font-size: 1.25rem;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
         
         .ping-btn:hover {
-            background: var(--color-bg-hover);
-            transform: scale(1.1);
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            transform: scale(1.08);
         }
         
         .ping-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.92);
         }
 
         /* ===== CHAT OVERLAY ===== */
         .chat-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: all 0.25s;
             z-index: calc(var(--z-modal) - 1);
         }
         
@@ -624,7 +563,9 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -632,7 +573,7 @@
             z-index: var(--z-modal);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: all 0.25s;
         }
         
         .modal-overlay.open { 
@@ -641,14 +582,25 @@
         }
         
         .modal {
-            background: var(--color-bg-primary);
+            background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
+            border-radius: var(--radius-2xl);
             padding: 2rem;
             width: 100%;
-            max-width: 400px;
-            transform: scale(0.95) translateY(20px);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 420px;
+            transform: scale(0.94) translateY(16px);
+            transition: transform 0.35s var(--ease-spring);
+            position: relative;
+            box-shadow: var(--shadow-2xl);
+        }
+        
+        .modal::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 30%);
+            pointer-events: none;
         }
         
         .modal-overlay.open .modal {
@@ -659,35 +611,54 @@
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .gift-code-display {
-            background: var(--color-bg-secondary);
+            background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-elevated) 100%);
             border: 2px dashed var(--color-brand);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
             text-align: center;
-            margin: 1rem 0;
+            margin: 1.25rem 0;
+            position: relative;
+        }
+        
+        .gift-code-display::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--cinq-gradient-subtle);
+            border-radius: inherit;
+            opacity: 0.5;
         }
         
         .gift-code {
-            font-size: 1.5rem;
+            position: relative;
+            font-size: 1.625rem;
             font-weight: 700;
-            font-family: monospace;
-            color: var(--color-brand);
-            letter-spacing: 0.1em;
+            font-family: var(--font-mono);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.08em;
         }
         
         .copy-btn {
             margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
+            padding: 0.875rem 1.5rem;
             background: var(--cinq-gradient);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
+            font-size: 0.9375rem;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
         .copy-btn:hover {
@@ -708,7 +679,7 @@
             z-index: var(--z-toast);
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.625rem;
             pointer-events: none;
             width: 90%;
             max-width: 400px;
@@ -717,24 +688,26 @@
         .toast {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: 1rem;
+            border-radius: var(--radius-xl);
+            padding: 1rem 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            box-shadow: var(--shadow-lg);
-            animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            gap: 0.875rem;
+            box-shadow: var(--shadow-xl);
+            animation: toast-in 0.35s var(--ease-spring);
             pointer-events: auto;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         
         .toast.toast-out {
-            animation: toast-out 0.3s ease-out forwards;
+            animation: toast-out 0.25s ease-out forwards;
         }
         
         @keyframes toast-in {
             0% { 
                 opacity: 0; 
-                transform: translateY(-20px) scale(0.95);
+                transform: translateY(-16px) scale(0.96);
             }
             100% { 
                 opacity: 1; 
@@ -749,7 +722,7 @@
             }
             100% { 
                 opacity: 0; 
-                transform: translateY(-20px) scale(0.95);
+                transform: translateY(-16px) scale(0.96);
             }
         }
         
@@ -763,38 +736,39 @@
         
         .toast-title {
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
         }
         
         .toast-message {
-            font-size: 0.75rem;
+            font-size: 0.8125rem;
             color: var(--color-text-muted);
+            margin-top: 0.125rem;
         }
         
         .toast.success {
             border-color: var(--color-success);
-            background: rgba(16, 185, 129, 0.1);
+            background: var(--color-success-muted);
         }
         
         .toast.error {
             border-color: var(--color-error);
-            background: rgba(239, 68, 68, 0.1);
+            background: var(--color-error-muted);
         }
         
         .toast.notification {
             border-color: var(--color-brand);
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--color-brand-muted);
             cursor: pointer;
         }
         
         .toast.notification:hover {
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(255, 107, 74, 0.18);
         }
 
         /* ===== LOADING STATES ===== */
         .loading-spinner {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border: 2px solid var(--color-border);
             border-top-color: var(--color-brand);
             border-radius: 50%;
@@ -809,11 +783,11 @@
             background: linear-gradient(
                 90deg,
                 var(--color-bg-secondary) 25%,
-                var(--color-bg-elevated) 50%,
+                var(--color-bg-tertiary) 50%,
                 var(--color-bg-secondary) 75%
             );
             background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
             border-radius: var(--radius-lg);
         }
         
@@ -830,17 +804,20 @@
             color: var(--color-text-muted);
             text-decoration: none;
             font-size: 0.875rem;
-            transition: color 0.2s;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            transition: all 0.15s;
         }
         
         .settings-link:hover {
             color: var(--color-text-primary);
+            background: var(--color-bg-hover);
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 360px) {
+        @media (max-width: 380px) {
             .app-container {
-                padding: 0.75rem;
+                padding: 1rem;
             }
             
             .modal {
@@ -859,7 +836,7 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: all 0.3s;
         }
         
         .onboarding-overlay.open {
@@ -869,14 +846,14 @@
         
         .onboarding-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             padding: 2rem;
             text-align: center;
         }
         
         .onboarding-step {
             display: none;
-            animation: step-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: step-in 0.45s var(--ease-out-expo);
         }
         
         .onboarding-step.active {
@@ -886,7 +863,7 @@
         @keyframes step-in {
             0% { 
                 opacity: 0; 
-                transform: translateX(30px);
+                transform: translateX(24px);
             }
             100% { 
                 opacity: 1; 
@@ -895,44 +872,49 @@
         }
         
         .onboarding-logo {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 700;
-            color: var(--color-brand);
-            margin-bottom: 1rem;
-            animation: logo-pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes logo-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .onboarding-emoji {
-            font-size: 4rem;
-            margin-bottom: 1.5rem;
-            animation: emoji-bounce 0.6s ease-out;
-        }
-        
-        @keyframes emoji-bounce {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .onboarding-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
             background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 1.25rem;
+            filter: drop-shadow(0 4px 16px var(--color-brand-glow));
+            animation: logo-float 3s ease-in-out infinite;
+        }
+        
+        @keyframes logo-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .onboarding-emoji {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            animation: emoji-bounce 0.6s var(--ease-spring);
+        }
+        
+        @keyframes emoji-bounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        .onboarding-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.875rem;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
         }
         
         .onboarding-text {
-            color: var(--color-text-muted);
-            font-size: 1.1rem;
-            line-height: 1.6;
+            color: var(--color-text-secondary);
+            font-size: 1.0625rem;
+            line-height: 1.65;
             margin-bottom: 2rem;
         }
         
@@ -947,10 +929,16 @@
             gap: 1rem;
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            border-radius: var(--radius-xl);
+            padding: 1.125rem;
+            margin-bottom: 0.875rem;
             text-align: left;
+            transition: all 0.15s;
+        }
+        
+        .onboarding-feature:hover {
+            border-color: var(--color-border-active);
+            transform: translateX(4px);
         }
         
         .onboarding-feature-icon {
@@ -959,7 +947,7 @@
         }
         
         .onboarding-feature-text {
-            font-size: 0.95rem;
+            font-size: 0.9375rem;
         }
         
         .onboarding-feature-text strong {
@@ -969,69 +957,71 @@
         
         .onboarding-feature-text span {
             color: var(--color-text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8125rem;
         }
         
         .onboarding-demo {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
+            border-radius: var(--radius-2xl);
+            padding: 1.75rem;
+            margin: 1.75rem 0;
         }
         
         .onboarding-demo-slots {
             display: flex;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.625rem;
             margin-bottom: 1rem;
         }
         
         .onboarding-demo-slot {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
             font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s var(--ease-spring);
         }
         
         .onboarding-demo-slot.filled {
             background: var(--cinq-gradient);
             color: white;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
         }
         
         .onboarding-demo-slot.empty {
-            background: var(--color-bg-elevated);
+            background: var(--color-bg-tertiary);
             border: 2px dashed var(--color-border);
             color: var(--color-text-muted);
         }
         
         .onboarding-demo-slot.highlight {
-            transform: scale(1.15);
-            box-shadow: var(--shadow-glow-sm);
+            transform: scale(1.12);
+            box-shadow: var(--shadow-glow);
         }
         
         .onboarding-btn {
             width: 100%;
-            padding: 1rem;
+            padding: 1.125rem;
             background: var(--cinq-gradient);
             color: white;
             border: none;
-            border-radius: var(--radius-lg);
-            font-size: 1.1rem;
+            border-radius: var(--radius-xl);
+            font-size: 1.0625rem;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 1rem;
+            transition: all 0.15s;
+            margin-top: 1.25rem;
+            box-shadow: 0 4px 12px var(--color-brand-glow);
         }
         
         .onboarding-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-sm);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-glow);
         }
         
         .onboarding-btn:active {
@@ -1042,10 +1032,11 @@
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             color: var(--color-text-primary);
+            box-shadow: none;
         }
         
         .onboarding-btn-secondary:hover {
-            background: var(--color-bg-hover);
+            background: var(--color-bg-tertiary);
             box-shadow: none;
         }
         
@@ -1060,13 +1051,13 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--color-border);
-            transition: all 0.3s;
+            background: var(--color-bg-elevated);
+            transition: all 0.3s var(--ease-out-expo);
         }
         
         .onboarding-dot.active {
-            background: var(--color-brand);
-            width: 24px;
+            background: var(--cinq-gradient);
+            width: 28px;
             border-radius: 4px;
         }
         
@@ -1078,10 +1069,154 @@
             cursor: pointer;
             font-size: 0.875rem;
             padding: 0.5rem;
+            transition: color 0.15s;
         }
         
         .onboarding-skip:hover {
             color: var(--color-text-primary);
+        }
+
+        /* ===== ACCOUNT SECTION ===== */
+        .account-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border-subtle);
+        }
+        
+        .account-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .account-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .account-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .account-card-header span:first-child {
+            font-size: 1.25rem;
+        }
+        
+        .account-card-header span:last-child {
+            font-weight: 600;
+        }
+        
+        .account-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.9375rem;
+            transition: all 0.15s;
+        }
+        
+        .account-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .account-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .account-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+        }
+        
+        .account-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            color: var(--color-text-primary);
+            font-size: 0.9375rem;
+            transition: all 0.15s;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .account-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+        }
+        
+        .account-btn-danger {
+            background: var(--color-error-muted);
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .account-btn-danger:hover {
+            background: rgba(248, 113, 113, 0.18);
+        }
+        
+        .account-btn-info {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .account-btn-title {
+            font-weight: 600;
+            display: block;
+        }
+        
+        .account-btn-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 0.125rem;
+        }
+        
+        .account-btn-danger .account-btn-subtitle {
+            color: inherit;
+            opacity: 0.8;
+        }
+        
+        .save-btn {
+            padding: 0.75rem 1.25rem;
+            background: var(--cinq-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            transition: all 0.15s;
+            box-shadow: 0 2px 8px var(--color-brand-glow);
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .save-btn:active {
+            transform: translateY(0) scale(0.98);
         }
     </style>
 </head>
@@ -1090,6 +1225,10 @@
     <a href="#main-content" class="skip-link">Aller au contenu principal</a>
     
     <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Ambient orbs -->
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
@@ -1231,11 +1370,9 @@
         <header class="app-header" role="banner">
             <div class="app-logo" aria-label="Cinq logo">5</div>
             <div class="user-menu">
-                <div class="user-avatar" id="header-avatar" aria-hidden="true"></div>
                 <span class="user-name" id="user-name" aria-label="Utilisateur connecté"></span>
                 <a href="#mon-compte" class="settings-link" aria-label="Paramètres du compte">
                     <span aria-hidden="true">⚙️</span>
-                    <span class="sr-only">Paramètres</span>
                 </a>
                 <button class="logout-btn" onclick="logout()" aria-label="Se déconnecter">Déconnexion</button>
             </div>
@@ -1252,13 +1389,6 @@
         </section>
 
         <section class="actions-section">
-            <a href="/feed.html" class="action-btn" style="text-decoration: none; color: inherit;">
-                <span class="action-icon">📰</span>
-                <div class="action-text">
-                    <div class="action-title">Feed</div>
-                    <div class="action-subtitle">Voir les posts de tes 5 contacts</div>
-                </div>
-            </a>
             <button class="action-btn" onclick="openGiftModal()">
                 <span class="action-icon">🎁</span>
                 <div class="action-text">
@@ -1269,77 +1399,54 @@
         </section>
 
         <!-- Mon Compte Section -->
-        <section id="mon-compte" class="account-section" style="margin-top: 2rem;">
-            <div class="section-title" style="margin-bottom: 1rem;">
+        <section id="mon-compte" class="account-section">
+            <div class="section-title" style="margin-bottom: 1.25rem;">
                 Mon compte
             </div>
             
             <!-- Profile Edit -->
-            <div class="account-card" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <span style="font-size: 1.25rem;">👤</span>
-                    <span style="font-weight: 600;">Mon profil</span>
+            <div class="account-card">
+                <div class="account-card-header">
+                    <span>👤</span>
+                    <span>Mon profil</span>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <!-- Avatar Upload -->
-                    <div class="avatar-upload-container">
-                        <div class="avatar-preview" id="profile-avatar-preview" onclick="document.getElementById('avatar-input').click()">
-                            <span id="avatar-initial">?</span>
-                            <div class="avatar-preview-overlay">📷</div>
-                        </div>
-                        <div class="avatar-upload-actions">
-                            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
-                            <button type="button" class="avatar-upload-btn" onclick="document.getElementById('avatar-input').click()">
-                                📷 Changer la photo
-                            </button>
-                            <button type="button" class="avatar-upload-btn danger" id="remove-avatar-btn" onclick="removeAvatar()" style="display: none;">
-                                🗑️ Supprimer
-                            </button>
-                            <span class="avatar-upload-hint">JPEG, PNG, GIF, WebP • Max 2 Mo</span>
-                        </div>
-                    </div>
-                    
+                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
                     <div>
-                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Pseudo</label>
-                        <input type="text" id="profile-display-name" placeholder="Ton pseudo..." maxlength="50"
-                            style="width: 100%; padding: 0.625rem 0.75rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: 0.9rem;">
+                        <label class="account-label" for="profile-display-name">Pseudo</label>
+                        <input type="text" id="profile-display-name" class="account-input" placeholder="Ton pseudo..." maxlength="50">
                     </div>
                     <div>
-                        <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Bio</label>
-                        <textarea id="profile-bio" placeholder="Quelques mots sur toi..." maxlength="500" rows="2"
-                            style="width: 100%; padding: 0.625rem 0.75rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text-primary); font-size: 0.9rem; resize: vertical; min-height: 60px;"></textarea>
+                        <label class="account-label" for="profile-bio">Bio</label>
+                        <textarea id="profile-bio" class="account-input" placeholder="Quelques mots sur toi..." maxlength="500" rows="2" style="resize: vertical; min-height: 60px;"></textarea>
                     </div>
-                    <button onclick="saveProfile()" id="save-profile-btn"
-                        style="padding: 0.625rem 1rem; background: var(--cinq-gradient); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: transform 0.2s, box-shadow 0.2s;">
+                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn">
                         💾 Enregistrer
                     </button>
                 </div>
             </div>
 
             <!-- Data & Account Actions -->
-            <div class="account-card" style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.25rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <span style="font-size: 1.25rem;">📦</span>
-                    <span style="font-weight: 600;">Mes données</span>
+            <div class="account-card">
+                <div class="account-card-header">
+                    <span>📦</span>
+                    <span>Mes données</span>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <button onclick="exportData()" id="export-data-btn"
-                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; color: var(--color-text-primary); font-size: 0.875rem; transition: all 0.2s;">
+                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+                    <button onclick="exportData()" id="export-data-btn" class="account-btn">
                         <span>📥</span>
-                        <div style="text-align: left;">
-                            <div style="font-weight: 600;">Exporter mes données</div>
-                            <div style="font-size: 0.75rem; color: var(--color-text-muted);">Télécharge toutes tes données (RGPD)</div>
+                        <div class="account-btn-info">
+                            <span class="account-btn-title">Exporter mes données</span>
+                            <span class="account-btn-subtitle">Télécharge toutes tes données (RGPD)</span>
                         </div>
                     </button>
                     
-                    <button onclick="openDeleteAccountModal()" 
-                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); border-radius: var(--radius-md); cursor: pointer; color: var(--color-error); font-size: 0.875rem; transition: all 0.2s;">
+                    <button onclick="openDeleteAccountModal()" class="account-btn account-btn-danger">
                         <span>🗑️</span>
-                        <div style="text-align: left;">
-                            <div style="font-weight: 600;">Supprimer mon compte</div>
-                            <div style="font-size: 0.75rem; opacity: 0.8;">Action définitive et irréversible</div>
+                        <div class="account-btn-info">
+                            <span class="account-btn-title">Supprimer mon compte</span>
+                            <span class="account-btn-subtitle">Action définitive et irréversible</span>
                         </div>
                     </button>
                 </div>
@@ -1363,13 +1470,11 @@
         <div class="chat-input-area">
             <button class="ping-btn" onclick="sendPing()" aria-label="Envoyer un ping pour dire que tu penses à cette personne">
                 <span aria-hidden="true">👋</span>
-                <span class="sr-only">Ping</span>
             </button>
             <label for="chat-input" class="sr-only">Écrire un message</label>
             <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500" aria-label="Écrire un message">
             <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled aria-label="Envoyer le message">
                 <span aria-hidden="true">→</span>
-                <span class="sr-only">Envoyer</span>
             </button>
         </div>
     </div>
@@ -1386,7 +1491,7 @@
                     Générer un code
                 </button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeGiftModal()" aria-label="Fermer la fenêtre">
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeGiftModal()" aria-label="Fermer la fenêtre">
                 Fermer
             </button>
         </div>
@@ -1400,22 +1505,19 @@
                 Entre l'ID de la personne à ajouter
             </p>
             <label for="contact-id-input" class="sr-only">ID du contact à ajouter</label>
-            <input type="text" id="contact-id-input" placeholder="ID (ex: abc123-...)" 
-                   style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem;"
-                   aria-describedby="add-contact-error"
-                   aria-label="Identifiant du contact">
+            <input type="text" id="contact-id-input" class="account-input" placeholder="ID (ex: abc123-...)" aria-describedby="add-contact-error" aria-label="Identifiant du contact" style="margin-bottom: 1rem;">
             <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;" role="alert" aria-live="polite"></div>
             <button class="copy-btn" style="width: 100%;" onclick="addContact()" id="add-contact-btn" aria-label="Ajouter ce contact">
                 Ajouter
             </button>
-            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+            <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border);">
                 <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Ton ID (à partager) :</p>
-                <code id="my-id" style="font-size: 0.7rem; color: var(--color-brand); word-break: break-all; display: block; background: var(--color-bg-secondary); padding: 0.5rem; border-radius: var(--radius-sm);"></code>
-                <button onclick="copyMyId()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;" aria-label="Copier mon identifiant dans le presse-papiers">
+                <code id="my-id" style="font-size: 0.6875rem; background: var(--cinq-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; word-break: break-all; display: block; background-color: var(--color-bg-tertiary); padding: 0.75rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border);"></code>
+                <button onclick="copyMyId()" style="margin-top: 0.625rem; padding: 0.625rem 1rem; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.15s;" aria-label="Copier mon identifiant dans le presse-papiers">
                     <span aria-hidden="true">📋</span> <span id="copy-id-text">Copier mon ID</span>
                 </button>
             </div>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeAddContactModal()" aria-label="Fermer la fenêtre">
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeAddContactModal()" aria-label="Fermer la fenêtre">
                 Fermer
             </button>
         </div>
@@ -1424,15 +1526,15 @@
     <!-- Delete Account Modal -->
     <div class="modal-overlay" id="delete-account-modal">
         <div class="modal">
-            <h2 class="modal-title" style="color: var(--color-error);">🗑️ Supprimer mon compte</h2>
+            <h2 class="modal-title" style="color: var(--color-error);"><span>🗑️</span> Supprimer mon compte</h2>
             <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
                 Cette action est <strong style="color: var(--color-error);">définitive et irréversible</strong>.
             </p>
-            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem;">
+            <div style="background: var(--color-error-muted); border: 1px solid var(--color-error); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem;">
                 <p style="font-size: 0.875rem; color: var(--color-text-primary); margin-bottom: 0.5rem;">
                     <strong>Seront supprimés :</strong>
                 </p>
-                <ul style="font-size: 0.8rem; color: var(--color-text-muted); margin: 0; padding-left: 1.25rem;">
+                <ul style="font-size: 0.8rem; color: var(--color-text-secondary); margin: 0; padding-left: 1.25rem;">
                     <li>Ton profil et toutes tes infos</li>
                     <li>Tes 5 contacts</li>
                     <li>Tous tes messages envoyés et reçus</li>
@@ -1442,14 +1544,12 @@
             <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">
                 Pour confirmer, tape <strong style="color: var(--color-error);">SUPPRIMER</strong> :
             </p>
-            <input type="text" id="delete-confirmation-input" placeholder="SUPPRIMER" autocomplete="off"
-                style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem; text-align: center; letter-spacing: 0.1em;">
+            <input type="text" id="delete-confirmation-input" class="account-input" placeholder="SUPPRIMER" autocomplete="off" style="text-align: center; letter-spacing: 0.1em; margin-bottom: 1rem;">
             <div id="delete-account-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;"></div>
-            <button onclick="deleteAccount()" id="delete-account-btn"
-                style="width: 100%; padding: 0.75rem; background: var(--color-error); color: white; border: none; border-radius: var(--radius-lg); cursor: pointer; font-weight: 600; transition: all 0.2s;">
+            <button onclick="deleteAccount()" id="delete-account-btn" class="copy-btn" style="width: 100%; background: var(--color-error); box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);">
                 Supprimer définitivement
             </button>
-            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeDeleteAccountModal()">
+            <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%; padding: 0.5rem;" onclick="closeDeleteAccountModal()">
                 Annuler
             </button>
         </div>
@@ -1500,9 +1600,7 @@
             }
             
             container.appendChild(toast);
-            
             setTimeout(() => removeToast(toast), duration);
-            
             return toast;
         }
         
@@ -1513,10 +1611,7 @@
         }
 
         // ===== AUTH =====
-        function getToken() {
-            return session?.access_token;
-        }
-
+        function getToken() { return session?.access_token; }
         function authHeaders() {
             return {
                 'Content-Type': 'application/json',
@@ -1526,40 +1621,28 @@
 
         async function init() {
             try {
-                console.log('Init started');
-                
                 const sessionStr = localStorage.getItem('cinq_session');
                 const userStr = localStorage.getItem('cinq_user');
                 
                 if (!sessionStr || !userStr) {
-                    console.log('No session, redirecting to login');
                     window.location.href = '/login.html';
                     return;
                 }
 
                 session = JSON.parse(sessionStr);
                 user = JSON.parse(userStr);
-                
-                console.log('User loaded:', user?.email);
 
                 const userNameEl = document.getElementById('user-name');
                 if (userNameEl) {
                     userNameEl.textContent = user.email?.split('@')[0] || 'User';
                 }
 
-                // Check if new user and show onboarding
                 const isNewUser = localStorage.getItem('cinq_new_user');
-                if (isNewUser === 'true') {
-                    showOnboarding();
-                }
+                if (isNewUser === 'true') showOnboarding();
 
-                console.log('Loading contacts...');
                 await loadContacts();
-                console.log('Loading profile...');
                 await loadProfile();
-                console.log('Starting polling...');
                 startPolling();
-                console.log('Init complete');
             } catch (e) {
                 console.error('Init error:', e);
                 alert('Erreur de chargement: ' + e.message);
@@ -1575,12 +1658,10 @@
         }
 
         function showOnboardingStep(step) {
-            // Hide all steps
             for (let i = 1; i <= totalOnboardingSteps; i++) {
                 const stepEl = document.getElementById(`onboarding-step-${i}`);
                 if (stepEl) stepEl.classList.remove('active');
             }
-            // Show current step
             const currentStepEl = document.getElementById(`onboarding-step-${step}`);
             if (currentStepEl) currentStepEl.classList.add('active');
         }
@@ -1592,9 +1673,7 @@
             }
         }
 
-        function skipOnboarding() {
-            finishOnboarding();
-        }
+        function skipOnboarding() { finishOnboarding(); }
 
         function finishOnboarding() {
             localStorage.removeItem('cinq_new_user');
@@ -1605,7 +1684,6 @@
                 overlay.classList.remove('open');
                 overlay.style.opacity = '';
                 overlay.style.transition = '';
-                // Show a welcome toast
                 showToast({
                     type: 'success',
                     title: 'Bienvenue ! 🎉',
@@ -1615,7 +1693,6 @@
         }
 
         function animateDemoSlots() {
-            // Animate demo slots on step 2
             const slots = document.querySelectorAll('#demo-slots .onboarding-demo-slot');
             if (slots.length === 0) return;
             
@@ -1626,7 +1703,6 @@
                 i = (i + 1) % slots.length;
             }, 800);
             
-            // Clear when onboarding closes
             const overlay = document.getElementById('onboarding-overlay');
             const observer = new MutationObserver(() => {
                 if (!overlay.classList.contains('open')) {
@@ -1638,7 +1714,6 @@
         }
 
         function startPolling() {
-            // Poll for new messages every 10 seconds
             contactPollingInterval = setInterval(checkForNewMessages, 10000);
         }
         
@@ -1660,17 +1735,13 @@
                         const latestMsg = data.messages[data.messages.length - 1];
                         const lastKnown = lastMessageIds[contact.contact_user_id];
                         
-                        // If new message from them (not us)
                         if (latestMsg.id !== lastKnown && latestMsg.sender_id !== user.id) {
                             lastMessageIds[contact.contact_user_id] = latestMsg.id;
                             
-                            // Don't notify if chat is open with this contact
                             if (!currentChatContact || currentChatContact.contact_user_id !== contact.contact_user_id) {
-                                // Increment unread count
                                 unreadCounts[contact.contact_user_id] = (unreadCounts[contact.contact_user_id] || 0) + 1;
                                 renderContacts();
                                 
-                                // Show notification
                                 const senderName = contact.contact?.email?.split('@')[0] || 'Contact';
                                 showToast({
                                     type: 'notification',
@@ -1679,7 +1750,6 @@
                                     onClick: () => openChat(contact)
                                 });
                                 
-                                // Play sound if available
                                 playNotificationSound();
                             }
                         }
@@ -1691,7 +1761,6 @@
         }
         
         function playNotificationSound() {
-            // Simple beep using Web Audio API
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
@@ -1704,9 +1773,7 @@
                 osc.start();
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
                 osc.stop(ctx.currentTime + 0.2);
-            } catch (e) {
-                // Audio not available
-            }
+            } catch (e) {}
         }
 
         // ===== CONTACTS =====
@@ -1715,14 +1782,10 @@
                 const res = await fetch(`${API_URL}/contacts`, { headers: authHeaders() });
                 const data = await res.json();
                 
-                if (res.status === 401) {
-                    logout();
-                    return;
-                }
+                if (res.status === 401) { logout(); return; }
 
                 contacts = data.contacts || [];
                 
-                // Initialize last message IDs
                 for (const contact of contacts) {
                     if (!lastMessageIds[contact.contact_user_id]) {
                         try {
@@ -1762,7 +1825,6 @@
                     const avatarUrl = contact.contact?.avatar_url;
                     const unread = unreadCounts[contact.contact_user_id] || 0;
                     
-                    // Avatar content: image or initial
                     const avatarContent = avatarUrl 
                         ? `<img src="${avatarUrl}" alt="${name}" onerror="this.parentElement.innerHTML='${initial}'">`
                         : initial;
@@ -1778,11 +1840,7 @@
                 } else {
                     slot.setAttribute('aria-label', `Emplacement ${i + 1} vide. Cliquer pour ajouter un contact.`);
                     slot.innerHTML = `<span class="empty-plus" aria-hidden="true">+</span>`;
-                    slot.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        console.log('Slot clicked!');
-                        openAddContactModal();
-                    });
+                    slot.addEventListener('click', (e) => { e.stopPropagation(); openAddContactModal(); });
                     slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAddContactModal(); } };
                 }
                 
@@ -1795,8 +1853,6 @@
         // ===== CHAT =====
         function openChat(contact) {
             currentChatContact = contact;
-            
-            // Clear unread for this contact
             unreadCounts[contact.contact_user_id] = 0;
             renderContacts();
             
@@ -1806,7 +1862,6 @@
             
             document.getElementById('chat-contact-name').textContent = name;
             
-            // Set chat avatar
             const chatAvatar = document.getElementById('chat-contact-avatar');
             if (avatarUrl) {
                 chatAvatar.innerHTML = `<img src="${avatarUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='${initial}'">`;
@@ -1819,8 +1874,6 @@
             document.getElementById('chat-input').focus();
             
             loadMessages();
-            
-            // Poll for new messages while chat is open
             messagePollingInterval = setInterval(loadMessages, 3000);
         }
 
@@ -1874,18 +1927,11 @@
                     div.textContent = msg.content;
                 }
                 
-                // Don't animate old messages
-                if (i < previousCount) {
-                    div.style.animation = 'none';
-                }
-                
+                if (i < previousCount) div.style.animation = 'none';
                 container.appendChild(div);
             });
 
-            // Auto-scroll if was at bottom
-            if (wasAtBottom) {
-                container.scrollTop = container.scrollHeight;
-            }
+            if (wasAtBottom) container.scrollTop = container.scrollHeight;
         }
 
         async function sendMessage() {
@@ -1949,7 +1995,6 @@
             btn.disabled = !input.value.trim();
         }
 
-        // Input handling
         const chatInput = document.getElementById('chat-input');
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -1984,9 +2029,7 @@
                 });
                 const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur');
-                }
+                if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 contentEl.innerHTML = `
                     <div class="gift-code-display">
@@ -2020,13 +2063,8 @@
 
         // ===== ADD CONTACT MODAL =====
         function openAddContactModal() {
-            console.log('Opening add contact modal');
             const modal = document.getElementById('add-contact-modal');
-            if (!modal) {
-                console.error('Modal not found!');
-                alert('Erreur: modal non trouvé');
-                return;
-            }
+            if (!modal) { alert('Erreur: modal non trouvé'); return; }
             modal.classList.add('open');
             document.getElementById('contact-id-input').value = '';
             document.getElementById('add-contact-error').style.display = 'none';
@@ -2067,9 +2105,7 @@
                 });
                 const data = await res.json();
 
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur');
-                }
+                if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 closeAddContactModal();
                 showToast({ type: 'success', title: 'Contact ajouté !', message: 'Tu peux maintenant lui envoyer des messages' });
@@ -2113,8 +2149,6 @@
         });
 
         // ===== PROFILE MANAGEMENT =====
-        let currentAvatarUrl = null;
-        
         async function loadProfile() {
             try {
                 const res = await fetch(`${API_URL}/user-profile`, { headers: authHeaders() });
@@ -2123,153 +2157,12 @@
                 if (data.profile) {
                     document.getElementById('profile-display-name').value = data.profile.display_name || '';
                     document.getElementById('profile-bio').value = data.profile.bio || '';
-                    
-                    // Update header with display name if set
                     if (data.profile.display_name) {
                         document.getElementById('user-name').textContent = data.profile.display_name;
                     }
-                    
-                    // Update avatar
-                    updateAvatarDisplay(data.profile.avatar_url, data.profile.display_name || user?.email);
                 }
             } catch (e) {
                 console.error('Load profile error:', e);
-            }
-        }
-        
-        function updateAvatarDisplay(avatarUrl, name) {
-            currentAvatarUrl = avatarUrl;
-            const initial = (name || '?').charAt(0).toUpperCase();
-            
-            // Header avatar
-            const headerAvatar = document.getElementById('header-avatar');
-            if (headerAvatar) {
-                if (avatarUrl) {
-                    headerAvatar.innerHTML = `<img src="${avatarUrl}" alt="Avatar" onerror="this.parentElement.innerHTML='${initial}'">`;
-                } else {
-                    headerAvatar.textContent = initial;
-                }
-            }
-            
-            // Profile preview avatar
-            const profilePreview = document.getElementById('profile-avatar-preview');
-            const avatarInitial = document.getElementById('avatar-initial');
-            const removeBtn = document.getElementById('remove-avatar-btn');
-            
-            if (profilePreview) {
-                if (avatarUrl) {
-                    avatarInitial.style.display = 'none';
-                    // Remove existing img if any
-                    const existingImg = profilePreview.querySelector('img');
-                    if (existingImg) existingImg.remove();
-                    // Add new img
-                    const img = document.createElement('img');
-                    img.src = avatarUrl;
-                    img.alt = 'Avatar';
-                    img.onerror = () => {
-                        img.remove();
-                        avatarInitial.style.display = '';
-                        avatarInitial.textContent = initial;
-                    };
-                    profilePreview.insertBefore(img, profilePreview.firstChild);
-                    if (removeBtn) removeBtn.style.display = '';
-                } else {
-                    const existingImg = profilePreview.querySelector('img');
-                    if (existingImg) existingImg.remove();
-                    avatarInitial.style.display = '';
-                    avatarInitial.textContent = initial;
-                    if (removeBtn) removeBtn.style.display = 'none';
-                }
-            }
-        }
-        
-        async function handleAvatarSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!allowedTypes.includes(file.type)) {
-                showToast({ type: 'error', title: 'Format non supporté', message: 'Utilise JPEG, PNG, GIF ou WebP' });
-                return;
-            }
-            
-            // Validate file size (2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showToast({ type: 'error', title: 'Image trop grande', message: 'Taille max: 2 Mo' });
-                return;
-            }
-            
-            // Show loading state
-            const preview = document.getElementById('profile-avatar-preview');
-            const overlay = preview.querySelector('.avatar-preview-overlay');
-            overlay.textContent = '⏳';
-            overlay.style.opacity = '1';
-            
-            try {
-                // Read file as base64
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                
-                // Upload
-                const res = await fetch(`${API_URL}/upload-avatar`, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        image: base64,
-                        contentType: file.type
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur upload');
-                }
-                
-                // Update display
-                updateAvatarDisplay(data.avatar_url, document.getElementById('profile-display-name').value || user?.email);
-                showToast({ type: 'success', title: 'Photo mise à jour !', message: 'Ta nouvelle photo de profil est en ligne' });
-                
-                // Reload contacts to update avatars
-                loadContacts();
-                
-            } catch (e) {
-                console.error('Avatar upload error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
-            } finally {
-                overlay.textContent = '📷';
-                overlay.style.opacity = '';
-                event.target.value = ''; // Reset input
-            }
-        }
-        
-        async function removeAvatar() {
-            if (!currentAvatarUrl) return;
-            
-            if (!confirm('Supprimer ta photo de profil ?')) return;
-            
-            try {
-                const res = await fetch(`${API_URL}/upload-avatar`, {
-                    method: 'DELETE',
-                    headers: authHeaders()
-                });
-                
-                if (!res.ok) {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Erreur');
-                }
-                
-                updateAvatarDisplay(null, document.getElementById('profile-display-name').value || user?.email);
-                showToast({ type: 'success', title: 'Photo supprimée', message: 'Ta photo de profil a été supprimée' });
-                
-            } catch (e) {
-                console.error('Remove avatar error:', e);
-                showToast({ type: 'error', title: 'Erreur', message: e.message });
             }
         }
 
@@ -2292,14 +2185,10 @@
                 });
                 
                 const data = await res.json();
-                
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur');
-                }
+                if (!res.ok) throw new Error(data.error || 'Erreur');
                 
                 showToast({ type: 'success', title: 'Profil mis à jour !', message: 'Tes modifications ont été enregistrées' });
                 
-                // Update displayed name in header if display_name was set
                 if (displayName) {
                     document.getElementById('user-name').textContent = displayName;
                 }
@@ -2315,21 +2204,16 @@
         // ===== DATA EXPORT (GDPR) =====
         async function exportData() {
             const btn = document.getElementById('export-data-btn');
+            const titleEl = btn.querySelector('.account-btn-title');
             btn.disabled = true;
-            btn.querySelector('div > div:first-child').textContent = 'Export en cours...';
+            titleEl.textContent = 'Export en cours...';
             
             try {
-                const res = await fetch(`${API_URL}/user-profile?action=export`, { 
-                    headers: authHeaders() 
-                });
-                
-                if (!res.ok) {
-                    throw new Error('Erreur lors de l\'export');
-                }
+                const res = await fetch(`${API_URL}/user-profile?action=export`, { headers: authHeaders() });
+                if (!res.ok) throw new Error('Erreur lors de l\'export');
                 
                 const data = await res.json();
                 
-                // Create and download JSON file
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2346,7 +2230,7 @@
                 showToast({ type: 'error', title: 'Erreur', message: e.message });
             } finally {
                 btn.disabled = false;
-                btn.querySelector('div > div:first-child').textContent = 'Exporter mes données';
+                titleEl.textContent = 'Exporter mes données';
             }
         }
 
@@ -2384,21 +2268,15 @@
                 });
                 
                 const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Erreur');
                 
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur');
-                }
-                
-                // Clear session and redirect
                 stopPolling();
                 localStorage.removeItem('cinq_session');
                 localStorage.removeItem('cinq_user');
                 
                 showToast({ type: 'success', title: 'Compte supprimé', message: 'Adieu ! 👋', duration: 3000 });
                 
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+                setTimeout(() => { window.location.href = '/'; }, 2000);
             } catch (e) {
                 console.error('Delete account error:', e);
                 errorEl.textContent = e.message;
@@ -2412,24 +2290,12 @@
         const VAPID_PUBLIC_KEY = 'BFvUbvZkUNjbCf_lea-V2FGiVLhAdyAXaUC5CUWYlwmCkejWxefzR3rvqJI4DOj_M1Gh664VGVYRo0SEJ-94faM';
 
         async function initPushNotifications() {
-            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-                console.log('[Push] Not supported');
-                return;
-            }
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
             try {
-                // Register service worker
                 const registration = await navigator.serviceWorker.register('/service-worker.js');
-                console.log('[Push] Service Worker registered');
-
-                // Check if already subscribed
                 const existingSubscription = await registration.pushManager.getSubscription();
-                if (existingSubscription) {
-                    console.log('[Push] Already subscribed');
-                    return;
-                }
-
-                // Ask for permission after a delay (better UX)
+                if (existingSubscription) return;
                 setTimeout(() => askForNotificationPermission(registration), 3000);
             } catch (err) {
                 console.error('[Push] SW registration failed:', err);
@@ -2437,19 +2303,12 @@
         }
 
         async function askForNotificationPermission(registration) {
-            // Don't ask if already denied
-            if (Notification.permission === 'denied') {
-                console.log('[Push] Permission denied');
-                return;
-            }
-
-            // Already granted? Subscribe directly
+            if (Notification.permission === 'denied') return;
             if (Notification.permission === 'granted') {
                 await subscribeToPush(registration);
                 return;
             }
 
-            // Show a friendly toast first
             showToast({
                 type: 'info',
                 title: '🔔 Notifications',
@@ -2472,7 +2331,6 @@
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
 
-                // Send subscription to server
                 const res = await fetch(`${API_URL}/push-subscribe`, {
                     method: 'POST',
                     headers: authHeaders(),
@@ -2480,7 +2338,6 @@
                 });
 
                 if (!res.ok) throw new Error('Subscribe failed');
-                console.log('[Push] Subscribed successfully');
             } catch (err) {
                 console.error('[Push] Subscribe error:', err);
             }
@@ -2497,10 +2354,8 @@
             return outputArray;
         }
 
-        // Listen for messages from service worker
         navigator.serviceWorker?.addEventListener('message', (event) => {
             if (event.data?.type === 'NOTIFICATION_CLICKED') {
-                // Handle notification click - could open specific chat
                 console.log('[Push] Notification clicked:', event.data);
             }
         });
@@ -2510,7 +2365,6 @@
         initPushNotifications();
     </script>
     
-    <!-- PWA Install Prompt -->
     <script src="/pwa-install.js" defer></script>
 </body>
 </html>
