@@ -131,11 +131,12 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNnrT412YHQ';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const form = document.getElementById('waitlist-form');
         const message = document.getElementById('form-message');
         const counter = document.getElementById('counter');
@@ -144,7 +145,7 @@
         // Charger le compteur au démarrage
         async function loadCount() {
             try {
-                const { count, error } = await supabase
+                const { count, error } = await db
                     .from('waitlist')
                     .select('*', { count: 'exact', head: true });
                 if (!error) animateCounter(count || 0);
@@ -189,7 +190,7 @@
             submitBtn.textContent = '...';
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await db
                     .from('waitlist')
                     .insert([{ 
                         email: email.toLowerCase().trim(),
