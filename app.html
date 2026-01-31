@@ -427,7 +427,7 @@
                 slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
                 
                 if (contact) {
-                    const name = contact.nickname || contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                    const name = contact.contact?.email?.split('@')[0] || '?';
                     const initial = name.charAt(0).toUpperCase();
                     
                     slot.innerHTML = `
@@ -449,7 +449,7 @@
         function openChat(contact) {
             currentChatContact = contact;
             document.getElementById('chat-contact-name').textContent = 
-                contact.nickname || contact.contact?.display_name || 'Contact';
+                contact.contact?.email?.split('@')[0] || 'Contact';
             document.getElementById('chat-panel').classList.add('open');
             loadMessages();
         }

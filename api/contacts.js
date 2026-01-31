@@ -32,9 +32,8 @@ export default async function handler(req, res) {
                 .select(`
                     id,
                     contact_user_id,
-                    nickname,
                     created_at,
-                    contact:users!contacts_contact_user_id_fkey(id, display_name, avatar_url)
+                    contact:users!contacts_contact_user_id_fkey(id, email)
                 `)
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: true });
@@ -45,7 +44,7 @@ export default async function handler(req, res) {
 
         // ============ POST - Add contact ============
         if (req.method === 'POST') {
-            const { contactId, nickname } = req.body;
+            const { contactId } = req.body;
 
             if (!contactId) {
                 return res.status(400).json({ error: 'contactId requis' });
@@ -81,8 +80,7 @@ export default async function handler(req, res) {
                 .from('contacts')
                 .insert({
                     user_id: user.id,
-                    contact_user_id: contactId,
-                    nickname: nickname || null
+                    contact_user_id: contactId
                 })
                 .select()
                 .single();
