@@ -51,18 +51,18 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"></noscript>
     
-    <!-- Design System - Critical CSS is inlined, rest loaded async -->
-    <link rel="stylesheet" href="/design/styles.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="/css/mobile-responsive.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="/css/a11y.css" media="print" onload="this.media='all'">
+    <!-- Design System - Critical CSS is inlined, rest loaded async (minified) -->
+    <link rel="stylesheet" href="/design/styles.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/a11y.min.css" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="/design/styles.css">
-        <link rel="stylesheet" href="/css/mobile-responsive.css">
-        <link rel="stylesheet" href="/css/a11y.css">
+        <link rel="stylesheet" href="/design/styles.min.css">
+        <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+        <link rel="stylesheet" href="/css/a11y.min.css">
     </noscript>
     
-    <!-- Analytics -->
-    <script defer src="/analytics.js"></script>
+    <!-- Analytics (minified) -->
+    <script defer src="/analytics.min.js"></script>
     
     <style>
         /* ===== HEADER ===== */
@@ -901,9 +901,9 @@
         </nav>
     </footer>
 
-    <!-- Scripts - Non-blocking -->
-    <script defer src="/animations.js"></script>
-    <script defer src="/fun.js"></script>
+    <!-- Scripts - Non-blocking (minified) -->
+    <script defer src="/animations.min.js"></script>
+    <script defer src="/fun.min.js"></script>
     <script>
         const API_URL = '/api/waitlist';
         const form = document.getElementById('waitlist-form');
