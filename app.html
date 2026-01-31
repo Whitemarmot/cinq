@@ -2,16 +2,20 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cinq — Tes 5</title>
     <link rel="stylesheet" href="/styles.css">
     <style>
+        /* ===== APP LAYOUT ===== */
         .app-container {
             min-height: 100vh;
+            min-height: 100dvh;
             padding: 1rem;
             max-width: 500px;
             margin: 0 auto;
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
         }
+        
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -20,33 +24,42 @@
             border-bottom: 1px solid var(--color-border);
             margin-bottom: 1.5rem;
         }
+        
         .app-logo {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--color-brand);
         }
+        
         .user-menu {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
+        
         .user-name {
             font-size: 0.875rem;
             color: var(--color-text-muted);
         }
+        
         .logout-btn {
             background: none;
             border: none;
             color: var(--color-text-muted);
             cursor: pointer;
             font-size: 0.875rem;
+            transition: color var(--transition-fast);
         }
-        .logout-btn:hover { color: var(--color-error); }
+        
+        .logout-btn:hover { 
+            color: var(--color-error); 
+        }
 
-        /* Contacts grid */
+        /* ===== CONTACTS GRID ===== */
         .contacts-section {
             margin-bottom: 2rem;
         }
+        
         .section-title {
             font-size: 1rem;
             font-weight: 600;
@@ -55,16 +68,25 @@
             justify-content: space-between;
             align-items: center;
         }
+        
         .contact-count {
             font-size: 0.875rem;
             color: var(--color-text-muted);
             font-weight: normal;
         }
+        
         .contacts-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 0.75rem;
         }
+        
+        @media (max-width: 380px) {
+            .contacts-grid {
+                gap: 0.5rem;
+            }
+        }
+        
         .contact-slot {
             aspect-ratio: 1;
             border-radius: var(--radius-xl);
@@ -73,31 +95,59 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            position: relative;
         }
+        
         .contact-slot:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
         }
+        
+        .contact-slot:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+        
         .contact-slot.filled {
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
         }
+        
         .contact-slot.empty {
             background: var(--color-bg-elevated);
             border: 2px dashed var(--color-border);
         }
+        
+        .contact-slot.empty:hover {
+            border-color: var(--color-brand);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
         .contact-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--color-brand);
+            background: var(--cinq-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
             color: white;
             font-weight: 600;
+            transition: transform 0.2s;
         }
+        
+        @media (max-width: 380px) {
+            .contact-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+        
+        .contact-slot:hover .contact-avatar {
+            transform: scale(1.1);
+        }
+        
         .contact-name {
             font-size: 0.625rem;
             margin-top: 0.25rem;
@@ -107,18 +157,52 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            padding: 0 2px;
         }
+        
         .empty-plus {
             font-size: 1.5rem;
             color: var(--color-border-active);
+            transition: color 0.2s, transform 0.2s;
+        }
+        
+        .contact-slot.empty:hover .empty-plus {
+            color: var(--color-brand);
+            transform: rotate(90deg);
         }
 
-        /* Actions */
+        /* ===== UNREAD BADGE ===== */
+        .unread-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            background: var(--color-error);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: white;
+            padding: 0 4px;
+            animation: badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+        }
+        
+        @keyframes badge-pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== ACTIONS ===== */
         .actions-section {
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
         }
+        
         .action-btn {
             display: flex;
             align-items: center;
@@ -128,27 +212,37 @@
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
+        
         .action-btn:hover {
             background: var(--color-bg-hover);
+            transform: translateX(4px);
         }
+        
+        .action-btn:active {
+            transform: translateX(2px) scale(0.99);
+        }
+        
         .action-icon {
             font-size: 1.5rem;
         }
+        
         .action-text {
             flex: 1;
         }
+        
         .action-title {
             font-weight: 600;
             margin-bottom: 0.125rem;
         }
+        
         .action-subtitle {
             font-size: 0.75rem;
             color: var(--color-text-muted);
         }
 
-        /* Chat panel */
+        /* ===== CHAT PANEL ===== */
         .chat-panel {
             position: fixed;
             bottom: 0;
@@ -157,14 +251,19 @@
             background: var(--color-bg-primary);
             border-top: 1px solid var(--color-border);
             transform: translateY(100%);
-            transition: transform 0.3s;
-            max-height: 70vh;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 80vh;
+            max-height: 80dvh;
             display: flex;
             flex-direction: column;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            z-index: var(--z-modal);
         }
+        
         .chat-panel.open {
             transform: translateY(0);
         }
+        
         .chat-header {
             display: flex;
             justify-content: space-between;
@@ -172,48 +271,121 @@
             padding: 1rem;
             border-bottom: 1px solid var(--color-border);
         }
+        
+        .chat-contact-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .chat-contact-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: white;
+            font-weight: 600;
+        }
+        
         .chat-contact-name {
             font-weight: 600;
         }
+        
         .chat-close {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--color-text-muted);
+            transition: color 0.2s, transform 0.2s;
+            padding: 0.5rem;
         }
+        
+        .chat-close:hover {
+            color: var(--color-text-primary);
+            transform: rotate(90deg);
+        }
+        
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
-            min-height: 200px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            scroll-behavior: smooth;
         }
+        
+        .chat-messages:empty::before {
+            content: 'Aucun message';
+            text-align: center;
+            color: var(--color-text-muted);
+            margin: auto;
+        }
+        
         .chat-message {
             max-width: 80%;
             padding: 0.75rem 1rem;
             border-radius: var(--radius-lg);
-            margin-bottom: 0.5rem;
+            animation: message-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            word-wrap: break-word;
         }
+        
+        @keyframes message-in {
+            0% { 
+                opacity: 0; 
+                transform: translateY(10px) scale(0.95);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+        
         .chat-message.sent {
-            background: var(--color-brand);
+            background: var(--cinq-gradient);
             color: white;
             margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
+        
         .chat-message.received {
             background: var(--color-bg-secondary);
+            border-bottom-left-radius: 4px;
         }
+        
         .chat-message.ping {
             text-align: center;
             max-width: 100%;
             background: none;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            animation: ping-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        
+        @keyframes ping-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .chat-message-time {
+            font-size: 0.625rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+        
         .chat-input-area {
             display: flex;
             gap: 0.5rem;
             padding: 1rem;
             border-top: 1px solid var(--color-border);
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
         }
+        
         .chat-input {
             flex: 1;
             padding: 0.75rem 1rem;
@@ -221,15 +393,42 @@
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             color: var(--color-text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
         .chat-send {
             padding: 0.75rem 1rem;
-            background: var(--color-brand);
+            background: var(--cinq-gradient);
             border: none;
             border-radius: var(--radius-lg);
             color: white;
             cursor: pointer;
+            font-size: 1.25rem;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        
+        .chat-send:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .chat-send:active {
+            transform: scale(0.95);
+        }
+        
+        .chat-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .ping-btn {
             padding: 0.75rem;
             background: var(--color-bg-secondary);
@@ -237,41 +436,75 @@
             border-radius: var(--radius-lg);
             cursor: pointer;
             font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+        
+        .ping-btn:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.1);
+        }
+        
+        .ping-btn:active {
+            transform: scale(0.9);
         }
 
-        /* Modal */
+        /* ===== CHAT OVERLAY ===== */
+        .chat-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: calc(var(--z-modal) - 1);
+        }
+        
+        .chat-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
-            z-index: 100;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
         }
-        .modal-overlay.open { display: flex; }
+        
+        .modal-overlay.open { 
+            opacity: 1;
+            visibility: visible;
+        }
+        
         .modal {
             background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             padding: 2rem;
             width: 100%;
             max-width: 400px;
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        
+        .modal-overlay.open .modal {
+            transform: scale(1) translateY(0);
+        }
+        
         .modal-title {
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 1rem;
         }
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
+        
         .gift-code-display {
             background: var(--color-bg-secondary);
             border: 2px dashed var(--color-brand);
@@ -280,6 +513,7 @@
             text-align: center;
             margin: 1rem 0;
         }
+        
         .gift-code {
             font-size: 1.5rem;
             font-weight: 700;
@@ -287,26 +521,190 @@
             color: var(--color-brand);
             letter-spacing: 0.1em;
         }
+        
         .copy-btn {
             margin-top: 1rem;
             padding: 0.75rem 1.5rem;
-            background: var(--color-brand);
+            background: var(--cinq-gradient);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: var(--z-toast);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .toast {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            animation: toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: auto;
+        }
+        
+        .toast.toast-out {
+            animation: toast-out 0.3s ease-out forwards;
+        }
+        
+        @keyframes toast-in {
+            0% { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.95);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes toast-out {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+        
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .toast-message {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .toast.success {
+            border-color: var(--color-success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .toast.error {
+            border-color: var(--color-error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .toast.notification {
+            border-color: var(--color-brand);
+            background: rgba(99, 102, 241, 0.1);
+            cursor: pointer;
+        }
+        
+        .toast.notification:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--color-bg-secondary) 25%,
+                var(--color-bg-elevated) 50%,
+                var(--color-bg-secondary) 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-lg);
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ===== SETTINGS LINK ===== */
+        .settings-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        
+        .settings-link:hover {
+            color: var(--color-text-primary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 360px) {
+            .app-container {
+                padding: 0.75rem;
+            }
+            
+            .modal {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="noise-overlay" aria-hidden="true"></div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
     <div class="app-container">
         <header class="app-header">
             <div class="app-logo">5</div>
             <div class="user-menu">
                 <span class="user-name" id="user-name"></span>
+                <a href="/settings.html" class="settings-link" title="Paramètres">⚙️</a>
                 <button class="logout-btn" onclick="logout()">Déconnexion</button>
             </div>
         </header>
@@ -332,17 +730,23 @@
         </section>
     </div>
 
+    <!-- Chat Overlay -->
+    <div class="chat-overlay" id="chat-overlay" onclick="closeChat()"></div>
+
     <!-- Chat Panel -->
     <div class="chat-panel" id="chat-panel">
         <div class="chat-header">
-            <span class="chat-contact-name" id="chat-contact-name"></span>
-            <button class="chat-close" onclick="closeChat()">×</button>
+            <div class="chat-contact-info">
+                <div class="chat-contact-avatar" id="chat-contact-avatar">?</div>
+                <span class="chat-contact-name" id="chat-contact-name"></span>
+            </div>
+            <button class="chat-close" onclick="closeChat()" aria-label="Fermer">×</button>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input-area">
-            <button class="ping-btn" onclick="sendPing()">👋</button>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Message...">
-            <button class="chat-send" onclick="sendMessage()">→</button>
+            <button class="ping-btn" onclick="sendPing()" title="Envoyer un ping">👋</button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Message..." maxlength="500">
+            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled>→</button>
         </div>
     </div>
 
@@ -372,16 +776,16 @@
                 Entre l'ID de la personne à ajouter
             </p>
             <input type="text" id="contact-id-input" placeholder="ID (ex: abc123-...)" 
-                   style="width: 100%; padding: 0.75rem; background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem;">
-            <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem;"></div>
-            <button class="copy-btn" style="width: 100%; background: var(--color-brand); color: white;" onclick="addContact()">
+                   style="width: 100%; padding: 0.75rem; background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); margin-bottom: 1rem; font-size: 1rem;">
+            <div id="add-contact-error" style="color: var(--color-error); font-size: 0.875rem; margin-bottom: 1rem; display: none;"></div>
+            <button class="copy-btn" style="width: 100%;" onclick="addContact()" id="add-contact-btn">
                 Ajouter
             </button>
             <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
                 <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Ton ID (à partager) :</p>
-                <code id="my-id" style="font-size: 0.7rem; color: var(--color-brand); word-break: break-all;"></code>
-                <button onclick="copyMyId()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.75rem;">
-                    📋 Copier mon ID
+                <code id="my-id" style="font-size: 0.7rem; color: var(--color-brand); word-break: break-all; display: block; background: var(--color-bg-secondary); padding: 0.5rem; border-radius: var(--radius-sm);"></code>
+                <button onclick="copyMyId()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-lg); color: var(--color-text-primary); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📋</span> <span id="copy-id-text">Copier mon ID</span>
                 </button>
             </div>
             <button style="margin-top: 1rem; background: none; border: none; color: var(--color-text-muted); cursor: pointer; width: 100%;" onclick="closeAddContactModal()">
@@ -396,7 +800,56 @@
         let user = null;
         let contacts = [];
         let currentChatContact = null;
+        let messagePollingInterval = null;
+        let contactPollingInterval = null;
+        let lastMessageIds = {};
+        let unreadCounts = {};
 
+        // ===== TOAST SYSTEM =====
+        function showToast(options) {
+            const { type = 'info', title, message, duration = 4000, onClick } = options;
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                notification: '💬',
+                info: 'ℹ'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || icons.info}</span>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    ${message ? `<div class="toast-message">${message}</div>` : ''}
+                </div>
+            `;
+            
+            if (onClick) {
+                toast.style.cursor = 'pointer';
+                toast.onclick = () => {
+                    onClick();
+                    removeToast(toast);
+                };
+            }
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => removeToast(toast), duration);
+            
+            return toast;
+        }
+        
+        function removeToast(toast) {
+            if (!toast.parentNode) return;
+            toast.classList.add('toast-out');
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // ===== AUTH =====
         function getToken() {
             return session?.access_token;
         }
@@ -409,7 +862,6 @@
         }
 
         async function init() {
-            // Check auth
             const sessionStr = localStorage.getItem('cinq_session');
             const userStr = localStorage.getItem('cinq_user');
             
@@ -424,8 +876,82 @@
             document.getElementById('user-name').textContent = user.email.split('@')[0];
 
             await loadContacts();
+            startPolling();
         }
 
+        function startPolling() {
+            // Poll for new messages every 10 seconds
+            contactPollingInterval = setInterval(checkForNewMessages, 10000);
+        }
+        
+        function stopPolling() {
+            if (contactPollingInterval) clearInterval(contactPollingInterval);
+            if (messagePollingInterval) clearInterval(messagePollingInterval);
+        }
+
+        async function checkForNewMessages() {
+            for (const contact of contacts) {
+                try {
+                    const res = await fetch(
+                        `${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`,
+                        { headers: authHeaders() }
+                    );
+                    const data = await res.json();
+                    
+                    if (data.messages && data.messages.length > 0) {
+                        const latestMsg = data.messages[data.messages.length - 1];
+                        const lastKnown = lastMessageIds[contact.contact_user_id];
+                        
+                        // If new message from them (not us)
+                        if (latestMsg.id !== lastKnown && latestMsg.sender_id !== user.id) {
+                            lastMessageIds[contact.contact_user_id] = latestMsg.id;
+                            
+                            // Don't notify if chat is open with this contact
+                            if (!currentChatContact || currentChatContact.contact_user_id !== contact.contact_user_id) {
+                                // Increment unread count
+                                unreadCounts[contact.contact_user_id] = (unreadCounts[contact.contact_user_id] || 0) + 1;
+                                renderContacts();
+                                
+                                // Show notification
+                                const senderName = contact.contact?.email?.split('@')[0] || 'Contact';
+                                showToast({
+                                    type: 'notification',
+                                    title: `Nouveau message de ${senderName}`,
+                                    message: latestMsg.is_ping ? '👋' : latestMsg.content.substring(0, 50),
+                                    onClick: () => openChat(contact)
+                                });
+                                
+                                // Play sound if available
+                                playNotificationSound();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('Poll error:', e);
+                }
+            }
+        }
+        
+        function playNotificationSound() {
+            // Simple beep using Web Audio API
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.value = 0.1;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.stop(ctx.currentTime + 0.2);
+            } catch (e) {
+                // Audio not available
+            }
+        }
+
+        // ===== CONTACTS =====
         async function loadContacts() {
             try {
                 const res = await fetch(`${API_URL}/contacts`, { headers: authHeaders() });
@@ -437,9 +963,27 @@
                 }
 
                 contacts = data.contacts || [];
+                
+                // Initialize last message IDs
+                for (const contact of contacts) {
+                    if (!lastMessageIds[contact.contact_user_id]) {
+                        try {
+                            const msgRes = await fetch(
+                                `${API_URL}/messages?contact_id=${contact.contact_user_id}&limit=1`,
+                                { headers: authHeaders() }
+                            );
+                            const msgData = await msgRes.json();
+                            if (msgData.messages && msgData.messages.length > 0) {
+                                lastMessageIds[contact.contact_user_id] = msgData.messages[msgData.messages.length - 1].id;
+                            }
+                        } catch (e) {}
+                    }
+                }
+                
                 renderContacts();
             } catch (e) {
                 console.error('Load contacts error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de charger les contacts' });
             }
         }
 
@@ -455,10 +999,12 @@
                 if (contact) {
                     const name = contact.contact?.email?.split('@')[0] || '?';
                     const initial = name.charAt(0).toUpperCase();
+                    const unread = unreadCounts[contact.contact_user_id] || 0;
                     
                     slot.innerHTML = `
                         <div class="contact-avatar">${initial}</div>
                         <div class="contact-name">${name}</div>
+                        ${unread > 0 ? `<div class="unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
                     `;
                     slot.onclick = () => openChat(contact);
                 } else {
@@ -472,17 +1018,36 @@
             document.getElementById('contact-count').textContent = `${contacts.length}/5`;
         }
 
+        // ===== CHAT =====
         function openChat(contact) {
             currentChatContact = contact;
-            document.getElementById('chat-contact-name').textContent = 
-                contact.contact?.email?.split('@')[0] || 'Contact';
+            
+            // Clear unread for this contact
+            unreadCounts[contact.contact_user_id] = 0;
+            renderContacts();
+            
+            const name = contact.contact?.email?.split('@')[0] || 'Contact';
+            document.getElementById('chat-contact-name').textContent = name;
+            document.getElementById('chat-contact-avatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('chat-panel').classList.add('open');
+            document.getElementById('chat-overlay').classList.add('open');
+            document.getElementById('chat-input').focus();
+            
             loadMessages();
+            
+            // Poll for new messages while chat is open
+            messagePollingInterval = setInterval(loadMessages, 3000);
         }
 
         function closeChat() {
             document.getElementById('chat-panel').classList.remove('open');
+            document.getElementById('chat-overlay').classList.remove('open');
             currentChatContact = null;
+            
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+                messagePollingInterval = null;
+            }
         }
 
         async function loadMessages() {
@@ -494,7 +1059,13 @@
                     { headers: authHeaders() }
                 );
                 const data = await res.json();
-                renderMessages(data.messages || []);
+                
+                const messages = data.messages || [];
+                if (messages.length > 0) {
+                    lastMessageIds[currentChatContact.contact_user_id] = messages[messages.length - 1].id;
+                }
+                
+                renderMessages(messages);
             } catch (e) {
                 console.error('Load messages error:', e);
             }
@@ -502,22 +1073,34 @@
 
         function renderMessages(messages) {
             const container = document.getElementById('chat-messages');
+            const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
+            const previousCount = container.children.length;
+            
             container.innerHTML = '';
 
-            if (messages.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--color-text-muted);">Aucun message</p>';
-                return;
-            }
-
-            messages.forEach(msg => {
+            messages.forEach((msg, i) => {
                 const div = document.createElement('div');
                 const isSent = msg.sender_id === user.id;
                 div.className = `chat-message ${isSent ? 'sent' : 'received'} ${msg.is_ping ? 'ping' : ''}`;
-                div.textContent = msg.content;
+                
+                if (msg.is_ping) {
+                    div.textContent = '👋';
+                } else {
+                    div.textContent = msg.content;
+                }
+                
+                // Don't animate old messages
+                if (i < previousCount) {
+                    div.style.animation = 'none';
+                }
+                
                 container.appendChild(div);
             });
 
-            container.scrollTop = container.scrollHeight;
+            // Auto-scroll if was at bottom
+            if (wasAtBottom) {
+                container.scrollTop = container.scrollHeight;
+            }
         }
 
         async function sendMessage() {
@@ -525,8 +1108,11 @@
             const content = input.value.trim();
             if (!content || !currentChatContact) return;
 
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+
             try {
-                await fetch(`${API_URL}/messages`, {
+                const res = await fetch(`${API_URL}/messages`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify({
@@ -534,15 +1120,25 @@
                         content
                     })
                 });
+                
+                if (!res.ok) throw new Error('Failed to send');
+                
                 input.value = '';
+                updateSendButton();
                 loadMessages();
             } catch (e) {
                 console.error('Send error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: 'Message non envoyé' });
+            } finally {
+                btn.disabled = !input.value.trim();
             }
         }
 
         async function sendPing() {
             if (!currentChatContact) return;
+            
+            const btn = document.querySelector('.ping-btn');
+            btn.style.transform = 'scale(0.8)';
             
             try {
                 await fetch(`${API_URL}/messages`, {
@@ -556,14 +1152,29 @@
                 loadMessages();
             } catch (e) {
                 console.error('Ping error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: 'Ping non envoyé' });
+            } finally {
+                setTimeout(() => btn.style.transform = '', 200);
             }
         }
+        
+        function updateSendButton() {
+            const input = document.getElementById('chat-input');
+            const btn = document.getElementById('send-btn');
+            btn.disabled = !input.value.trim();
+        }
 
-        // Enter to send
-        document.getElementById('chat-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+        // Input handling
+        const chatInput = document.getElementById('chat-input');
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
+        chatInput.addEventListener('input', updateSendButton);
 
+        // ===== GIFT MODAL =====
         function openGiftModal() {
             document.getElementById('gift-modal').classList.add('open');
             document.getElementById('gift-content').innerHTML = `
@@ -577,10 +1188,56 @@
             document.getElementById('gift-modal').classList.remove('open');
         }
 
+        async function createGift() {
+            const contentEl = document.getElementById('gift-content');
+            contentEl.innerHTML = '<div class="loading-spinner" style="margin: 2rem auto;"></div>';
+            
+            try {
+                const res = await fetch(`${API_URL}/gift?action=create`, {
+                    method: 'POST',
+                    headers: authHeaders()
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+
+                contentEl.innerHTML = `
+                    <div class="gift-code-display">
+                        <div class="gift-code">${data.gift.code}</div>
+                    </div>
+                    <button class="copy-btn" style="width: 100%;" onclick="copyGift('${data.gift.shareUrl}')">
+                        📋 Copier le lien
+                    </button>
+                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; text-align: center;">
+                        Valable 30 jours
+                    </p>
+                `;
+            } catch (e) {
+                contentEl.innerHTML = `
+                    <p style="color: var(--color-error); text-align: center;">${e.message}</p>
+                    <button class="copy-btn" style="width: 100%; margin-top: 1rem;" onclick="createGift()">
+                        Réessayer
+                    </button>
+                `;
+            }
+        }
+
+        async function copyGift(url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast({ type: 'success', title: 'Copié !', message: 'Lien copié dans le presse-papier' });
+            } catch (e) {
+                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de copier' });
+            }
+        }
+
+        // ===== ADD CONTACT MODAL =====
         function openAddContactModal() {
             document.getElementById('add-contact-modal').classList.add('open');
             document.getElementById('contact-id-input').value = '';
-            document.getElementById('add-contact-error').textContent = '';
+            document.getElementById('add-contact-error').style.display = 'none';
             document.getElementById('my-id').textContent = user.id;
         }
 
@@ -591,16 +1248,24 @@
         async function addContact() {
             const contactId = document.getElementById('contact-id-input').value.trim();
             const errorEl = document.getElementById('add-contact-error');
+            const btn = document.getElementById('add-contact-btn');
+            
+            errorEl.style.display = 'none';
             
             if (!contactId) {
                 errorEl.textContent = 'Entre un ID';
+                errorEl.style.display = 'block';
                 return;
             }
 
             if (contactId === user.id) {
                 errorEl.textContent = 'Tu ne peux pas t\'ajouter toi-même !';
+                errorEl.style.display = 'block';
                 return;
             }
+
+            btn.disabled = true;
+            btn.textContent = 'Ajout...';
 
             try {
                 const res = await fetch(`${API_URL}/contacts`, {
@@ -615,57 +1280,46 @@
                 }
 
                 closeAddContactModal();
+                showToast({ type: 'success', title: 'Contact ajouté !', message: 'Tu peux maintenant lui envoyer des messages' });
                 loadContacts();
             } catch (e) {
                 errorEl.textContent = e.message;
+                errorEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Ajouter';
             }
         }
 
-        function copyMyId() {
-            navigator.clipboard.writeText(user.id);
-            alert('ID copié !');
-        }
-
-        async function createGift() {
+        async function copyMyId() {
+            const textEl = document.getElementById('copy-id-text');
             try {
-                const res = await fetch(`${API_URL}/gift?action=create`, {
-                    method: 'POST',
-                    headers: authHeaders()
-                });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    alert(data.error);
-                    return;
-                }
-
-                document.getElementById('gift-content').innerHTML = `
-                    <div class="gift-code-display">
-                        <div class="gift-code">${data.gift.code}</div>
-                    </div>
-                    <button class="copy-btn" onclick="copyGift('${data.gift.shareUrl}')">
-                        📋 Copier le lien
-                    </button>
-                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; text-align: center;">
-                        Valable 30 jours
-                    </p>
-                `;
+                await navigator.clipboard.writeText(user.id);
+                textEl.textContent = 'Copié !';
+                setTimeout(() => textEl.textContent = 'Copier mon ID', 2000);
             } catch (e) {
-                alert('Erreur lors de la création');
+                showToast({ type: 'error', title: 'Erreur', message: 'Impossible de copier' });
             }
         }
 
-        function copyGift(url) {
-            navigator.clipboard.writeText(url);
-            alert('Lien copié !');
-        }
-
+        // ===== LOGOUT =====
         function logout() {
+            stopPolling();
             localStorage.removeItem('cinq_session');
             localStorage.removeItem('cinq_user');
             window.location.href = '/login.html';
         }
 
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (currentChatContact) closeChat();
+                else if (document.getElementById('gift-modal').classList.contains('open')) closeGiftModal();
+                else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
+            }
+        });
+
+        // ===== INIT =====
         init();
     </script>
 </body>

@@ -98,10 +98,29 @@
             border-radius: var(--radius-lg);
             margin-top: 1rem;
             font-size: 0.875rem;
+            animation: message-in 0.3s ease-out;
+        }
+        @keyframes message-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .message.error {
             background: rgba(239, 68, 68, 0.1);
             color: var(--color-error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         .home-link {
             text-align: center;
@@ -180,7 +199,7 @@
             
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = 'Connexion...';
+            btn.innerHTML = '<span class="loading-spinner"></span>Connexion...';
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
