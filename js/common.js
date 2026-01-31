@@ -252,15 +252,19 @@ window.Cinq = window.Cinq || {};
       info: 'bg-indigo-500/90'
     };
     
-    // Create toast
+    // Create toast - SECURITY: Use DOM methods to prevent XSS
     const toast = document.createElement('div');
     toast.id = 'cinq-toast';
     toast.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 ${colors[type] || colors.error} text-white rounded-xl text-sm font-medium shadow-lg z-50 flex items-center gap-2 transition-all`;
     toast.style.animation = 'slideUp 0.3s ease-out';
-    toast.innerHTML = `
-      <span>${icon || icons[type] || icons.error}</span>
-      <span>${escapeHtml(message)}</span>
-    `;
+    
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = icon || icons[type] || icons.error;
+    toast.appendChild(iconSpan);
+    
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;  // textContent = XSS safe (no need for escapeHtml)
+    toast.appendChild(messageSpan);
     
     // Add animation keyframes if not present
     if (!document.getElementById('toast-styles')) {

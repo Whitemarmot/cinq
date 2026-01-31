@@ -1,0 +1,373 @@
+/**
+ * CINQ Theme Transitions & Utilities
+ * Smooth, flicker-free theme switching
+ * 
+ * @version 1.0
+ * @description Global theme transition system for CINQ
+ */
+
+/* ============================================
+   ANTI-FLASH INITIALIZATION
+   Add this class during page load to prevent FOUC
+   ============================================ */
+html.theme-loading,
+html.theme-loading * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ============================================
+   SMOOTH THEME TRANSITIONS
+   Applied to all color-changing properties
+   ============================================ */
+html.theme-transitioning,
+html.theme-transitioning * {
+  transition-property: 
+    background-color, 
+    border-color, 
+    color, 
+    fill, 
+    stroke, 
+    box-shadow, 
+    opacity !important;
+  transition-duration: 350ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Don't animate these during theme switch */
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: none !important;
+}
+
+/* ============================================
+   THEME COLOR MAPPINGS - Comprehensive Coverage
+   ============================================ */
+
+/* === BACKGROUNDS === */
+.bg-primary { background-color: var(--color-bg-primary); }
+.bg-secondary { background-color: var(--color-bg-secondary); }
+.bg-tertiary { background-color: var(--color-bg-tertiary); }
+.bg-elevated { background-color: var(--color-bg-elevated); }
+.bg-hover { background-color: var(--color-bg-hover); }
+
+/* === TEXT === */
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-muted { color: var(--color-text-muted); }
+.text-brand { color: var(--color-brand); }
+
+/* === BORDERS === */
+.border-default { border-color: var(--color-border); }
+.border-subtle { border-color: var(--color-border-subtle); }
+.border-active { border-color: var(--color-border-active); }
+.border-brand { border-color: var(--color-border-brand); }
+
+/* ============================================
+   THEME TOGGLE BUTTON STYLES
+   ============================================ */
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 44px; /* A11y: Touch target */
+  min-height: 44px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  transition: 
+    background-color 250ms ease,
+    border-color 250ms ease,
+    transform 150ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-active);
+  transform: scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Icons positioning */
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon,
+.theme-toggle .icon-auto {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
+  transition: 
+    opacity 300ms ease,
+    transform 300ms ease,
+    color 250ms ease;
+}
+
+/* Dark mode (default): Show sun icon */
+.theme-toggle .icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle .icon-moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+
+.theme-toggle .icon-auto {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+/* Light mode: Show moon icon */
+[data-theme="light"] .theme-toggle .icon-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+
+[data-theme="light"] .theme-toggle .icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Auto mode: Show auto icon */
+[data-theme="auto"] .theme-toggle .icon-sun,
+[data-theme="auto"] .theme-toggle .icon-moon {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+[data-theme="auto"] .theme-toggle .icon-auto {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   THEME SELECTOR (for settings page)
+   ============================================ */
+.theme-selector {
+  display: flex;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-1, 0.25rem);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl, 1.25rem);
+}
+
+.theme-selector-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  min-height: 44px; /* A11y */
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg, 0.9375rem);
+  cursor: pointer;
+  transition: 
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.theme-selector-option:hover {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+.theme-selector-option:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+.theme-selector-option.active {
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+}
+
+.theme-selector-option svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   DARK MODE SPECIFIC ADJUSTMENTS
+   ============================================ */
+
+/* Ensure proper contrast on dark backgrounds */
+[data-theme="dark"] .card,
+:root:not([data-theme]) .card {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .input,
+:root:not([data-theme]) .input {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="dark"] .input::placeholder,
+:root:not([data-theme]) .input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   LIGHT MODE SPECIFIC ADJUSTMENTS
+   ============================================ */
+
+[data-theme="light"] .card {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .input {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+[data-theme="light"] .input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Glass adjustments for light mode */
+[data-theme="light"] .glass {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+/* Scrollbar adjustments */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================
+   TAILWIND-STYLE CLASS OVERRIDES FOR DARK MODE
+   These ensure Tailwind classes work with our theme
+   ============================================ */
+
+/* Background overrides */
+[data-theme="light"] .bg-white\/5,
+[data-theme="light"] .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] .bg-white\/20 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Text overrides */
+[data-theme="light"] .text-white {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .text-white\/90 {
+  color: rgba(26, 25, 24, 0.9) !important;
+}
+
+[data-theme="light"] .text-white\/80,
+[data-theme="light"] .text-white\/70 {
+  color: rgba(26, 25, 24, 0.7) !important;
+}
+
+[data-theme="light"] .text-white\/60,
+[data-theme="light"] .text-white\/50 {
+  color: rgba(26, 25, 24, 0.6) !important;
+}
+
+[data-theme="light"] .text-white\/40,
+[data-theme="light"] .text-white\/30 {
+  color: rgba(26, 25, 24, 0.4) !important;
+}
+
+/* Border overrides */
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Gradient backgrounds for light mode */
+[data-theme="light"] .gradient-bg,
+[data-theme="light"] .bg-gradient-dark {
+  background: linear-gradient(135deg, #f8f7f5 0%, #f0efed 50%, #e8e7e5 100%) !important;
+}
+
+/* ============================================
+   FOCUS STATES - High visibility for both themes
+   ============================================ */
+
+/* Ensure focus ring is visible in both themes */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Alternative focus style for inputs */
+.input:focus-visible,
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px var(--color-bg-primary),
+    0 0 0 4px var(--color-brand);
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transitioning,
+  html.theme-transitioning * {
+    transition: none !important;
+  }
+  
+  .theme-toggle .icon-sun,
+  .theme-toggle .icon-moon,
+  .theme-toggle .icon-auto {
+    transition: opacity 0.01ms !important;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE SUPPORT
+   ============================================ */
+@media (forced-colors: active) {
+  .theme-toggle {
+    border: 2px solid CanvasText;
+  }
+  
+  .theme-selector-option.active {
+    border: 2px solid CanvasText;
+  }
+}
