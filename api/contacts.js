@@ -29,6 +29,16 @@ async function getUserEmail(userId) {
     return data?.user?.email || null;
 }
 
+// Helper to get user profile (display_name, avatar_url) from public.users
+async function getUserProfile(userId) {
+    const { data } = await supabase
+        .from('users')
+        .select('display_name, avatar_url')
+        .eq('id', userId)
+        .single();
+    return data || {};
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -134,9 +144,10 @@ export default async function handler(req, res) {
 
             if (error) throw error;
 
-            // Enrich with emails and mutual status
+            // Enrich with emails, profile info, and mutual status
             const contacts = await Promise.all(data.map(async (c) => {
                 const email = await getUserEmail(c.contact_user_id);
+                const profile = await getUserProfile(c.contact_user_id);
                 
                 // Check if mutual
                 const { data: reverse } = await supabase
@@ -148,7 +159,12 @@ export default async function handler(req, res) {
 
                 return {
                     ...c,
-                    contact: { id: c.contact_user_id, email },
+                    contact: { 
+                        id: c.contact_user_id, 
+                        email,
+                        display_name: profile.display_name || null,
+                        avatar_url: profile.avatar_url || null
+                    },
                     mutual: !!reverse
                 };
             }));

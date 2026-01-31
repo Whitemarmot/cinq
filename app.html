@@ -70,6 +70,27 @@
             gap: 1rem;
         }
         
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
         .user-name {
             font-size: 0.875rem;
             color: var(--color-text-muted);
@@ -167,6 +188,14 @@
             color: white;
             font-weight: 600;
             transition: transform 0.2s;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         @media (max-width: 380px) {
@@ -179,6 +208,100 @@
         
         .contact-slot:hover .contact-avatar {
             transform: scale(1.1);
+        }
+        
+        /* Avatar Upload Styles */
+        .avatar-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .avatar-preview {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .avatar-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-preview-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 50%;
+        }
+        
+        .avatar-preview:hover .avatar-preview-overlay {
+            opacity: 1;
+        }
+        
+        .avatar-upload-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .avatar-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .avatar-upload-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-brand);
+        }
+        
+        .avatar-upload-btn.danger {
+            color: var(--color-error);
+            border-color: transparent;
+            background: var(--color-error-muted);
+        }
+        
+        .avatar-upload-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--color-error);
+        }
+        
+        .avatar-upload-hint {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
         }
         
         .contact-name {
@@ -1108,6 +1231,7 @@
         <header class="app-header" role="banner">
             <div class="app-logo" aria-label="Cinq logo">5</div>
             <div class="user-menu">
+                <div class="user-avatar" id="header-avatar" aria-hidden="true"></div>
                 <span class="user-name" id="user-name" aria-label="Utilisateur connecté"></span>
                 <a href="#mon-compte" class="settings-link" aria-label="Paramètres du compte">
                     <span aria-hidden="true">⚙️</span>
@@ -1151,6 +1275,24 @@
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <!-- Avatar Upload -->
+                    <div class="avatar-upload-container">
+                        <div class="avatar-preview" id="profile-avatar-preview" onclick="document.getElementById('avatar-input').click()">
+                            <span id="avatar-initial">?</span>
+                            <div class="avatar-preview-overlay">📷</div>
+                        </div>
+                        <div class="avatar-upload-actions">
+                            <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
+                            <button type="button" class="avatar-upload-btn" onclick="document.getElementById('avatar-input').click()">
+                                📷 Changer la photo
+                            </button>
+                            <button type="button" class="avatar-upload-btn danger" id="remove-avatar-btn" onclick="removeAvatar()" style="display: none;">
+                                🗑️ Supprimer
+                            </button>
+                            <span class="avatar-upload-hint">JPEG, PNG, GIF, WebP • Max 2 Mo</span>
+                        </div>
+                    </div>
+                    
                     <div>
                         <label style="font-size: 0.75rem; color: var(--color-text-muted); display: block; margin-bottom: 0.25rem;">Pseudo</label>
                         <input type="text" id="profile-display-name" placeholder="Ton pseudo..." maxlength="50"
@@ -1608,13 +1750,19 @@
                 slot.setAttribute('tabindex', '0');
                 
                 if (contact) {
-                    const name = contact.contact?.email?.split('@')[0] || '?';
+                    const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
                     const initial = name.charAt(0).toUpperCase();
+                    const avatarUrl = contact.contact?.avatar_url;
                     const unread = unreadCounts[contact.contact_user_id] || 0;
+                    
+                    // Avatar content: image or initial
+                    const avatarContent = avatarUrl 
+                        ? `<img src="${avatarUrl}" alt="${name}" onerror="this.parentElement.innerHTML='${initial}'">`
+                        : initial;
                     
                     slot.setAttribute('aria-label', `Contact ${name}${unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : ''}. Cliquer pour ouvrir la conversation.`);
                     slot.innerHTML = `
-                        <div class="contact-avatar" aria-hidden="true">${initial}</div>
+                        <div class="contact-avatar" aria-hidden="true">${avatarContent}</div>
                         <div class="contact-name">${name}</div>
                         ${unread > 0 ? `<div class="unread-badge" aria-label="${unread} messages non lus">${unread > 9 ? '9+' : unread}</div>` : ''}
                     `;
@@ -1645,9 +1793,20 @@
             unreadCounts[contact.contact_user_id] = 0;
             renderContacts();
             
-            const name = contact.contact?.email?.split('@')[0] || 'Contact';
+            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
+            const avatarUrl = contact.contact?.avatar_url;
+            const initial = name.charAt(0).toUpperCase();
+            
             document.getElementById('chat-contact-name').textContent = name;
-            document.getElementById('chat-contact-avatar').textContent = name.charAt(0).toUpperCase();
+            
+            // Set chat avatar
+            const chatAvatar = document.getElementById('chat-contact-avatar');
+            if (avatarUrl) {
+                chatAvatar.innerHTML = `<img src="${avatarUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='${initial}'">`;
+            } else {
+                chatAvatar.innerHTML = initial;
+            }
+            
             document.getElementById('chat-panel').classList.add('open');
             document.getElementById('chat-overlay').classList.add('open');
             document.getElementById('chat-input').focus();
@@ -1947,6 +2106,8 @@
         });
 
         // ===== PROFILE MANAGEMENT =====
+        let currentAvatarUrl = null;
+        
         async function loadProfile() {
             try {
                 const res = await fetch(`${API_URL}/user-profile`, { headers: authHeaders() });
@@ -1960,9 +2121,148 @@
                     if (data.profile.display_name) {
                         document.getElementById('user-name').textContent = data.profile.display_name;
                     }
+                    
+                    // Update avatar
+                    updateAvatarDisplay(data.profile.avatar_url, data.profile.display_name || user?.email);
                 }
             } catch (e) {
                 console.error('Load profile error:', e);
+            }
+        }
+        
+        function updateAvatarDisplay(avatarUrl, name) {
+            currentAvatarUrl = avatarUrl;
+            const initial = (name || '?').charAt(0).toUpperCase();
+            
+            // Header avatar
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) {
+                if (avatarUrl) {
+                    headerAvatar.innerHTML = `<img src="${avatarUrl}" alt="Avatar" onerror="this.parentElement.innerHTML='${initial}'">`;
+                } else {
+                    headerAvatar.textContent = initial;
+                }
+            }
+            
+            // Profile preview avatar
+            const profilePreview = document.getElementById('profile-avatar-preview');
+            const avatarInitial = document.getElementById('avatar-initial');
+            const removeBtn = document.getElementById('remove-avatar-btn');
+            
+            if (profilePreview) {
+                if (avatarUrl) {
+                    avatarInitial.style.display = 'none';
+                    // Remove existing img if any
+                    const existingImg = profilePreview.querySelector('img');
+                    if (existingImg) existingImg.remove();
+                    // Add new img
+                    const img = document.createElement('img');
+                    img.src = avatarUrl;
+                    img.alt = 'Avatar';
+                    img.onerror = () => {
+                        img.remove();
+                        avatarInitial.style.display = '';
+                        avatarInitial.textContent = initial;
+                    };
+                    profilePreview.insertBefore(img, profilePreview.firstChild);
+                    if (removeBtn) removeBtn.style.display = '';
+                } else {
+                    const existingImg = profilePreview.querySelector('img');
+                    if (existingImg) existingImg.remove();
+                    avatarInitial.style.display = '';
+                    avatarInitial.textContent = initial;
+                    if (removeBtn) removeBtn.style.display = 'none';
+                }
+            }
+        }
+        
+        async function handleAvatarSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast({ type: 'error', title: 'Format non supporté', message: 'Utilise JPEG, PNG, GIF ou WebP' });
+                return;
+            }
+            
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast({ type: 'error', title: 'Image trop grande', message: 'Taille max: 2 Mo' });
+                return;
+            }
+            
+            // Show loading state
+            const preview = document.getElementById('profile-avatar-preview');
+            const overlay = preview.querySelector('.avatar-preview-overlay');
+            overlay.textContent = '⏳';
+            overlay.style.opacity = '1';
+            
+            try {
+                // Read file as base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                // Upload
+                const res = await fetch(`${API_URL}/upload-avatar`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        image: base64,
+                        contentType: file.type
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur upload');
+                }
+                
+                // Update display
+                updateAvatarDisplay(data.avatar_url, document.getElementById('profile-display-name').value || user?.email);
+                showToast({ type: 'success', title: 'Photo mise à jour !', message: 'Ta nouvelle photo de profil est en ligne' });
+                
+                // Reload contacts to update avatars
+                loadContacts();
+                
+            } catch (e) {
+                console.error('Avatar upload error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            } finally {
+                overlay.textContent = '📷';
+                overlay.style.opacity = '';
+                event.target.value = ''; // Reset input
+            }
+        }
+        
+        async function removeAvatar() {
+            if (!currentAvatarUrl) return;
+            
+            if (!confirm('Supprimer ta photo de profil ?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/upload-avatar`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                updateAvatarDisplay(null, document.getElementById('profile-display-name').value || user?.email);
+                showToast({ type: 'success', title: 'Photo supprimée', message: 'Ta photo de profil a été supprimée' });
+                
+            } catch (e) {
+                console.error('Remove avatar error:', e);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
             }
         }
 
