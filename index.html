@@ -240,6 +240,7 @@
         .five-core {
             position: absolute;
             inset: 0;
+            /* Pentagon-inspired rounded shape */
             border-radius: 50%;
             background: linear-gradient(
                 145deg,
@@ -254,6 +255,32 @@
                 var(--shadow-glow),
                 inset 0 1px 1px rgba(255, 255, 255, 0.06);
             animation: core-breathe 4s ease-in-out infinite;
+        }
+        
+        /* Pentagon glow behind the core */
+        .five-core::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 107, 74, 0.4) 0deg,
+                rgba(255, 138, 106, 0.3) 72deg,
+                rgba(251, 191, 36, 0.2) 144deg,
+                rgba(167, 139, 250, 0.3) 216deg,
+                rgba(255, 107, 74, 0.4) 288deg,
+                rgba(255, 107, 74, 0.4) 360deg
+            );
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            opacity: 0.4;
+            z-index: -1;
+            filter: blur(25px);
+            animation: pentagon-glow 6s ease-in-out infinite;
+        }
+        
+        @keyframes pentagon-glow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
         }
         
         @keyframes core-breathe {
@@ -375,6 +402,28 @@
         .feature-pill:hover .feature-icon {
             stroke: var(--color-brand-light);
             transform: scale(1.1);
+        }
+        
+        /* Pentagon pattern - THE signature */
+        .pentagon-pattern {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+            animation: pentagon-drift 60s linear infinite;
+        }
+        
+        @keyframes pentagon-drift {
+            from { background-position: 0 0; }
+            to { background-position: 60px 60px; }
+        }
+        
+        /* Light mode - softer pentagon pattern */
+        [data-theme="light"] .pentagon-pattern {
+            opacity: 0.015;
         }
 
         /* ===== CTA SECTION ===== */
@@ -858,6 +907,9 @@
     
     <!-- Noise overlay -->
     <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Pentagon pattern - THE signature Rule of Five -->
+    <div class="pentagon-pattern" aria-hidden="true"></div>
     
     <!-- Ambient orbs -->
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>

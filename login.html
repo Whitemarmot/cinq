@@ -54,18 +54,77 @@
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
-            padding: 2rem;
+            padding: 2.5rem;
             width: 100%;
             max-width: 400px;
+            position: relative;
+            box-shadow: 0 24px 48px -8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Gradient border glow on hover */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #a78bfa 100%);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            padding: 1px;
+        }
+        
+        .login-card:hover::before {
+            opacity: 0.4;
+        }
+        
+        /* Top highlight */
+        .login-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            right: 2rem;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+            pointer-events: none;
         }
         .login-logo {
             text-align: center;
             margin-bottom: 2rem;
         }
         .login-logo .five {
-            font-size: 3rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
             font-weight: 700;
-            color: var(--color-brand);
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px rgba(255, 107, 74, 0.35));
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Pentagon glow */
+        .login-logo .five::before {
+            content: '';
+            position: absolute;
+            inset: -30px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 107, 74, 0.3) 0deg,
+                rgba(255, 138, 106, 0.2) 72deg,
+                rgba(251, 191, 36, 0.15) 144deg,
+                rgba(167, 139, 250, 0.2) 216deg,
+                rgba(255, 107, 74, 0.3) 288deg
+            );
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            opacity: 0.5;
+            z-index: -1;
+            filter: blur(20px);
         }
         .login-title {
             font-size: 1.5rem;
@@ -113,21 +172,44 @@
         .submit-btn {
             width: 100%;
             padding: 0.875rem;
-            background: var(--color-brand);
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             margin-top: 1rem;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            box-shadow: 0 2px 12px rgba(255, 107, 74, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        .submit-btn:hover {
-            opacity: 0.9;
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .submit-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 74, 0.35);
+        }
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
         }
         .submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
         }
         .message {
             padding: 0.75rem;
@@ -168,6 +250,43 @@
             color: var(--color-brand);
             text-decoration: none;
         }
+        
+        /* Pentagon pattern */
+        .pentagon-pattern {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-size: 60px 60px;
+        }
+        
+        /* Gradient orbs */
+        .gradient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .gradient-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: #ff6b4a;
+            top: -100px;
+            right: -100px;
+        }
+        
+        .gradient-orb-2 {
+            width: 300px;
+            height: 300px;
+            background: #a78bfa;
+            bottom: -50px;
+            left: -50px;
+        }
     </style>
 </head>
 <body>
@@ -175,6 +294,13 @@
     <a href="#login-form" class="skip-link">Aller au formulaire de connexion</a>
     
     <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Pentagon pattern - THE signature Rule of Five -->
+    <div class="pentagon-pattern" aria-hidden="true"></div>
+    
+    <!-- Ambient orbs -->
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
 
     <main id="main-content">
     <div class="login-container">
