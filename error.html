@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oups — Quelque chose s'est cassé | Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Une erreur s'est produite. Même les meilleurs anti-réseaux ont parfois des bugs.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>5️⃣</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        .glow {
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.3);
+        }
+        
+        .glow-error {
+            box-shadow: 0 0 60px rgba(239, 68, 68, 0.3);
+        }
+        
+        .circle {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        .glitch:hover {
+            animation: glitch 0.3s ease-in-out;
+        }
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .spin-slow {
+            animation: spin-slow 20s linear infinite;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .circle, .spin-slow {
+                animation: none !important;
+            }
+            .glitch:hover {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- Cercles décoratifs - légèrement rougeâtres pour l'erreur -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="circle absolute -top-20 -left-20 w-96 h-96 bg-red-500/10 rounded-full blur-3xl"></div>
+        <div class="circle absolute top-1/2 -right-32 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" style="animation-delay: -2s;"></div>
+        <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
+    </div>
+
+    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center">
+        
+        <!-- Icône erreur -->
+        <div class="mb-8">
+            <div class="w-24 h-24 rounded-full border-4 border-red-400/30 flex items-center justify-center glow-error bg-red-500/10 backdrop-blur glitch cursor-default">
+                <span class="text-5xl">⚡</span>
+            </div>
+        </div>
+
+        <!-- Message principal -->
+        <h1 class="text-2xl md:text-4xl font-bold mb-4">
+            Oups, quelque chose s'est cassé
+        </h1>
+        
+        <p class="text-lg md:text-xl text-white/70 mb-4 max-w-md">
+            Même les anti-réseaux ont parfois des bugs.<br>
+            <span class="text-indigo-400">Au moins, on n'a que 5 utilisateurs à décevoir.</span>
+        </p>
+        
+        <p class="text-white/40 mb-8 max-w-sm">
+            Notre équipe de 1 personne est probablement déjà dessus. Ou en train de dormir. C'est 50/50.
+        </p>
+
+        <!-- Code d'erreur (optionnel, injecté par le serveur) -->
+        <div id="error-code" class="mb-8 px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white/30 text-sm font-mono hidden">
+            <!-- Sera rempli par JS si disponible -->
+        </div>
+
+        <!-- CTA -->
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a 
+                href="/"
+                class="px-8 py-4 bg-indigo-500 hover:bg-indigo-400 rounded-xl font-semibold text-lg transition transform hover:scale-105 active:scale-95 glow"
+            >
+                ← Retour à l'accueil
+            </a>
+            <button 
+                onclick="window.location.reload()"
+                class="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold text-lg transition transform hover:scale-105 active:scale-95"
+            >
+                🔄 Réessayer
+            </button>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="mt-12 p-6 bg-white/5 rounded-xl border border-white/10 max-w-md">
+            <p class="text-white/60 text-sm mb-3">En attendant, tu peux :</p>
+            <ul class="text-white/40 text-sm space-y-2">
+                <li>📱 Appeler un de tes 5 (IRL, pas sur l'app)</li>
+                <li>☕ Te faire un café</li>
+                <li>🧘 Profiter de cette pause forcée</li>
+            </ul>
+        </div>
+
+        <!-- Easter egg -->
+        <p class="mt-12 text-white/20 text-sm italic">
+            "La friction est le feature" — même quand c'est pas voulu.
+        </p>
+
+    </main>
+
+    <script>
+        // Affiche le code d'erreur si présent dans l'URL
+        const params = new URLSearchParams(window.location.search);
+        const errorCode = params.get('code') || params.get('error');
+        if (errorCode) {
+            const errorDiv = document.getElementById('error-code');
+            errorDiv.textContent = `Code: ${errorCode}`;
+            errorDiv.classList.remove('hidden');
+        }
+    </script>
+
+</body>
+</html>
