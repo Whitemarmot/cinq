@@ -47,13 +47,18 @@ exports.handler = async (event, context) => {
             authMethod = 'stripe_webhook';
         }
         
-        // Option 2: Bearer token admin
+        // Option 2: Bearer token admin (timing-safe comparison)
         if (authHeader.startsWith('Bearer ')) {
             const token = authHeader.slice(7);
             const adminSecret = process.env.GIFT_ADMIN_SECRET;
-            if (token === adminSecret) {
-                isAuthenticated = true;
-                authMethod = 'admin_token';
+            if (adminSecret && token.length === adminSecret.length) {
+                const crypto = require('crypto');
+                const tokenBuf = Buffer.from(token);
+                const secretBuf = Buffer.from(adminSecret);
+                if (crypto.timingSafeEqual(tokenBuf, secretBuf)) {
+                    isAuthenticated = true;
+                    authMethod = 'admin_token';
+                }
             }
         }
         

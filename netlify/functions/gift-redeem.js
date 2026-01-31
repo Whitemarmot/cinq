@@ -66,6 +66,7 @@ exports.handler = async (event, context) => {
             code: rawCode,
             order_id,
             user_id,
+            email,  // Support frontend redeem flow with email
         } = body;
 
         // Normaliser le code
@@ -77,8 +78,12 @@ exports.handler = async (event, context) => {
             return error('Invalid gift code format', 400);
         }
 
-        if (!order_id) {
-            return error('order_id is required', 400);
+        // Accept either order_id or email for redemption
+        // email is used by frontend redeem flow (account creation)
+        // order_id is used by backend/webhook flow
+        const redemptionRef = order_id || email;
+        if (!redemptionRef) {
+            return error('order_id or email is required', 400);
         }
 
         // ============================================
@@ -141,8 +146,8 @@ exports.handler = async (event, context) => {
             .update({
                 status: 'redeemed',
                 redeemed_at: new Date().toISOString(),
-                redeemed_by: user_id || null,
-                redeemed_order_id: order_id,
+                redeemed_by: user_id || email || null,
+                redeemed_order_id: order_id || `email:${email}`,
             })
             .eq('id', giftCode.id)
             .eq('status', 'active') // Condition atomique
@@ -163,7 +168,7 @@ exports.handler = async (event, context) => {
         await supabase.rpc('reset_gift_code_rate_limit', { client_ip: clientIP });
         await logAttempt(supabase, clientIP, codeHash, true, null);
 
-        console.log(`Gift code redeemed: ${extractPrefix(code)}**** - ${updated.amount_cents} ${updated.currency} - Order: ${order_id}`);
+        console.log(`Gift code redeemed: ${extractPrefix(code)}**** - ${updated.amount_cents} ${updated.currency} - Ref: ${redemptionRef}`);
 
         return success({
             redemption: {
@@ -174,7 +179,8 @@ exports.handler = async (event, context) => {
                 },
                 currency: updated.currency,
                 redeemed_at: updated.redeemed_at,
-                order_id: order_id,
+                order_id: order_id || null,
+                email: email || null,
             },
             discount: {
                 type: 'fixed_amount',

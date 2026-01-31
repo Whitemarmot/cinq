@@ -26,8 +26,8 @@ exports.handler = async (event, context) => {
         return { statusCode: 204, headers, body: '' };
     }
 
-    // GET only
-    if (event.httpMethod !== 'GET') {
+    // GET or POST
+    if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
         return error('Method not allowed', 405);
     }
 
@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
         }
 
         // ============================================
-        // Extract Code from Path
+        // Extract Code from Path, Query, or Body
         // ============================================
         
         // Path: /.netlify/functions/gift-verify/CINQ-XXXX-XXXX-XXXX
@@ -60,7 +60,18 @@ exports.handler = async (event, context) => {
         // Aussi accepter en query param
         const queryCode = event.queryStringParameters?.code;
         
-        const codeToVerify = rawCode && rawCode !== 'gift-verify' ? rawCode : queryCode;
+        // Aussi accepter en body JSON (pour POST depuis frontend)
+        let bodyCode = null;
+        if (event.httpMethod === 'POST' && event.body) {
+            try {
+                const body = JSON.parse(event.body);
+                bodyCode = body.code;
+            } catch (e) {
+                // Ignore parse errors, try other methods
+            }
+        }
+        
+        const codeToVerify = bodyCode || (rawCode && rawCode !== 'gift-verify' ? rawCode : queryCode);
 
         if (!codeToVerify) {
             return error('Code parameter is required', 400);
