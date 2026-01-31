@@ -20,8 +20,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Mobile Responsive Fixes -->
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.css">
     <link rel="stylesheet" href="/css/mobile-responsive.css">
+    
+    <!-- Theme initialization (before body to prevent flash) -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('cinq_theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('cinq_theme', next);
+        }
+    </script>
     
     <style>
         body { font-family: 'Inter', sans-serif; }
