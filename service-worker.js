@@ -97,11 +97,13 @@ const DYNAMIC_CACHE = `${CACHE_PREFIX}-dynamic-v5`;
 const IMAGE_CACHE = `${CACHE_PREFIX}-images-v3`;
 const FONT_CACHE = `${CACHE_PREFIX}-fonts-v3`;
 const API_CACHE = `${CACHE_PREFIX}-api-v1`;
+const CONVERSATION_CACHE = `${CACHE_PREFIX}-conversations-v1`;
 
 // Maximum cache sizes
 const MAX_DYNAMIC_CACHE = 50;
 const MAX_IMAGE_CACHE = 30;
 const MAX_API_CACHE = 20;
+const MAX_CONVERSATION_CACHE = 10;
 
 // API endpoint patterns
 const API_BASE = '/.netlify/functions';
@@ -324,7 +326,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   console.log(`[SW ${SW_VERSION}] Activating...`);
   
-  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE, FONT_CACHE, API_CACHE];
+  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE, FONT_CACHE, API_CACHE, CONVERSATION_CACHE];
   
   event.waitUntil(
     (async () => {
@@ -469,6 +471,11 @@ async function handleFetch(event) {
   const url = new URL(request.url);
 
   try {
+    // Conversation API calls - Special cache strategy
+    if ((url.pathname.startsWith('/api/messages') || url.pathname.includes('/messages')) && url.searchParams.has('contact_id')) {
+      return await staleWhileRevalidate(request, CONVERSATION_CACHE);
+    }
+
     // API calls - Network first with cache fallback
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith(API_BASE) || url.hostname.includes(SUPABASE_URL)) {
       return await networkFirst(request, API_CACHE, 5000);
@@ -838,8 +845,12 @@ self.addEventListener('push', (event) => {
   };
 
   // Update app badge
-  if ('setAppBadge' in navigator && data.badgeCount) {
-    navigator.setAppBadge(data.badgeCount).catch(() => {});
+  if ('setAppBadge' in navigator) {
+    if (data.badgeCount && data.badgeCount > 0) {
+      navigator.setAppBadge(data.badgeCount).catch(() => {});
+    } else if (data.clearBadge) {
+      navigator.clearAppBadge().catch(() => {});
+    }
   }
 
   event.waitUntil(
@@ -973,6 +984,38 @@ self.addEventListener('message', (event) => {
         const messages = await getPendingMessages();
         event.ports[0]?.postMessage({ count: messages.length });
       })();
+      break;
+      
+    case 'UPDATE_BADGE':
+      if ('setAppBadge' in navigator) {
+        const count = data?.count || 0;
+        if (count > 0) {
+          navigator.setAppBadge(count).catch(() => {});
+        } else {
+          navigator.clearAppBadge().catch(() => {});
+        }
+      }
+      event.ports[0]?.postMessage({ success: true });
+      break;
+      
+    case 'PRELOAD_CONVERSATIONS':
+      // Preload conversation data for better offline experience
+      if (data?.contactIds && Array.isArray(data.contactIds)) {
+        (async () => {
+          const cache = await caches.open(API_CACHE);
+          for (const contactId of data.contactIds) {
+            try {
+              const response = await fetch(`${API_BASE}/messages?contact_id=${contactId}&limit=50`);
+              if (response.ok) {
+                await cache.put(`${API_BASE}/messages?contact_id=${contactId}`, response.clone());
+              }
+            } catch (e) {
+              console.warn('[SW] Failed to preload conversation:', contactId);
+            }
+          }
+          event.ports[0]?.postMessage({ success: true });
+        })();
+      }
       break;
   }
 });

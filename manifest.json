@@ -6,6 +6,7 @@
   "id": "/app.html",
   "display": "standalone",
   "display_override": [
+    "window-controls-overlay",
     "standalone",
     "minimal-ui"
   ],
@@ -90,7 +91,7 @@
   ],
   "screenshots": [
     {
-      "src": "/assets/og/og-image.png",
+      "src": "/assets/screenshots/desktop-feed.png",
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
@@ -119,9 +120,9 @@
       "url": "/app.html?action=ping",
       "icons": [
         {
-          "src": "/assets/icons/icon-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
+          "src": "/assets/icons/icon-ping.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -135,6 +136,45 @@
           "src": "/assets/icons/icon-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Chat avec mes proches",
+      "short_name": "Chat",
+      "description": "Accès direct aux conversations",
+      "url": "/app.html?view=chat",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Anniversaires",
+      "short_name": "Anniversaires",
+      "description": "Voir les anniversaires de mes proches",
+      "url": "/birthdays.html?source=shortcut",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-gift.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Moments partagés",
+      "short_name": "Moments",
+      "description": "Voir les derniers moments partagés",
+      "url": "/app.html?view=moments",
+      "icons": [
+        {
+          "src": "/assets/icons/icon-moment.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
         }
       ]
     }
@@ -165,5 +205,26 @@
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "file_handlers": [
+    {
+      "action": "/app.html?action=share",
+      "accept": {
+        "image/*": [
+          ".png",
+          ".jpg",
+          ".jpeg",
+          ".webp",
+          ".gif"
+        ],
+        "text/*": [
+          ".txt"
+        ]
+      }
+    }
+  ],
+  "capture_links": "existing-client-navigate",
+  "version": "1.0.0",
+  "last_updated": "2026-02-01T08:26:28.783Z",
+  "badge": "/assets/icons/icon-72x72.png"
 }

@@ -1,6 +1,182 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- PWA Meta Tags Optimisées -->
+<!-- À injecter dans la section <head> de vos pages HTML -->
+
+<!-- iOS Safari PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cinq">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<!-- iOS Splash Screens -->
+<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-430x932.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-393x852.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-428x926.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-390x844.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-375x812.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-414x896.png">
+
+<!-- iOS Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-180x180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/assets/icons/icon-167x167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/icon-120x120.png">
+
+<!-- Windows Metro -->
+<meta name="msapplication-TileColor" content="#0a0a0b">
+<meta name="msapplication-TileImage" content="/assets/icons/icon-144x144.png">
+<meta name="msapplication-navbutton-color" content="#0a0a0b">
+
+<!-- Performance hints -->
+<link rel="preload" href="/css/critical.min.css" as="style">
+<link rel="preload" href="/js/app.min.js" as="script">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- PWA Install prompts -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Cinq">
+
+<!-- Chrome Android -->
+<meta name="theme-color" content="#0a0a0b">
+<meta name="color-scheme" content="dark light">
+
+<!-- Edge Pinned Sites -->
+<meta name="msapplication-config" content="/browserconfig.xml">
+
+<!-- Focus ring for accessibility -->
+<style>
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* PWA splash screen styles */
+.pwa-splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0a0a0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.pwa-splash.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pwa-splash-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+}
+
+.pwa-splash-text {
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.pwa-splash-subtitle {
+  color: #9ca3af;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  text-align: center;
+  max-width: 280px;
+}
+
+/* Loading animation */
+.pwa-loading {
+  margin-top: 32px;
+  width: 40px;
+  height: 40px;
+  border: 3px solid #374151;
+  border-top: 3px solid #6366f1;
+  border-radius: 50%;
+  animation: pwa-spin 1s linear infinite;
+}
+
+@keyframes pwa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+// PWA Splash Screen Management
+window.addEventListener('DOMContentLoaded', () => {
+  // Create splash screen if not exists
+  if (!document.querySelector('.pwa-splash')) {
+    const splash = document.createElement('div');
+    splash.className = 'pwa-splash';
+    splash.innerHTML = `
+      <img src="/assets/icons/icon-192x192.png" alt="Cinq" class="pwa-splash-logo">
+      <div class="pwa-splash-text">Cinq</div>
+      <div class="pwa-splash-subtitle">L'anti-réseau social</div>
+      <div class="pwa-loading"></div>
+    `;
+    document.body.appendChild(splash);
+    
+    // Hide splash when app is ready
+    setTimeout(() => {
+      splash.classList.add('hidden');
+      setTimeout(() => splash.remove(), 300);
+    }, 1500);
+  }
+});
+
+// PWA Install Banner
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Show install button/banner
+  const installBtn = document.querySelector('#pwa-install-btn');
+  if (installBtn) {
+    installBtn.style.display = 'block';
+  }
+});
+
+// Badge API Support
+if ('setAppBadge' in navigator) {
+  // Function to update badge from app
+  window.updateAppBadge = (count) => {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      const channel = new MessageChannel();
+      navigator.serviceWorker.controller.postMessage({
+        type: 'UPDATE_BADGE',
+        data: { count }
+      }, [channel.port2]);
+    }
+  };
+  
+  // Clear badge on focus
+  window.addEventListener('focus', () => {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      const channel = new MessageChannel();
+      navigator.serviceWorker.controller.postMessage({
+        type: 'UPDATE_BADGE',
+        data: { count: 0 }
+      }, [channel.port2]);
+    }
+  });
+}
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Offrir Cinq — L'anti-réseau social</title>
