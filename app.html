@@ -2215,6 +2215,218 @@
             color: var(--color-warning, #fbbf24);
         }
         
+        /* Chat mute button */
+        .chat-mute-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .chat-mute-btn:hover {
+            background: var(--color-error-muted, rgba(248, 113, 113, 0.1));
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .chat-mute-btn.muted {
+            background: var(--color-error-muted, rgba(248, 113, 113, 0.1));
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .chat-mute-btn .mute-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 10px;
+            background: var(--color-error);
+            color: white;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        
+        /* Contact slot mute indicator */
+        .contact-muted-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            font-size: 12px;
+            background: var(--color-error-muted, rgba(248, 113, 113, 0.15));
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        
+        /* Mute Modal */
+        .mute-modal {
+            max-width: 340px;
+        }
+        
+        .mute-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            margin: var(--space-4) 0;
+        }
+        
+        .mute-option-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            transition: all 0.2s;
+        }
+        
+        .mute-option-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            transform: translateX(4px);
+        }
+        
+        .mute-option-btn:active {
+            transform: translateX(2px) scale(0.98);
+        }
+        
+        .mute-option-btn.selected {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .mute-option-btn svg {
+            color: var(--color-text-muted);
+            transition: color 0.2s;
+        }
+        
+        .mute-option-btn:hover svg,
+        .mute-option-btn.selected svg {
+            color: var(--color-brand);
+        }
+        
+        .mute-current-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: var(--color-error-muted, rgba(248, 113, 113, 0.1));
+            border: 1px solid var(--color-error);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--color-error);
+        }
+        
+        .mute-current-status.hidden {
+            display: none;
+        }
+        
+        /* Chat private note button */
+        .chat-note-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .chat-note-btn:hover {
+            background: var(--color-primary-muted, rgba(139, 92, 246, 0.1));
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .chat-note-btn.has-note {
+            background: var(--color-primary-muted, rgba(139, 92, 246, 0.1));
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        
+        .chat-note-btn .note-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .chat-note-btn.has-note .note-indicator {
+            display: block;
+        }
+        
+        /* Private note modal content */
+        .private-note-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-tertiary);
+            color: var(--color-text);
+            font-family: inherit;
+            font-size: var(--text-base);
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .private-note-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-muted, rgba(139, 92, 246, 0.2));
+        }
+        
+        .private-note-textarea::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .private-note-hint {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-top: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .private-note-hint svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+        
         /* ===== SUGGESTIONS SECTION ===== */
         .suggestions-section {
             margin-top: var(--space-6);
@@ -5743,7 +5955,300 @@
                 padding-left: 44px;
             }
         }
+        
+        /* ===== SCHEDULED MESSAGES ===== */
+        .schedule-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .schedule-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .schedule-btn.has-scheduled::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-brand);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .scheduled-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            background: var(--color-brand);
+            border-radius: var(--radius-full);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        
+        .schedule-modal {
+            max-width: 400px;
+        }
+        
+        .schedule-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+        
+        .schedule-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        
+        .schedule-input-group label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .schedule-input {
+            width: 100%;
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text);
+            font-size: var(--text-base);
+            transition: all 0.2s;
+        }
+        
+        .schedule-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            background: var(--color-bg-secondary);
+        }
+        
+        .schedule-textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .schedule-datetime {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3);
+        }
+        
+        .schedule-quick-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-top: var(--space-2);
+        }
+        
+        .schedule-quick-btn {
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .schedule-quick-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .scheduled-list-section {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .scheduled-list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+        }
+        
+        .scheduled-list-title {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .scheduled-list-title svg {
+            color: var(--color-brand);
+        }
+        
+        .scheduled-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .scheduled-list:empty::before {
+            content: 'Aucun message programmé';
+            display: block;
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            padding: var(--space-4);
+        }
+        
+        .scheduled-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            transition: all 0.2s;
+        }
+        
+        .scheduled-item:hover {
+            border-color: var(--color-border-active);
+        }
+        
+        .scheduled-item-icon {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-brand);
+        }
+        
+        .scheduled-item-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .scheduled-item-message {
+            font-size: var(--text-sm);
+            color: var(--color-text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 2px;
+        }
+        
+        .scheduled-item-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .scheduled-item-contact {
+            font-weight: 500;
+            color: var(--color-brand);
+        }
+        
+        .scheduled-item-time {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .scheduled-item-delete {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .scheduled-item-delete:hover {
+            background: var(--color-error-muted, rgba(239, 68, 68, 0.1));
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        /* Floating scheduled messages indicator in chat */
+        .chat-scheduled-indicator {
+            display: none;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-brand-muted);
+            border: 1px solid var(--color-brand);
+            border-radius: var(--radius-lg);
+            margin: var(--space-2) var(--space-4);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .chat-scheduled-indicator.visible {
+            display: flex;
+        }
+        
+        .chat-scheduled-indicator:hover {
+            background: var(--color-brand);
+            color: white;
+        }
+        
+        .chat-scheduled-indicator svg {
+            color: var(--color-brand);
+        }
+        
+        .chat-scheduled-indicator:hover svg {
+            color: white;
+        }
+        
+        .chat-scheduled-text {
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-brand);
+        }
+        
+        .chat-scheduled-indicator:hover .chat-scheduled-text {
+            color: white;
+        }
     </style>
+    
+    <!-- Confetti celebrations -->
+    <script src="/js/confetti.js"></script>
 </head>
 <body>
     <!-- Skip Links - WCAG AAA Compliant -->
@@ -6200,10 +6705,23 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <button class="chat-mute-btn" id="chat-mute-btn" onclick="openMuteModal()" type="button" aria-label="Mettre en sourdine" title="Sourdine">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="mute-icon">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                        <line x1="23" y1="9" x2="17" y2="15"/>
+                        <line x1="17" y1="9" x2="23" y2="15"/>
+                    </svg>
+                </button>
                 <button class="chat-archive-btn" id="chat-archive-btn" onclick="toggleArchiveContact()" type="button" aria-label="Archiver cette conversation" title="Archiver">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
                     </svg>
+                </button>
+                <button class="chat-note-btn" id="chat-note-btn" onclick="openPrivateNoteModal()" type="button" aria-label="Note privée" title="Note privée">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span class="note-indicator"></span>
                 </button>
                 <button class="chat-header-pin-btn" id="chat-pin-btn" onclick="togglePinnedMessagesSection()" type="button" aria-label="Messages épinglés" aria-expanded="false">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -6364,11 +6882,88 @@
                     </svg>
                 </button>
             </div>
+            <button class="schedule-btn" id="schedule-btn" onclick="openScheduleModal()" type="button" aria-label="Programmer un message" title="Programmer un message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span class="scheduled-count" id="scheduled-count" style="display: none;">0</span>
+            </button>
             <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled type="button" aria-label="Envoyer le message">
                 <span aria-hidden="true">→</span>
             </button>
         </div>
         <div class="voice-cancel-hint" id="voice-cancel-hint">Relâche pour annuler</div>
+        <!-- Scheduled Messages Indicator -->
+        <div class="chat-scheduled-indicator" id="chat-scheduled-indicator" onclick="openScheduleModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="chat-scheduled-text" id="chat-scheduled-text">1 message programmé</span>
+        </div>
+    </div>
+    
+    <!-- Schedule Message Modal -->
+    <div class="modal-overlay" id="schedule-modal" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title" aria-hidden="true">
+        <div class="modal schedule-modal">
+            <h2 class="modal-title" id="schedule-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 8px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Programmer un message
+            </h2>
+            
+            <div class="schedule-form">
+                <div class="schedule-input-group">
+                    <label for="schedule-message">Message</label>
+                    <textarea class="schedule-input schedule-textarea" id="schedule-message" placeholder="Écris ton message ici..." maxlength="500"></textarea>
+                </div>
+                
+                <div class="schedule-input-group">
+                    <label>Envoyer le</label>
+                    <div class="schedule-datetime">
+                        <input type="date" class="schedule-input" id="schedule-date">
+                        <input type="time" class="schedule-input" id="schedule-time">
+                    </div>
+                    <div class="schedule-quick-btns">
+                        <button class="schedule-quick-btn" onclick="setQuickSchedule('1h')" type="button">Dans 1h</button>
+                        <button class="schedule-quick-btn" onclick="setQuickSchedule('3h')" type="button">Dans 3h</button>
+                        <button class="schedule-quick-btn" onclick="setQuickSchedule('tomorrow-9')" type="button">Demain 9h</button>
+                        <button class="schedule-quick-btn" onclick="setQuickSchedule('tomorrow-20')" type="button">Demain 20h</button>
+                    </div>
+                </div>
+                
+                <button class="save-btn btn-ripple glow-hover" style="width:100%;" onclick="scheduleMessage()" id="schedule-submit-btn" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Programmer
+                </button>
+            </div>
+            
+            <!-- Scheduled Messages List -->
+            <div class="scheduled-list-section" id="scheduled-list-section">
+                <div class="scheduled-list-header">
+                    <div class="scheduled-list-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        Messages programmés
+                    </div>
+                </div>
+                <div class="scheduled-list" id="scheduled-list" role="list">
+                    <!-- Scheduled messages will be rendered here -->
+                </div>
+            </div>
+            
+            <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeScheduleModal()" type="button">Fermer</button>
+        </div>
     </div>
     
     <!-- Gift Modal -->
@@ -6467,6 +7062,35 @@
             </div>
             <input type="hidden" id="reminder-message-id">
             <input type="hidden" id="reminder-selected-time">
+        </div>
+    </div>
+
+    <!-- Private Note Modal -->
+    <div class="modal-overlay" id="private-note-modal" role="dialog" aria-modal="true" aria-labelledby="private-note-modal-title" aria-hidden="true">
+        <div class="modal">
+            <h2 class="modal-title" id="private-note-modal-title">
+                <span aria-hidden="true">📝</span>
+                Note privée
+            </h2>
+            <p id="private-note-contact-name" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);"></p>
+            <textarea 
+                id="private-note-textarea" 
+                class="private-note-textarea" 
+                placeholder="Ajoute une note personnelle sur ce contact... (anniversaire, préférences, ce que tu veux retenir...)"
+                maxlength="1000"
+            ></textarea>
+            <div class="private-note-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>Cette note est privée et visible uniquement par toi.</span>
+            </div>
+            <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4);">
+                <button class="modal-btn secondary" onclick="closePrivateNoteModal()" type="button">Annuler</button>
+                <button class="modal-btn primary" id="save-private-note-btn" onclick="savePrivateNote()" type="button">
+                    <span aria-hidden="true">💾</span> Enregistrer
+                </button>
+            </div>
         </div>
     </div>
 
@@ -7726,6 +8350,89 @@
             }
         }
 
+        // ===== PRIVATE NOTES =====
+        function openPrivateNoteModal() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('private-note-modal');
+            const textarea = document.getElementById('private-note-textarea');
+            const contactNameEl = document.getElementById('private-note-contact-name');
+            
+            const name = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            contactNameEl.textContent = `Note sur ${name}`;
+            
+            // Load existing note
+            textarea.value = currentChatContact.private_note || '';
+            
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            setTimeout(() => textarea.focus(), 100);
+        }
+        
+        function closePrivateNoteModal() {
+            const modal = document.getElementById('private-note-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        async function savePrivateNote() {
+            if (!currentChatContact) return;
+            
+            const textarea = document.getElementById('private-note-textarea');
+            const noteValue = textarea.value.trim();
+            const contactId = currentChatContact.id;
+            const name = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}&action=note`, {
+                    method: 'PATCH',
+                    headers: {
+                        ...authHeaders(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ private_note: noteValue || null })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la sauvegarde');
+                }
+                
+                // Update local contact data
+                currentChatContact.private_note = data.private_note;
+                
+                // Update contacts array
+                const contactIndex = contacts.findIndex(c => c.id === contactId);
+                if (contactIndex !== -1) {
+                    contacts[contactIndex].private_note = data.private_note;
+                }
+                
+                // Update note button state
+                updateNoteButtonState();
+                
+                closePrivateNoteModal();
+                showToast({ 
+                    type: 'success', 
+                    message: noteValue ? 'Note enregistrée 📝' : 'Note supprimée',
+                    duration: 2000 
+                });
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        function updateNoteButtonState() {
+            const noteBtn = document.getElementById('chat-note-btn');
+            if (!noteBtn || !currentChatContact) return;
+            
+            const hasNote = !!currentChatContact.private_note;
+            noteBtn.classList.toggle('has-note', hasNote);
+            noteBtn.setAttribute('title', hasNote ? 'Note privée (1)' : 'Note privée');
+        }
+
         function renderContacts() {
             const grid = document.getElementById('contacts-grid');
             grid.innerHTML = '';
@@ -8348,6 +9055,9 @@
             archiveBtn.classList.toggle('archived', isArchived);
             archiveBtn.setAttribute('aria-label', isArchived ? 'Désarchiver cette conversation' : 'Archiver cette conversation');
             archiveBtn.setAttribute('title', isArchived ? 'Désarchiver' : 'Archiver');
+            
+            // Update private note button state
+            updateNoteButtonState();
             
             // Show quick replies when chat opens
             showQuickReplies();
@@ -10843,8 +11553,23 @@
                 if (!res.ok) throw new Error(data.error || 'Erreur');
 
                 closeAddContactModal();
-                showToast({ type: 'success', title: 'Contact ajouté !', message: 'Dis-lui bonjour 👋' });
-                loadContacts();
+                
+                // Check if this is the 5th contact BEFORE loading (current contacts + 1)
+                const willBeFifthContact = contacts.length === 4;
+                
+                await loadContacts();
+                
+                // 🎊 Celebrate 5th contact with confetti!
+                if (willBeFifthContact && window.CinqConfetti) {
+                    const wasFifth = await CinqConfetti.triggerFifthContactIfNeeded();
+                    if (wasFifth) {
+                        showToast({ type: 'success', title: '🎊 Cercle complet !', message: 'Tu as tes 5 proches !' });
+                    } else {
+                        showToast({ type: 'success', title: 'Contact ajouté !', message: 'Dis-lui bonjour 👋' });
+                    }
+                } else {
+                    showToast({ type: 'success', title: 'Contact ajouté !', message: 'Dis-lui bonjour 👋' });
+                }
                 
                 // Onboarding: check progress after adding contact
                 setTimeout(() => {
@@ -11574,6 +12299,373 @@
         }
         
         initMobileKeyboard();
+        
+        // ===== SCHEDULED MESSAGES =====
+        const SCHEDULED_MESSAGES_KEY = 'cinq_scheduled_messages';
+        let scheduledMessages = [];
+        let scheduledCheckInterval = null;
+        
+        function loadScheduledMessages() {
+            try {
+                const stored = localStorage.getItem(SCHEDULED_MESSAGES_KEY);
+                scheduledMessages = stored ? JSON.parse(stored) : [];
+                // Filter out expired messages that weren't sent
+                const now = Date.now();
+                scheduledMessages = scheduledMessages.filter(m => m.scheduledAt > now - 60000);
+                saveScheduledMessages();
+            } catch (e) {
+                console.error('Error loading scheduled messages:', e);
+                scheduledMessages = [];
+            }
+            updateScheduledUI();
+        }
+        
+        function saveScheduledMessages() {
+            try {
+                localStorage.setItem(SCHEDULED_MESSAGES_KEY, JSON.stringify(scheduledMessages));
+            } catch (e) {
+                console.error('Error saving scheduled messages:', e);
+            }
+        }
+        
+        function updateScheduledUI() {
+            // Update button badge
+            const countEl = document.getElementById('scheduled-count');
+            const btn = document.getElementById('schedule-btn');
+            const count = scheduledMessages.length;
+            
+            if (count > 0) {
+                countEl.textContent = count;
+                countEl.style.display = 'flex';
+                btn.classList.add('has-scheduled');
+            } else {
+                countEl.style.display = 'none';
+                btn.classList.remove('has-scheduled');
+            }
+            
+            // Update chat indicator for current contact
+            updateChatScheduledIndicator();
+            
+            // Render scheduled list in modal
+            renderScheduledList();
+        }
+        
+        function updateChatScheduledIndicator() {
+            const indicator = document.getElementById('chat-scheduled-indicator');
+            const textEl = document.getElementById('chat-scheduled-text');
+            
+            if (!currentChatContact || !indicator) return;
+            
+            const contactScheduled = scheduledMessages.filter(
+                m => m.contactId === currentChatContact.contact_user_id
+            );
+            
+            if (contactScheduled.length > 0) {
+                indicator.classList.add('visible');
+                textEl.textContent = contactScheduled.length === 1 
+                    ? '1 message programmé' 
+                    : `${contactScheduled.length} messages programmés`;
+            } else {
+                indicator.classList.remove('visible');
+            }
+        }
+        
+        function renderScheduledList() {
+            const list = document.getElementById('scheduled-list');
+            if (!list) return;
+            
+            if (scheduledMessages.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            // Sort by scheduled time
+            const sorted = [...scheduledMessages].sort((a, b) => a.scheduledAt - b.scheduledAt);
+            
+            list.innerHTML = sorted.map(msg => {
+                const date = new Date(msg.scheduledAt);
+                const dateStr = formatScheduledDate(date);
+                const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const contactName = msg.contactName || 'Contact';
+                const preview = msg.content.length > 40 ? msg.content.substring(0, 40) + '…' : msg.content;
+                
+                return `
+                    <div class="scheduled-item" role="listitem">
+                        <div class="scheduled-item-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <div class="scheduled-item-content">
+                            <div class="scheduled-item-message">${escapeHtml(preview)}</div>
+                            <div class="scheduled-item-meta">
+                                <span class="scheduled-item-contact">→ ${escapeHtml(contactName)}</span>
+                                <span class="scheduled-item-time">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                    </svg>
+                                    ${dateStr} ${timeStr}
+                                </span>
+                            </div>
+                        </div>
+                        <button class="scheduled-item-delete" onclick="deleteScheduledMessage('${msg.id}')" type="button" aria-label="Supprimer">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatScheduledDate(date) {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (date.toDateString() === now.toDateString()) {
+                return "Aujourd'hui";
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return "Demain";
+            } else {
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            }
+        }
+        
+        function openScheduleModal() {
+            const modal = document.getElementById('schedule-modal');
+            const messageInput = document.getElementById('schedule-message');
+            const dateInput = document.getElementById('schedule-date');
+            const timeInput = document.getElementById('schedule-time');
+            
+            // Pre-fill message from chat input if available
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput && chatInput.value.trim()) {
+                messageInput.value = chatInput.value.trim();
+            } else {
+                messageInput.value = '';
+            }
+            
+            // Set default date/time (1 hour from now)
+            const defaultTime = new Date(Date.now() + 60 * 60 * 1000);
+            dateInput.value = defaultTime.toISOString().split('T')[0];
+            timeInput.value = defaultTime.toTimeString().slice(0, 5);
+            
+            // Set minimum date to today
+            dateInput.min = new Date().toISOString().split('T')[0];
+            
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            messageInput.focus();
+            
+            renderScheduledList();
+        }
+        
+        function closeScheduleModal() {
+            const modal = document.getElementById('schedule-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        function setQuickSchedule(preset) {
+            const dateInput = document.getElementById('schedule-date');
+            const timeInput = document.getElementById('schedule-time');
+            const now = new Date();
+            let target;
+            
+            switch (preset) {
+                case '1h':
+                    target = new Date(now.getTime() + 60 * 60 * 1000);
+                    break;
+                case '3h':
+                    target = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+                    break;
+                case 'tomorrow-9':
+                    target = new Date(now);
+                    target.setDate(target.getDate() + 1);
+                    target.setHours(9, 0, 0, 0);
+                    break;
+                case 'tomorrow-20':
+                    target = new Date(now);
+                    target.setDate(target.getDate() + 1);
+                    target.setHours(20, 0, 0, 0);
+                    break;
+                default:
+                    return;
+            }
+            
+            dateInput.value = target.toISOString().split('T')[0];
+            timeInput.value = target.toTimeString().slice(0, 5);
+            
+            triggerHaptic('tap');
+        }
+        
+        function scheduleMessage() {
+            const messageInput = document.getElementById('schedule-message');
+            const dateInput = document.getElementById('schedule-date');
+            const timeInput = document.getElementById('schedule-time');
+            
+            const content = messageInput.value.trim();
+            if (!content) {
+                showToast({ type: 'error', message: 'Écris un message à programmer' });
+                messageInput.focus();
+                return;
+            }
+            
+            if (!currentChatContact) {
+                showToast({ type: 'error', message: 'Ouvre une conversation d\'abord' });
+                return;
+            }
+            
+            const dateStr = dateInput.value;
+            const timeStr = timeInput.value;
+            
+            if (!dateStr || !timeStr) {
+                showToast({ type: 'error', message: 'Choisis une date et une heure' });
+                return;
+            }
+            
+            const scheduledAt = new Date(`${dateStr}T${timeStr}`).getTime();
+            
+            if (scheduledAt <= Date.now()) {
+                showToast({ type: 'error', message: 'Choisis un moment dans le futur' });
+                return;
+            }
+            
+            const contactName = currentChatContact.contact?.display_name || 
+                               currentChatContact.contact?.email?.split('@')[0] || 
+                               'Contact';
+            
+            const newMessage = {
+                id: 'scheduled-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                contactId: currentChatContact.contact_user_id,
+                contactName: contactName,
+                content: content,
+                scheduledAt: scheduledAt,
+                createdAt: Date.now()
+            };
+            
+            scheduledMessages.push(newMessage);
+            saveScheduledMessages();
+            updateScheduledUI();
+            
+            // Clear the chat input if the message came from there
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput && chatInput.value.trim() === content) {
+                chatInput.value = '';
+                document.getElementById('send-btn').disabled = true;
+            }
+            
+            closeScheduleModal();
+            triggerHaptic('success');
+            
+            const formattedTime = new Date(scheduledAt).toLocaleString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            showToast({ 
+                type: 'success', 
+                title: 'Message programmé',
+                message: `Sera envoyé le ${formattedTime}`
+            });
+        }
+        
+        function deleteScheduledMessage(msgId) {
+            scheduledMessages = scheduledMessages.filter(m => m.id !== msgId);
+            saveScheduledMessages();
+            updateScheduledUI();
+            triggerHaptic('tap');
+            showToast({ type: 'info', message: 'Message programmé supprimé' });
+        }
+        
+        async function sendScheduledMessage(msg) {
+            try {
+                const res = await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        contact_id: msg.contactId, 
+                        content: msg.content 
+                    })
+                });
+                
+                if (!res.ok) throw new Error('Échec envoi');
+                
+                // Remove from scheduled
+                scheduledMessages = scheduledMessages.filter(m => m.id !== msg.id);
+                saveScheduledMessages();
+                updateScheduledUI();
+                
+                // Show notification
+                showToast({ 
+                    type: 'success', 
+                    title: 'Message envoyé',
+                    message: `→ ${msg.contactName}`
+                });
+                
+                // Refresh messages if viewing this contact
+                if (currentChatContact && currentChatContact.contact_user_id === msg.contactId) {
+                    loadMessages();
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Failed to send scheduled message:', e);
+                showToast({ 
+                    type: 'error', 
+                    title: 'Échec d\'envoi',
+                    message: `Message pour ${msg.contactName} non envoyé`
+                });
+                return false;
+            }
+        }
+        
+        function checkScheduledMessages() {
+            const now = Date.now();
+            const toSend = scheduledMessages.filter(m => m.scheduledAt <= now);
+            
+            toSend.forEach(msg => {
+                sendScheduledMessage(msg);
+            });
+        }
+        
+        function startScheduledMessagesChecker() {
+            // Check every 30 seconds
+            scheduledCheckInterval = setInterval(checkScheduledMessages, 30000);
+            // Also check immediately
+            checkScheduledMessages();
+        }
+        
+        function stopScheduledMessagesChecker() {
+            if (scheduledCheckInterval) {
+                clearInterval(scheduledCheckInterval);
+                scheduledCheckInterval = null;
+            }
+        }
+        
+        // Initialize scheduled messages
+        loadScheduledMessages();
+        startScheduledMessagesChecker();
+        
+        // Update indicator when opening a chat
+        const originalOpenChat = openChat;
+        openChat = function(contact) {
+            originalOpenChat(contact);
+            setTimeout(updateChatScheduledIndicator, 100);
+        };
+        
+        // Close modal on overlay click
+        document.getElementById('schedule-modal')?.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeScheduleModal();
+            }
+        });
         
         // ===== HEARTBEAT (Last Seen) =====
         let heartbeatInterval = null;
