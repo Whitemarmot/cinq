@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Aide & Support — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Centre d'aide Cinq : FAQ, tutoriels et guide d'utilisation complet. Tout pour bien démarrer avec l'anti-réseau social.">
+    <meta name="keywords" content="cinq, aide, support, tutoriel, guide, faq, anti-réseau social">
+    <meta name="author" content="Cinq">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/help">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Aide & Support — Cinq">
+    <meta property="og:description" content="Centre d'aide Cinq : FAQ, tutoriels et guide d'utilisation complet.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/help">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Aide & Support — Cinq">
+    <meta name="twitter:description" content="Centre d'aide Cinq : FAQ, tutoriels et guide d'utilisation complet.">
+    <meta name="twitter:image" content="https://cinq.app/og-image.png">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Aide & Support — Cinq",
+        "description": "Centre d'aide Cinq : FAQ, tutoriels et guide d'utilisation complet.",
+        "url": "https://cinq.app/help",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "Cinq",
+            "url": "https://cinq.app"
+        },
+        "mainEntity": {
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Comment ajouter un contact ?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Clique sur un slot vide dans ton cercle, entre l'email de la personne que tu veux ajouter, puis confirme. La personne recevra une invitation si elle n'est pas déjà sur Cinq."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Comment envoyer un Ping ?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Depuis ton cercle, clique sur l'avatar d'un contact, puis appuie sur le bouton Ping. Ton contact recevra une notification instantanée."
+                    }
+                }
+            ]
+        }
+    }
+    </script>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#0c0c0f">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+    
+    <style>
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --cinq-gradient: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #fbbf24 100%);
+            --color-brand: #ff6b4a;
+            --color-brand-light: #ff8a6a;
+            --color-brand-glow: rgba(255, 107, 74, 0.4);
+            --color-brand-muted: rgba(255, 107, 74, 0.1);
+            --color-bg-primary: #0c0c0f;
+            --color-bg-secondary: #141419;
+            --color-bg-tertiary: #1a1a21;
+            --color-bg-elevated: #222230;
+            --color-text-primary: #fafafa;
+            --color-text-secondary: #a1a1aa;
+            --color-text-muted: #71717a;
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-border-subtle: rgba(255, 255, 255, 0.04);
+            --color-border-active: rgba(255, 255, 255, 0.15);
+            --color-success: #22c55e;
+            --color-info: #3b82f6;
+            --color-warning: #f59e0b;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            --shadow-glow: 0 0 40px var(--color-brand-glow);
+            --shadow-glow-sm: 0 0 20px var(--color-brand-glow);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        [data-theme="light"] {
+            --color-bg-primary: #faf9f7;
+            --color-bg-secondary: #f5f4f2;
+            --color-bg-tertiary: #efeeed;
+            --color-bg-elevated: #ffffff;
+            --color-text-primary: #18181b;
+            --color-text-secondary: #52525b;
+            --color-text-muted: #a1a1aa;
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-border-subtle: rgba(0, 0, 0, 0.04);
+            --color-border-active: rgba(0, 0, 0, 0.15);
+            --color-brand-glow: rgba(255, 107, 74, 0.25);
+        }
+        
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; }
+        * { margin: 0; padding: 0; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            line-height: 1.2;
+        }
+        
+        a { color: inherit; text-decoration: none; }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        
+        /* ===== BACKGROUND ===== */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        
+        /* ===== HEADER ===== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: rgba(12, 12, 15, 0.9);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        
+        [data-theme="light"] .site-header {
+            background: rgba(250, 249, 247, 0.9);
+        }
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .header-logo:hover { transform: scale(1.05); }
+        
+        .header-logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .header-logo-icon svg { width: 100%; height: 100%; }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--color-bg-elevated);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
+        }
+        
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+        
+        .header-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .header-back-btn:hover {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            color: white;
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .help-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 6rem 1.5rem 4rem;
+        }
+        
+        /* ===== HERO ===== */
+        .help-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+        
+        .help-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-brand-muted);
+            border: 1px solid var(--color-brand);
+            border-radius: 50%;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 var(--color-brand-glow); }
+            50% { box-shadow: 0 0 30px 10px var(--color-brand-glow); }
+        }
+        
+        .help-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--color-brand);
+        }
+        
+        .help-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .help-subtitle {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        /* ===== QUICK NAV ===== */
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+        }
+        
+        .quick-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-nav-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+            transform: translateY(-2px);
+        }
+        
+        .quick-nav-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* ===== SEARCH BAR ===== */
+        .search-container {
+            margin-bottom: 3rem;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem 1rem 3rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted), var(--shadow-glow-sm);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            stroke: var(--color-text-muted);
+            pointer-events: none;
+        }
+        
+        /* ===== SECTIONS ===== */
+        .help-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-md);
+        }
+        
+        .section-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--color-brand);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        /* ===== ACCORDION ===== */
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .accordion-item {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .accordion-item:hover {
+            border-color: var(--color-brand);
+        }
+        
+        .accordion-item.open {
+            border-color: var(--color-brand);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .accordion-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--color-text-primary);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .accordion-header:hover {
+            background: var(--color-bg-tertiary);
+        }
+        
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .accordion-title .badge {
+            padding: 0.25rem 0.5rem;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-brand);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .accordion-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            stroke: var(--color-text-muted);
+            transition: transform 0.3s ease, stroke 0.2s;
+        }
+        
+        .accordion-item.open .accordion-icon {
+            transform: rotate(180deg);
+            stroke: var(--color-brand);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        
+        .accordion-item.open .accordion-content {
+            max-height: 2000px;
+        }
+        
+        .accordion-body {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+        }
+        
+        .accordion-body p {
+            margin-bottom: 1rem;
+        }
+        
+        .accordion-body p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .accordion-body ul,
+        .accordion-body ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .accordion-body li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .accordion-body strong {
+            color: var(--color-text-primary);
+        }
+        
+        .accordion-body code {
+            padding: 0.2rem 0.4rem;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.9em;
+            color: var(--color-brand);
+        }
+        
+        /* ===== TUTORIAL STEPS ===== */
+        .tutorial-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .tutorial-step {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--color-brand);
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cinq-gradient);
+            border-radius: 50%;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* ===== INFO BOX ===== */
+        .info-box {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--color-info);
+        }
+        
+        .info-box.tip {
+            border-left-color: var(--color-success);
+        }
+        
+        .info-box.warning {
+            border-left-color: var(--color-warning);
+        }
+        
+        .info-box-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .info-box.tip .info-box-icon { stroke: var(--color-success); }
+        .info-box.warning .info-box-icon { stroke: var(--color-warning); }
+        .info-box .info-box-icon { stroke: var(--color-info); }
+        
+        .info-box-content {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== KEYBOARD SHORTCUTS ===== */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+        
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+        }
+        
+        .shortcut-label {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .shortcut-keys {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        kbd {
+            padding: 0.25rem 0.5rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--color-text-primary);
+            box-shadow: 0 2px 0 var(--color-border);
+        }
+        
+        /* ===== CONTACT SECTION ===== */
+        .contact-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            margin-top: 3rem;
+        }
+        
+        .contact-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .contact-desc {
+            color: var(--color-text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--cinq-gradient);
+            border: none;
+            border-radius: var(--radius-full);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .contact-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* ===== FOOTER ===== */
+        .help-footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            border-top: 1px solid var(--color-border-subtle);
+            margin-top: 3rem;
+        }
+        
+        .help-footer nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .help-footer a {
+            color: var(--color-text-muted);
+            transition: color 0.2s;
+        }
+        
+        .help-footer a:hover {
+            color: var(--color-brand);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .help-container {
+                padding: 5rem 1rem 3rem;
+            }
+            
+            .help-title {
+                font-size: 2rem;
+            }
+            
+            .quick-nav {
+                gap: 0.5rem;
+            }
+            
+            .quick-nav-btn {
+                padding: 0.625rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+            }
+            
+            .accordion-header {
+                padding: 1rem 1.25rem;
+            }
+            
+            .accordion-body {
+                padding: 0 1.25rem 1.25rem;
+            }
+            
+            .shortcuts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-section {
+                padding: 2rem 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .site-header {
+                padding: 0.6rem 1rem;
+            }
+            
+            .header-back-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .header-back-btn span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <a href="/" class="header-logo" aria-label="Cinq - Accueil">
+            <span class="header-logo-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2L29.5 11.5L24.5 27.5H7.5L2.5 11.5L16 2Z" stroke="url(#logo-gradient)" stroke-width="2" fill="none"/>
+                    <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-gradient)">5</text>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b4a"/>
+                            <stop offset="100%" style="stop-color:#ff8a6a"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </span>
+            <span style="font-family: var(--font-display); font-weight: 600; color: var(--color-text-primary); font-size: 1.1rem;">cinq</span>
+        </a>
+        <nav class="header-nav" aria-label="Navigation">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" type="button">
+                <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <a href="/" class="header-back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>Retour</span>
+            </a>
+        </nav>
+    </header>
+    
+    <main id="main-content">
+        <div class="help-container">
+            <!-- Hero -->
+            <section class="help-hero">
+                <div class="help-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <h1 class="help-title">Aide & Support</h1>
+                <p class="help-subtitle">Tout ce dont tu as besoin pour maîtriser Cinq. FAQ, tutoriels et guide complet.</p>
+            </section>
+            
+            <!-- Quick Nav -->
+            <nav class="quick-nav" aria-label="Navigation rapide">
+                <a href="#getting-started" class="quick-nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Démarrage
+                </a>
+                <a href="#tutorials" class="quick-nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    Tutoriels
+                </a>
+                <a href="#faq" class="quick-nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    FAQ
+                </a>
+                <a href="#shortcuts" class="quick-nav-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>
+                    Raccourcis
+                </a>
+            </nav>
+            
+            <!-- Search -->
+            <div class="search-container">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="search" class="search-input" id="helpSearch" placeholder="Rechercher dans l'aide..." aria-label="Rechercher dans l'aide">
+                </div>
+            </div>
+            
+            <!-- ===== GETTING STARTED ===== -->
+            <section id="getting-started" class="help-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <h2 class="section-title">Bien démarrer</h2>
+                </div>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">
+                                C'est quoi Cinq, exactement ?
+                                <span class="badge">Essentiel</span>
+                            </span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Cinq est un anti-réseau social.</strong> Tu ne peux avoir que 5 contacts — les personnes qui comptent vraiment pour toi.</p>
+                                <p>Pas de likes, pas de followers, pas d'algorithme qui te pousse à scroller. Juste toi et tes proches.</p>
+                                <div class="info-box tip">
+                                    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div class="info-box-content">
+                                        <strong>Le saviez-vous ?</strong> Les études montrent que nous ne pouvons maintenir que ~5 relations vraiment intimes (le "cercle de soutien" de Robin Dunbar).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Comment rejoindre Cinq ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Tu ne t'inscris pas. On t'offre Cinq.</strong></p>
+                                <p>Quelqu'un doit payer 15€ pour t'offrir l'accès. C'est un filtre intentionnel : chaque utilisateur existe parce qu'il compte pour quelqu'un.</p>
+                                <div class="tutorial-steps">
+                                    <div class="tutorial-step">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Reçois un code cadeau</div>
+                                            <div class="step-desc">Quelqu'un qui t'apprécie t'envoie un code unique.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Active ton compte</div>
+                                            <div class="step-desc">Utilise le code sur cinq.app/redeem pour créer ton compte.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">3</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Choisis tes 5</div>
+                                            <div class="step-desc">Ajoute les personnes qui comptent vraiment.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Configurer mon profil</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Ton profil sur Cinq est volontairement minimaliste :</p>
+                                <ul>
+                                    <li><strong>Prénom ou pseudo</strong> — Comment tes proches te voient</li>
+                                    <li><strong>Avatar</strong> — Une photo ou une initiale colorée</li>
+                                    <li><strong>Date d'anniversaire</strong> (optionnel) — Pour que tes proches ne l'oublient pas</li>
+                                    <li><strong>Bio courte</strong> (optionnel) — Quelques mots sur toi</li>
+                                </ul>
+                                <p>Pas besoin de plus. Tes proches te connaissent déjà.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== TUTORIALS ===== -->
+            <section id="tutorials" class="help-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    </div>
+                    <h2 class="section-title">Tutoriels</h2>
+                </div>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">
+                                Ajouter un contact
+                                <span class="badge">Populaire</span>
+                            </span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="tutorial-steps">
+                                    <div class="tutorial-step">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Ouvre ton cercle</div>
+                                            <div class="step-desc">Sur l'écran principal, tu vois ton cercle avec 5 emplacements.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Clique sur un slot vide</div>
+                                            <div class="step-desc">Les slots vides affichent un "+" au centre.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">3</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Entre l'email de ton contact</div>
+                                            <div class="step-desc">Si la personne n'est pas sur Cinq, elle recevra une invitation.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">4</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Confirme l'ajout</div>
+                                            <div class="step-desc">Ton contact apparaît dans ton cercle !</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-box warning">
+                                    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    <div class="info-box-content">
+                                        <strong>Important :</strong> Tu n'as que 5 places. Choisis bien — si tu veux ajouter quelqu'un de nouveau, tu devras libérer une place.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Envoyer un Ping</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Un Ping, c'est juste dire "Je pense à toi"</strong> — sans texte, sans pression. Un clic. Ton contact reçoit une notification. C'est tout.</p>
+                                <div class="tutorial-steps">
+                                    <div class="tutorial-step">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Clique sur l'avatar d'un contact</div>
+                                            <div class="step-desc">Dans ton cercle, sélectionne la personne.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Appuie sur le bouton Ping</div>
+                                            <div class="step-desc">Tu verras une animation de confirmation.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">3</span>
+                                        <div class="step-content">
+                                            <div class="step-title">C'est envoyé !</div>
+                                            <div class="step-desc">Ton contact reçoit une notification instantanée.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-box tip">
+                                    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <div class="info-box-content">
+                                        Parfois, savoir que quelqu'un pense à nous suffit. Le Ping est parfait pour ces moments où tu veux juste faire un coucou.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Publier une Story</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Les Stories sur Cinq ne sont visibles que par tes 5 contacts. Pas de public, pas de pression de performance.</p>
+                                <div class="tutorial-steps">
+                                    <div class="tutorial-step">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Appuie sur le bouton "+"</div>
+                                            <div class="step-desc">En bas de l'écran ou via le menu.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Choisis ton contenu</div>
+                                            <div class="step-desc">Photo, vidéo courte ou texte simple.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">3</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Ajoute un message (optionnel)</div>
+                                            <div class="step-desc">Une légende ou un contexte si tu veux.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">4</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Publie</div>
+                                            <div class="step-desc">Ta Story sera visible pendant 24h par tes 5 contacts uniquement.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Offrir Cinq à quelqu'un</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Offrir Cinq, c'est dire à quelqu'un : "Tu fais partie des personnes qui comptent pour moi."</p>
+                                <div class="tutorial-steps">
+                                    <div class="tutorial-step">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Va sur cinq.app/gift</div>
+                                            <div class="step-desc">La page de cadeau dédiée.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Choisis ton mode de paiement</div>
+                                            <div class="step-desc">USDC, BTC Lightning, ou ETH — 15€.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">3</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Reçois ton code cadeau</div>
+                                            <div class="step-desc">Un code unique généré instantanément.</div>
+                                        </div>
+                                    </div>
+                                    <div class="tutorial-step">
+                                        <span class="step-number">4</span>
+                                        <div class="step-content">
+                                            <div class="step-title">Envoie le code</div>
+                                            <div class="step-desc">Par message, email, en personne... comme tu veux !</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Gérer les notifications</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Cinq respecte ton attention. Tu contrôles totalement tes notifications.</p>
+                                <ul>
+                                    <li><strong>Pings</strong> — Active/désactive les notifications de Ping</li>
+                                    <li><strong>Stories</strong> — Sois notifié quand tes proches publient</li>
+                                    <li><strong>Messages</strong> — Notifications de nouveaux messages</li>
+                                    <li><strong>Anniversaires</strong> — Rappels pour ne jamais oublier</li>
+                                    <li><strong>Mode silencieux</strong> — Plages horaires sans notifications</li>
+                                </ul>
+                                <p>Accède à ces paramètres via <strong>Paramètres → Notifications</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== FAQ ===== -->
+            <section id="faq" class="help-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <h2 class="section-title">Questions fréquentes</h2>
+                </div>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Pourquoi seulement 5 contacts ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Parce que la <strong>qualité > la quantité</strong>.</p>
+                                <p>Les études de l'anthropologue Robin Dunbar montrent que nous ne pouvons maintenir que ~5 relations vraiment intimes (le "cercle de soutien"). Cinq t'oblige à choisir — et ce choix a du sens.</p>
+                                <p>Tu as 847 amis Facebook. Combien t'appelleraient à 3h du mat' ? Probablement moins de 5.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Et si je veux plus de 5 contacts ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Tu ne peux pas.</strong> Et c'est le but.</p>
+                                <p>Si tu veux ajouter quelqu'un de nouveau, tu dois libérer une place. Ce n'est pas une prison, c'est une invitation à l'intentionnalité.</p>
+                                <p>Ce choix difficile est ce qui rend Cinq différent. Il te force à réfléchir à qui compte vraiment.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Quelles données collectez-vous ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Le minimum vital :</strong></p>
+                                <ul>
+                                    <li>Email — Pour te connecter</li>
+                                    <li>Prénom/pseudo — Affiché à tes contacts</li>
+                                    <li>Contacts — Stockés de façon chiffrée</li>
+                                    <li>Messages — Chiffrés de bout en bout</li>
+                                </ul>
+                                <p><strong>Ce qu'on ne fait PAS :</strong></p>
+                                <ul>
+                                    <li>❌ Vendre tes données</li>
+                                    <li>❌ Afficher de la publicité</li>
+                                    <li>❌ Tracker ton comportement</li>
+                                    <li>❌ Analyser tes messages</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">L'app est-elle gratuite ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Oui, une fois que quelqu'un t'a offert l'accès.</strong></p>
+                                <p>Le modèle est simple :</p>
+                                <ol>
+                                    <li>Quelqu'un paie 15€ pour t'offrir Cinq</li>
+                                    <li>Tu utilises l'app gratuitement, pour toujours</li>
+                                    <li>Si tu veux, tu peux offrir Cinq à d'autres</li>
+                                </ol>
+                                <p>Pas d'abonnement, pas de fonctionnalités premium cachées.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Puis-je supprimer mon compte ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Oui, à tout moment.</strong></p>
+                                <p>Va dans <strong>Paramètres → Compte → Supprimer mon compte</strong>.</p>
+                                <p>Toutes tes données seront supprimées de façon permanente sous 30 jours. Tu seras retiré des cercles de tes contacts.</p>
+                                <div class="info-box warning">
+                                    <svg class="info-box-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    <div class="info-box-content">
+                                        Cette action est irréversible. Tu devras être re-invité pour revenir sur Cinq.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Cinq est-il disponible en app mobile ?</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p><strong>Cinq est une Progressive Web App (PWA).</strong></p>
+                                <p>Tu peux l'installer sur ton téléphone comme une app native :</p>
+                                <ul>
+                                    <li><strong>iPhone :</strong> Safari → Partager → "Sur l'écran d'accueil"</li>
+                                    <li><strong>Android :</strong> Chrome → Menu → "Installer l'application"</li>
+                                </ul>
+                                <p>L'avantage ? Pas besoin de passer par les app stores, mises à jour instantanées, et ça fonctionne même hors-ligne.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== KEYBOARD SHORTCUTS ===== -->
+            <section id="shortcuts" class="help-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>
+                    </div>
+                    <h2 class="section-title">Raccourcis clavier</h2>
+                </div>
+                
+                <div class="accordion">
+                    <div class="accordion-item open">
+                        <button class="accordion-header" aria-expanded="true">
+                            <span class="accordion-title">Navigation rapide</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="shortcuts-grid">
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Accueil</span>
+                                        <div class="shortcut-keys"><kbd>G</kbd> <kbd>H</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Messages</span>
+                                        <div class="shortcut-keys"><kbd>G</kbd> <kbd>M</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Stories</span>
+                                        <div class="shortcut-keys"><kbd>G</kbd> <kbd>S</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Paramètres</span>
+                                        <div class="shortcut-keys"><kbd>G</kbd> <kbd>P</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Profil</span>
+                                        <div class="shortcut-keys"><kbd>G</kbd> <kbd>U</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Aide</span>
+                                        <div class="shortcut-keys"><kbd>?</kbd></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <button class="accordion-header" aria-expanded="false">
+                            <span class="accordion-title">Actions rapides</span>
+                            <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <div class="shortcuts-grid">
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Nouvelle Story</span>
+                                        <div class="shortcut-keys"><kbd>N</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Recherche</span>
+                                        <div class="shortcut-keys"><kbd>/</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Thème clair/sombre</span>
+                                        <div class="shortcut-keys"><kbd>T</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Fermer modal</span>
+                                        <div class="shortcut-keys"><kbd>Esc</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Envoyer message</span>
+                                        <div class="shortcut-keys"><kbd>⌘</kbd> <kbd>Enter</kbd></div>
+                                    </div>
+                                    <div class="shortcut-item">
+                                        <span class="shortcut-label">Ping contact 1-5</span>
+                                        <div class="shortcut-keys"><kbd>1</kbd> - <kbd>5</kbd></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== CONTACT ===== -->
+            <section class="contact-section">
+                <h2 class="contact-title">Toujours besoin d'aide ?</h2>
+                <p class="contact-desc">Notre équipe est là pour toi. On répond généralement en moins de 24h.</p>
+                <a href="mailto:support@cinq.app" class="contact-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Contacter le support
+                </a>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="help-footer" role="contentinfo">
+        <nav aria-label="Liens légaux">
+            <a href="/privacy.html">Confidentialité</a>
+            <a href="/terms.html">CGU</a>
+            <a href="/FAQ.html">FAQ complète</a>
+            <a href="/about.html">À propos</a>
+        </nav>
+        <p>© 2025 Cinq. L'anti-réseau social.</p>
+    </footer>
+    
+    <script>
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isOpen = item.classList.contains('open');
+                const expanded = button.getAttribute('aria-expanded') === 'true';
+                
+                // Close all in same accordion (optional: remove for multi-open)
+                // item.closest('.accordion').querySelectorAll('.accordion-item').forEach(i => {
+                //     i.classList.remove('open');
+                //     i.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+                // });
+                
+                // Toggle current
+                item.classList.toggle('open', !isOpen);
+                button.setAttribute('aria-expanded', !expanded);
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('helpSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const items = document.querySelectorAll('.accordion-item');
+                
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const matches = query === '' || text.includes(query);
+                    item.style.display = matches ? '' : 'none';
+                    
+                    // Auto-open matching items
+                    if (matches && query !== '') {
+                        item.classList.add('open');
+                        item.querySelector('.accordion-header').setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+        // Keyboard shortcut: / to focus search
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                searchInput?.focus();
+            }
+            if (e.key === 'Escape') {
+                searchInput?.blur();
+            }
+        });
+    </script>
+</body>
+</html>
