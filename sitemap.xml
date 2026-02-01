@@ -64,4 +64,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+  
+  <!-- Roadmap - Public roadmap with feature voting -->
+  <url>
+    <loc>https://cinq.app/roadmap</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
