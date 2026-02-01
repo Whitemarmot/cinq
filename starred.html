@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cinq — Messages favoris</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Cinq — Tes messages favoris. Retrouve les messages que tu as marqués d'une étoile.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/starred">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Messages favoris — Cinq">
+    <meta property="og:description" content="Tes messages favoris sur Cinq.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/starred">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    
+    <!-- Design System -->
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        /* ===== STARRED MESSAGES LAYOUT ===== */
+        .starred-container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 1rem));
+        }
+        
+        .starred-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+        }
+        
+        .starred-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .starred-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.05);
+        }
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
+        }
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+        /* ===== MESSAGES LIST ===== */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .starred-message-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            opacity: 0;
+            animation: message-fade-in 0.4s ease forwards;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .starred-message-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes message-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .message-sender {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .message-avatar.own {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .message-sender-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        
+        .message-sender-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .you-badge {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            font-weight: 400;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .message-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            padding: 0.75rem;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            border-left: 3px solid #fbbf24;
+        }
+        
+        .message-content.sent {
+            background: linear-gradient(135deg, rgba(255, 107, 74, 0.1) 0%, rgba(255, 138, 106, 0.1) 100%);
+            border-left-color: var(--color-brand);
+        }
+        
+        .message-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--color-bg-elevated);
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .message-gif img,
+        .message-sticker img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--radius-lg);
+        }
+
+        /* ===== STARRED INFO ===== */
+        .starred-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .starred-info svg {
+            width: 14px;
+            height: 14px;
+            color: #fbbf24;
+        }
+
+        /* ===== MESSAGE ACTIONS ===== */
+        .message-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.65rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .action-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            border-color: var(--color-border-active);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .action-btn.remove:hover {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .action-btn.go-chat:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+
+        /* ===== FILTER TABS ===== */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 0.25rem 0;
+        }
+        
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .filter-tab {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-tab:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-text {
+            color: var(--color-text-muted);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .empty-state-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .empty-state-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .toast {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: toast-in 0.3s ease-out;
+            pointer-events: auto;
+        }
+        
+        .toast.success { border-color: var(--color-success); }
+        .toast.error { border-color: var(--color-error); }
+        
+        @keyframes toast-in {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== SEARCH ===== */
+        .search-bar {
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+        }
+        
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .search-wrapper {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--color-text-muted);
+            pointer-events: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .starred-header {
+                padding: 0.75rem 0;
+            }
+            
+            .starred-message-card {
+                padding: 0.75rem;
+            }
+            
+            .message-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .action-btn span {
+                display: none;
+            }
+            
+            .action-btn {
+                padding: 0.5rem;
+            }
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            .starred-message-card,
+            .toast {
+                animation: none;
+                transition: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Links -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        <a href="#messages-list" class="skip-link">Aller aux messages favoris</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
+
+    <main class="starred-container" id="main-content">
+        <header class="starred-header">
+            <a href="/app.html" class="starred-logo" aria-label="Retour à l'accueil">5</a>
+            <span class="starred-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                Messages favoris
+            </span>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+                    <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <a href="/app.html" class="back-btn" aria-label="Retour aux conversations">← Chats</a>
+            </div>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <div class="search-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="search" class="search-input" id="search-input" placeholder="Rechercher dans les favoris..." oninput="filterMessages()">
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs" role="tablist">
+            <button class="filter-tab active" data-filter="all" onclick="setFilter('all')" role="tab" aria-selected="true">Tous</button>
+            <button class="filter-tab" data-filter="text" onclick="setFilter('text')" role="tab" aria-selected="false">💬 Messages</button>
+            <button class="filter-tab" data-filter="media" onclick="setFilter('media')" role="tab" aria-selected="false">🖼️ Médias</button>
+            <button class="filter-tab" data-filter="sent" onclick="setFilter('sent')" role="tab" aria-selected="false">📤 Envoyés</button>
+            <button class="filter-tab" data-filter="received" onclick="setFilter('received')" role="tab" aria-selected="false">📥 Reçus</button>
+        </div>
+
+        <!-- Messages List -->
+        <div class="messages-list" id="messages-list" role="feed" aria-label="Liste des messages favoris">
+            <!-- Messages will be rendered here -->
+        </div>
+    </main>
+
+    <script>
+        let starredMessages = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // ===== INIT =====
+        function init() {
+            const sessionStr = localStorage.getItem('cinq_session');
+            if (!sessionStr) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            loadStarredMessages();
+            renderMessages();
+        }
+
+        // ===== LOAD STARRED MESSAGES =====
+        function loadStarredMessages() {
+            try {
+                const stored = localStorage.getItem('cinq_starred_messages');
+                starredMessages = stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.error('Failed to load starred messages:', e);
+                starredMessages = [];
+            }
+        }
+
+        // ===== SAVE STARRED MESSAGES =====
+        function saveStarredMessages() {
+            try {
+                localStorage.setItem('cinq_starred_messages', JSON.stringify(starredMessages));
+            } catch (e) {
+                console.error('Failed to save starred messages:', e);
+            }
+        }
+
+        // ===== FILTER MESSAGES =====
+        function getFilteredMessages() {
+            let filtered = starredMessages;
+            
+            // Apply filter
+            switch (currentFilter) {
+                case 'text':
+                    filtered = filtered.filter(m => m.type === 'text');
+                    break;
+                case 'media':
+                    filtered = filtered.filter(m => ['gif', 'sticker', 'voice', 'file'].includes(m.type));
+                    break;
+                case 'sent':
+                    filtered = filtered.filter(m => m.isSent);
+                    break;
+                case 'received':
+                    filtered = filtered.filter(m => !m.isSent);
+                    break;
+            }
+            
+            // Apply search
+            if (searchQuery.trim()) {
+                const query = searchQuery.toLowerCase();
+                filtered = filtered.filter(m => 
+                    (m.preview && m.preview.toLowerCase().includes(query)) ||
+                    (m.content && m.content.toLowerCase().includes(query)) ||
+                    (m.contactName && m.contactName.toLowerCase().includes(query)) ||
+                    (m.senderName && m.senderName.toLowerCase().includes(query))
+                );
+            }
+            
+            return filtered;
+        }
+
+        // ===== SET FILTER =====
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                const isActive = tab.dataset.filter === filter;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive);
+            });
+            
+            renderMessages();
+        }
+
+        // ===== FILTER ON SEARCH =====
+        function filterMessages() {
+            searchQuery = document.getElementById('search-input').value;
+            renderMessages();
+        }
+
+        // ===== RENDER MESSAGES =====
+        function renderMessages() {
+            const container = document.getElementById('messages-list');
+            const filtered = getFilteredMessages();
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⭐</div>
+                        <h2 class="empty-state-title">${searchQuery ? 'Aucun résultat' : 'Aucun message favori'}</h2>
+                        <p class="empty-state-text">
+                            ${searchQuery 
+                                ? 'Essaie une autre recherche ou modifie les filtres.' 
+                                : 'Appuie sur l\'étoile d\'un message pour l\'ajouter à tes favoris.'}
+                        </p>
+                        <a href="/app.html" class="empty-state-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            Aller aux conversations
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            filtered.forEach((msg, index) => {
+                const initials = msg.senderName ? msg.senderName.charAt(0).toUpperCase() : '?';
+                const starredDate = msg.starredAt ? formatRelativeTime(msg.starredAt) : '';
+                
+                html += `
+                    <article class="starred-message-card" style="animation-delay: ${index * 0.05}s;">
+                        <div class="message-header">
+                            <div class="message-sender">
+                                <div class="message-avatar ${msg.isSent ? 'own' : ''}" aria-hidden="true">
+                                    ${initials}
+                                </div>
+                                <div class="message-sender-info">
+                                    <span class="message-sender-name">
+                                        ${escapeHtml(msg.senderName || 'Inconnu')}
+                                        ${msg.isSent ? '<span class="you-badge">(toi)</span>' : ''}
+                                    </span>
+                                    <span class="message-time">Avec ${escapeHtml(msg.contactName || 'Contact')} • ${msg.messageTime || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-content ${msg.isSent ? 'sent' : ''}">
+                            ${renderMessageContent(msg)}
+                        </div>
+                        
+                        <div class="starred-info">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            <span>Ajouté aux favoris ${starredDate}</span>
+                        </div>
+                        
+                        <div class="message-actions">
+                            <button class="action-btn remove" onclick="unstarMessage('${msg.id}')" aria-label="Retirer des favoris">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                <span>Retirer</span>
+                            </button>
+                            <a href="/app.html" class="action-btn go-chat" aria-label="Aller à la conversation">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                <span>Conversation</span>
+                            </a>
+                        </div>
+                    </article>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ===== RENDER MESSAGE CONTENT =====
+        function renderMessageContent(msg) {
+            switch (msg.type) {
+                case 'ping':
+                    return '<span class="message-type-badge">👋 Coucou</span>';
+                case 'sticker':
+                    return msg.content 
+                        ? `<div class="message-sticker"><img src="${escapeHtml(msg.content)}" alt="Sticker" loading="lazy"></div>`
+                        : '<span class="message-type-badge">🎨 Sticker</span>';
+                case 'gif':
+                    return msg.content 
+                        ? `<div class="message-gif"><img src="${escapeHtml(msg.content)}" alt="GIF" loading="lazy"></div>`
+                        : '<span class="message-type-badge">🖼️ GIF</span>';
+                case 'voice':
+                    return '<span class="message-type-badge">🎤 Message vocal</span>';
+                case 'file':
+                    return `<span class="message-type-badge">📎 ${escapeHtml(msg.content || 'Fichier')}</span>`;
+                case 'location':
+                    return '<span class="message-type-badge">📍 Position partagée</span>';
+                default:
+                    return escapeHtml(msg.preview || msg.content || '');
+            }
+        }
+
+        // ===== UNSTAR MESSAGE =====
+        function unstarMessage(messageId) {
+            starredMessages = starredMessages.filter(m => m.id !== messageId);
+            saveStarredMessages();
+            renderMessages();
+            showToast({ type: 'success', message: 'Message retiré des favoris' });
+        }
+
+        // ===== UTILITIES =====
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatRelativeTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'à l\'instant';
+            if (diffMins < 60) return `il y a ${diffMins} min`;
+            if (diffHours < 24) return `il y a ${diffHours}h`;
+            if (diffDays === 1) return 'hier';
+            if (diffDays < 7) return `il y a ${diffDays} jours`;
+            
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+
+        function showToast({ type, message }) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+            toast.innerHTML = `<span>${icon}</span><span>${escapeHtml(message)}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('cinq_theme', newTheme);
+            
+            // Update meta theme-color
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) {
+                meta.content = newTheme === 'light' ? '#faf9f7' : '#121218';
+            }
+        }
+
+        // Start app
+        init();
+    </script>
+</body>
+</html>

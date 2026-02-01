@@ -6691,6 +6691,13 @@
             
             <!-- Actions -->
             <div class="header-actions">
+                <!-- Starred Messages Button -->
+                <a href="/starred.html" class="header-action-btn" aria-label="Messages favoris" title="Messages favoris">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </a>
+                
                 <!-- Search Button -->
                 <button class="header-action-btn" id="search-btn" onclick="openSearch()" aria-label="Rechercher" type="button">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -7529,6 +7536,7 @@
         let archivedContacts = [];
         let posts = [];
         let currentChatContact = null;
+        let replyingTo = null; // Message being replied to
         let messagePollingInterval = null;
         let contactPollingInterval = null;
         let lastMessageIds = {};
@@ -13962,6 +13970,13 @@
         document.getElementById('schedule-modal')?.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 closeScheduleModal();
+            }
+        });
+        
+        // Close export modal on overlay click
+        document.getElementById('export-modal')?.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeExportModal();
             }
         });
         
