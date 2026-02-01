@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="coffee-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8D6E63"/>
+      <stop offset="100%" style="stop-color:#5D4037"/>
+    </linearGradient>
+    <linearGradient id="steam-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#BDBDBD"/>
+      <stop offset="100%" style="stop-color:#BDBDBD;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="30" width="40" height="40" rx="4" fill="white"/>
+  <rect x="22" y="34" width="32" height="32" rx="2" fill="url(#coffee-grad)"/>
+  <path d="M58 40C68 40 68 55 58 55" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <path d="M28 20C28 14 32 10 32 10" stroke="url(#steam-grad)" stroke-width="2" stroke-linecap="round">
+    <animate attributeName="d" values="M28 20C28 14 32 10 32 10;M28 20C28 14 26 8 28 6;M28 20C28 14 32 10 32 10" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M38 20C38 14 42 10 42 10" stroke="url(#steam-grad)" stroke-width="2" stroke-linecap="round">
+    <animate attributeName="d" values="M38 20C38 14 42 10 42 10;M38 20C38 14 36 8 38 6;M38 20C38 14 42 10 42 10" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+  </path>
+  <path d="M48 20C48 14 52 10 52 10" stroke="url(#steam-grad)" stroke-width="2" stroke-linecap="round">
+    <animate attributeName="d" values="M48 20C48 14 52 10 52 10;M48 20C48 14 46 8 48 6;M48 20C48 14 52 10 52 10" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+  </path>
+  <ellipse cx="38" cy="40" rx="8" ry="3" fill="#A1887F" fill-opacity="0.5"/>
+</svg>

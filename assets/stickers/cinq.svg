@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="cinq-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="cinq-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C4B5FD"/>
+      <stop offset="100%" style="stop-color:#A78BFA"/>
+    </linearGradient>
+  </defs>
+  <!-- Pentagon shape (Cinq logo) -->
+  <path d="M40 8L68 28L58 62H22L12 28L40 8Z" fill="url(#cinq-grad)"/>
+  <path d="M40 14L62 30L54 58H26L18 30L40 14Z" fill="url(#cinq-shine)" fill-opacity="0.3"/>
+  <!-- Number 5 inside -->
+  <text x="40" y="48" font-family="Arial" font-weight="bold" font-size="28" fill="white" text-anchor="middle">5</text>
+  <!-- Sparkles -->
+  <circle cx="68" cy="18" r="3" fill="#FFD700"/>
+  <circle cx="74" cy="40" r="2" fill="#FFD700" fill-opacity="0.7"/>
+  <circle cx="10" cy="20" r="2" fill="#FFD700" fill-opacity="0.8"/>
+</svg>

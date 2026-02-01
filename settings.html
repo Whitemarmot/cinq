@@ -1622,6 +1622,40 @@
                 </div>
             </section>
 
+            <!-- Section: Confidentialité -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Confidentialité
+                </h2>
+                
+                <div class="settings-card">
+                    <!-- Toggle hide last seen -->
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span id="last-seen-status-icon">👁️</span>
+                                <span id="last-seen-status-text">Masquer mon statut "Vu en dernier"</span>
+                            </p>
+                            <p id="last-seen-status-desc" class="settings-item-subtitle">Tes contacts ne verront pas quand tu étais en ligne</p>
+                        </div>
+                        <button id="btn-hide-last-seen-toggle" class="toggle-switch" data-pref="hideLastSeen" onclick="toggleHideLastSeen(this)" aria-label="Masquer mon statut vu en dernier"></button>
+                    </div>
+                </div>
+                
+                <!-- Info box when hide last seen is active -->
+                <div id="hide-last-seen-info" class="push-card hidden" style="margin-top: var(--space-3); background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3);">
+                    <div class="push-card-content">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title" style="color: var(--color-brand);">
+                                🙈 Statut masqué
+                            </p>
+                            <p class="settings-item-subtitle">Tes contacts verront uniquement "Hors ligne" au lieu de ta dernière connexion.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Section: Sécurité -->
             <section class="settings-section">
                 <h2 class="section-header">
@@ -2689,6 +2723,59 @@
         $('btn-save-focus-hours').addEventListener('click', saveFocusHours);
         
         // ============================================
+        // Hide Last Seen
+        // ============================================
+        function updateHideLastSeenUI(isActive) {
+            const button = $('btn-hide-last-seen-toggle');
+            const icon = $('last-seen-status-icon');
+            const text = $('last-seen-status-text');
+            const desc = $('last-seen-status-desc');
+            const infoBox = $('hide-last-seen-info');
+            
+            if (isActive) {
+                button.classList.add('active');
+                icon.textContent = '🙈';
+                text.textContent = 'Statut "Vu en dernier" masqué';
+                desc.textContent = 'Tes contacts ne voient pas ta dernière connexion';
+                infoBox.classList.remove('hidden');
+            } else {
+                button.classList.remove('active');
+                icon.textContent = '👁️';
+                text.textContent = 'Masquer mon statut "Vu en dernier"';
+                desc.textContent = 'Tes contacts ne verront pas quand tu étais en ligne';
+                infoBox.classList.add('hidden');
+            }
+        }
+        
+        async function toggleHideLastSeen(button) {
+            const willBeActive = !button.classList.contains('active');
+            
+            button.disabled = true;
+            
+            try {
+                await UserProfile.updateProfile({ hide_last_seen: willBeActive });
+                updateHideLastSeenUI(willBeActive);
+                
+                if (willBeActive) {
+                    showToast('Statut "Vu en dernier" masqué 🙈');
+                    logUserActivity('hide_last_seen_enabled');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Ton statut "Vu en dernier" est maintenant masqué.';
+                } else {
+                    showToast('Statut "Vu en dernier" visible 👁️');
+                    logUserActivity('hide_last_seen_disabled');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Ton statut "Vu en dernier" est maintenant visible.';
+                }
+            } catch (err) {
+                console.error('Toggle hide last seen error:', err);
+                showToast('Erreur', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        // ============================================
         // Activity Log
         // ============================================
         let activityOffset = 0;
@@ -3056,6 +3143,9 @@
                         profile.focus_start || '09:00',
                         profile.focus_end || '18:00'
                     );
+                    
+                    // Load hide last seen state
+                    updateHideLastSeenUI(profile.hide_last_seen || false);
                     
                     // Load user status
                     updateStatusUI(

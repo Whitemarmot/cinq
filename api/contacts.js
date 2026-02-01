@@ -75,6 +75,10 @@ async function handleGet(req, res, user) {
         return getFollowers(res, user);
     }
 
+    if (action === 'birthdays') {
+        return listBirthdays(res, user);
+    }
+
     return listContacts(res, user);
 }
 
@@ -184,10 +188,10 @@ async function listContacts(res, user) {
 
     const contactIds = data.map(c => c.contact_user_id);
     
-    // Batch fetch user profiles (avoid N+1 queries)
+    // Batch fetch user profiles (avoid N+1 queries) - include last_seen fields
     const { data: profiles } = await supabase
         .from('users')
-        .select('id, email, display_name, avatar_url, status_emoji, status_text')
+        .select('id, email, display_name, avatar_url, status_emoji, status_text, last_seen_at, hide_last_seen')
         .in('id', contactIds);
     
     const profileMap = (profiles || []).reduce((acc, p) => {
@@ -204,6 +208,54 @@ async function listContacts(res, user) {
     
     const mutualSet = new Set((mutualContacts || []).map(c => c.user_id));
 
+    const contacts = data.map(c => {
+        const profile = profileMap[c.contact_user_id];
+        // Only include last_seen if user hasn't hidden it
+        const lastSeenAt = profile?.hide_last_seen ? null : (profile?.last_seen_at || null);
+        
+        return {
+            ...c,
+            contact: { 
+                id: c.contact_user_id, 
+                email: profile?.email || null,
+                display_name: profile?.display_name || null,
+                avatar_url: profile?.avatar_url || null,
+                status_emoji: profile?.status_emoji || null,
+                status_text: profile?.status_text || null,
+                last_seen_at: lastSeenAt
+            },
+            mutual: mutualSet.has(c.contact_user_id)
+        };
+    });
+
+    return res.json({ contacts, count: data.length, max: MAX_CONTACTS });
+}
+
+async function listBirthdays(res, user) {
+    const { data, error } = await supabase
+        .from('contacts')
+        .select('id, contact_user_id, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+        return res.json({ contacts: [], count: 0 });
+    }
+
+    const contactIds = data.map(c => c.contact_user_id);
+    
+    // Fetch profiles with birthdays
+    const { data: profiles } = await supabase
+        .from('users')
+        .select('id, email, display_name, avatar_url, birthday')
+        .in('id', contactIds);
+    
+    const profileMap = (profiles || []).reduce((acc, p) => {
+        acc[p.id] = p;
+        return acc;
+    }, {});
+
     const contacts = data.map(c => ({
         ...c,
         contact: { 
@@ -211,13 +263,11 @@ async function listContacts(res, user) {
             email: profileMap[c.contact_user_id]?.email || null,
             display_name: profileMap[c.contact_user_id]?.display_name || null,
             avatar_url: profileMap[c.contact_user_id]?.avatar_url || null,
-            status_emoji: profileMap[c.contact_user_id]?.status_emoji || null,
-            status_text: profileMap[c.contact_user_id]?.status_text || null
-        },
-        mutual: mutualSet.has(c.contact_user_id)
+            birthday: profileMap[c.contact_user_id]?.birthday || null
+        }
     }));
 
-    return res.json({ contacts, count: data.length, max: MAX_CONTACTS });
+    return res.json({ contacts, count: data.length });
 }
 
 // ===== POST HANDLER =====

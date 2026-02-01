@@ -2200,12 +2200,18 @@
         <div class="scroll-sentinel" id="scroll-sentinel" aria-hidden="true"></div>
     </main>
 
+    <!-- GIPHY Integration -->
+    <script src="/js/giphy.js"></script>
+
     <script>
         const API_URL = '/api';
         let session = null;
         let user = null;
         let posts = [];
         let openMenuPostId = null;
+        
+        // GIF state
+        let selectedGif = null; // { id, url, ... }
         
         // Reactions state
         const REACTION_EMOJIS = ['❤️', '😂', '😮', '😢', '👏'];

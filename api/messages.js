@@ -80,10 +80,10 @@ async function handleGetMessages(req, res, user) {
 
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || 50), MAX_FETCH_LIMIT);
 
-    // Build query - include read_at for read receipts
+    // Build query - include read_at for read receipts and file attachment fields
     let query = supabase
         .from('messages')
-        .select('id, sender_id, receiver_id, content, is_ping, created_at, read_at')
+        .select('id, sender_id, receiver_id, content, is_ping, created_at, read_at, file_url, file_name, file_size, file_type')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
         .limit(safeLimit);
@@ -209,7 +209,7 @@ async function handleGetUnreadCount(req, res, user, since, includeLatest) {
 // ===== POST - Send message =====
 
 async function handleSendMessage(req, res, user) {
-    const { contact_id, content, is_ping = false } = req.body;
+    const { contact_id, content, is_ping = false, file_url, file_name, file_size, file_type } = req.body;
 
     if (!contact_id) {
         return res.status(400).json({ error: 'contact_id requis' });
@@ -219,8 +219,9 @@ async function handleSendMessage(req, res, user) {
         return res.status(400).json({ error: 'Format contact_id invalide' });
     }
 
-    // Validate content (unless it's a ping)
-    if (!is_ping) {
+    // Validate content (unless it's a ping or file attachment)
+    const hasFile = file_url && file_name;
+    if (!is_ping && !hasFile) {
         const contentResult = validateMessageContent(content, { 
             maxLength: MAX_MESSAGE_LENGTH, 
             required: true 
@@ -239,17 +240,28 @@ async function handleSendMessage(req, res, user) {
     // Sanitize content
     const safeContent = is_ping 
         ? '👋' 
-        : validateMessageContent(content, { maxLength: MAX_MESSAGE_LENGTH }).content;
+        : validateMessageContent(content || '', { maxLength: MAX_MESSAGE_LENGTH }).content || '';
+
+    // Build message object
+    const messageData = {
+        sender_id: user.id,
+        receiver_id: contact_id,
+        content: safeContent,
+        is_ping
+    };
+
+    // Add file attachment fields if present
+    if (hasFile) {
+        messageData.file_url = file_url;
+        messageData.file_name = file_name;
+        if (file_size) messageData.file_size = file_size;
+        if (file_type) messageData.file_type = file_type;
+    }
 
     // Create message
     const { data, error } = await supabase
         .from('messages')
-        .insert({
-            sender_id: user.id,
-            receiver_id: contact_id,
-            content: safeContent,
-            is_ping
-        })
+        .insert(messageData)
         .select()
         .single();
 
@@ -259,7 +271,8 @@ async function handleSendMessage(req, res, user) {
         messageId: data.id, 
         senderId: user.id, 
         receiverId: contact_id,
-        isPing: is_ping 
+        isPing: is_ping,
+        hasFile: !!file_url
     });
 
     // Send push notification (fire and forget)

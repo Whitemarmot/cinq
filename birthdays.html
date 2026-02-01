@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Anniversaires — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Calendrier des anniversaires de tes proches sur Cinq.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        .birthdays-page {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-bg-primary);
+        }
+        
+        .birthdays-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .birthdays-content {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Calendar Navigation */
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+        }
+        
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            border-color: var(--color-brand);
+        }
+        
+        .current-month {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            padding: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+            cursor: default;
+            position: relative;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+            background: transparent;
+        }
+        
+        .calendar-day.today {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+            font-weight: 600;
+        }
+        
+        .calendar-day.has-birthday {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(255, 107, 74, 0.2) 100%);
+            border-color: #fbbf24;
+            cursor: pointer;
+        }
+        
+        .calendar-day.has-birthday:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+        
+        .birthday-indicator {
+            position: absolute;
+            bottom: 2px;
+            font-size: 0.75rem;
+        }
+        
+        /* Upcoming Birthdays */
+        .upcoming-section {
+            margin-top: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .birthday-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .birthday-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            transition: all 0.2s;
+        }
+        
+        .birthday-card:hover {
+            border-color: var(--color-brand);
+            transform: translateX(4px);
+        }
+        
+        .birthday-card.today {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(255, 107, 74, 0.15) 100%);
+            border-color: #fbbf24;
+        }
+        
+        .birthday-card.upcoming {
+            border-left: 3px solid var(--color-brand);
+        }
+        
+        .birthday-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .birthday-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .birthday-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .birthday-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .birthday-date {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .birthday-countdown {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .countdown-days {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fbbf24 0%, var(--color-brand) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .countdown-today {
+            font-size: 1.25rem;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--color-text-muted);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Notification Settings */
+        .notification-settings {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+        }
+        
+        .notification-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .notification-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .notification-option:last-child {
+            border-bottom: none;
+        }
+        
+        .option-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background: var(--color-text-muted);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background: white;
+        }
+        
+        /* Loading */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s;
+        }
+        
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.open .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .btn-secondary {
+            padding: 0.625rem 1rem;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        @media (max-width: 600px) {
+            .calendar-grid {
+                gap: 0.125rem;
+            }
+            
+            .calendar-day {
+                font-size: 0.75rem;
+                padding: 0.125rem;
+            }
+            
+            .birthday-indicator {
+                font-size: 0.625rem;
+            }
+            
+            .birthday-card {
+                padding: 0.75rem;
+            }
+            
+            .birthday-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <main class="birthdays-page">
+        <header class="birthdays-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">← Retour</button>
+                <h1 class="page-title">🎂 Anniversaires</h1>
+            </div>
+        </header>
+        
+        <div class="birthdays-content" id="content">
+            <div class="loading-state" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Chargement du calendrier...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Birthday Detail Modal -->
+    <div class="modal-overlay" id="birthday-modal">
+        <div class="modal">
+            <h2 class="modal-title" id="modal-title">🎂 Anniversaire</h2>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeBirthdayModal()">Fermer</button>
+                <button class="cta-btn" onclick="sendBirthdayWish()" id="send-wish-btn">
+                    🎉 Envoyer un message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+        let currentDate = new Date();
+        let contacts = [];
+        let birthdays = [];
+        let selectedContact = null;
+        
+        const MONTHS = [
+            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ];
+        
+        const DAYS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        
+        function goBack() {
+            if (document.referrer && document.referrer.includes(window.location.origin)) {
+                history.back();
+            } else {
+                window.location.href = '/app.html';
+            }
+        }
+        
+        async function init() {
+            const token = localStorage.getItem('cinq_token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            await loadBirthdays();
+            renderContent();
+        }
+        
+        async function loadBirthdays() {
+            try {
+                const res = await fetch(`${API_URL}/contacts?action=birthdays`, {
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) throw new Error('Failed to load');
+                
+                const data = await res.json();
+                contacts = data.contacts || [];
+                birthdays = contacts.filter(c => c.contact?.birthday);
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                contacts = [];
+                birthdays = [];
+            }
+        }
+        
+        function renderContent() {
+            const container = document.getElementById('content');
+            
+            if (birthdays.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎂</div>
+                        <h2 class="empty-title">Aucun anniversaire enregistré</h2>
+                        <p class="empty-text">Ajoute la date de naissance de tes contacts pour ne plus jamais oublier un anniversaire !</p>
+                        <a href="/app.html" class="cta-btn">
+                            Retour à l'app
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <!-- Calendar Navigation -->
+                <div class="calendar-nav">
+                    <button class="nav-btn" onclick="prevMonth()" aria-label="Mois précédent">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span class="current-month" id="current-month"></span>
+                    <button class="nav-btn" onclick="nextMonth()" aria-label="Mois suivant">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+                
+                <!-- Calendar Grid -->
+                <div class="calendar-grid" id="calendar-grid"></div>
+                
+                <!-- Upcoming Birthdays -->
+                <div class="upcoming-section">
+                    <h2 class="section-title">🎁 Prochains anniversaires</h2>
+                    <div class="birthday-list" id="birthday-list"></div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div class="notification-settings">
+                    <h3 class="notification-title">🔔 Rappels</h3>
+                    <div class="notification-option">
+                        <span class="option-label">Rappel le jour même</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notify-same-day" checked onchange="saveNotificationPrefs()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-option">
+                        <span class="option-label">Rappel 1 jour avant</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notify-1-day" checked onchange="saveNotificationPrefs()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="notification-option">
+                        <span class="option-label">Rappel 1 semaine avant</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notify-1-week" onchange="saveNotificationPrefs()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            renderCalendar();
+            renderUpcomingBirthdays();
+            loadNotificationPrefs();
+        }
+        
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthLabel = document.getElementById('current-month');
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            monthLabel.textContent = `${MONTHS[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDay = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+            
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+            
+            // Create birthday map for this month
+            const birthdayMap = {};
+            birthdays.forEach(c => {
+                if (!c.contact?.birthday) return;
+                const [_, m, d] = c.contact.birthday.split('-').map(Number);
+                if (m === month + 1) {
+                    if (!birthdayMap[d]) birthdayMap[d] = [];
+                    birthdayMap[d].push(c);
+                }
+            });
+            
+            let html = DAYS.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+            
+            // Previous month days
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = startingDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
+            }
+            
+            // Current month days
+            for (let day = 1; day <= totalDays; day++) {
+                const isToday = isCurrentMonth && today.getDate() === day;
+                const hasBirthday = birthdayMap[day];
+                
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                if (hasBirthday) classes += ' has-birthday';
+                
+                const indicator = hasBirthday ? '<span class="birthday-indicator">🎂</span>' : '';
+                const onclick = hasBirthday ? `onclick="showDayBirthdays(${day})"` : '';
+                
+                html += `<div class="${classes}" ${onclick}>${day}${indicator}</div>`;
+            }
+            
+            // Next month days
+            const remainingDays = (7 - ((startingDay + totalDays) % 7)) % 7;
+            for (let i = 1; i <= remainingDays; i++) {
+                html += `<div class="calendar-day other-month">${i}</div>`;
+            }
+            
+            grid.innerHTML = html;
+        }
+        
+        function renderUpcomingBirthdays() {
+            const list = document.getElementById('birthday-list');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Calculate days until next birthday
+            const upcoming = birthdays.map(c => {
+                const [_, month, day] = c.contact.birthday.split('-').map(Number);
+                const thisYear = new Date(today.getFullYear(), month - 1, day);
+                
+                let nextBirthday = thisYear;
+                if (thisYear < today) {
+                    nextBirthday = new Date(today.getFullYear() + 1, month - 1, day);
+                }
+                
+                const diffTime = nextBirthday - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                return {
+                    ...c,
+                    nextBirthday,
+                    daysUntil: diffDays,
+                    birthdayDate: `${day} ${MONTHS[month - 1]}`
+                };
+            }).sort((a, b) => a.daysUntil - b.daysUntil);
+            
+            if (upcoming.length === 0) {
+                list.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">Aucun anniversaire à venir</p>';
+                return;
+            }
+            
+            list.innerHTML = upcoming.map(c => {
+                const contact = c.contact;
+                const initial = (contact.display_name || contact.email || '?')[0].toUpperCase();
+                const name = contact.display_name || contact.email?.split('@')[0] || 'Contact';
+                const avatar = contact.avatar_url 
+                    ? `<img src="${escapeHtml(contact.avatar_url)}" alt="${escapeHtml(name)}">`
+                    : initial;
+                
+                const isToday = c.daysUntil === 0;
+                const isSoon = c.daysUntil <= 7;
+                let cardClass = 'birthday-card';
+                if (isToday) cardClass += ' today';
+                else if (isSoon) cardClass += ' upcoming';
+                
+                const countdown = isToday 
+                    ? '<span class="countdown-today">🎉 Aujourd\'hui !</span>'
+                    : `<span class="countdown-days">${c.daysUntil}</span><br><span class="countdown-label">jour${c.daysUntil > 1 ? 's' : ''}</span>`;
+                
+                return `
+                    <div class="${cardClass}" onclick="showBirthdayDetail('${contact.id}')">
+                        <div class="birthday-avatar">${avatar}</div>
+                        <div class="birthday-info">
+                            <div class="birthday-name">${escapeHtml(name)}</div>
+                            <div class="birthday-date">${c.birthdayDate}</div>
+                        </div>
+                        <div class="birthday-countdown">
+                            ${countdown}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        function showDayBirthdays(day) {
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+            
+            const dayBirthdays = birthdays.filter(c => {
+                const [_, m, d] = c.contact.birthday.split('-').map(Number);
+                return m === month + 1 && d === day;
+            });
+            
+            if (dayBirthdays.length === 1) {
+                showBirthdayDetail(dayBirthdays[0].contact.id);
+            } else if (dayBirthdays.length > 1) {
+                // Multiple birthdays - show list
+                const modal = document.getElementById('birthday-modal');
+                const title = document.getElementById('modal-title');
+                const body = document.getElementById('modal-body');
+                
+                title.textContent = `🎂 ${day} ${MONTHS[month]}`;
+                body.innerHTML = dayBirthdays.map(c => {
+                    const contact = c.contact;
+                    const name = contact.display_name || contact.email?.split('@')[0] || 'Contact';
+                    return `<p style="margin:0.5rem 0;cursor:pointer;" onclick="showBirthdayDetail('${contact.id}')">${escapeHtml(name)}</p>`;
+                }).join('');
+                
+                document.getElementById('send-wish-btn').style.display = 'none';
+                modal.classList.add('open');
+            }
+        }
+        
+        function showBirthdayDetail(contactId) {
+            const contact = contacts.find(c => c.contact.id === contactId)?.contact;
+            if (!contact) return;
+            
+            selectedContact = contact;
+            
+            const modal = document.getElementById('birthday-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            const name = contact.display_name || contact.email?.split('@')[0] || 'Contact';
+            const [_, month, day] = contact.birthday.split('-').map(Number);
+            
+            title.textContent = `🎂 ${escapeHtml(name)}`;
+            body.innerHTML = `
+                <p style="font-size: 1.25rem; text-align: center; margin-bottom: 1rem;">
+                    ${day} ${MONTHS[month - 1]}
+                </p>
+                <p style="color: var(--color-text-muted); text-align: center;">
+                    N'oublie pas de lui souhaiter un joyeux anniversaire !
+                </p>
+            `;
+            
+            document.getElementById('send-wish-btn').style.display = 'inline-flex';
+            modal.classList.add('open');
+        }
+        
+        function closeBirthdayModal() {
+            document.getElementById('birthday-modal').classList.remove('open');
+            selectedContact = null;
+        }
+        
+        function sendBirthdayWish() {
+            if (!selectedContact) return;
+            // Navigate to chat with pre-filled message
+            window.location.href = `/app.html?chat=${selectedContact.id}&message=🎂 Joyeux anniversaire ! 🎉`;
+        }
+        
+        function loadNotificationPrefs() {
+            const prefs = JSON.parse(localStorage.getItem('cinq_birthday_prefs') || '{}');
+            document.getElementById('notify-same-day').checked = prefs.sameDay !== false;
+            document.getElementById('notify-1-day').checked = prefs.oneDay !== false;
+            document.getElementById('notify-1-week').checked = prefs.oneWeek === true;
+        }
+        
+        function saveNotificationPrefs() {
+            const prefs = {
+                sameDay: document.getElementById('notify-same-day').checked,
+                oneDay: document.getElementById('notify-1-day').checked,
+                oneWeek: document.getElementById('notify-1-week').checked
+            };
+            localStorage.setItem('cinq_birthday_prefs', JSON.stringify(prefs));
+        }
+        
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeBirthdayModal();
+        });
+        
+        // Close modal on overlay click
+        document.getElementById('birthday-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'birthday-modal') closeBirthdayModal();
+        });
+        
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

@@ -153,9 +153,38 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, status_emoji, status_text } = req.body;
+    const { display_name, avatar_url, bio, birthday, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, status_emoji, status_text, hide_last_seen } = req.body;
 
     const updates = {};
+    
+    // Birthday (date of birth)
+    if (birthday !== undefined) {
+        if (birthday === null || birthday === '') {
+            updates.birthday = null;
+        } else {
+            // Validate date format (YYYY-MM-DD)
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(birthday)) {
+                return res.status(400).json({ error: 'Format de date invalide (AAAA-MM-JJ)', field: 'birthday' });
+            }
+            // Validate it's a real date
+            const date = new Date(birthday);
+            if (isNaN(date.getTime())) {
+                return res.status(400).json({ error: 'Date invalide', field: 'birthday' });
+            }
+            // Ensure date is not in the future
+            if (date > new Date()) {
+                return res.status(400).json({ error: 'La date de naissance ne peut pas être dans le futur', field: 'birthday' });
+            }
+            // Ensure reasonable age (not older than 150 years)
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 150);
+            if (date < minDate) {
+                return res.status(400).json({ error: 'Date de naissance invalide', field: 'birthday' });
+            }
+            updates.birthday = birthday;
+        }
+    }
     
     if (display_name !== undefined) {
         const result = validateDisplayName(display_name);
@@ -242,6 +271,12 @@ async function handleUpdateProfile(req, res, user) {
         } else {
             return res.status(400).json({ error: 'Texte de statut invalide', field: 'status_text' });
         }
+    }
+    
+    // Hide last seen (privacy setting)
+    if (hide_last_seen !== undefined) {
+        updates.hide_last_seen = Boolean(hide_last_seen);
+        logInfo('Hide last seen toggled', { userId: user.id, hideLastSeen: updates.hide_last_seen });
     }
 
     if (Object.keys(updates).length === 0) {

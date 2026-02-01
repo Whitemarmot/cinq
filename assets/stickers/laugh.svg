@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="laugh-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D"/>
+      <stop offset="100%" style="stop-color:#FFA726"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="32" fill="url(#laugh-grad)"/>
+  <path d="M24 32C24 32 26 28 30 28C34 28 36 32 36 32" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+  <path d="M44 32C44 32 46 28 50 28C54 28 56 32 56 32" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 44C22 44 30 58 40 58C50 58 58 44 58 44" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+  <path d="M25 47C25 47 32 54 40 54C48 54 55 47 55 47" fill="#5D4037"/>
+  <text x="14" y="18" font-size="12" fill="#5D4037">😂</text>
+  <text x="58" y="18" font-size="12" fill="#5D4037">😂</text>
+</svg>

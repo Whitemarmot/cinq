@@ -1,0 +1,485 @@
+/**
+ * ==========================================================================
+ * CINQ - GIPHY Integration Styles
+ * ==========================================================================
+ */
+
+/* ===== GIF TRIGGER BUTTON ===== */
+.giphy-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, #00ff99 0%, #00ccff 50%, #9933ff 100%);
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.giphy-trigger-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(153, 51, 255, 0.4);
+}
+
+.giphy-trigger-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.giphy-trigger-btn .giphy-btn-text {
+    background: linear-gradient(135deg, #000 0%, #333 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* ===== PICKER OVERLAY ===== */
+.giphy-picker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: giphy-fade-in 0.2s ease-out;
+}
+
+@keyframes giphy-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ===== PICKER CONTENT ===== */
+.giphy-picker-content {
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    background: var(--color-bg-secondary, #1a1a2e);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-xl, 16px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: giphy-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes giphy-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== PICKER HEADER ===== */
+.giphy-picker-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+}
+
+.giphy-search-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.giphy-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    pointer-events: none;
+}
+
+.giphy-search-input {
+    width: 100%;
+    padding: 0.625rem 2.5rem 0.625rem 2.5rem;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-lg, 12px);
+    color: var(--color-text-primary, white);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.giphy-search-input:focus {
+    outline: none;
+    border-color: var(--color-brand, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.giphy-search-input::placeholder {
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+}
+
+.giphy-search-clear {
+    position: absolute;
+    right: 0.5rem;
+    width: 24px;
+    height: 24px;
+    background: var(--color-bg-hover, rgba(255, 255, 255, 0.1));
+    border: none;
+    border-radius: 50%;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.giphy-search-clear:hover {
+    background: var(--color-bg-active, rgba(255, 255, 255, 0.15));
+    color: var(--color-text-primary, white);
+}
+
+.giphy-search-clear svg {
+    width: 14px;
+    height: 14px;
+}
+
+.giphy-close-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: 50%;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.giphy-close-btn:hover {
+    background: var(--color-error, #ef4444);
+    border-color: var(--color-error, #ef4444);
+    color: white;
+}
+
+.giphy-close-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== TABS ===== */
+.giphy-tabs {
+    display: flex;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+}
+
+.giphy-tab {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.giphy-tab:hover {
+    background: var(--color-bg-hover, rgba(255, 255, 255, 0.05));
+    color: var(--color-text-primary, white);
+}
+
+.giphy-tab.active {
+    background: var(--color-brand-muted, rgba(99, 102, 241, 0.2));
+    color: var(--color-brand, #6366f1);
+}
+
+/* ===== GRID CONTAINER ===== */
+.giphy-grid-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    min-height: 300px;
+    max-height: 50vh;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ===== GIF GRID ===== */
+.giphy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.5rem;
+}
+
+.giphy-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.giphy-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.giphy-item:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-brand, #6366f1);
+}
+
+.giphy-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ===== LOADING STATE ===== */
+.giphy-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 0.75rem;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    font-size: 0.875rem;
+}
+
+.giphy-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-bg-elevated, rgba(255, 255, 255, 0.1));
+    border-top-color: var(--color-brand, #6366f1);
+    border-radius: 50%;
+    animation: giphy-spin 0.8s linear infinite;
+}
+
+@keyframes giphy-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== EMPTY STATE ===== */
+.giphy-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.giphy-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.5;
+}
+
+.giphy-empty p {
+    margin: 0;
+}
+
+.giphy-empty-hint {
+    font-size: 0.875rem;
+    margin-top: 0.25rem !important;
+    opacity: 0.7;
+}
+
+/* ===== FOOTER / ATTRIBUTION ===== */
+.giphy-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    display: flex;
+    justify-content: center;
+}
+
+.giphy-attribution {
+    height: 20px;
+    width: auto;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.giphy-attribution:hover {
+    opacity: 1;
+}
+
+/* ===== HOVER PREVIEW ===== */
+.giphy-preview {
+    position: absolute;
+    background: var(--color-bg-secondary, #1a1a2e);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-lg, 12px);
+    padding: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    max-width: 300px;
+    pointer-events: none;
+}
+
+.giphy-preview-img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: var(--radius-md, 8px);
+    display: block;
+}
+
+/* ===== SELECTED GIF PREVIEW ===== */
+.giphy-selected-preview {
+    position: relative;
+    display: inline-block;
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    margin-top: 0.75rem;
+    max-width: 100%;
+}
+
+.giphy-selected-img {
+    max-width: 100%;
+    max-height: 300px;
+    display: block;
+    border-radius: var(--radius-lg, 12px);
+}
+
+.giphy-preview-remove {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.giphy-selected-preview:hover .giphy-preview-remove {
+    opacity: 1;
+}
+
+.giphy-preview-remove:hover {
+    background: var(--color-error, #ef4444);
+}
+
+.giphy-preview-remove svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===== GIF BADGE ===== */
+.giphy-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    background: linear-gradient(135deg, #00ff99 0%, #00ccff 50%, #9933ff 100%);
+    border-radius: var(--radius-sm, 4px);
+    color: #000;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== GIF IN CONTENT (Messages/Posts) ===== */
+.giphy-content-gif {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+
+.giphy-content-img {
+    max-width: 100%;
+    max-height: 400px;
+    display: block;
+    border-radius: var(--radius-lg, 12px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .giphy-picker-content {
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: var(--radius-xl, 16px) var(--radius-xl, 16px) 0 0;
+        margin-top: auto;
+    }
+    
+    .giphy-picker {
+        align-items: flex-end;
+        padding: 0;
+    }
+    
+    .giphy-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .giphy-grid-container {
+        max-height: 60vh;
+    }
+    
+    .giphy-preview {
+        display: none;
+    }
+}
+
+/* ===== HIDDEN UTILITY ===== */
+.giphy-picker .hidden {
+    display: none !important;
+}
+
+/* ===== LIGHT THEME ADJUSTMENTS ===== */
+[data-theme="light"] .giphy-picker-content {
+    background: var(--color-bg-primary, #ffffff);
+}
+
+[data-theme="light"] .giphy-search-input {
+    background: var(--color-bg-secondary, #f5f5f5);
+}
+
+[data-theme="light"] .giphy-item {
+    background: var(--color-bg-secondary, #f5f5f5);
+}
+
+[data-theme="light"] .giphy-preview {
+    background: var(--color-bg-primary, #ffffff);
+}

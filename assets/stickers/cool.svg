@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="cool-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD93D"/>
+      <stop offset="100%" style="stop-color:#FFA726"/>
+    </linearGradient>
+    <linearGradient id="glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#424242"/>
+      <stop offset="100%" style="stop-color:#212121"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="42" r="28" fill="url(#cool-grad)"/>
+  <rect x="16" y="32" width="20" height="10" rx="2" fill="url(#glass-grad)"/>
+  <rect x="44" y="32" width="20" height="10" rx="2" fill="url(#glass-grad)"/>
+  <path d="M36 37L44 37" stroke="url(#glass-grad)" stroke-width="2"/>
+  <path d="M30 54C30 54 35 58 40 58C45 58 50 54 50 54" stroke="#5D4037" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="26" cy="35" rx="4" ry="2" fill="white" fill-opacity="0.3"/>
+  <ellipse cx="54" cy="35" rx="4" ry="2" fill="white" fill-opacity="0.3"/>
+</svg>

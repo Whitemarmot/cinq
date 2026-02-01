@@ -6494,6 +6494,24 @@
                         slot.appendChild(statusDiv);
                     }
                     
+                    // Add last seen status
+                    const lastSeenAt = contact.contact?.last_seen_at;
+                    const lastSeenInfo = formatLastSeen(lastSeenAt);
+                    const lastSeenDiv = document.createElement('div');
+                    lastSeenDiv.className = 'contact-last-seen' + (lastSeenInfo.isOnline ? ' online' : '');
+                    lastSeenDiv.setAttribute('aria-hidden', 'true');
+                    
+                    const dot = document.createElement('span');
+                    dot.className = 'contact-last-seen-dot';
+                    lastSeenDiv.appendChild(dot);
+                    
+                    const lastSeenText = document.createElement('span');
+                    lastSeenText.className = 'contact-last-seen-text';
+                    lastSeenText.textContent = lastSeenInfo.text;
+                    lastSeenDiv.appendChild(lastSeenText);
+                    
+                    slot.appendChild(lastSeenDiv);
+                    
                     if (unread > 0) {
                         const badge = document.createElement('div');
                         badge.className = 'unread-badge';

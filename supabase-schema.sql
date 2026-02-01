@@ -65,6 +65,19 @@ BEGIN
     END IF;
 END $$;
 
+-- Add last seen columns (presence tracking)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='last_seen_at') THEN
+        ALTER TABLE users ADD COLUMN last_seen_at TIMESTAMPTZ DEFAULT NOW();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='hide_last_seen') THEN
+        ALTER TABLE users ADD COLUMN hide_last_seen BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_users_last_seen ON users(last_seen_at DESC);
+
 -- Auto-create user profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
