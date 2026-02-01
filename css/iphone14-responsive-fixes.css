@@ -1,0 +1,641 @@
+/**
+ * ==========================================================================
+ * CINQ - iPhone 14 Responsive Fixes
+ * ==========================================================================
+ * 
+ * Spécifiquement optimisé pour iPhone 14: 390x844px
+ * Fixes:
+ * - Overflow horizontal 
+ * - Textes trop petits
+ * - Boutons trop petits pour le touch
+ * - Espacements incorrects
+ * - Media queries optimisées
+ * 
+ * @author Subagent Mobile Responsive
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   IPHONE 14 BREAKPOINT - 390x844
+   ========================================================================== */
+
+/* iPhone 14 & 14 Pro base styles */
+@media screen and (max-width: 390px) {
+  
+  /* ===== PREVENT HORIZONTAL OVERFLOW ===== */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    position: relative;
+  }
+  
+  /* Ensure no elements exceed viewport width */
+  * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Container fixes for narrow screens */
+  .hero, 
+  .section,
+  .container {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  /* ===== TEXT SIZE FIXES - Minimum 14px ===== */
+  
+  /* Base text size increase */
+  body {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+  
+  /* Hero text adjustments */
+  .hero-headline {
+    font-size: 2rem !important; /* 32px minimum */
+    line-height: 1.1 !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .hero-sub {
+    font-size: 1rem !important; /* 16px */
+    line-height: 1.6 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Feature pills text */
+  .feature-pill {
+    font-size: 0.875rem !important; /* 14px minimum */
+    padding: 0.75rem 1rem !important;
+    min-height: 44px !important;
+  }
+  
+  /* Section titles */
+  .section-title {
+    font-size: 2rem !important; /* 32px */
+    line-height: 1.2 !important;
+  }
+  
+  .section-subtitle {
+    font-size: 1rem !important; /* 16px */
+    line-height: 1.6 !important;
+  }
+  
+  /* Step descriptions */
+  .step-desc {
+    font-size: 0.875rem !important; /* 14px minimum */
+    line-height: 1.5 !important;
+  }
+  
+  /* FAQ text */
+  .faq-question {
+    font-size: 1rem !important; /* 16px */
+    padding: 1rem 0 !important;
+  }
+  
+  .faq-answer-content {
+    font-size: 0.875rem !important; /* 14px */
+    line-height: 1.6 !important;
+  }
+  
+  /* Footer links */
+  footer a {
+    font-size: 0.875rem !important; /* 14px minimum */
+  }
+  
+  /* ===== TOUCH TARGET FIXES - Minimum 44x44px ===== */
+  
+  /* Universal button sizing */
+  button,
+  [role="button"],
+  .btn,
+  a.btn,
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-size: 1rem !important;
+  }
+  
+  /* Header elements */
+  .theme-toggle {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+  .header-login-btn {
+    min-height: 44px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* CTA buttons */
+  .cta-button {
+    min-height: 56px !important;
+    padding: 1rem 2rem !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  /* Waitlist form elements */
+  .waitlist-input {
+    min-height: 48px !important;
+    padding: 0.875rem 1rem !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    border-radius: 24px !important;
+  }
+  
+  .waitlist-submit {
+    min-height: 48px !important;
+    min-width: 80px !important;
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+  }
+  
+  /* FAQ accordion buttons */
+  .faq-question {
+    min-height: 52px !important;
+    padding: 1rem 0 !important;
+  }
+  
+  .faq-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  /* ===== SPACING FIXES ===== */
+  
+  /* Reduce excessive spacing for small screen */
+  .hero {
+    padding-top: 6rem !important; /* Account for header */
+    padding-bottom: 3rem !important;
+  }
+  
+  .section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+  
+  /* Hero elements spacing */
+  .hero-badge {
+    margin-bottom: 1.5rem !important;
+    padding: 0.625rem 1rem !important;
+  }
+  
+  .hero-logo {
+    margin-bottom: 2rem !important;
+  }
+  
+  .features {
+    margin-bottom: 2rem !important;
+    gap: 0.75rem !important;
+    padding: 0 !important;
+  }
+  
+  .cta-section {
+    gap: 1rem !important;
+  }
+  
+  .hero-social-proof {
+    margin-top: 2rem !important;
+    padding-top: 2rem !important;
+    gap: 1rem !important;
+  }
+  
+  /* Section spacing */
+  .section-header {
+    margin-bottom: 2rem !important;
+  }
+  
+  .steps {
+    gap: 1.5rem !important;
+  }
+  
+  .step {
+    padding: 1.5rem !important;
+  }
+  
+  /* Testimonials spacing */
+  .testimonials-grid {
+    gap: 1rem !important;
+  }
+  
+  .testimonial {
+    padding: 1.5rem !important;
+  }
+  
+  /* ===== LAYOUT ADJUSTMENTS ===== */
+  
+  /* Stack elements vertically */
+  .features {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  .feature-pill {
+    width: 100% !important;
+    max-width: 300px !important;
+    justify-content: center !important;
+  }
+  
+  /* Steps grid to single column */
+  .steps {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Testimonials to single column */
+  .testimonials-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Waitlist form stack */
+  .waitlist-form {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  
+  /* Hero stats stack */
+  .hero-social-proof {
+    flex-direction: column !important;
+  }
+  
+  .stat-divider {
+    width: 60px !important;
+    height: 1px !important;
+  }
+  
+  /* ===== HEADER FIXES ===== */
+  
+  .site-header {
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .header-nav {
+    gap: 0.5rem !important;
+  }
+  
+  /* Logo scaling */
+  .header-logo-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  /* ===== HERO 5 LOGO SCALING ===== */
+  
+  .five {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  .five-number {
+    font-size: 42px !important;
+  }
+  
+  /* ===== FORM IMPROVEMENTS ===== */
+  
+  /* Ensure inputs don't cause zoom on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px !important;
+    -webkit-appearance: none !important;
+    border-radius: 12px !important;
+  }
+  
+  /* ===== SAFE AREAS ===== */
+  
+  /* Top safe area */
+  .hero {
+    padding-top: max(6rem, env(safe-area-inset-top) + 5rem) !important;
+  }
+  
+  .site-header {
+    padding-top: max(0.75rem, env(safe-area-inset-top) + 0.5rem) !important;
+  }
+  
+  /* Bottom safe area */
+  .final-cta-section,
+  footer {
+    padding-bottom: max(3rem, env(safe-area-inset-bottom) + 2rem) !important;
+  }
+  
+  /* Sticky CTA safe area */
+  .sticky-cta {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom) + 0.5rem) !important;
+  }
+  
+  /* ===== ANIMATION OPTIMIZATIONS ===== */
+  
+  /* Reduce motion for better performance on small devices */
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-reveal,
+    .scroll-reveal-left,
+    .scroll-reveal-right,
+    .scroll-reveal-scale,
+    .stagger-children {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+  
+  /* Simpler animations for mobile */
+  .scroll-reveal {
+    transition: opacity 0.4s ease !important;
+  }
+  
+  /* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+  
+  /* Larger touch targets for accessibility */
+  a, button, [tabindex] {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Better focus states */
+  :focus {
+    outline: 3px solid var(--cinq-indigo, #6366f1) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Skip links for screen readers */
+  .skip-links a {
+    position: absolute !important;
+    left: -9999px !important;
+    z-index: 999999 !important;
+    padding: 8px 16px !important;
+    background: var(--cinq-indigo, #6366f1) !important;
+    color: white !important;
+    text-decoration: none !important;
+    font-size: 16px !important;
+  }
+  
+  .skip-links a:focus {
+    left: 6px !important;
+    top: 6px !important;
+  }
+}
+
+/* ==========================================================================
+   VERY SMALL SCREENS - < 360px (iPhone SE, older devices)
+   ========================================================================== */
+
+@media screen and (max-width: 360px) {
+  
+  /* Even smaller text adjustments if needed */
+  .hero-headline {
+    font-size: 1.75rem !important; /* 28px */
+  }
+  
+  .cta-button {
+    padding: 0.875rem 1.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Tighter spacing */
+  .hero {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  .section {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* Feature pills even smaller */
+  .feature-pill {
+    font-size: 0.8125rem !important; /* 13px */
+    padding: 0.625rem 0.875rem !important;
+  }
+  
+  /* Five logo smaller */
+  .five {
+    width: 90px !important;
+    height: 90px !important;
+  }
+  
+  .five-number {
+    font-size: 38px !important;
+  }
+}
+
+/* ==========================================================================
+   LANDSCAPE MODE OPTIMIZATIONS
+   ========================================================================== */
+
+@media screen and (max-height: 500px) and (orientation: landscape) and (max-width: 844px) {
+  
+  /* Reduce vertical spacing in landscape */
+  .hero {
+    min-height: 100vh !important;
+    padding-top: 4rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  
+  .hero-logo {
+    margin-bottom: 1rem !important;
+  }
+  
+  .five {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  
+  .five-number {
+    font-size: 32px !important;
+  }
+  
+  .hero-headline {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .features {
+    margin-bottom: 1rem !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .feature-pill {
+    width: auto !important;
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  /* Hide some decorative elements in landscape */
+  .hero-social-proof,
+  .pentagon-pattern,
+  .gradient-orb {
+    display: none !important;
+  }
+  
+  /* Sticky CTA less prominent in landscape */
+  .sticky-cta {
+    padding: 0.5rem !important;
+  }
+  
+  .sticky-cta .cta-button {
+    min-height: 40px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE OPTIMIZATIONS FOR MOBILE
+   ========================================================================== */
+
+@media screen and (max-width: 390px) and (prefers-color-scheme: dark) {
+  
+  /* Ensure sufficient contrast on small screens */
+  .hero-headline {
+    color: #ffffff !important;
+  }
+  
+  .hero-sub {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+  
+  .feature-pill {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  
+  /* Better button contrast */
+  .waitlist-input {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+  }
+  
+  .waitlist-input::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE SUPPORT
+   ========================================================================== */
+
+@media (prefers-contrast: high) and (max-width: 390px) {
+  
+  /* Increase contrast for better readability */
+  .hero-headline,
+  .section-title {
+    color: #000000 !important;
+  }
+  
+  [data-theme="dark"] .hero-headline,
+  [data-theme="dark"] .section-title {
+    color: #ffffff !important;
+  }
+  
+  /* High contrast buttons */
+  .cta-button {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+  
+  [data-theme="dark"] .cta-button {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+  
+  /* High contrast form elements */
+  .waitlist-input {
+    border-width: 2px !important;
+    border-color: #000000 !important;
+  }
+  
+  [data-theme="dark"] .waitlist-input {
+    border-color: #ffffff !important;
+  }
+}
+
+/* ==========================================================================
+   PRINT STYLES - Mobile optimized
+   ========================================================================== */
+
+@media print {
+  
+  /* Hide interactive elements */
+  .cta-button,
+  .waitlist-form,
+  .theme-toggle,
+  .sticky-cta,
+  .hero-badge {
+    display: none !important;
+  }
+  
+  /* Optimize text for print */
+  .hero-headline,
+  .section-title {
+    color: #000000 !important;
+    page-break-after: avoid !important;
+  }
+  
+  /* Ensure readability */
+  body {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+  
+  .section {
+    page-break-inside: avoid !important;
+    margin-bottom: 20pt !important;
+  }
+}
+
+/* ==========================================================================
+   REDUCED DATA MODE - Minimize animations and effects
+   ========================================================================== */
+
+@media (prefers-reduced-data: reduce) and (max-width: 390px) {
+  
+  /* Remove background animations */
+  .pentagon-pattern,
+  .gradient-orb,
+  .noise-overlay {
+    display: none !important;
+  }
+  
+  /* Simplify animations */
+  .scroll-reveal,
+  .stagger-children,
+  .five-ring {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  /* Remove complex gradients */
+  .five-core::before,
+  .final-cta-section::before {
+    display: none !important;
+  }
+  
+  /* Simplified buttons */
+  .cta-button {
+    background: var(--cinq-indigo, #6366f1) !important;
+    box-shadow: none !important;
+  }
+}

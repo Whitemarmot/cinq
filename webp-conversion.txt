@@ -1,0 +1,17 @@
+
+<!-- WebP Optimization Instructions -->
+<!-- Convert these PNG files to WebP for better compression -->
+
+const imagesToOptimize = [
+    { src: 'assets/icons/icon-128x128.png', webp: 'assets/icons/icon-128x128.webp' },
+    { src: 'assets/icons/icon-144x144.png', webp: 'assets/icons/icon-144x144.webp' },
+    { src: 'assets/icons/icon-152x152.png', webp: 'assets/icons/icon-152x152.webp' },
+    { src: 'assets/icons/icon-192x192.png', webp: 'assets/icons/icon-192x192.webp' },
+    { src: 'assets/icons/icon-384x384.png', webp: 'assets/icons/icon-384x384.webp' },
+    { src: 'assets/icons/icon-512x512.png', webp: 'assets/icons/icon-512x512.webp' },
+    { src: 'assets/icons/icon-72x72.png', webp: 'assets/icons/icon-72x72.webp' },
+    { src: 'assets/icons/icon-96x96.png', webp: 'assets/icons/icon-96x96.webp' }
+];
+
+// Use online tools or CLI:
+// cwebp input.png -o output.webp -q 80

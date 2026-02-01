@@ -9,11 +9,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
+    <!-- Performance: Preload critical resources -->
+    <link rel="preload" href="/css/critical.min.css" as="style">
+    <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" as="style">
+    <link rel="dns-prefetch" href="https://api.supabase.co">
+    
     <!-- Preload critical fonts -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
     
     <!-- SEO -->
-    <meta name="description" content="5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment. Rejoins l'anti-réseau social.">
+    <meta name="description" content="5 proches. Zero like. Zero algorithme. Juste les gens qui comptent vraiment. Rejoins l'anti-réseau social.">
     <meta name="keywords" content="réseau social, anti social, minimaliste, vie privée, slow social">
     <meta name="author" content="Cinq">
     
@@ -119,17 +125,21 @@
     <!-- Design System (async load for non-critical) -->
     <link rel="stylesheet" href="/design/styles.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/iphone14-responsive-fixes.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/css/a11y.min.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/css/improvements.css" media="print" onload="this.media='all'">
     <noscript>
         <link rel="stylesheet" href="/design/styles.min.css">
         <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+        <link rel="stylesheet" href="/css/iphone14-responsive-fixes.css">
         <link rel="stylesheet" href="/css/a11y.min.css">
         <link rel="stylesheet" href="/css/improvements.css">
     </noscript>
     
     <!-- Analytics (deferred) -->
     <script defer src="/analytics.min.js"></script>
+    <!-- PWA Install Script - Deferred -->
+    <script defer src="/pwa-install.min.js"></script>
     
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.min.css">
@@ -1432,7 +1442,7 @@
                 <div class="features scroll-reveal-enhanced stagger-enhanced">
                     <span class="feature-pill">
                         <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                        <span>5 slots. C'est tout.</span>
+                        <span>5 places. Point.</span>
                     </span>
                     <span class="feature-pill">
                         <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/></svg>
@@ -1503,8 +1513,8 @@
                     <div class="step-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
-                    <h3 class="step-title">Choisis tes 5 proches</h3>
-                    <p class="step-desc">5 slots. Pas 500. Tu dois choisir. Qui compte vraiment dans ta vie ?</p>
+                    <h3 class="step-title">Choisis tes 5</h3>
+                    <p class="step-desc">Pas 50, pas 500. Juste 5. Qui mérite vraiment ta bulle ?</p>
                 </div>
                 
                 <div class="step">
@@ -1512,8 +1522,8 @@
                     <div class="step-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
-                    <h3 class="step-title">Échange pour de vrai</h3>
-                    <p class="step-desc">Messages, audio, moments. Sans likes, sans pression. Juste vous.</p>
+                    <h3 class="step-title">Parle pour de vrai</h3>
+                    <p class="step-desc">Messages, audio, moments. Sans métriques, sans spectacle. Juste vous.</p>
                 </div>
             </div>
         </section>
@@ -1523,7 +1533,7 @@
             <div class="section-header scroll-reveal">
                 <span class="section-tag">Témoignages</span>
                 <h2 class="section-title">Ce qu'ils en disent</h2>
-                <p class="section-subtitle">Des vraies personnes, des vraies relations.</p>
+                <p class="section-subtitle">De vraies personnes qui ont arrêté de faire semblant.</p>
             </div>
             
             <div class="testimonials-grid stagger-children scroll-reveal">
@@ -1587,7 +1597,7 @@
                         <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p class="faq-answer-content">Oui. Pas de pub, pas de premium, pas de vente de données. On croit qu'un produit minimal peut survivre sans monétiser ton attention. Si ça change, on te préviendra.</p>
+                        <p class="faq-answer-content">Oui. Zero pub, zero premium, zero vente de données. On croit qu'un truc simple peut marcher sans parasiter ton cerveau. Si ça change, on te dit.</p>
                     </div>
                 </div>
                 
@@ -1597,7 +1607,7 @@
                         <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p class="faq-answer-content">Parce qu'un réseau social où tu entres seul, ça n'a pas de sens. Le geste d'offrir crée immédiatement une connexion. C'est notre filtre anti-masse : seules les personnes qui ont quelqu'un à qui penser entrent.</p>
+                        <p class="faq-answer-content">Parce qu'on entre pas comme ça chez les gens. Le geste d'offrir crée immédiatement une connexion. C'est notre filtre anti-masse : seules les personnes qui ont quelqu'un à qui penser entrent.</p>
                     </div>
                 </div>
                 
@@ -1627,19 +1637,19 @@
         <section class="final-cta-section" id="join">
             <div class="final-cta-content scroll-reveal">
                 <h2 class="final-cta-title">Prêt·e à retrouver tes vrais proches ?</h2>
-                <p class="final-cta-subtitle">Offre Cinq à quelqu'un qui compte. Ou rejoins la liste d'attente.</p>
+                <p class="final-cta-subtitle">Offre un accès à quelqu'un qui compte. Ou entre dans la file.</p>
                 
                 <a href="gift.html" class="cta-button">
                     <svg class="cta-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/></svg>
-                    <span>Offrir Cinq</span>
+                    <span>Offrir un accès</span>
                 </a>
                 
                 <div class="waitlist-section">
                     <p class="waitlist-label" id="waitlist-label">Pas encore de code ? Rejoins la liste</p>
                     <form id="waitlist-form" class="waitlist-form" aria-labelledby="waitlist-label">
                         <label for="email" class="sr-only">Adresse email</label>
-                        <input type="email" id="email" name="email" placeholder="ton@email.com" required autocomplete="email" class="waitlist-input" aria-describedby="form-message">
-                        <button type="submit" class="waitlist-submit" aria-label="Rejoindre la liste d'attente">Rejoindre</button>
+                        <input type="email" id="email" name="email" placeholder="toi@example.com" required autocomplete="email" class="waitlist-input" aria-describedby="form-message">
+                        <button type="submit" class="waitlist-submit" aria-label="Entrer dans la file">Entrer</button>
                     </form>
                     <p id="form-message" class="waitlist-message hidden"></p>
                 </div>
@@ -1656,7 +1666,7 @@
     <div class="sticky-cta" id="sticky-cta">
         <a href="gift.html" class="cta-button">
             <svg class="cta-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/></svg>
-            <span>Offrir Cinq</span>
+            <span>Offrir un accès</span>
         </a>
     </div>
 

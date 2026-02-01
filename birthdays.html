@@ -686,16 +686,16 @@
                 <div class="notification-settings">
                     <h3 class="notification-title">🔔 Rappels</h3>
                     <div class="notification-option">
-                        <span class="option-label">Rappel le jour même</span>
+                        <span class="option-label" id="label-same-day">Rappel le jour même</span>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="notify-same-day" checked onchange="saveNotificationPrefs()">
+                            <input type="checkbox" id="notify-same-day" checked onchange="saveNotificationPrefs()" aria-labelledby="label-same-day">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="notification-option">
-                        <span class="option-label">Rappel 1 jour avant</span>
+                        <span class="option-label" id="label-1-day">Rappel 1 jour avant</span>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="notify-1-day" checked onchange="saveNotificationPrefs()">
+                            <input type="checkbox" id="notify-1-day" checked onchange="saveNotificationPrefs()" aria-labelledby="label-1-day">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>

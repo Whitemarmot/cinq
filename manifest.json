@@ -5,14 +5,20 @@
   "start_url": "/app.html?source=pwa",
   "id": "/app.html",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#0a0a0b",
   "theme_color": "#0a0a0b",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "scope": "/",
   "lang": "fr",
   "dir": "ltr",
-  "categories": ["social", "lifestyle"],
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
   "iarc_rating_id": "",
   "icons": [
     {
@@ -112,7 +118,11 @@
       "description": "Envoie un ping rapide à tes proches",
       "url": "/app.html?action=ping",
       "icons": [
-        { "src": "/assets/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }
+        {
+          "src": "/assets/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
       ]
     },
     {
@@ -121,7 +131,11 @@
       "description": "Écris un nouveau message",
       "url": "/app.html?action=compose",
       "icons": [
-        { "src": "/assets/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" }
+        {
+          "src": "/assets/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
       ]
     }
   ],
@@ -135,7 +149,10 @@
     }
   },
   "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
   },
   "handle_links": "preferred",
   "edge_side_panel": {

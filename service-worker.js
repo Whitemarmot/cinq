@@ -1,3 +1,78 @@
+
+// Performance-focused caching strategy
+const PERFORMANCE_CACHE = 'cinq-perf-v2';
+
+// Critical resources to cache immediately
+const CRITICAL_RESOURCES = [
+    '/',
+    '/css/critical.min.css',
+    '/js/theme-init.js',
+    '/favicon.svg',
+    '/manifest.json'
+];
+
+// Lazy-load cache for non-critical resources
+const LAZY_CACHE = 'cinq-lazy-v2';
+
+// Install event - cache only critical resources
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(PERFORMANCE_CACHE)
+            .then(cache => cache.addAll(CRITICAL_RESOURCES))
+            .then(() => self.skipWaiting())
+    );
+});
+
+// Fetch event with performance-first strategy
+self.addEventListener('fetch', (event) => {
+    const { request } = event;
+    const url = new URL(request.url);
+    
+    // For HTML files: Network first with fast fallback
+    if (request.destination === 'document') {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    // Cache successful responses
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(PERFORMANCE_CACHE)
+                            .then(cache => cache.put(request, responseClone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(request))
+        );
+        return;
+    }
+    
+    // For assets: Cache first with network fallback
+    if (request.destination === 'script' || 
+        request.destination === 'style' || 
+        request.destination === 'image') {
+        event.respondWith(
+            caches.match(request)
+                .then(response => {
+                    if (response) return response;
+                    
+                    return fetch(request)
+                        .then(response => {
+                            if (response.ok) {
+                                const responseClone = response.clone();
+                                const cacheName = CRITICAL_RESOURCES.includes(url.pathname) 
+                                    ? PERFORMANCE_CACHE 
+                                    : LAZY_CACHE;
+                                caches.open(cacheName)
+                                    .then(cache => cache.put(request, responseClone));
+                            }
+                            return response;
+                        });
+                })
+        );
+    }
+});
+
+
 /**
  * ==========================================================================
  * CINQ PWA Service Worker v4
