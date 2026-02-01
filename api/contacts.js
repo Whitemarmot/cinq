@@ -212,10 +212,10 @@ async function listContacts(req, res, user) {
 
     const contactIds = data.map(c => c.contact_user_id);
     
-    // Batch fetch user profiles (avoid N+1 queries) - include last_seen fields
+    // Batch fetch user profiles (avoid N+1 queries) - include last_seen fields and mood
     const { data: profiles } = await supabase
         .from('users')
-        .select('id, email, display_name, avatar_url, status_emoji, status_text, last_seen_at, hide_last_seen')
+        .select('id, email, display_name, avatar_url, status_emoji, status_text, last_seen_at, hide_last_seen, mood, mood_updated_at')
         .in('id', contactIds);
     
     const profileMap = (profiles || []).reduce((acc, p) => {
@@ -260,7 +260,9 @@ async function listContacts(req, res, user) {
                 avatar_url: profile?.avatar_url || null,
                 status_emoji: profile?.status_emoji || null,
                 status_text: profile?.status_text || null,
-                last_seen_at: lastSeenAt
+                last_seen_at: lastSeenAt,
+                mood: profile?.mood || null,
+                mood_updated_at: profile?.mood_updated_at || null
             },
             mutual: mutualSet.has(c.contact_user_id)
         };

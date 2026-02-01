@@ -61,6 +61,9 @@
     <!-- Message Templates -->
     <link rel="stylesheet" href="/css/message-templates.css">
     
+    <!-- Message Formatting (text size, color, alignment) -->
+    <link rel="stylesheet" href="/css/message-formatting.css">
+    
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
     
@@ -706,6 +709,166 @@
         
         .header-avatar.online::after {
             opacity: 1;
+        }
+        
+        /* ===== MOOD INDICATOR ===== */
+        .mood-indicator-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mood-indicator-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-1) var(--space-2);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            font-size: 1.1rem;
+            min-width: 42px;
+            justify-content: center;
+        }
+        
+        .mood-indicator-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+            transform: translateY(-1px);
+        }
+        
+        .mood-indicator-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        .mood-indicator-btn .mood-emoji {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        
+        .mood-indicator-btn .mood-placeholder {
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+            font-weight: 500;
+        }
+        
+        .mood-indicator-btn .mood-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            display: none;
+        }
+        
+        @media (min-width: 480px) {
+            .mood-indicator-btn .mood-label {
+                display: inline;
+            }
+        }
+        
+        /* Mood Picker Dropdown */
+        .mood-picker {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-3);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-dropdown);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .mood-picker.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .mood-picker-title {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-2);
+            padding: 0 var(--space-1);
+        }
+        
+        .mood-options {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .mood-option {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--color-bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+        }
+        
+        .mood-option:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.15);
+        }
+        
+        .mood-option:active {
+            transform: scale(0.95);
+        }
+        
+        .mood-option.selected {
+            border-color: var(--color-brand);
+            background: var(--color-brand-muted);
+            box-shadow: 0 0 12px var(--color-brand-glow);
+        }
+        
+        .mood-option.selected:hover {
+            transform: scale(1.05);
+        }
+        
+        .mood-clear-btn {
+            width: 100%;
+            margin-top: var(--space-3);
+            padding: var(--space-2);
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mood-clear-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        /* Mood badge on contact avatars */
+        .contact-mood-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            font-size: 12px;
+            background: var(--color-bg-primary);
+            border-radius: 50%;
+            padding: 2px;
+            line-height: 1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         /* Divider between action groups */
@@ -2396,6 +2559,33 @@
             display: block;
         }
         
+        /* Chat wallpaper button */
+        .chat-wallpaper-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-wallpaper-btn:hover {
+            background: var(--color-brand-muted, rgba(255, 107, 74, 0.1));
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .chat-wallpaper-btn.has-wallpaper {
+            background: var(--color-brand-muted, rgba(255, 107, 74, 0.1));
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
         /* Chat export button */
         .chat-export-btn {
             width: 32px;
@@ -2465,6 +2655,220 @@
         .export-option-desc {
             font-size: var(--text-sm);
             color: var(--color-text-muted);
+        }
+        
+        /* ===== WALLPAPER SYSTEM ===== */
+        .wallpaper-modal .modal {
+            max-width: 480px;
+        }
+        
+        .wallpaper-categories {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            overflow-x: auto;
+            padding-bottom: var(--space-2);
+        }
+        
+        .wallpaper-category-btn {
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .wallpaper-category-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text);
+        }
+        
+        .wallpaper-category-btn.active {
+            background: var(--cinq-gradient);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .wallpaper-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+            max-height: 320px;
+            overflow-y: auto;
+            padding: var(--space-2);
+        }
+        
+        .wallpaper-option {
+            aspect-ratio: 1;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallpaper-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .wallpaper-option.selected {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-glow);
+        }
+        
+        .wallpaper-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--cinq-gradient);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        /* Solid colors */
+        .wallpaper-option.color {
+            background: var(--wp-color);
+        }
+        
+        /* Gradients */
+        .wallpaper-option.gradient {
+            background: var(--wp-gradient);
+        }
+        
+        /* Patterns */
+        .wallpaper-option.pattern {
+            background-color: var(--wp-bg);
+            background-image: var(--wp-pattern);
+            background-size: var(--wp-size, 20px 20px);
+        }
+        
+        /* Images */
+        .wallpaper-option.image {
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .wallpaper-option.none {
+            background: var(--color-bg-primary);
+            border: 2px dashed var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+        }
+        
+        .wallpaper-preview {
+            margin-top: var(--space-4);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            transition: background 0.3s ease;
+        }
+        
+        .wallpaper-preview-title {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+        
+        .wallpaper-preview-bubble {
+            max-width: 70%;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+        }
+        
+        .wallpaper-preview-bubble.sent {
+            background: var(--cinq-gradient);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .wallpaper-preview-bubble.received {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .wallpaper-custom-url {
+            margin-top: var(--space-4);
+        }
+        
+        .wallpaper-custom-url label {
+            display: block;
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+        
+        .wallpaper-custom-url input {
+            width: 100%;
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-tertiary);
+            color: var(--color-text);
+            font-size: var(--text-sm);
+        }
+        
+        .wallpaper-custom-url input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+        }
+        
+        .wallpaper-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--space-4);
+            gap: var(--space-3);
+        }
+        
+        .wallpaper-actions .modal-btn {
+            flex: 1;
+        }
+        
+        /* Chat messages with wallpaper */
+        .chat-messages.has-wallpaper {
+            background-size: cover;
+            background-position: center;
+            background-attachment: local;
+        }
+        
+        .chat-messages.has-wallpaper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .chat-messages.has-wallpaper > * {
+            position: relative;
+            z-index: 1;
         }
         
         /* Private note modal content */
@@ -7090,6 +7494,28 @@
                 
                 <div class="header-divider" aria-hidden="true"></div>
                 
+                <!-- Mood Indicator -->
+                <div class="mood-indicator-wrapper">
+                    <button class="mood-indicator-btn" id="mood-indicator-btn" onclick="toggleMoodPicker()" aria-label="Changer mon humeur" aria-expanded="false" aria-haspopup="true" type="button">
+                        <span class="mood-emoji" id="current-mood-emoji" aria-hidden="true"></span>
+                        <span class="mood-placeholder" id="mood-placeholder">😊</span>
+                        <span class="mood-label">Humeur</span>
+                    </button>
+                    <div class="mood-picker" id="mood-picker" role="dialog" aria-label="Choisir mon humeur">
+                        <p class="mood-picker-title">Comment tu te sens ?</p>
+                        <div class="mood-options" role="radiogroup" aria-label="Options d'humeur">
+                            <button class="mood-option" data-mood="😊" onclick="selectMood('😊')" role="radio" aria-checked="false" aria-label="Content" title="Content" type="button">😊</button>
+                            <button class="mood-option" data-mood="😐" onclick="selectMood('😐')" role="radio" aria-checked="false" aria-label="Neutre" title="Neutre" type="button">😐</button>
+                            <button class="mood-option" data-mood="😔" onclick="selectMood('😔')" role="radio" aria-checked="false" aria-label="Triste" title="Triste" type="button">😔</button>
+                            <button class="mood-option" data-mood="🎉" onclick="selectMood('🎉')" role="radio" aria-checked="false" aria-label="Fête" title="En mode fête" type="button">🎉</button>
+                            <button class="mood-option" data-mood="🤒" onclick="selectMood('🤒')" role="radio" aria-checked="false" aria-label="Malade" title="Pas en forme" type="button">🤒</button>
+                        </div>
+                        <button class="mood-clear-btn" onclick="selectMood(null)" type="button">Effacer mon humeur</button>
+                    </div>
+                </div>
+                
+                <div class="header-divider" aria-hidden="true"></div>
+                
                 <!-- User Avatar -->
                 <button class="header-avatar online" id="header-avatar" onclick="switchTab('profil')" aria-label="Accéder à mon profil" type="button">
                     <span id="header-avatar-initial" aria-hidden="true">?</span>
@@ -7407,6 +7833,11 @@
                         <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
                     </svg>
                     <span class="pin-count" id="pin-count" style="display: none;">0</span>
+                </button>
+                <button class="chat-wallpaper-btn" id="chat-wallpaper-btn" onclick="openWallpaperModal()" type="button" aria-label="Fond d'écran" title="Fond d'écran">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                    </svg>
                 </button>
                 <button class="chat-export-btn" id="chat-export-btn" onclick="openExportModal()" type="button" aria-label="Exporter la conversation" title="Exporter">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -7902,6 +8333,55 @@
         </div>
     </div>
 
+    <!-- Wallpaper Modal -->
+    <div class="modal-overlay wallpaper-modal" id="wallpaper-modal" role="dialog" aria-modal="true" aria-labelledby="wallpaper-modal-title" aria-hidden="true">
+        <div class="modal">
+            <h2 class="modal-title" id="wallpaper-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                </svg>
+                Fond d'écran
+            </h2>
+            <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                Personnalise l'apparence de cette conversation
+            </p>
+            
+            <!-- Categories -->
+            <div class="wallpaper-categories" role="tablist">
+                <button class="wallpaper-category-btn active" onclick="switchWallpaperCategory('colors')" data-category="colors" role="tab" aria-selected="true">Couleurs</button>
+                <button class="wallpaper-category-btn" onclick="switchWallpaperCategory('gradients')" data-category="gradients" role="tab" aria-selected="false">Dégradés</button>
+                <button class="wallpaper-category-btn" onclick="switchWallpaperCategory('patterns')" data-category="patterns" role="tab" aria-selected="false">Motifs</button>
+                <button class="wallpaper-category-btn" onclick="switchWallpaperCategory('images')" data-category="images" role="tab" aria-selected="false">Images</button>
+            </div>
+            
+            <!-- Wallpaper Grid -->
+            <div class="wallpaper-grid" id="wallpaper-grid" role="listbox" aria-label="Options de fond d'écran">
+                <!-- Options will be rendered by JS -->
+            </div>
+            
+            <!-- Custom URL for images -->
+            <div class="wallpaper-custom-url" id="wallpaper-custom-url" style="display: none;">
+                <label for="wallpaper-url-input">URL d'une image personnalisée</label>
+                <input type="url" id="wallpaper-url-input" placeholder="https://example.com/image.jpg" onchange="previewCustomWallpaper()">
+            </div>
+            
+            <!-- Preview -->
+            <div class="wallpaper-preview" id="wallpaper-preview">
+                <div class="wallpaper-preview-title">Aperçu</div>
+                <div class="wallpaper-preview-bubble received">Salut ! 👋</div>
+                <div class="wallpaper-preview-bubble sent">Hello ! Comment ça va ?</div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="wallpaper-actions">
+                <button class="modal-btn secondary" onclick="closeWallpaperModal()" type="button">Annuler</button>
+                <button class="modal-btn primary" onclick="applyWallpaper()" type="button">
+                    <span aria-hidden="true">✓</span> Appliquer
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Forward Message Modal -->
     <div class="modal-overlay" id="forward-modal" role="dialog" aria-modal="true" aria-labelledby="forward-modal-title" aria-hidden="true">
         <div class="modal forward-modal">
@@ -7946,6 +8426,9 @@
     
     <!-- Message Templates -->
     <script src="/js/message-templates.js"></script>
+    
+    <!-- Smart Replies -->
+    <script src="/js/smart-replies.js"></script>
 
     <script>
         const API_URL = '/api';
@@ -8200,6 +8683,9 @@
                     // Update all avatars
                     updateAllAvatars(data.profile.avatar_url, initial);
                     
+                    // Load mood indicator
+                    loadMoodFromProfile(data.profile);
+                    
                     // Load upcoming birthdays hint
                     loadUpcomingBirthdaysHint();
                 }
@@ -8303,6 +8789,100 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💾 Enregistrer';
+            }
+        }
+        
+        // ===== MOOD INDICATOR =====
+        let currentMood = null;
+        
+        function toggleMoodPicker() {
+            const picker = document.getElementById('mood-picker');
+            const btn = document.getElementById('mood-indicator-btn');
+            const isOpen = picker.classList.contains('open');
+            
+            if (isOpen) {
+                picker.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            } else {
+                picker.classList.add('open');
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        // Close mood picker when clicking outside
+        document.addEventListener('click', (e) => {
+            const picker = document.getElementById('mood-picker');
+            const btn = document.getElementById('mood-indicator-btn');
+            if (picker && btn && !picker.contains(e.target) && !btn.contains(e.target)) {
+                picker.classList.remove('open');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        async function selectMood(mood) {
+            const picker = document.getElementById('mood-picker');
+            const btn = document.getElementById('mood-indicator-btn');
+            
+            // Update UI immediately for responsiveness
+            updateMoodUI(mood);
+            
+            // Close picker
+            picker.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            
+            // Save to server
+            try {
+                const res = await fetch(`${API_URL}/user-profile`, {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ mood })
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                currentMood = mood;
+                showToast({ 
+                    type: 'success', 
+                    title: mood ? `Humeur : ${mood}` : 'Humeur effacée',
+                    message: mood ? 'Tes contacts peuvent voir ton humeur' : ''
+                });
+            } catch (e) {
+                // Revert UI on error
+                updateMoodUI(currentMood);
+                showToast({ type: 'error', title: 'Erreur', message: e.message });
+            }
+        }
+        
+        function updateMoodUI(mood) {
+            const emojiEl = document.getElementById('current-mood-emoji');
+            const placeholderEl = document.getElementById('mood-placeholder');
+            const options = document.querySelectorAll('.mood-option');
+            
+            if (mood) {
+                emojiEl.textContent = mood;
+                emojiEl.style.display = 'inline';
+                placeholderEl.style.display = 'none';
+            } else {
+                emojiEl.textContent = '';
+                emojiEl.style.display = 'none';
+                placeholderEl.style.display = 'inline';
+            }
+            
+            // Update selected state
+            options.forEach(opt => {
+                const isSelected = opt.dataset.mood === mood;
+                opt.classList.toggle('selected', isSelected);
+                opt.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+            });
+        }
+        
+        function loadMoodFromProfile(profile) {
+            if (profile && profile.mood) {
+                currentMood = profile.mood;
+                updateMoodUI(profile.mood);
             }
         }
         
@@ -8764,6 +9344,15 @@
                 const body = { content };
                 if (currentImageUrl) body.image_url = currentImageUrl;
                 
+                // Add formatting data if available
+                if (window.CinqFormatting) {
+                    const format = CinqFormatting.getFormat();
+                    // Only include format if it's not all defaults
+                    if (format.size !== 'normal' || format.color !== 'default' || format.align !== 'left') {
+                        body.format = JSON.stringify(format);
+                    }
+                }
+                
                 const res = await fetch(`${API_URL}/posts`, {
                     method: 'POST',
                     headers: authHeaders(),
@@ -8779,6 +9368,11 @@
                 document.getElementById('post-content').value = '';
                 document.getElementById('char-count').textContent = '0/280';
                 removeImage();
+                
+                // Reset formatting
+                if (window.CinqFormatting) {
+                    CinqFormatting.reset();
+                }
                 
                 // Clear saved draft after successful post
                 clearDraftPost();
@@ -8870,6 +9464,19 @@
                     </div>
                 ` : '';
                 
+                // Parse formatting data
+                const formatClasses = (() => {
+                    if (!post.format) return '';
+                    try {
+                        const format = typeof post.format === 'string' ? JSON.parse(post.format) : post.format;
+                        const classes = [];
+                        if (format.size && format.size !== 'normal') classes.push(`text-${format.size}`);
+                        if (format.color && format.color !== 'default') classes.push(`color-${format.color}`);
+                        if (format.align && format.align !== 'left') classes.push(`align-${format.align}`);
+                        return classes.join(' ');
+                    } catch (e) { return ''; }
+                })();
+                
                 return `
                     <article class="post-card" data-post-id="${post.id}" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
                         <div class="post-header">
@@ -8886,7 +9493,7 @@
                             </div>
                             ${menuHtml}
                         </div>
-                        <div class="post-content">${renderMentions(post.content)}</div>
+                        <div class="post-content ${formatClasses}">${renderMentions(post.content)}</div>
                         ${imageHtml}
                     </article>
                 `;
@@ -9857,6 +10464,16 @@
                         slot.appendChild(mutedBadge);
                     }
                     
+                    // Add mood badge if contact has a mood set
+                    const contactMood = contact.contact?.mood;
+                    if (contactMood) {
+                        const moodBadge = document.createElement('span');
+                        moodBadge.className = 'contact-mood-badge';
+                        moodBadge.setAttribute('aria-label', 'Humeur du contact');
+                        moodBadge.textContent = contactMood;
+                        avatarSlot.appendChild(moodBadge);
+                    }
+                    
                     slot.onclick = () => openChat(contact);
                     slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(contact); } };
                 } else {
@@ -10038,6 +10655,17 @@
                 span.textContent = initial;
                 avatarSlot.appendChild(span);
             }
+            
+            // Add mood badge if contact has a mood set
+            const contactMood = contact.contact?.mood;
+            if (contactMood) {
+                const moodBadge = document.createElement('span');
+                moodBadge.className = 'contact-mood-badge';
+                moodBadge.setAttribute('aria-label', 'Humeur du contact');
+                moodBadge.textContent = contactMood;
+                avatarSlot.appendChild(moodBadge);
+            }
+            
             slot.appendChild(avatarSlot);
             
             // Name
@@ -10982,6 +11610,15 @@
                     top: container.scrollHeight,
                     behavior: 'smooth'
                 });
+            }
+            
+            // === Smart Replies Integration ===
+            // Show smart reply suggestions for the last received message
+            if (window.CinqSmartReplies && window.CinqSmartReplies.isActive() && currentChatContact) {
+                const inputArea = document.getElementById('chat-input-area') || document.querySelector('.chat-input-wrapper');
+                if (inputArea) {
+                    window.CinqSmartReplies.processMessages(messages, user?.id, inputArea);
+                }
             }
         }
 
@@ -14991,5 +15628,8 @@
     <script src="/js/easter-eggs.min.js" defer></script>
     <!-- View Transitions -->
     <script defer src="/js/view-transitions.min.js"></script>
+    
+    <!-- Message Formatting (text size, color, alignment) -->
+    <script src="/js/message-formatting.js" defer></script>
 </body>
 </html>

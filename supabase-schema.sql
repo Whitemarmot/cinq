@@ -65,6 +65,17 @@ BEGIN
     END IF;
 END $$;
 
+-- Add mood indicator column (😊😐😔🎉🤒)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='mood') THEN
+        ALTER TABLE users ADD COLUMN mood TEXT DEFAULT NULL CHECK (mood IN ('😊', '😐', '😔', '🎉', '🤒', NULL));
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='mood_updated_at') THEN
+        ALTER TABLE users ADD COLUMN mood_updated_at TIMESTAMPTZ DEFAULT NULL;
+    END IF;
+END $$;
+
 -- Add last seen columns (presence tracking)
 DO $$ 
 BEGIN 

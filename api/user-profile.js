@@ -278,6 +278,22 @@ async function handleUpdateProfile(req, res, user) {
         updates.hide_last_seen = Boolean(hide_last_seen);
         logInfo('Hide last seen toggled', { userId: user.id, hideLastSeen: updates.hide_last_seen });
     }
+    
+    // Mood indicator (😊😐😔🎉🤒)
+    const { mood } = req.body;
+    if (mood !== undefined) {
+        const validMoods = ['😊', '😐', '😔', '🎉', '🤒', null, ''];
+        if (mood === null || mood === '') {
+            updates.mood = null;
+            updates.mood_updated_at = null;
+        } else if (validMoods.includes(mood)) {
+            updates.mood = mood;
+            updates.mood_updated_at = new Date().toISOString();
+            logInfo('Mood updated', { userId: user.id, mood });
+        } else {
+            return res.status(400).json({ error: 'Humeur invalide. Choisis parmi: 😊😐😔🎉🤒', field: 'mood' });
+        }
+    }
 
     if (Object.keys(updates).length === 0) {
         return res.status(400).json({ error: 'Aucun champ à mettre à jour' });
