@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sécurité — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Guide sécurité de Cinq : active la double authentification, gère tes sessions actives et consulte l'historique de tes connexions.">
+    <meta name="keywords" content="cinq, sécurité, 2FA, authentification, sessions, connexions, protection">
+    <meta name="author" content="Cinq">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/security">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sécurité — Cinq">
+    <meta property="og:description" content="Protège ton compte Cinq : 2FA, sessions actives et historique des connexions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/security">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Sécurité — Cinq">
+    <meta name="twitter:description" content="Protège ton compte Cinq : 2FA, sessions et historique.">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS for smooth transitions -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization (before body to prevent flash) -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+    
+    <style>
+        .legal-container {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .legal-header {
+            margin-bottom: 3rem;
+        }
+        .legal-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+        .legal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .legal-subtitle {
+            font-size: 1rem;
+            color: var(--color-text-muted);
+        }
+        .legal-content {
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+        }
+        .legal-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 3rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .legal-content h2 svg {
+            flex-shrink: 0;
+        }
+        .legal-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 1.5rem 0 0.75rem;
+        }
+        .legal-content p {
+            margin-bottom: 1rem;
+        }
+        .legal-content ul, .legal-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        .legal-content li {
+            margin-bottom: 0.5rem;
+        }
+        .legal-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border);
+            text-align: center;
+        }
+        .legal-footer a {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            margin: 0 0.75rem;
+            font-size: 0.875rem;
+        }
+        .legal-footer a:hover {
+            color: var(--color-brand);
+        }
+        
+        /* Security-specific styles */
+        .security-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .security-card.warning {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .security-card.success {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .badge-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .badge-current {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+        
+        .session-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .session-item:last-child {
+            border-bottom: none;
+        }
+        .session-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--color-surface-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+        }
+        .session-details h4 {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .session-details p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+        .session-action {
+            color: #ef4444;
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .session-action:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .login-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .login-item:last-child {
+            border-bottom: none;
+        }
+        .login-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .login-status.success { background: #22c55e; }
+        .login-status.failed { background: #ef4444; }
+        .login-info {
+            flex: 1;
+        }
+        .login-info strong {
+            color: var(--color-text-primary);
+        }
+        .login-info span {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        .login-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .step-list {
+            counter-reset: step;
+            list-style: none;
+            padding-left: 0;
+        }
+        .step-list li {
+            counter-increment: step;
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            align-items: flex-start;
+        }
+        .step-list li::before {
+            content: counter(step);
+            background: var(--color-brand);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .qr-placeholder {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem auto;
+            padding: 1rem;
+        }
+        .qr-placeholder svg {
+            width: 100%;
+            height: 100%;
+            color: #1a1a2e;
+        }
+        
+        .code-input {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .code-input input {
+            width: 48px;
+            height: 56px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+        }
+        .code-input input:focus {
+            border-color: var(--color-brand);
+            outline: none;
+        }
+        
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-brand);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--color-surface-elevated);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .tip-box {
+            background: rgba(99, 102, 241, 0.1);
+            border-left: 3px solid var(--color-brand);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+        .tip-box strong {
+            color: var(--color-brand);
+        }
+        
+        .recovery-codes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            background: var(--color-surface);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Space Grotesk', monospace;
+            margin: 1rem 0;
+        }
+        .recovery-codes code {
+            padding: 0.5rem;
+            background: var(--color-surface-elevated);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 640px) {
+            .legal-container {
+                padding: 2rem 1rem;
+            }
+            .session-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .session-action {
+                align-self: flex-start;
+            }
+            .recovery-codes {
+                grid-template-columns: 1fr;
+            }
+            .code-input input {
+                width: 40px;
+                height: 48px;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+    
+    <!-- Accessibility Styles -->
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <!-- View Transitions -->
+    <link rel="stylesheet" href="/css/view-transitions.min.css">
+</head>
+<body>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    </nav>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: 1rem; right: 1rem; z-index: 100;">
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <main id="main-content" class="legal-container">
+        <header class="legal-header">
+            <a href="/" class="legal-logo">5</a>
+            <h1 class="legal-title">🔐 Guide Sécurité</h1>
+            <p class="legal-subtitle">Protège ton compte et tes données sur Cinq</p>
+        </header>
+
+        <div class="legal-content">
+            
+            <!-- Introduction -->
+            <div class="security-card">
+                <p style="margin: 0;">
+                    <strong>Ta sécurité, notre priorité.</strong> Cinq est conçu pour protéger tes conversations 
+                    avec tes 5 proches. Ce guide t'explique comment renforcer la sécurité de ton compte.
+                </p>
+            </div>
+
+            <!-- 2FA Section -->
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+                Authentification à deux facteurs (2FA)
+            </h2>
+            
+            <p>
+                La 2FA ajoute une couche de sécurité supplémentaire : même si quelqu'un obtient ton mot de passe, 
+                il ne pourra pas accéder à ton compte sans ton téléphone.
+            </p>
+            
+            <div class="security-card" id="2fa-status">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <strong>Statut 2FA</strong>
+                        <span class="security-badge badge-inactive" id="2fa-badge">Non activé</span>
+                    </div>
+                    <button class="btn-primary" id="enable-2fa-btn" onclick="show2FASetup()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Activer la 2FA
+                    </button>
+                </div>
+            </div>
+
+            <h3>Comment configurer la 2FA</h3>
+            <ol class="step-list">
+                <li>
+                    <div>
+                        <strong>Télécharge une application d'authentification</strong><br>
+                        <span style="color: var(--color-text-muted);">Google Authenticator, Authy, ou 1Password</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>Scanne le QR code</strong><br>
+                        <span style="color: var(--color-text-muted);">Ouvre l'app et scanne le code affiché</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>Entre le code de vérification</strong><br>
+                        <span style="color: var(--color-text-muted);">L'app génère un code à 6 chiffres toutes les 30 secondes</span>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <strong>Sauvegarde tes codes de récupération</strong><br>
+                        <span style="color: var(--color-text-muted);">Garde-les dans un endroit sûr (pas sur ton téléphone)</span>
+                    </div>
+                </li>
+            </ol>
+
+            <!-- 2FA Setup Modal (hidden by default) -->
+            <div id="2fa-setup" style="display: none;">
+                <div class="security-card">
+                    <h3 style="margin-top: 0;">Configuration 2FA</h3>
+                    
+                    <p>Scanne ce QR code avec ton application d'authentification :</p>
+                    
+                    <div class="qr-placeholder">
+                        <svg viewBox="0 0 100 100" fill="currentColor">
+                            <rect x="0" y="0" width="30" height="30"/>
+                            <rect x="35" y="0" width="5" height="5"/>
+                            <rect x="45" y="0" width="5" height="5"/>
+                            <rect x="55" y="0" width="5" height="5"/>
+                            <rect x="70" y="0" width="30" height="30"/>
+                            <rect x="5" y="5" width="20" height="20" fill="white"/>
+                            <rect x="10" y="10" width="10" height="10"/>
+                            <rect x="75" y="5" width="20" height="20" fill="white"/>
+                            <rect x="80" y="10" width="10" height="10"/>
+                            <rect x="0" y="35" width="5" height="5"/>
+                            <rect x="10" y="35" width="10" height="5"/>
+                            <rect x="25" y="35" width="5" height="5"/>
+                            <rect x="35" y="35" width="30" height="30"/>
+                            <rect x="40" y="40" width="20" height="20" fill="white"/>
+                            <rect x="45" y="45" width="10" height="10"/>
+                            <rect x="70" y="35" width="5" height="5"/>
+                            <rect x="85" y="35" width="5" height="10"/>
+                            <rect x="0" y="45" width="5" height="10"/>
+                            <rect x="15" y="50" width="5" height="5"/>
+                            <rect x="0" y="70" width="30" height="30"/>
+                            <rect x="5" y="75" width="20" height="20" fill="white"/>
+                            <rect x="10" y="80" width="10" height="10"/>
+                            <rect x="70" y="70" width="10" height="5"/>
+                            <rect x="85" y="70" width="10" height="10"/>
+                            <rect x="95" y="75" width="5" height="5"/>
+                            <rect x="70" y="85" width="5" height="15"/>
+                            <rect x="80" y="90" width="10" height="5"/>
+                            <rect x="95" y="85" width="5" height="15"/>
+                        </svg>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 0.875rem; color: var(--color-text-muted);">
+                        Clé secrète : <code style="background: var(--color-surface-elevated); padding: 0.25rem 0.5rem; border-radius: 4px;">XXXX-XXXX-XXXX-XXXX</code>
+                    </p>
+                    
+                    <p>Entre le code à 6 chiffres généré par ton app :</p>
+                    
+                    <div class="code-input">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 1">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 2">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 3">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 4">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 5">
+                        <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Chiffre 6">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        <button class="btn-secondary" onclick="hide2FASetup()">Annuler</button>
+                        <button class="btn-primary" onclick="verify2FA()">Vérifier et activer</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Conseil :</strong> Utilise une app comme Authy qui sauvegarde tes codes dans le cloud. 
+                Si tu perds ton téléphone, tu pourras récupérer l'accès.
+            </div>
+
+            <h3>Codes de récupération</h3>
+            <p>
+                Si tu perds l'accès à ton app d'authentification, ces codes te permettront de te connecter. 
+                <strong>Chaque code ne peut être utilisé qu'une seule fois.</strong>
+            </p>
+            
+            <div class="security-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <strong>Tes codes de récupération</strong>
+                    <button class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="generateRecoveryCodes()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                        Régénérer
+                    </button>
+                </div>
+                <div class="recovery-codes" id="recovery-codes">
+                    <code>ABCD-1234-EFGH</code>
+                    <code>IJKL-5678-MNOP</code>
+                    <code>QRST-9012-UVWX</code>
+                    <code>YZAB-3456-CDEF</code>
+                    <code>GHIJ-7890-KLMN</code>
+                    <code>OPQR-1234-STUV</code>
+                    <code>WXYZ-5678-ABCD</code>
+                    <code>EFGH-9012-IJKL</code>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-top: 1rem; margin-bottom: 0;">
+                    ⚠️ Imprime ou sauvegarde ces codes dans un gestionnaire de mots de passe sécurisé.
+                </p>
+            </div>
+
+            <!-- Sessions Section -->
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Sessions actives
+            </h2>
+            
+            <p>
+                Voici tous les appareils actuellement connectés à ton compte. Si tu ne reconnais pas un appareil, 
+                déconnecte-le immédiatement.
+            </p>
+            
+            <div class="security-card">
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        </div>
+                        <div class="session-details">
+                            <h4>iPhone 15 Pro <span class="security-badge badge-current">Session actuelle</span></h4>
+                            <p>Paris, France • Safari • Actif maintenant</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        </div>
+                        <div class="session-details">
+                            <h4>MacBook Pro</h4>
+                            <p>Paris, France • Chrome • Il y a 2 heures</p>
+                        </div>
+                    </div>
+                    <button class="session-action" onclick="revokeSession(this)">Déconnecter</button>
+                </div>
+                
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        </div>
+                        <div class="session-details">
+                            <h4>iPad Air</h4>
+                            <p>Lyon, France • Safari • Il y a 3 jours</p>
+                        </div>
+                    </div>
+                    <button class="session-action" onclick="revokeSession(this)">Déconnecter</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <button class="btn-secondary btn-danger" onclick="revokeAllSessions()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Déconnecter tous les autres appareils
+                </button>
+            </div>
+
+            <!-- Login History Section -->
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Historique des connexions
+            </h2>
+            
+            <p>
+                Les 10 dernières tentatives de connexion à ton compte. 
+                Une connexion suspecte ? Change ton mot de passe immédiatement.
+            </p>
+            
+            <div class="security-card">
+                <div class="login-item">
+                    <div class="login-status success"></div>
+                    <div class="login-info">
+                        <strong>Connexion réussie</strong><br>
+                        <span>iPhone 15 Pro • Paris, France • Safari</span>
+                    </div>
+                    <div class="login-time">Aujourd'hui, 14:32</div>
+                </div>
+                
+                <div class="login-item">
+                    <div class="login-status success"></div>
+                    <div class="login-info">
+                        <strong>Connexion réussie</strong><br>
+                        <span>MacBook Pro • Paris, France • Chrome</span>
+                    </div>
+                    <div class="login-time">Aujourd'hui, 09:15</div>
+                </div>
+                
+                <div class="login-item">
+                    <div class="login-status failed"></div>
+                    <div class="login-info">
+                        <strong>Échec de connexion</strong><br>
+                        <span>Appareil inconnu • Amsterdam, Pays-Bas • Firefox</span>
+                    </div>
+                    <div class="login-time">Hier, 23:47</div>
+                </div>
+                
+                <div class="login-item">
+                    <div class="login-status success"></div>
+                    <div class="login-info">
+                        <strong>Connexion réussie</strong><br>
+                        <span>iPad Air • Lyon, France • Safari</span>
+                    </div>
+                    <div class="login-time">Il y a 3 jours</div>
+                </div>
+                
+                <div class="login-item">
+                    <div class="login-status success"></div>
+                    <div class="login-info">
+                        <strong>Connexion réussie (2FA)</strong><br>
+                        <span>MacBook Pro • Paris, France • Chrome</span>
+                    </div>
+                    <div class="login-time">Il y a 5 jours</div>
+                </div>
+                
+                <div class="login-item">
+                    <div class="login-status failed"></div>
+                    <div class="login-info">
+                        <strong>Échec de connexion</strong><br>
+                        <span>Appareil inconnu • Moscou, Russie • Chrome</span>
+                    </div>
+                    <div class="login-time">Il y a 1 semaine</div>
+                </div>
+            </div>
+            
+            <div class="security-card warning">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="flex-shrink: 0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div>
+                        <strong style="color: #f59e0b;">Tu vois des connexions suspectes ?</strong>
+                        <p style="margin: 0.5rem 0 0;">
+                            Change immédiatement ton mot de passe et active la 2FA si ce n'est pas déjà fait. 
+                            Contacte-nous à <strong>security@cinq.app</strong> si tu as besoin d'aide.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tips Section -->
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                Bonnes pratiques
+            </h2>
+            
+            <ul>
+                <li>
+                    <strong>Utilise un mot de passe unique</strong> — Ne réutilise jamais ton mot de passe Cinq sur d'autres sites. 
+                    Un gestionnaire de mots de passe (1Password, Bitwarden) peut t'aider.
+                </li>
+                <li>
+                    <strong>Active la 2FA</strong> — C'est la meilleure protection contre le vol de compte. 
+                    Même si ton mot de passe fuite, personne ne pourra se connecter.
+                </li>
+                <li>
+                    <strong>Vérifie régulièrement tes sessions</strong> — Si tu vois un appareil que tu ne reconnais pas, 
+                    déconnecte-le et change ton mot de passe.
+                </li>
+                <li>
+                    <strong>Méfie-toi du phishing</strong> — On ne te demandera jamais ton mot de passe par email. 
+                    Vérifie toujours que l'URL est bien <code>cinq.app</code>.
+                </li>
+                <li>
+                    <strong>Garde tes codes de récupération</strong> — Imprime-les ou stocke-les dans un endroit sûr. 
+                    Si tu perds l'accès à ton app 2FA, c'est ton seul recours.
+                </li>
+            </ul>
+
+            <!-- Contact -->
+            <h2>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Contact sécurité
+            </h2>
+            
+            <p>
+                Tu as découvert une faille de sécurité ? Tu penses que ton compte a été compromis ?
+            </p>
+            <ul>
+                <li><strong>Urgence sécurité :</strong> <a href="mailto:security@cinq.app">security@cinq.app</a></li>
+                <li><strong>Questions générales :</strong> <a href="mailto:hello@cinq.app">hello@cinq.app</a></li>
+                <li><strong>Bug bounty :</strong> Contacte-nous pour notre programme de récompenses</li>
+            </ul>
+
+        </div>
+
+        <footer class="legal-footer">
+            <a href="/">← Accueil</a>
+            <a href="/settings.html">Paramètres</a>
+            <a href="/privacy.html">Confidentialité</a>
+            <a href="/help.html">Aide</a>
+        </footer>
+    </main>
+
+    <script>
+        // 2FA Setup interactions
+        function show2FASetup() {
+            document.getElementById('2fa-setup').style.display = 'block';
+            document.getElementById('enable-2fa-btn').style.display = 'none';
+            // Focus first input
+            const inputs = document.querySelectorAll('.code-input input');
+            if (inputs[0]) inputs[0].focus();
+        }
+        
+        function hide2FASetup() {
+            document.getElementById('2fa-setup').style.display = 'none';
+            document.getElementById('enable-2fa-btn').style.display = 'inline-flex';
+        }
+        
+        function verify2FA() {
+            // Demo: just show success
+            const badge = document.getElementById('2fa-badge');
+            badge.textContent = 'Activé';
+            badge.classList.remove('badge-inactive');
+            badge.classList.add('badge-active');
+            
+            document.getElementById('2fa-setup').style.display = 'none';
+            document.getElementById('enable-2fa-btn').textContent = 'Désactiver la 2FA';
+            document.getElementById('enable-2fa-btn').style.display = 'inline-flex';
+            document.getElementById('enable-2fa-btn').classList.remove('btn-primary');
+            document.getElementById('enable-2fa-btn').classList.add('btn-secondary', 'btn-danger');
+            
+            alert('✅ 2FA activée avec succès !');
+        }
+        
+        // Auto-focus next input in code entry
+        document.querySelectorAll('.code-input input').forEach((input, index, inputs) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+        
+        function generateRecoveryCodes() {
+            if (confirm('Attention : les anciens codes seront invalidés. Continuer ?')) {
+                const codes = document.getElementById('recovery-codes');
+                const newCodes = [];
+                for (let i = 0; i < 8; i++) {
+                    newCodes.push(generateCode());
+                }
+                codes.innerHTML = newCodes.map(c => `<code>${c}</code>`).join('');
+                alert('✅ Nouveaux codes générés. N\'oublie pas de les sauvegarder !');
+            }
+        }
+        
+        function generateCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 12; i++) {
+                if (i === 4 || i === 8) code += '-';
+                code += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return code;
+        }
+        
+        function revokeSession(btn) {
+            if (confirm('Déconnecter cet appareil ?')) {
+                const item = btn.closest('.session-item');
+                item.style.opacity = '0.5';
+                item.style.pointerEvents = 'none';
+                btn.textContent = 'Déconnecté';
+            }
+        }
+        
+        function revokeAllSessions() {
+            if (confirm('Déconnecter TOUS les autres appareils ? Tu resteras connecté sur celui-ci.')) {
+                document.querySelectorAll('.session-item').forEach((item, index) => {
+                    if (index > 0) { // Skip current session
+                        item.style.opacity = '0.5';
+                        item.style.pointerEvents = 'none';
+                        const btn = item.querySelector('.session-action');
+                        if (btn) btn.textContent = 'Déconnecté';
+                    }
+                });
+                alert('✅ Tous les autres appareils ont été déconnectés.');
+            }
+        }
+    </script>
+
+    <!-- View Transitions -->
+    <script defer src="/js/view-transitions.min.js"></script>
+</body>
+</html>
