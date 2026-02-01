@@ -72,4 +72,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Stats - Public statistics page -->
+  <url>
+    <loc>https://cinq.app/stats</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
