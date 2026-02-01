@@ -9,6 +9,7 @@
  * - GET ?action=followers - Get followers
  * - POST - Add contact by ID or email
  * - PATCH ?id=xxx&action=archive - Archive/unarchive contact
+ * - PATCH ?id=xxx&action=mute&duration=1h|8h|24h|forever - Mute/unmute contact notifications
  * - DELETE ?id=xxx - Remove contact
  */
 
@@ -187,7 +188,7 @@ async function listContacts(req, res, user) {
     
     let query = supabase
         .from('contacts')
-        .select('id, contact_user_id, created_at, is_favorite, archived')
+        .select('id, contact_user_id, created_at, is_favorite, archived, muted_until, private_note')
         .eq('user_id', user.id);
     
     // Filter by archived status
@@ -231,15 +232,26 @@ async function listContacts(req, res, user) {
     
     const mutualSet = new Set((mutualContacts || []).map(c => c.user_id));
 
+    const now = new Date();
     const contacts = data.map(c => {
         const profile = profileMap[c.contact_user_id];
         // Only include last_seen if user hasn't hidden it
         const lastSeenAt = profile?.hide_last_seen ? null : (profile?.last_seen_at || null);
         
+        // Calculate if contact is currently muted
+        let isMuted = false;
+        if (c.muted_until) {
+            const mutedUntil = new Date(c.muted_until);
+            // Check for 'infinity' timestamp (year 9999) or future date
+            isMuted = mutedUntil.getFullYear() >= 9999 || mutedUntil > now;
+        }
+        
         return {
             ...c,
             is_favorite: c.is_favorite || false,
             archived: c.archived || false,
+            muted_until: c.muted_until || null,
+            is_muted: isMuted,
             contact: { 
                 id: c.contact_user_id, 
                 email: profile?.email || null,
@@ -418,7 +430,7 @@ async function handlePatch(req, res, user) {
     // Get current contact status
     const { data: contact, error: fetchError } = await supabase
         .from('contacts')
-        .select('id, is_favorite, archived')
+        .select('id, is_favorite, archived, muted_until')
         .eq('id', contactId)
         .eq('user_id', user.id)
         .single();
@@ -447,6 +459,85 @@ async function handlePatch(req, res, user) {
         return res.json({ 
             success: true, 
             archived: newArchivedStatus,
+            contact: data
+        });
+    }
+
+    // Handle private note update
+    if (action === 'note') {
+        const { private_note } = req.body;
+        
+        // Allow null/empty to clear the note, otherwise validate max length
+        const noteValue = private_note ? private_note.trim().slice(0, 1000) : null;
+        
+        const { data, error } = await supabase
+            .from('contacts')
+            .update({ private_note: noteValue })
+            .eq('id', contactId)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Log activity
+        logActivity(user.id, 'contact_note_updated', { contact_id: contactId }, req);
+
+        return res.json({ 
+            success: true, 
+            private_note: noteValue,
+            contact: data
+        });
+    }
+
+    // Handle mute action
+    if (action === 'mute') {
+        const duration = req.query.duration; // '1h', '8h', '24h', 'forever', or 'off'
+        let mutedUntil = null;
+        let isMuted = false;
+        
+        if (duration && duration !== 'off') {
+            const now = new Date();
+            switch (duration) {
+                case '1h':
+                    mutedUntil = new Date(now.getTime() + 1 * 60 * 60 * 1000);
+                    break;
+                case '8h':
+                    mutedUntil = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+                    break;
+                case '24h':
+                    mutedUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                    break;
+                case 'forever':
+                    // Use year 9999 for "forever" mute
+                    mutedUntil = new Date('9999-12-31T23:59:59.999Z');
+                    break;
+                default:
+                    return res.status(400).json({ error: 'Durée invalide. Utilise: 1h, 8h, 24h, forever, ou off' });
+            }
+            isMuted = true;
+        }
+        
+        const { data, error } = await supabase
+            .from('contacts')
+            .update({ muted_until: mutedUntil })
+            .eq('id', contactId)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Log activity
+        logActivity(user.id, isMuted ? 'contact_muted' : 'contact_unmuted', { 
+            contact_id: contactId, 
+            duration: duration || 'off' 
+        }, req);
+
+        return res.json({ 
+            success: true, 
+            muted_until: mutedUntil,
+            is_muted: isMuted,
             contact: data
         });
     }

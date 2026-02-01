@@ -137,7 +137,15 @@ CREATE INDEX IF NOT EXISTS idx_contacts_user ON contacts(user_id);
 ALTER TABLE contacts ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN DEFAULT FALSE;
 ALTER TABLE contacts ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
 
+-- Add muted_until column for contact muting feature
+-- NULL = not muted, timestamp = muted until that time, 'infinity' = muted indefinitely
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS muted_until TIMESTAMPTZ DEFAULT NULL;
+
+-- Add private_note column for private notes about contacts (visible only by the user)
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS private_note TEXT DEFAULT NULL;
+
 CREATE INDEX IF NOT EXISTS idx_contacts_archived ON contacts(user_id, archived);
+CREATE INDEX IF NOT EXISTS idx_contacts_muted ON contacts(user_id, muted_until);
 
 -- Enforce max 5 contacts (only non-archived)
 CREATE OR REPLACE FUNCTION check_contact_limit()
@@ -711,6 +719,36 @@ CREATE POLICY "Users can update own reminders" ON reminders FOR UPDATE
     USING (auth.uid() = user_id);
 CREATE POLICY "Users can delete reminders" ON reminders FOR DELETE 
     USING (auth.uid() = user_id);
+
+-- ============================================
+-- POST VIEWS (seen by - for posts < 24h)
+-- ============================================
+CREATE TABLE IF NOT EXISTS post_views (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    viewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    viewed_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(post_id, viewer_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_post_views_post_id ON post_views(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_views_viewer_id ON post_views(viewer_id);
+CREATE INDEX IF NOT EXISTS idx_post_views_viewed_at ON post_views(viewed_at DESC);
+
+ALTER TABLE post_views ENABLE ROW LEVEL SECURITY;
+
+-- Post views: post owner can see who viewed, viewers can create views
+CREATE POLICY "Post owners can view who watched" ON post_views FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM posts 
+            WHERE posts.id = post_views.post_id 
+            AND posts.user_id = auth.uid()
+        )
+        OR viewer_id = auth.uid()
+    );
+CREATE POLICY "Users can mark posts as viewed" ON post_views FOR INSERT
+    WITH CHECK (auth.uid() = viewer_id);
 
 -- ============================================
 -- GRANT SERVICE ROLE ACCESS
