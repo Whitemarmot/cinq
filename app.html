@@ -2390,6 +2390,77 @@
             display: block;
         }
         
+        /* Chat export button */
+        .chat-export-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-export-btn:hover {
+            background: var(--color-success-muted, rgba(34, 197, 94, 0.1));
+            border-color: var(--color-success, #22c55e);
+            color: var(--color-success, #22c55e);
+        }
+        
+        /* Export modal options */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+        
+        .export-option-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        
+        .export-option-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+        }
+        
+        .export-option-btn svg {
+            width: 24px;
+            height: 24px;
+            color: var(--color-brand);
+            flex-shrink: 0;
+        }
+        
+        .export-option-info {
+            flex: 1;
+        }
+        
+        .export-option-title {
+            font-weight: 600;
+            font-size: var(--text-base);
+            margin-bottom: var(--space-1);
+        }
+        
+        .export-option-desc {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
         /* Private note modal content */
         .private-note-textarea {
             width: 100%;
@@ -3410,6 +3481,14 @@
             outline: none;
             border-color: var(--color-brand);
             box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .chat-char-count {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            align-self: center;
+            min-width: 45px;
+            text-align: center;
         }
         
         .chat-send {
@@ -4682,6 +4761,17 @@
             background: var(--color-warning);
             color: white;
             border-color: var(--color-warning);
+        }
+        
+        .message-action-btn.starred {
+            background: #fbbf24;
+            color: white;
+            border-color: #fbbf24;
+        }
+        
+        .message-action-btn.starred:hover {
+            background: #f59e0b;
+            border-color: #f59e0b;
         }
         
         .message-action-btn svg {
@@ -6451,6 +6541,8 @@
     
     <!-- Confetti celebrations -->
     <script src="/js/confetti.js"></script>
+    <!-- View Transitions -->
+    <link rel="stylesheet" href="/css/view-transitions.min.css">
 </head>
 <body>
     <!-- Skip Links - WCAG AAA Compliant -->
@@ -6671,7 +6763,7 @@
                         class="composer-textarea" 
                         id="post-content" 
                         placeholder="Un truc marrant ? Une pensée ? Un coup de gueule ? C'est entre vous..."
-                        maxlength="1000"
+                        maxlength="280"
                         aria-describedby="char-count"
                     ></textarea>
                     <div class="image-preview" id="image-preview" role="region" aria-label="Aperçu de l'image">
@@ -6696,7 +6788,7 @@
                             </button>
                         </div>
                         <div style="display:flex;align-items:center;gap:var(--space-4);">
-                            <span class="char-count" id="char-count" aria-live="polite" aria-atomic="true">0/1000</span>
+                            <span class="char-count" id="char-count" aria-live="polite" aria-atomic="true">0/280</span>
                             <button class="post-btn btn-ripple glow-hover" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
                         </div>
                     </div>
@@ -6931,6 +7023,11 @@
                     </svg>
                     <span class="pin-count" id="pin-count" style="display: none;">0</span>
                 </button>
+                <button class="chat-export-btn" id="chat-export-btn" onclick="openExportModal()" type="button" aria-label="Exporter la conversation" title="Exporter">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
                 <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
                     <span aria-hidden="true">×</span>
                 </button>
@@ -7062,7 +7159,8 @@
                 </div>
             </div>
             <label for="chat-input" class="sr-only">Écrire un message</label>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500" autocomplete="off">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="280" autocomplete="off">
+            <span class="char-count chat-char-count" id="chat-char-count" aria-live="polite">0/280</span>
             <div class="file-preview" id="file-preview">
                 <div class="file-preview-icon" id="file-preview-icon">📄</div>
                 <div class="file-preview-info">
@@ -7338,6 +7436,45 @@
                 <button class="modal-btn primary" id="save-private-note-btn" onclick="savePrivateNote()" type="button">
                     <span aria-hidden="true">💾</span> Enregistrer
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Conversation Modal -->
+    <div class="modal-overlay" id="export-modal" role="dialog" aria-modal="true" aria-labelledby="export-modal-title" aria-hidden="true">
+        <div class="modal">
+            <h2 class="modal-title" id="export-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exporter la conversation
+            </h2>
+            <p id="export-contact-name" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-2);">Exporter l'historique complet avec <span id="export-contact-display"></span></p>
+            
+            <div class="export-options">
+                <button class="export-option-btn" onclick="exportConversation('txt')" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <div class="export-option-info">
+                        <div class="export-option-title">Fichier texte (.txt)</div>
+                        <div class="export-option-desc">Format simple, compatible partout</div>
+                    </div>
+                </button>
+                
+                <button class="export-option-btn" onclick="exportConversation('pdf')" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12h4"/><path d="M10 16h4"/><path d="M10 20h4"/>
+                    </svg>
+                    <div class="export-option-info">
+                        <div class="export-option-title">Document PDF</div>
+                        <div class="export-option-desc">Format professionnel, imprimable</div>
+                    </div>
+                </button>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4);">
+                <button class="modal-btn secondary" onclick="closeExportModal()" type="button">Annuler</button>
             </div>
         </div>
     </div>
@@ -7829,13 +7966,13 @@
                 if (draft.content && textarea) {
                     textarea.value = draft.content;
                     const len = draft.content.length;
-                    charCount.textContent = `${len}/1000`;
+                    charCount.textContent = `${len}/280`;
                     
                     charCount.classList.remove('warning', 'error');
-                    if (len > 900) charCount.classList.add('error');
-                    else if (len > 700) charCount.classList.add('warning');
+                    if (len > 250) charCount.classList.add('error');
+                    else if (len > 220) charCount.classList.add('warning');
                     
-                    postBtn.disabled = len === 0 || len > 1000;
+                    postBtn.disabled = len === 0 || len > 280;
                 }
                 
                 if (draft.imageUrl) {
@@ -7928,11 +8065,11 @@
             
             textarea.addEventListener('input', () => {
                 const len = textarea.value.length;
-                charCount.textContent = `${len}/1000`;
+                charCount.textContent = `${len}/280`;
                 charCount.classList.remove('warning', 'error');
-                if (len > 900) charCount.classList.add('error');
-                else if (len > 700) charCount.classList.add('warning');
-                postBtn.disabled = len === 0 || len > 1000;
+                if (len > 250) charCount.classList.add('error');
+                else if (len > 220) charCount.classList.add('warning');
+                postBtn.disabled = len === 0 || len > 280;
                 
                 // Check for @mention trigger
                 handleMentionInput(textarea);
@@ -8213,7 +8350,7 @@
                 renderPosts();
                 
                 document.getElementById('post-content').value = '';
-                document.getElementById('char-count').textContent = '0/1000';
+                document.getElementById('char-count').textContent = '0/280';
                 removeImage();
                 
                 // Clear saved draft after successful post
@@ -8844,6 +8981,332 @@
             noteBtn.setAttribute('title', hasNote ? 'Note privée (1)' : 'Note privée');
         }
 
+        // ===== CONVERSATION EXPORT =====
+        function openExportModal() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('export-modal');
+            const contactName = currentChatContact.contact?.display_name || 
+                               currentChatContact.contact?.email?.split('@')[0] || 
+                               'Contact';
+            
+            document.getElementById('export-contact-display').textContent = contactName;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+        
+        function closeExportModal() {
+            const modal = document.getElementById('export-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        async function exportConversation(format) {
+            if (!currentChatContact) return;
+            
+            const contactName = currentChatContact.contact?.display_name || 
+                               currentChatContact.contact?.email?.split('@')[0] || 
+                               'Contact';
+            
+            // Fetch all messages for this contact
+            try {
+                showToast({ type: 'info', message: 'Préparation de l\'export...', duration: 2000 });
+                
+                const res = await fetch(`${API_URL}/messages?contact_id=${currentChatContact.id}&limit=10000`, {
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) throw new Error('Erreur lors de la récupération des messages');
+                
+                const messages = await res.json();
+                
+                if (!messages || messages.length === 0) {
+                    showToast({ type: 'warning', message: 'Aucun message à exporter', duration: 2000 });
+                    return;
+                }
+                
+                // Sort messages by date (oldest first)
+                messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                
+                const currentUserEmail = localStorage.getItem('cinq-email') || 'Moi';
+                const currentUserName = localStorage.getItem('cinq-display-name') || currentUserEmail.split('@')[0];
+                
+                if (format === 'txt') {
+                    exportAsTxt(messages, contactName, currentUserName);
+                } else if (format === 'pdf') {
+                    exportAsPdf(messages, contactName, currentUserName);
+                }
+                
+                closeExportModal();
+                showToast({ type: 'success', message: `Conversation exportée en ${format.toUpperCase()} 📥`, duration: 3000 });
+                
+            } catch (e) {
+                console.error('Export error:', e);
+                showToast({ type: 'error', message: 'Erreur lors de l\'export', duration: 3000 });
+            }
+        }
+        
+        function formatMessageDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            return date.toLocaleDateString('fr-FR', options);
+        }
+        
+        function exportAsTxt(messages, contactName, currentUserName) {
+            const date = new Date().toLocaleDateString('fr-FR');
+            let content = `═══════════════════════════════════════════════════\n`;
+            content += `  CONVERSATION CINQ\n`;
+            content += `  Avec : ${contactName}\n`;
+            content += `  Exporté le : ${date}\n`;
+            content += `  Nombre de messages : ${messages.length}\n`;
+            content += `═══════════════════════════════════════════════════\n\n`;
+            
+            let currentDate = '';
+            
+            messages.forEach(msg => {
+                const msgDate = new Date(msg.created_at);
+                const dateLabel = msgDate.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                // Add date separator if new day
+                if (dateLabel !== currentDate) {
+                    currentDate = dateLabel;
+                    content += `\n─── ${dateLabel} ───\n\n`;
+                }
+                
+                const time = msgDate.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const sender = msg.is_from_me ? currentUserName : contactName;
+                const indicator = msg.is_from_me ? '→' : '←';
+                
+                // Handle different message types
+                let messageText = '';
+                if (msg.content_type === 'ping') {
+                    messageText = '👋 [Coucou]';
+                } else if (msg.content_type === 'voice') {
+                    messageText = '🎤 [Message vocal]';
+                } else if (msg.content_type === 'image') {
+                    messageText = '📷 [Image]';
+                } else if (msg.content_type === 'gif') {
+                    messageText = '🎬 [GIF]';
+                } else {
+                    messageText = msg.content || '';
+                }
+                
+                content += `[${time}] ${indicator} ${sender}:\n${messageText}\n\n`;
+            });
+            
+            content += `\n═══════════════════════════════════════════════════\n`;
+            content += `  Fin de la conversation\n`;
+            content += `  Généré par Cinq — cinq.app\n`;
+            content += `═══════════════════════════════════════════════════\n`;
+            
+            // Download file
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cinq-conversation-${contactName.replace(/[^a-zA-Z0-9]/g, '_')}-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportAsPdf(messages, contactName, currentUserName) {
+            const date = new Date().toLocaleDateString('fr-FR');
+            
+            // Build HTML content for PDF
+            let html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation Cinq - ${contactName}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+            line-height: 1.5;
+        }
+        .header {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .stats { 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        .stats span { 
+            background: rgba(255,255,255,0.2); 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+        }
+        .date-separator {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 20px 0;
+            padding: 10px;
+            background: #e5e5e5;
+            border-radius: 8px;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 12px;
+            flex-direction: column;
+        }
+        .message.sent { align-items: flex-end; }
+        .message.received { align-items: flex-start; }
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+        }
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e5e5;
+        }
+        .message-content { word-wrap: break-word; }
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        .message.sent .message-meta { justify-content: flex-end; }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #e5e5e5;
+        }
+        @media print {
+            body { padding: 20px; }
+            .header { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💬 Conversation avec ${escapeHtml(contactName)}</h1>
+        <p>Exportée le ${date}</p>
+        <div class="stats">
+            <span>📨 ${messages.length} messages</span>
+            <span>📅 ${messages.length > 0 ? new Date(messages[0].created_at).toLocaleDateString('fr-FR') : '-'} → ${messages.length > 0 ? new Date(messages[messages.length-1].created_at).toLocaleDateString('fr-FR') : '-'}</span>
+        </div>
+    </div>
+    <div class="messages">`;
+            
+            let currentDate = '';
+            
+            messages.forEach(msg => {
+                const msgDate = new Date(msg.created_at);
+                const dateLabel = msgDate.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                // Add date separator if new day
+                if (dateLabel !== currentDate) {
+                    currentDate = dateLabel;
+                    html += `<div class="date-separator">📅 ${dateLabel}</div>`;
+                }
+                
+                const time = msgDate.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const sender = msg.is_from_me ? currentUserName : contactName;
+                const msgClass = msg.is_from_me ? 'sent' : 'received';
+                
+                // Handle different message types
+                let messageText = '';
+                if (msg.content_type === 'ping') {
+                    messageText = '👋 Coucou !';
+                } else if (msg.content_type === 'voice') {
+                    messageText = '🎤 Message vocal';
+                } else if (msg.content_type === 'image') {
+                    messageText = '📷 Image';
+                } else if (msg.content_type === 'gif') {
+                    messageText = '🎬 GIF';
+                } else {
+                    messageText = escapeHtml(msg.content || '');
+                }
+                
+                html += `
+        <div class="message ${msgClass}">
+            <div class="message-bubble">
+                <div class="message-content">${messageText}</div>
+                <div class="message-meta">
+                    <span>${sender}</span>
+                    <span>•</span>
+                    <span>${time}</span>
+                </div>
+            </div>
+        </div>`;
+            });
+            
+            html += `
+    </div>
+    <div class="footer">
+        <p>💜 Généré par <strong>Cinq</strong> — L'anti-réseau social</p>
+        <p>cinq.app</p>
+    </div>
+</body>
+</html>`;
+            
+            // Open in new window for printing/saving as PDF
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            // Auto-trigger print dialog
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+
         function renderContacts() {
             const grid = document.getElementById('contacts-grid');
             grid.innerHTML = '';
@@ -9248,9 +9711,17 @@
         function setupChatInput() {
             const input = document.getElementById('chat-input');
             const btn = document.getElementById('send-btn');
+            const charCount = document.getElementById('chat-char-count');
             
             input.addEventListener('input', () => {
                 btn.disabled = !input.value.trim();
+                
+                // Update character counter
+                const len = input.value.length;
+                charCount.textContent = `${len}/280`;
+                charCount.classList.remove('warning', 'error');
+                if (len > 250) charCount.classList.add('error');
+                else if (len > 220) charCount.classList.add('warning');
                 
                 // Typing indicator logic - broadcast typing state
                 if (input.value.trim() && !isTyping) {
@@ -9843,6 +10314,13 @@
             addOptimisticMessage(optimisticMsg);
             input.value = '';
             
+            // Reset character counter
+            const charCount = document.getElementById('chat-char-count');
+            if (charCount) {
+                charCount.textContent = '0/280';
+                charCount.classList.remove('warning', 'error');
+            }
+            
             // Clear saved chat draft after sending
             if (currentChatContact) {
                 clearChatDraft(currentChatContact.contact_user_id);
@@ -10125,7 +10603,17 @@
         function getPinButtonHtml(messageId) {
             const isPinned = pinnedMessageIds.has(messageId);
             const hasReminder = reminderMessageIds.has(messageId);
+            const isStarred = starredMessageIds.has(messageId);
             return `
+                <button class="message-action-btn ${isStarred ? 'starred' : ''}" 
+                        onclick="toggleStarMessage('${messageId}')" 
+                        data-star-msg-id="${messageId}"
+                        type="button" 
+                        aria-label="${isStarred ? 'Retirer des favoris' : 'Ajouter aux favoris'}">
+                    <svg viewBox="0 0 24 24" fill="${isStarred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </button>
                 <button class="message-action-btn ${isPinned ? 'pinned' : ''}" 
                         onclick="togglePinMessage('${messageId}')" 
                         data-pin-msg-id="${messageId}"
@@ -10156,6 +10644,150 @@
                 </button>
             `;
         }
+
+        // ===== STARRED MESSAGES =====
+        let starredMessageIds = new Set();
+        
+        function loadStarredMessageIds() {
+            try {
+                const stored = localStorage.getItem('cinq_starred_messages');
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    starredMessageIds = new Set(data.map(m => m.id));
+                }
+            } catch (e) {
+                console.error('Failed to load starred messages:', e);
+                starredMessageIds = new Set();
+            }
+        }
+        
+        function getStarredMessages() {
+            try {
+                const stored = localStorage.getItem('cinq_starred_messages');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        function saveStarredMessages(messages) {
+            try {
+                localStorage.setItem('cinq_starred_messages', JSON.stringify(messages));
+                starredMessageIds = new Set(messages.map(m => m.id));
+            } catch (e) {
+                console.error('Failed to save starred messages:', e);
+            }
+        }
+        
+        function starMessage(messageId) {
+            if (!currentChatContact) return;
+            
+            // Find the message in current chat
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            if (!msgEl) return;
+            
+            const contentEl = msgEl.querySelector('.chat-message-content');
+            const isSent = msgEl.classList.contains('sent');
+            const contactName = currentChatContact?.contact?.display_name || 'Contact';
+            
+            // Determine message content/type
+            let content = '';
+            let type = 'text';
+            let preview = '';
+            
+            if (msgEl.classList.contains('ping')) {
+                type = 'ping';
+                content = '👋';
+                preview = '👋 Coucou';
+            } else if (msgEl.classList.contains('sticker')) {
+                type = 'sticker';
+                const img = msgEl.querySelector('.sticker-content img');
+                content = img ? img.src : '';
+                preview = '🎨 Sticker';
+            } else if (msgEl.classList.contains('gif')) {
+                type = 'gif';
+                const img = msgEl.querySelector('.gif-content img');
+                content = img ? img.src : '';
+                preview = '🖼️ GIF';
+            } else if (msgEl.querySelector('.voice-message')) {
+                type = 'voice';
+                const playBtn = msgEl.querySelector('.voice-play-btn');
+                content = playBtn ? playBtn.getAttribute('onclick')?.match(/'([^']+\.webm)'/)?.[1] || '' : '';
+                preview = '🎤 Message vocal';
+            } else if (msgEl.querySelector('.file-attachment')) {
+                type = 'file';
+                const fileName = msgEl.querySelector('.file-attachment-name');
+                content = fileName ? fileName.textContent : 'Fichier';
+                preview = '📎 ' + content;
+            } else if (msgEl.classList.contains('location')) {
+                type = 'location';
+                preview = '📍 Position';
+            } else if (contentEl) {
+                content = contentEl.textContent || contentEl.innerText || '';
+                preview = content.length > 100 ? content.substring(0, 100) + '...' : content;
+            }
+            
+            const timeEl = msgEl.querySelector('.chat-message-time');
+            const timeText = timeEl ? timeEl.textContent : '';
+            
+            const starredMessage = {
+                id: messageId,
+                content: content,
+                preview: preview,
+                type: type,
+                isSent: isSent,
+                senderName: isSent ? 'Toi' : contactName,
+                contactId: currentChatContact.contact_user_id,
+                contactName: contactName,
+                starredAt: new Date().toISOString(),
+                messageTime: timeText
+            };
+            
+            const messages = getStarredMessages();
+            // Check if already starred
+            if (!messages.find(m => m.id === messageId)) {
+                messages.unshift(starredMessage); // Add at beginning
+                saveStarredMessages(messages);
+                updateStarButton(messageId, true);
+                showToast({ type: 'success', message: 'Message ajouté aux favoris ⭐' });
+                triggerHaptic('success');
+            }
+        }
+        
+        function unstarMessage(messageId) {
+            const messages = getStarredMessages();
+            const filtered = messages.filter(m => m.id !== messageId);
+            saveStarredMessages(filtered);
+            updateStarButton(messageId, false);
+            showToast({ type: 'success', message: 'Message retiré des favoris' });
+            triggerHaptic('tap');
+        }
+        
+        function toggleStarMessage(messageId) {
+            if (starredMessageIds.has(messageId)) {
+                unstarMessage(messageId);
+            } else {
+                starMessage(messageId);
+            }
+        }
+        
+        function updateStarButton(messageId, isStarred) {
+            const btn = document.querySelector(`[data-star-msg-id="${messageId}"]`);
+            if (btn) {
+                if (isStarred) {
+                    btn.classList.add('starred');
+                    btn.setAttribute('aria-label', 'Retirer des favoris');
+                    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                } else {
+                    btn.classList.remove('starred');
+                    btn.setAttribute('aria-label', 'Ajouter aux favoris');
+                    btn.querySelector('svg').setAttribute('fill', 'none');
+                }
+            }
+        }
+        
+        // Load starred message IDs on init
+        loadStarredMessageIds();
 
         // ===== REMINDERS =====
         let reminders = [];
@@ -13499,5 +14131,7 @@
     
     <!-- Easter Eggs 🥚 -->
     <script src="/js/easter-eggs.min.js" defer></script>
+    <!-- View Transitions -->
+    <script defer src="/js/view-transitions.min.js"></script>
 </body>
 </html>
