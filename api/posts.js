@@ -22,6 +22,7 @@ const DEFAULT_FETCH_LIMIT = 50;
 const MIN_POLL_OPTIONS = 2;
 const MAX_POLL_OPTIONS = 4;
 const MAX_POLL_OPTION_LENGTH = 100;
+const MAX_REPLY_DEPTH = 1; // Only allow direct replies, no nested threads
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['GET', 'POST', 'DELETE', 'PATCH', 'OPTIONS'])) return;
@@ -72,7 +73,7 @@ export default async function handler(req, res) {
 // ===== GET - List posts =====
 
 async function handleGetPosts(req, res, user) {
-    const { limit, offset, user_id, cursor } = req.query;
+    const { limit, offset, user_id, cursor, parent_id } = req.query;
     
     // Parse and validate pagination params
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || DEFAULT_FETCH_LIMIT), MAX_FETCH_LIMIT);
@@ -80,6 +81,11 @@ async function handleGetPosts(req, res, user) {
     
     // Parse cursor (ISO date string for cursor-based pagination)
     const parsedCursor = cursor ? parseCursor(cursor) : null;
+    
+    // Get replies to a specific post
+    if (parent_id) {
+        return getReplies(res, user, parent_id, safeLimit, safeOffset, parsedCursor);
+    }
     
     // Specific user's posts
     if (user_id) {
@@ -106,6 +112,79 @@ function parseCursor(cursorStr) {
     }
 }
 
+/**
+ * Get replies to a specific post
+ */
+async function getReplies(res, user, parentId, limit, offset, cursor = null) {
+    if (!isValidUUID(parentId)) {
+        return res.status(400).json({ error: 'Format parent_id invalide' });
+    }
+    
+    // Verify the parent post exists
+    const { data: parentPost, error: parentError } = await supabase
+        .from('posts')
+        .select('id, user_id')
+        .eq('id', parentId)
+        .single();
+    
+    if (parentError || !parentPost) {
+        return res.status(404).json({ error: 'Post parent non trouvé' });
+    }
+    
+    // Build query for replies
+    let query = supabase
+        .from('posts')
+        .select('*')
+        .eq('parent_id', parentId)
+        .order('created_at', { ascending: true }); // Oldest first for thread readability
+    
+    // Cursor-based pagination
+    if (cursor) {
+        query = query.gt('created_at', cursor);
+    } else if (offset > 0) {
+        query = query.range(offset, offset + limit - 1);
+    }
+    
+    query = query.limit(limit);
+    
+    const { data: replies, error } = await query;
+    
+    if (error) throw error;
+    
+    // Get user's poll votes for these replies
+    const replyIds = replies.map(r => r.id);
+    const userPollVotes = await getUserPollVotes(user.id, replyIds);
+    
+    // Enrich with author info
+    const authorCache = {};
+    const enriched = await Promise.all(replies.map(async (reply) => {
+        if (!authorCache[reply.user_id]) {
+            authorCache[reply.user_id] = await getUserInfo(reply.user_id);
+        }
+        const enrichedReply = { ...reply, author: authorCache[reply.user_id] };
+        if (reply.poll_options) {
+            enrichedReply.user_poll_vote = userPollVotes[reply.id] ?? null;
+            enrichedReply.poll_total_votes = reply.poll_votes 
+                ? Object.values(reply.poll_votes).reduce((sum, c) => sum + c, 0) 
+                : 0;
+        }
+        return enrichedReply;
+    }));
+    
+    // Generate next cursor (created_at of last reply)
+    const nextCursor = replies.length === limit && replies.length > 0 
+        ? replies[replies.length - 1].created_at 
+        : null;
+    
+    return res.json({ 
+        replies: enriched, 
+        count: replies.length,
+        parentId,
+        nextCursor,
+        hasMore: replies.length === limit
+    });
+}
+
 async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = null) {
     if (!isValidUUID(userId)) {
         return res.status(400).json({ error: 'Format user_id invalide' });
@@ -125,11 +204,12 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
         }
     }
     
-    // Build query
+    // Build query - exclude replies (only show root posts)
     let query = supabase
         .from('posts')
         .select('*')
         .eq('user_id', userId)
+        .is('parent_id', null)
         .order('created_at', { ascending: false });
     
     // Cursor-based pagination (preferred) or offset-based
@@ -152,8 +232,15 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
     const postIds = posts.map(p => p.id);
     const userPollVotes = await getUserPollVotes(user.id, postIds);
     
+    // Get reply counts for all posts
+    const replyCounts = await getReplyCountsForPosts(postIds);
+    
     const enriched = posts.map(post => {
-        const enrichedPost = { ...post, author: authorInfo };
+        const enrichedPost = { 
+            ...post, 
+            author: authorInfo,
+            reply_count: replyCounts[post.id] || 0
+        };
         if (post.poll_options) {
             enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
             enrichedPost.poll_total_votes = post.poll_votes 
@@ -186,11 +273,12 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     const contactIds = contacts?.map(c => c.contact_user_id) || [];
     const allUserIds = [user.id, ...contactIds];
     
-    // Build query
+    // Build query - exclude replies (only show root posts)
     let query = supabase
         .from('posts')
         .select('*')
         .in('user_id', allUserIds)
+        .is('parent_id', null)
         .order('created_at', { ascending: false });
     
     // Cursor-based pagination (preferred) or offset-based fallback
@@ -213,13 +301,20 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     const postIds = posts.map(p => p.id);
     const userPollVotes = await getUserPollVotes(user.id, postIds);
     
+    // Get reply counts for all posts
+    const replyCounts = await getReplyCountsForPosts(postIds);
+    
     // Enrich with author info (cached)
     const authorCache = {};
     const enriched = await Promise.all(posts.map(async (post) => {
         if (!authorCache[post.user_id]) {
             authorCache[post.user_id] = await getUserInfo(post.user_id);
         }
-        const enrichedPost = { ...post, author: authorCache[post.user_id] };
+        const enrichedPost = { 
+            ...post, 
+            author: authorCache[post.user_id],
+            reply_count: replyCounts[post.id] || 0
+        };
         if (post.poll_options) {
             enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
             enrichedPost.poll_total_votes = post.poll_votes 
@@ -241,6 +336,30 @@ async function getFeed(res, user, limit, offset, cursor = null) {
         nextCursor,
         hasMore: posts.length === limit
     });
+}
+
+/**
+ * Get reply counts for a list of post IDs
+ * @returns {Object} { postId: replyCount }
+ */
+async function getReplyCountsForPosts(postIds) {
+    if (!postIds || postIds.length === 0) return {};
+    
+    // Use a raw SQL query for efficient counting
+    const { data, error } = await supabase
+        .from('posts')
+        .select('parent_id')
+        .in('parent_id', postIds);
+    
+    if (error || !data) return {};
+    
+    // Count replies per parent
+    const counts = {};
+    data.forEach(row => {
+        counts[row.parent_id] = (counts[row.parent_id] || 0) + 1;
+    });
+    
+    return counts;
 }
 
 /**

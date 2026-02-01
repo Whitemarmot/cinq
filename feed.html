@@ -1971,6 +1971,75 @@
                 transition: none;
             }
         }
+        
+        /* ===== COMPACT MODE ===== */
+        [data-compact-mode="true"] .post-image {
+            display: none !important;
+        }
+        
+        [data-compact-mode="true"] .post-card {
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+        }
+        
+        [data-compact-mode="true"] .post-content {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            -webkit-line-clamp: 2;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        [data-compact-mode="true"] .post-header {
+            margin-bottom: 0.25rem;
+        }
+        
+        [data-compact-mode="true"] .post-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.75rem;
+        }
+        
+        [data-compact-mode="true"] .post-author-name {
+            font-size: 0.85rem;
+        }
+        
+        [data-compact-mode="true"] .post-time {
+            font-size: 0.7rem;
+        }
+        
+        [data-compact-mode="true"] .post-reactions {
+            margin-top: 0.5rem;
+            gap: 0.25rem;
+        }
+        
+        [data-compact-mode="true"] .post-reactions .reaction-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        [data-compact-mode="true"] .post-actions {
+            margin-top: 0.5rem;
+            gap: 0.25rem;
+        }
+        
+        [data-compact-mode="true"] .post-actions .share-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        [data-compact-mode="true"] .post-actions .share-btn span {
+            display: none;
+        }
+        
+        [data-compact-mode="true"] .post-previews {
+            display: none;
+        }
+        
+        [data-compact-mode="true"] .giphy-content-gif {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -2306,7 +2375,16 @@
         }
 
         // ===== INIT =====
+        // ===== COMPACT MODE =====
+        function initCompactMode() {
+            const isCompact = localStorage.getItem('cinq_compact_mode') === 'true';
+            document.documentElement.setAttribute('data-compact-mode', isCompact ? 'true' : 'false');
+        }
+        
         async function init() {
+            // Initialize compact mode early for no flash
+            initCompactMode();
+            
             const sessionStr = localStorage.getItem('cinq_session');
             if (!sessionStr) {
                 window.location.href = '/login.html';

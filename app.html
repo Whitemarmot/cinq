@@ -3004,6 +3004,97 @@
             cursor: not-allowed;
         }
         
+        /* ===== QUICK REPLIES ===== */
+        .quick-replies {
+            display: none;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            background: var(--color-bg-secondary);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .quick-replies::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .quick-replies.visible {
+            display: flex;
+            animation: quick-replies-in 0.3s ease-out;
+        }
+        
+        @keyframes quick-replies-in {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .quick-reply-btn {
+            flex-shrink: 0;
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-reply-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+        }
+        
+        .quick-reply-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .quick-reply-btn.emoji-only {
+            padding: var(--space-2) var(--space-3);
+            font-size: 1.2rem;
+        }
+        
+        .quick-replies-toggle {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: var(--text-xs);
+            transition: all 0.2s ease;
+        }
+        
+        .quick-replies-toggle:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .quick-replies-toggle svg {
+            transition: transform 0.2s ease;
+        }
+        
+        .quick-replies-toggle.expanded svg {
+            transform: rotate(180deg);
+        }
+        
         .ping-btn {
             padding: var(--space-3);
             background: var(--color-bg-tertiary);
@@ -3755,6 +3846,386 @@
         
         .chat-message.sticker.received {
             margin-right: auto;
+        }
+        
+        /* ===== LOCATION SHARING ===== */
+        .location-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+            font-size: 1rem;
+        }
+        
+        .location-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            transform: scale(1.05);
+            border-color: var(--color-brand);
+        }
+        
+        .location-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .location-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .location-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--color-brand);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Location message in chat */
+        .chat-message.location {
+            max-width: 280px;
+        }
+        
+        .location-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+        
+        .location-map {
+            width: 100%;
+            height: 150px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            background: var(--color-bg-tertiary);
+        }
+        
+        .location-map img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .location-map-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .location-map:hover .location-map-overlay {
+            opacity: 1;
+        }
+        
+        .location-map-link {
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            font-size: var(--text-xs);
+            font-weight: 500;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .location-map-link:hover {
+            background: var(--color-brand);
+            color: white;
+        }
+        
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+        }
+        
+        .location-info svg {
+            flex-shrink: 0;
+            color: var(--color-brand);
+        }
+        
+        .chat-message.location.sent .location-info {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .chat-message.location.sent .location-info svg {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .chat-message.location.sent .location-map-link {
+            background: rgba(255,255,255,0.95);
+            color: var(--color-brand);
+        }
+        
+        /* ===== PINNED MESSAGES ===== */
+        .pinned-messages-section {
+            background: var(--color-bg-tertiary);
+            border-bottom: 1px solid var(--color-border);
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s var(--ease-out-expo), padding 0.3s;
+        }
+        
+        .pinned-messages-section.open {
+            max-height: 200px;
+            padding: var(--space-3) var(--space-4);
+        }
+        
+        .pinned-messages-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+        }
+        
+        .pinned-messages-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-brand);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .pinned-messages-title svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .pinned-messages-toggle {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: var(--space-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        
+        .pinned-messages-toggle:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .pinned-messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            max-height: 140px;
+            overflow-y: auto;
+        }
+        
+        .pinned-messages-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .pinned-messages-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .pinned-messages-list::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 2px;
+        }
+        
+        .pinned-message-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pinned-message-item:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-brand);
+        }
+        
+        .pinned-message-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .pinned-message-text {
+            font-size: var(--text-sm);
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .pinned-message-meta {
+            font-size: 10px;
+            color: var(--color-text-muted);
+        }
+        
+        .pinned-message-unpin {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-bg-tertiary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .pinned-message-unpin:hover {
+            background: var(--color-error-muted);
+            color: var(--color-error);
+        }
+        
+        .pinned-message-unpin svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        /* Pin indicator in chat header */
+        .chat-header-pin-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-lg);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .chat-header-pin-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-brand);
+            border-color: var(--color-brand);
+        }
+        
+        .chat-header-pin-btn.has-pins {
+            color: var(--color-brand);
+        }
+        
+        .chat-header-pin-btn .pin-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            background: var(--color-brand);
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Pin button on messages */
+        .chat-message-actions {
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            display: flex;
+            gap: var(--space-1);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+        
+        .chat-message:hover .chat-message-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .chat-message.sent .chat-message-actions {
+            right: auto;
+            left: 8px;
+        }
+        
+        .message-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: all 0.2s var(--ease-spring);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .message-action-btn:hover {
+            background: var(--color-brand-muted);
+            color: var(--color-brand);
+            border-color: var(--color-brand);
+            transform: scale(1.1);
+        }
+        
+        .message-action-btn.pinned {
+            background: var(--color-brand);
+            color: white;
+            border-color: var(--color-brand);
+        }
+        
+        .message-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        /* Empty state for pinned messages */
+        .pinned-messages-empty {
+            text-align: center;
+            padding: var(--space-4);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
         }
         
         /* ===== MODALS ===== */
@@ -5275,6 +5746,22 @@
             </button>
         </div>
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
+        <!-- Quick Replies -->
+        <div class="quick-replies" id="quick-replies" role="group" aria-label="Réponses rapides">
+            <button class="quick-reply-btn" onclick="sendQuickReply('Oui 👍')" type="button">Oui 👍</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Non 👎')" type="button">Non 👎</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('OK ✓')" type="button">OK ✓</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Merci ❤️')" type="button">Merci ❤️</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('À plus !')" type="button">À plus !</button>
+            <button class="quick-reply-btn emoji-only" onclick="sendQuickReply('😂')" type="button" aria-label="Rire">😂</button>
+            <button class="quick-reply-btn emoji-only" onclick="sendQuickReply('❤️')" type="button" aria-label="Cœur">❤️</button>
+            <button class="quick-reply-btn emoji-only" onclick="sendQuickReply('👀')" type="button" aria-label="Yeux">👀</button>
+            <button class="quick-replies-toggle" id="quick-replies-toggle" onclick="toggleQuickReplies()" type="button" aria-label="Masquer les réponses rapides" aria-expanded="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="18 15 12 9 6 15"/>
+                </svg>
+            </button>
+        </div>
         <div class="chat-input-area" id="chat-input-area">
             <button class="ping-btn" onclick="sendPing()" type="button" aria-label="Envoyer un coucou">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -5306,6 +5793,9 @@
             </button>
             <button class="gif-btn giphy-trigger-btn" id="gif-btn" onclick="toggleGifPicker()" type="button" aria-label="Envoyer un GIF">
                 GIF
+            </button>
+            <button class="location-btn" id="location-btn" onclick="sendLocation()" type="button" aria-label="Partager ma position">
+                📍
             </button>
             <!-- Sticker Picker -->
             <div class="sticker-picker" id="sticker-picker" role="dialog" aria-modal="false" aria-labelledby="sticker-picker-title">
@@ -7088,6 +7578,9 @@
             
             loadMessages();
             messagePollingInterval = setInterval(loadMessages, 3000);
+            
+            // Show quick replies when chat opens
+            showQuickReplies();
         }
 
         function closeChat() {
@@ -7132,6 +7625,9 @@
                 clearInterval(messagePollingInterval);
                 messagePollingInterval = null;
             }
+            
+            // Hide quick replies
+            hideQuickReplies();
             
             // Restore focus
             if (lastFocusedElement) {
@@ -8272,6 +8768,153 @@
             }
         }
         
+        // ===== LOCATION SHARING =====
+        async function sendLocation() {
+            if (!currentChatContact) return;
+            
+            const btn = document.getElementById('location-btn');
+            
+            // Check if geolocation is available
+            if (!navigator.geolocation) {
+                showToast({ type: 'error', message: 'Géolocalisation non disponible sur cet appareil' });
+                return;
+            }
+            
+            // Show loading state
+            btn.classList.add('loading');
+            btn.disabled = true;
+            triggerHaptic('tap');
+            
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    });
+                });
+                
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = Math.round(position.coords.accuracy);
+                
+                // Generate static map URL (using OpenStreetMap tiles)
+                const zoom = 15;
+                const mapUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=400x200&maptype=osmarenderer&markers=${lat},${lng},red-pushpin`;
+                
+                // Optimistic location message
+                const optimisticLocation = {
+                    id: 'temp-location-' + Date.now(),
+                    sender_id: user.id,
+                    location_lat: lat,
+                    location_lng: lng,
+                    location_accuracy: accuracy,
+                    created_at: new Date().toISOString()
+                };
+                
+                const container = document.getElementById('chat-messages');
+                const locationEl = document.createElement('div');
+                locationEl.className = 'chat-message location sent';
+                locationEl.id = `msg-${optimisticLocation.id}`;
+                locationEl.setAttribute('role', 'article');
+                locationEl.setAttribute('aria-label', 'Tu as partagé ta position');
+                
+                const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+                const mapsLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`;
+                
+                locationEl.innerHTML = `
+                    <div class="location-content">
+                        <div class="location-map">
+                            <img src="${escapeHtml(mapUrl)}" alt="Position partagée" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--color-text-muted);\\'>🗺️ Carte</div>'">
+                            <div class="location-map-overlay">
+                                <a href="${escapeHtml(mapsLink)}" target="_blank" rel="noopener noreferrer" class="location-map-link">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    Ouvrir
+                                </a>
+                            </div>
+                        </div>
+                        <div class="location-info">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span>Ma position${accuracy ? ` (±${accuracy}m)` : ''}</span>
+                        </div>
+                    </div>
+                    <div class="chat-message-meta">
+                        <span class="chat-message-time">${formatMessageTime(optimisticLocation.created_at)}</span>
+                        <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
+                    </div>
+                `;
+                
+                container.appendChild(locationEl);
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                
+                // Send to server
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        contact_id: currentChatContact.contact_user_id, 
+                        location_lat: lat,
+                        location_lng: lng,
+                        location_accuracy: accuracy
+                    })
+                });
+                
+                triggerHaptic('success');
+                loadMessages();
+                
+            } catch (error) {
+                triggerHaptic('error');
+                
+                let errorMessage = 'Impossible de récupérer ta position';
+                if (error.code === 1) {
+                    errorMessage = 'Accès à la position refusé. Autorise la géolocalisation.';
+                } else if (error.code === 2) {
+                    errorMessage = 'Position indisponible. Vérifie ton GPS.';
+                } else if (error.code === 3) {
+                    errorMessage = 'Délai dépassé. Réessaie.';
+                }
+                
+                showToast({ type: 'error', message: errorMessage });
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+        
+        // Helper to render location message HTML
+        function renderLocationMessage(msg, isSent) {
+            const lat = msg.location_lat;
+            const lng = msg.location_lng;
+            const accuracy = msg.location_accuracy;
+            const zoom = 15;
+            const mapUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=400x200&maptype=osmarenderer&markers=${lat},${lng},red-pushpin`;
+            const mapsLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`;
+            
+            return `
+                <div class="location-content">
+                    <div class="location-map">
+                        <img src="${escapeHtml(mapUrl)}" alt="Position partagée" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:var(--color-text-muted);\\'>🗺️ Carte</div>'">
+                        <div class="location-map-overlay">
+                            <a href="${escapeHtml(mapsLink)}" target="_blank" rel="noopener noreferrer" class="location-map-link">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                Ouvrir
+                            </a>
+                        </div>
+                    </div>
+                    <div class="location-info">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>${isSent ? 'Ma position' : 'Position partagée'}${accuracy ? ` (±${accuracy}m)` : ''}</span>
+                    </div>
+                </div>
+            `;
+        }
+        
         // Close sticker picker when clicking outside
         document.addEventListener('click', function(e) {
             const picker = document.getElementById('sticker-picker');
@@ -8280,6 +8923,101 @@
                 closeStickerPicker();
             }
         });
+
+        // ===== QUICK REPLIES =====
+        let quickRepliesCollapsed = false;
+        
+        function showQuickReplies() {
+            const quickReplies = document.getElementById('quick-replies');
+            if (quickReplies && !quickRepliesCollapsed) {
+                quickReplies.classList.add('visible');
+            }
+        }
+        
+        function hideQuickReplies() {
+            const quickReplies = document.getElementById('quick-replies');
+            if (quickReplies) {
+                quickReplies.classList.remove('visible');
+            }
+        }
+        
+        function toggleQuickReplies() {
+            const quickReplies = document.getElementById('quick-replies');
+            const toggleBtn = document.getElementById('quick-replies-toggle');
+            
+            if (!quickReplies || !toggleBtn) return;
+            
+            quickRepliesCollapsed = !quickRepliesCollapsed;
+            
+            if (quickRepliesCollapsed) {
+                quickReplies.classList.remove('visible');
+                toggleBtn.classList.add('expanded');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.setAttribute('aria-label', 'Afficher les réponses rapides');
+            } else {
+                quickReplies.classList.add('visible');
+                toggleBtn.classList.remove('expanded');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+                toggleBtn.setAttribute('aria-label', 'Masquer les réponses rapides');
+            }
+            
+            triggerHaptic('tap');
+        }
+        
+        async function sendQuickReply(text) {
+            if (!currentChatContact || !text) return;
+            
+            triggerHaptic('tap');
+            
+            // Optimistic message
+            const optimisticMsg = {
+                id: 'temp-qr-' + Date.now(),
+                sender_id: user.id,
+                content: text,
+                created_at: new Date().toISOString()
+            };
+            
+            const container = document.getElementById('chat-messages');
+            const msgEl = document.createElement('div');
+            msgEl.className = 'chat-message sent';
+            msgEl.id = `msg-${optimisticMsg.id}`;
+            msgEl.setAttribute('role', 'article');
+            msgEl.setAttribute('aria-label', `Tu as envoyé : ${text}`);
+            
+            const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+            
+            msgEl.innerHTML = `
+                <div class="chat-message-content">${escapeHtml(text)}</div>
+                <div class="chat-message-meta">
+                    <span class="chat-message-time">${formatMessageTime(optimisticMsg.created_at)}</span>
+                    <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
+                </div>
+            `;
+            
+            container.appendChild(msgEl);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            
+            // Hide quick replies after sending
+            hideQuickReplies();
+            
+            try {
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        contact_id: currentChatContact.contact_user_id, 
+                        content: text 
+                    })
+                });
+                triggerHaptic('success');
+                // Refresh to sync with server
+                loadMessages();
+            } catch (e) {
+                triggerHaptic('error');
+                showToast({ type: 'error', message: 'Le message n\'est pas passé 😕' });
+                removeOptimisticMessage(optimisticMsg.id);
+            }
+        }
 
         // ===== POLLING =====
         function startPolling() {

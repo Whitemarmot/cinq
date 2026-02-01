@@ -649,6 +649,32 @@ CREATE POLICY "Users can view poll votes on visible posts" ON poll_votes FOR SEL
     );
 
 -- ============================================
+-- PINNED MESSAGES
+-- ============================================
+CREATE TABLE IF NOT EXISTS pinned_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    message_id UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    contact_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    pinned_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(message_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_pinned_messages_user ON pinned_messages(user_id);
+CREATE INDEX IF NOT EXISTS idx_pinned_messages_contact ON pinned_messages(user_id, contact_id);
+CREATE INDEX IF NOT EXISTS idx_pinned_messages_pinned_at ON pinned_messages(pinned_at DESC);
+
+ALTER TABLE pinned_messages ENABLE ROW LEVEL SECURITY;
+
+-- Users can view and manage their own pinned messages
+CREATE POLICY "Users can view own pinned messages" ON pinned_messages FOR SELECT 
+    USING (auth.uid() = user_id);
+CREATE POLICY "Users can pin messages" ON pinned_messages FOR INSERT 
+    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can unpin messages" ON pinned_messages FOR DELETE 
+    USING (auth.uid() = user_id);
+
+-- ============================================
 -- GRANT SERVICE ROLE ACCESS
 -- ============================================
 -- For API routes using service role key
