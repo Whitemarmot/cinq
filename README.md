@@ -337,6 +337,88 @@ Voir [docs/security-audit.md](docs/security-audit.md) pour plus de détails.
 
 ## 🧪 Tests
 
+### Tests E2E Automatisés (Playwright)
+
+Cinq est livré avec une suite complète de **tests E2E** qui couvrent tous les flows critiques :
+
+| Flow Testé | Fichier | Description |
+|-----------|---------|-------------|
+| **Login/Logout** | `tests/e2e/login.spec.js` | Authentification, validation, redirection |
+| **Inscription avec code cadeau** | `tests/e2e/register.spec.js` | Validation du code, création de compte |
+| **Ajout d'un contact** | `tests/e2e/contacts.spec.js` | Limite de 5, validation, modal |
+| **Envoi d'un message** | `tests/e2e/messages.spec.js` | Chat, temps réel, notification |
+| **Création d'un post** | `tests/e2e/posts.spec.js` | Composer, publication, feed |
+
+#### Commandes disponibles
+
+```bash
+# Lancer tous les tests E2E
+npm run test:e2e
+
+# Avec interface utilisateur (debug)
+npm run test:e2e:ui
+
+# Mode visible (non-headless)
+npm run test:e2e:headed
+
+# Tests spécifiques par navigateur
+npm run test:e2e:chromium
+npm run test:e2e:firefox
+npm run test:e2e:webkit
+
+# Tests mobile
+npm run test:e2e:mobile
+
+# Rapport visuel des tests
+npm run test:e2e:report
+```
+
+#### Configuration CI/CD
+
+Les tests tournent automatiquement en CI/CD sur :
+- **GitHub Actions** — À chaque PR et merge sur `main`
+- **Multi-navigateurs** — Chrome, Firefox, Safari, Mobile
+- **Retries** — 2 tentatives en cas d'échec réseau
+- **Screenshots** — Captures en cas d'erreur
+- **Videos** — Enregistrement des échecs
+
+#### Structure des tests
+
+```bash
+tests/
+├── e2e/                    # Tests bout-en-bout
+│   ├── fixtures.js         # Utilitaires et données de test
+│   ├── login.spec.js       # Tests de connexion
+│   ├── register.spec.js    # Tests d'inscription
+│   ├── contacts.spec.js    # Tests d'ajout de contacts
+│   ├── messages.spec.js    # Tests de messagerie
+│   └── posts.spec.js       # Tests de publication
+├── unit/                   # Tests unitaires (Vitest)
+│   ├── auth.test.js
+│   ├── contacts.test.js
+│   ├── messages.test.js
+│   └── posts.test.js
+└── e2e-flow.js            # Test de flow complet
+```
+
+### Tests Unitaires (Vitest)
+
+```bash
+# Lancer les tests unitaires
+npm run test
+
+# En mode watch
+npm run test:watch
+
+# Avec coverage
+npm run test:coverage
+
+# Tests spécifiques
+npm run test:unit
+```
+
+### Tests Manuels
+
 ```bash
 # Test des webhooks BTCPay (mode simulation)
 node netlify/functions/test-btcpay-webhook.js
@@ -346,6 +428,16 @@ curl -X GET http://localhost:8888/api/waitlist
 curl -X POST http://localhost:8888/api/waitlist \
   -H "Content-Type: application/json" \
   -d '{"email": "test@example.com"}'
+```
+
+### Tests d'accessibilité
+
+```bash
+# Audit automatisé avec axe-core
+npm run test:a11y
+
+# Test manuel avec lecteur d'écran
+# VoiceOver (Mac), NVDA (Windows), Orca (Linux)
 ```
 
 ---
