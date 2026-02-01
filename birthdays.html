@@ -700,9 +700,9 @@
                         </label>
                     </div>
                     <div class="notification-option">
-                        <span class="option-label">Rappel 1 semaine avant</span>
+                        <span class="option-label" id="label-1-week">Rappel 1 semaine avant</span>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="notify-1-week" onchange="saveNotificationPrefs()">
+                            <input type="checkbox" id="notify-1-week" onchange="saveNotificationPrefs()" aria-labelledby="label-1-week">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
