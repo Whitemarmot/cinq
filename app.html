@@ -8037,7 +8037,7 @@
                         </div>
                         <div style="display:flex;align-items:center;gap:var(--space-4);">
                             <span class="char-count" id="char-count" aria-live="polite" aria-atomic="true">0/280</span>
-                            <button class="post-btn btn-ripple glow-hover" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
+                            <button class="post-btn btn-enhanced btn-ripple glow-hover" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post" type="button">Envoyer</button>
                         </div>
                     </div>
                 </div>
@@ -8128,7 +8128,7 @@
             <!-- TAB: PROFIL -->
             <section class="tab-panel" id="tab-profil" role="tabpanel" aria-labelledby="nav-profil" tabindex="0" hidden>
                 <div class="profile-header">
-                    <button class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" type="button" aria-label="Changer ma photo de profil">
+                    <button class="profile-avatar avatar-enhanced" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" type="button" aria-label="Changer ma photo de profil">
                         <span id="profile-avatar-initial" aria-hidden="true">?</span>
                         <div class="profile-avatar-overlay" aria-hidden="true">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -8153,18 +8153,18 @@
                     </div>
                     <div class="settings-field">
                         <label class="settings-label" for="profile-display-name">Pseudo</label>
-                        <input type="text" id="profile-display-name" class="settings-input" placeholder="Ton pseudo..." maxlength="50" autocomplete="nickname">
+                        <input type="text" id="profile-display-name" class="settings-input input-enhanced" placeholder="Ton pseudo..." maxlength="50" autocomplete="nickname">
                     </div>
                     <div class="settings-field">
                         <label class="settings-label" for="profile-bio">Bio</label>
-                        <textarea id="profile-bio" class="settings-input" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
+                        <textarea id="profile-bio" class="settings-input input-enhanced" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
                     <div class="settings-field">
                         <label class="settings-label" for="profile-birthday">🎂 Date de naissance</label>
-                        <input type="date" id="profile-birthday" class="settings-input" style="color-scheme: dark;">
+                        <input type="date" id="profile-birthday" class="settings-input input-enhanced" style="color-scheme: dark;">
                         <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Tes proches verront ton anniversaire (pas l'année)</p>
                     </div>
-                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn btn-ripple glow-hover" type="button">
+                    <button onclick="saveProfile()" id="save-profile-btn" class="save-btn btn-enhanced btn-ripple glow-hover" type="button">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
                         </svg>

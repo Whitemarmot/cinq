@@ -1,0 +1,347 @@
+/**
+ * ==========================================================================
+ * CINQ - Presence Indicators Styles
+ * ==========================================================================
+ * 
+ * Styles for real-time presence indicators:
+ * - Online dots on contact avatars
+ * - "Viewing with you" badge
+ * - Typing indicators
+ * - Animations
+ */
+
+/* ===== ONLINE INDICATOR ===== */
+.presence-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: #22c55e;
+    border: 2px solid var(--color-bg-secondary, #1a1a2e);
+    border-radius: 50%;
+    animation: presence-pulse 2s ease-in-out infinite;
+    z-index: 10;
+}
+
+/* Same page indicator - more vibrant */
+.presence-indicator.same-page {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    animation: presence-pulse-brand 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+@keyframes presence-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0);
+    }
+}
+
+@keyframes presence-pulse-brand {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(99, 102, 241, 0);
+    }
+}
+
+/* ===== VIEWING WITH YOU BADGE ===== */
+.viewing-with-you-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    width: fit-content;
+    animation: badge-slide-in 0.3s ease-out;
+}
+
+.viewing-with-you-badge.hidden {
+    display: none;
+}
+
+.viewing-badge-dot {
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    border-radius: 50%;
+    animation: badge-dot-pulse 1.5s ease-in-out infinite;
+}
+
+.viewing-badge-text {
+    font-weight: 500;
+    background: linear-gradient(135deg, var(--color-brand, #6366f1) 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@keyframes badge-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes badge-dot-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* ===== TYPING INDICATOR ===== */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0;
+    max-width: fit-content;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.05));
+    border-radius: 1rem;
+    border-bottom-left-radius: 0.25rem;
+    animation: typing-fade-in 0.2s ease-out;
+}
+
+.typing-indicator.hidden {
+    display: none;
+}
+
+.typing-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--color-brand, #6366f1);
+    border-radius: 50%;
+    animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.typing-text {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+    font-style: italic;
+}
+
+@keyframes typing-bounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+@keyframes typing-fade-in {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===== CONTACT LIST PRESENCE ===== */
+.contact-slot {
+    position: relative;
+}
+
+.contact-slot .w-10,
+.contact-slot .contact-avatar,
+.contact-slot [class*="rounded-full"]:first-child {
+    position: relative;
+}
+
+/* Online status in contact list */
+.contact-status {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+    margin-top: 0.125rem;
+}
+
+.contact-status.online {
+    color: #22c55e;
+}
+
+.contact-status.same-page {
+    color: var(--color-brand, #6366f1);
+}
+
+.contact-status-dot {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+/* ===== CHAT HEADER PRESENCE ===== */
+.chat-contact-status {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.chat-contact-status.online {
+    color: #22c55e;
+}
+
+.chat-contact-status .status-dot {
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: presence-pulse 2s ease-in-out infinite;
+}
+
+.chat-contact-status.typing .status-text {
+    font-style: italic;
+}
+
+/* ===== POST CARD PRESENCE ===== */
+.post-author-presence {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: #22c55e;
+    margin-left: 0.5rem;
+}
+
+.post-author-presence .presence-dot {
+    width: 5px;
+    height: 5px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+.post-author-presence.same-page {
+    color: var(--color-brand, #6366f1);
+}
+
+/* ===== PRESENCE BADGE (compact) ===== */
+.presence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    background: rgba(34, 197, 94, 0.15);
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    color: #22c55e;
+    font-weight: 500;
+}
+
+.presence-badge.same-page {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--color-brand, #6366f1);
+}
+
+.presence-badge .badge-dot {
+    width: 5px;
+    height: 5px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+/* ===== ANIMATIONS FOR TRANSITIONS ===== */
+.presence-enter {
+    animation: presence-enter 0.3s ease-out;
+}
+
+.presence-leave {
+    animation: presence-leave 0.3s ease-in forwards;
+}
+
+@keyframes presence-enter {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes presence-leave {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+/* ===== DARK/LIGHT MODE ADJUSTMENTS ===== */
+[data-theme="light"] .presence-indicator {
+    border-color: var(--color-bg-primary, #ffffff);
+}
+
+[data-theme="light"] .viewing-with-you-badge {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+}
+
+[data-theme="light"] .typing-indicator {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    .presence-indicator,
+    .presence-indicator.same-page,
+    .viewing-badge-dot,
+    .typing-dots span,
+    .chat-contact-status .status-dot {
+        animation: none;
+    }
+    
+    .viewing-with-you-badge,
+    .typing-indicator {
+        animation: none;
+    }
+}

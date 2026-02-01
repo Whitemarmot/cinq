@@ -1,0 +1,419 @@
+/**
+ * CINQ Chat Themes
+ * Themed color palettes for chat conversations
+ * Different from wallpapers - these are color schemes for chat bubbles and backgrounds
+ * 
+ * @version 1.0
+ * @description Predefined chat color themes: ocean, forest, sunset, midnight
+ */
+
+/* ============================================
+   CHAT THEME VARIABLES & BASE STYLES
+   ============================================ */
+
+:root {
+  /* Default chat colors (when no theme selected) */
+  --chat-bg: var(--color-bg-primary);
+  --chat-bubble-sent: var(--color-brand);
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: var(--color-bg-tertiary);
+  --chat-bubble-received-text: var(--color-text-primary);
+  --chat-timestamp: var(--color-text-muted);
+  --chat-input-bg: var(--color-bg-secondary);
+  --chat-input-border: var(--color-border);
+  --chat-accent: var(--color-brand);
+  --chat-gradient-start: transparent;
+  --chat-gradient-end: transparent;
+}
+
+/* ============================================
+   🌊 OCEAN THEME
+   Deep blues, teals, and aquatic vibes
+   ============================================ */
+[data-chat-theme="ocean"] {
+  --chat-bg: #0a192f;
+  --chat-bubble-sent: #0ea5e9;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #1e3a5f;
+  --chat-bubble-received-text: #e0f2fe;
+  --chat-timestamp: #7dd3fc;
+  --chat-input-bg: #112240;
+  --chat-input-border: #1e4976;
+  --chat-accent: #06b6d4;
+  --chat-gradient-start: rgba(14, 165, 233, 0.1);
+  --chat-gradient-end: rgba(6, 182, 212, 0.05);
+}
+
+/* Ocean theme in light mode */
+[data-theme="light"][data-chat-theme="ocean"] {
+  --chat-bg: #f0f9ff;
+  --chat-bubble-sent: #0284c7;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #e0f2fe;
+  --chat-bubble-received-text: #0c4a6e;
+  --chat-timestamp: #0369a1;
+  --chat-input-bg: #e0f2fe;
+  --chat-input-border: #7dd3fc;
+  --chat-accent: #0891b2;
+  --chat-gradient-start: rgba(14, 165, 233, 0.15);
+  --chat-gradient-end: rgba(6, 182, 212, 0.08);
+}
+
+/* ============================================
+   🌲 FOREST THEME
+   Earthy greens, browns, and nature tones
+   ============================================ */
+[data-chat-theme="forest"] {
+  --chat-bg: #1a2f1a;
+  --chat-bubble-sent: #22c55e;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #2d4a2d;
+  --chat-bubble-received-text: #dcfce7;
+  --chat-timestamp: #86efac;
+  --chat-input-bg: #1f3d1f;
+  --chat-input-border: #3d5a3d;
+  --chat-accent: #10b981;
+  --chat-gradient-start: rgba(34, 197, 94, 0.1);
+  --chat-gradient-end: rgba(16, 185, 129, 0.05);
+}
+
+/* Forest theme in light mode */
+[data-theme="light"][data-chat-theme="forest"] {
+  --chat-bg: #f0fdf4;
+  --chat-bubble-sent: #16a34a;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #dcfce7;
+  --chat-bubble-received-text: #14532d;
+  --chat-timestamp: #15803d;
+  --chat-input-bg: #dcfce7;
+  --chat-input-border: #86efac;
+  --chat-accent: #059669;
+  --chat-gradient-start: rgba(34, 197, 94, 0.15);
+  --chat-gradient-end: rgba(16, 185, 129, 0.08);
+}
+
+/* ============================================
+   🌅 SUNSET THEME
+   Warm oranges, pinks, and golden hues
+   ============================================ */
+[data-chat-theme="sunset"] {
+  --chat-bg: #2d1f1a;
+  --chat-bubble-sent: #f97316;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #4a2d24;
+  --chat-bubble-received-text: #ffedd5;
+  --chat-timestamp: #fdba74;
+  --chat-input-bg: #3d2a22;
+  --chat-input-border: #6b4439;
+  --chat-accent: #ec4899;
+  --chat-gradient-start: rgba(249, 115, 22, 0.1);
+  --chat-gradient-end: rgba(236, 72, 153, 0.05);
+}
+
+/* Sunset theme in light mode */
+[data-theme="light"][data-chat-theme="sunset"] {
+  --chat-bg: #fff7ed;
+  --chat-bubble-sent: #ea580c;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #ffedd5;
+  --chat-bubble-received-text: #7c2d12;
+  --chat-timestamp: #c2410c;
+  --chat-input-bg: #ffedd5;
+  --chat-input-border: #fdba74;
+  --chat-accent: #db2777;
+  --chat-gradient-start: rgba(249, 115, 22, 0.15);
+  --chat-gradient-end: rgba(236, 72, 153, 0.08);
+}
+
+/* ============================================
+   🌙 MIDNIGHT THEME
+   Deep purples, dark blues, and starry night
+   ============================================ */
+[data-chat-theme="midnight"] {
+  --chat-bg: #0f0a1e;
+  --chat-bubble-sent: #8b5cf6;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #1e1533;
+  --chat-bubble-received-text: #e9d5ff;
+  --chat-timestamp: #c4b5fd;
+  --chat-input-bg: #150d2a;
+  --chat-input-border: #3b2d5a;
+  --chat-accent: #a855f7;
+  --chat-gradient-start: rgba(139, 92, 246, 0.1);
+  --chat-gradient-end: rgba(168, 85, 247, 0.05);
+}
+
+/* Midnight theme in light mode */
+[data-theme="light"][data-chat-theme="midnight"] {
+  --chat-bg: #faf5ff;
+  --chat-bubble-sent: #7c3aed;
+  --chat-bubble-sent-text: #ffffff;
+  --chat-bubble-received: #f3e8ff;
+  --chat-bubble-received-text: #4c1d95;
+  --chat-timestamp: #6d28d9;
+  --chat-input-bg: #f3e8ff;
+  --chat-input-border: #c4b5fd;
+  --chat-accent: #9333ea;
+  --chat-gradient-start: rgba(139, 92, 246, 0.15);
+  --chat-gradient-end: rgba(168, 85, 247, 0.08);
+}
+
+/* ============================================
+   CHAT THEME APPLICATION STYLES
+   Apply these variables to chat components
+   ============================================ */
+
+/* Chat container background */
+.chat-container,
+.messages-area,
+.chat-messages {
+  background: var(--chat-bg);
+  background-image: linear-gradient(
+    135deg,
+    var(--chat-gradient-start) 0%,
+    var(--chat-gradient-end) 100%
+  );
+  transition: background-color 350ms ease, background-image 350ms ease;
+}
+
+/* Sent messages (mine) */
+.message.mine .message-bubble,
+.message-sent .message-bubble,
+.bubble-sent {
+  background: var(--chat-bubble-sent);
+  color: var(--chat-bubble-sent-text);
+}
+
+/* Received messages (theirs) */
+.message:not(.mine) .message-bubble,
+.message-received .message-bubble,
+.bubble-received {
+  background: var(--chat-bubble-received);
+  color: var(--chat-bubble-received-text);
+}
+
+/* Timestamps */
+.message-timestamp,
+.message-time,
+.chat-timestamp {
+  color: var(--chat-timestamp);
+}
+
+/* Chat input area */
+.chat-input-container,
+.message-input-area {
+  background: var(--chat-input-bg);
+  border-color: var(--chat-input-border);
+}
+
+/* Chat input field */
+.chat-input,
+.message-input {
+  background: var(--chat-input-bg);
+  border-color: var(--chat-input-border);
+}
+
+/* Accent elements in chat */
+.chat-accent,
+.typing-indicator,
+.read-receipt {
+  color: var(--chat-accent);
+}
+
+/* ============================================
+   CHAT THEME SELECTOR UI
+   ============================================ */
+.chat-theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-2, 0.5rem);
+}
+
+.chat-theme-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-3, 0.75rem);
+  min-width: 80px;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg, 0.9375rem);
+  cursor: pointer;
+  transition: 
+    border-color 200ms ease,
+    transform 150ms ease,
+    box-shadow 200ms ease;
+}
+
+.chat-theme-option:hover {
+  border-color: var(--color-border-active);
+  transform: translateY(-2px);
+}
+
+.chat-theme-option:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.chat-theme-option.active {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Theme preview swatch */
+.chat-theme-preview {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--preview-bg, #1a1a2e);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.chat-theme-preview-bubble {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.chat-theme-preview-bubble.sent {
+  background: var(--preview-sent, #6366f1);
+}
+
+.chat-theme-preview-bubble.received {
+  background: var(--preview-received, #2a2a3e);
+}
+
+/* Theme option labels */
+.chat-theme-label {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.chat-theme-option.active .chat-theme-label {
+  color: var(--color-brand);
+}
+
+/* Theme-specific preview colors */
+.chat-theme-option[data-chat-theme="default"] .chat-theme-preview {
+  --preview-bg: #1a1a2e;
+  --preview-sent: #6366f1;
+  --preview-received: #2a2a3e;
+}
+
+.chat-theme-option[data-chat-theme="ocean"] .chat-theme-preview {
+  --preview-bg: #0a192f;
+  --preview-sent: #0ea5e9;
+  --preview-received: #1e3a5f;
+}
+
+.chat-theme-option[data-chat-theme="forest"] .chat-theme-preview {
+  --preview-bg: #1a2f1a;
+  --preview-sent: #22c55e;
+  --preview-received: #2d4a2d;
+}
+
+.chat-theme-option[data-chat-theme="sunset"] .chat-theme-preview {
+  --preview-bg: #2d1f1a;
+  --preview-sent: #f97316;
+  --preview-received: #4a2d24;
+}
+
+.chat-theme-option[data-chat-theme="midnight"] .chat-theme-preview {
+  --preview-bg: #0f0a1e;
+  --preview-sent: #8b5cf6;
+  --preview-received: #1e1533;
+}
+
+/* ============================================
+   CHAT THEME LIVE PREVIEW
+   ============================================ */
+.chat-theme-live-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  padding: var(--space-4, 1rem);
+  background: var(--chat-bg);
+  background-image: linear-gradient(
+    135deg,
+    var(--chat-gradient-start) 0%,
+    var(--chat-gradient-end) 100%
+  );
+  border-radius: var(--radius-xl, 1.25rem);
+  border: 1px solid var(--color-border);
+  transition: all 350ms ease;
+}
+
+.preview-message {
+  max-width: 80%;
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-lg, 0.9375rem);
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.preview-message.received {
+  align-self: flex-start;
+  background: var(--chat-bubble-received);
+  color: var(--chat-bubble-received-text);
+  border-bottom-left-radius: 4px;
+}
+
+.preview-message.sent {
+  align-self: flex-end;
+  background: var(--chat-bubble-sent);
+  color: var(--chat-bubble-sent-text);
+  border-bottom-right-radius: 4px;
+}
+
+.preview-timestamp {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--chat-timestamp);
+  text-align: center;
+  margin: var(--space-1, 0.25rem) 0;
+}
+
+/* ============================================
+   SMOOTH THEME TRANSITIONS
+   ============================================ */
+html.chat-theme-transitioning .chat-container,
+html.chat-theme-transitioning .messages-area,
+html.chat-theme-transitioning .message-bubble,
+html.chat-theme-transitioning .chat-input-container {
+  transition-duration: 350ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 480px) {
+  .chat-theme-selector {
+    gap: var(--space-2, 0.5rem);
+  }
+  
+  .chat-theme-option {
+    min-width: 70px;
+    padding: var(--space-2, 0.5rem);
+  }
+  
+  .chat-theme-preview-bubble {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .chat-theme-option,
+  .chat-container,
+  .message-bubble,
+  .chat-theme-live-preview {
+    transition: none !important;
+  }
+}

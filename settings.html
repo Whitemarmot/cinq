@@ -1952,8 +1952,8 @@
                         <div class="form-group">
                             <label for="display-name" class="form-label">Nom d'affichage</label>
                             <div class="form-row">
-                                <input type="text" id="display-name" class="form-input" placeholder="Ton pseudo..." maxlength="30">
-                                <button id="btn-save-name" class="form-btn form-btn-primary" aria-label="Sauvegarder le nom">✓</button>
+                                <input type="text" id="display-name" class="form-input input-enhanced" placeholder="Ton pseudo..." maxlength="30">
+                                <button id="btn-save-name" class="form-btn form-btn-primary btn-enhanced" aria-label="Sauvegarder le nom">✓</button>
                             </div>
                             <p id="name-message" class="form-message hidden"></p>
                         </div>
@@ -1982,8 +1982,8 @@
                                 <div style="flex: 1;">
                                     <div class="form-row" style="margin-bottom: var(--space-2);">
                                         <input type="file" id="avatar-file" accept="image/*" style="display: none;">
-                                        <button id="btn-upload-avatar" class="form-btn">Choisir une photo</button>
-                                        <button id="btn-remove-avatar" class="form-btn" style="display: none;">Supprimer</button>
+                                        <button id="btn-upload-avatar" class="form-btn btn-enhanced">Choisir une photo</button>
+                                        <button id="btn-remove-avatar" class="form-btn btn-enhanced" style="display: none;">Supprimer</button>
                                     </div>
                                     <p style="color: var(--color-text-muted); font-size: var(--text-xs);">
                                         Formats acceptés: JPEG, PNG, GIF, WebP (max 2 Mo)
@@ -1997,8 +1997,8 @@
                         <div class="form-group" style="padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
                             <label for="user-email" class="form-label">Adresse email</label>
                             <div class="form-row">
-                                <input type="email" id="user-email" class="form-input" placeholder="ton@email.com">
-                                <button id="btn-change-email" class="form-btn">Modifier</button>
+                                <input type="email" id="user-email" class="form-input input-enhanced" placeholder="ton@email.com">
+                                <button id="btn-change-email" class="form-btn btn-enhanced">Modifier</button>
                             </div>
                             <p id="email-message" class="form-message hidden"></p>
                         </div>
@@ -2027,7 +2027,7 @@
                     </p>
                     
                     <div class="qr-add-contact-row">
-                        <button class="qr-add-contact-btn" onclick="showMyQRCode()" id="btn-show-qr">
+                        <button class="qr-add-contact-btn btn-enhanced" onclick="showMyQRCode()" id="btn-show-qr">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="7" height="7" rx="1"/>
                                 <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -2040,7 +2040,7 @@
                             <span>Mon QR Code</span>
                         </button>
                         
-                        <button class="qr-add-contact-btn" onclick="scanQRCode()" id="btn-scan-qr">
+                        <button class="qr-add-contact-btn btn-enhanced" onclick="scanQRCode()" id="btn-scan-qr">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
                                 <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
@@ -2128,7 +2128,7 @@
                     Mon Statut
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <div class="settings-form">
                         <!-- Status Preview -->
                         <div class="form-group">

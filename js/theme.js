@@ -697,6 +697,150 @@
     }
   }
 
+  // ===== CHAT THEMES (Colored chat palettes) =====
+
+  const CHAT_THEME_KEY = 'cinq_chat_theme';
+  const CHAT_THEMES = ['default', 'ocean', 'forest', 'sunset', 'midnight'];
+  const CHAT_THEME_NAMES = {
+    'default': 'Par défaut',
+    'ocean': '🌊 Océan',
+    'forest': '🌲 Forêt',
+    'sunset': '🌅 Coucher de soleil',
+    'midnight': '🌙 Minuit'
+  };
+  const CHAT_THEME_DESCRIPTIONS = {
+    'default': 'Thème par défaut, suit la couleur d\'accent.',
+    'ocean': 'Bleus profonds et teintes aquatiques.',
+    'forest': 'Verts naturels et tons terreux.',
+    'sunset': 'Oranges chauds et roses dorés.',
+    'midnight': 'Violets sombres et nuit étoilée.'
+  };
+
+  /**
+   * Get the saved chat theme from localStorage
+   * @returns {string}
+   */
+  function getChatTheme() {
+    try {
+      const val = localStorage.getItem(CHAT_THEME_KEY);
+      return CHAT_THEMES.includes(val) ? val : 'default';
+    } catch (e) {}
+    return 'default';
+  }
+
+  /**
+   * Save chat theme to localStorage
+   * @param {string} theme
+   */
+  function saveChatTheme(theme) {
+    try {
+      localStorage.setItem(CHAT_THEME_KEY, theme);
+    } catch (e) {}
+  }
+
+  /**
+   * Apply chat theme to the document
+   * @param {string} theme - Theme name
+   * @param {boolean} [withTransition=true] - Animate the change
+   */
+  function applyChatTheme(theme, withTransition = true) {
+    if (!CHAT_THEMES.includes(theme)) {
+      console.warn('Invalid chat theme:', theme);
+      return;
+    }
+
+    const html = document.documentElement;
+
+    if (withTransition && !html.classList.contains('theme-loading')) {
+      html.classList.add('chat-theme-transitioning');
+      setTimeout(() => html.classList.remove('chat-theme-transitioning'), 400);
+    }
+
+    if (theme === 'default') {
+      html.removeAttribute('data-chat-theme');
+    } else {
+      html.setAttribute('data-chat-theme', theme);
+    }
+
+    // Dispatch custom event for any listeners
+    window.dispatchEvent(new CustomEvent('chatthemechange', {
+      detail: { theme }
+    }));
+  }
+
+  /**
+   * Set a specific chat theme
+   * @param {string} theme - Theme name
+   */
+  function setChatTheme(theme) {
+    if (!CHAT_THEMES.includes(theme)) {
+      console.warn('Invalid chat theme:', theme);
+      return;
+    }
+
+    saveChatTheme(theme);
+    applyChatTheme(theme, true);
+    updateChatThemeSelector(theme);
+    updateChatThemeDescription(theme);
+    updateChatThemePreview(theme);
+  }
+
+  /**
+   * Get current chat theme
+   * @returns {string}
+   */
+  function getCurrentChatTheme() {
+    return getChatTheme();
+  }
+
+  /**
+   * Update chat theme selector UI (for settings page)
+   * @param {string} theme - Current theme
+   */
+  function updateChatThemeSelector(theme) {
+    const options = document.querySelectorAll('.chat-theme-option');
+    options.forEach(option => {
+      const t = option.getAttribute('data-chat-theme');
+      option.classList.toggle('active', t === theme);
+      option.setAttribute('aria-pressed', t === theme);
+    });
+  }
+
+  /**
+   * Update chat theme description (for settings page)
+   * @param {string} theme - Current theme
+   */
+  function updateChatThemeDescription(theme) {
+    const desc = document.getElementById('chat-theme-description');
+    if (desc) {
+      desc.textContent = CHAT_THEME_DESCRIPTIONS[theme] || CHAT_THEME_DESCRIPTIONS['default'];
+    }
+  }
+
+  /**
+   * Update the live preview (for settings page)
+   * @param {string} theme - Theme to preview
+   */
+  function updateChatThemePreview(theme) {
+    const preview = document.getElementById('chat-theme-live-preview');
+    if (!preview) return;
+
+    // Temporarily apply theme to preview area
+    if (theme === 'default') {
+      preview.removeAttribute('data-chat-theme');
+    } else {
+      preview.setAttribute('data-chat-theme', theme);
+    }
+  }
+
+  /**
+   * Initialize chat theme on page load
+   */
+  function initChatTheme() {
+    const theme = getChatTheme();
+    applyChatTheme(theme, false);
+  }
+
   // ===== MESSAGE ANIMATION SETTINGS =====
 
   const MSG_ANIM_KEY = 'cinq_msg_animation';
@@ -839,6 +983,11 @@
       const msgAnim = getMsgAnimation();
       updateMsgAnimSelector(msgAnim);
       updateMsgAnimDescription(msgAnim);
+      
+      // Update any chat theme selectors on the page
+      const chatTheme = getChatTheme();
+      updateChatThemeSelector(chatTheme);
+      updateChatThemeDescription(chatTheme);
     });
   } else {
     // DOM already ready
@@ -851,13 +1000,18 @@
     const msgAnim = getMsgAnimation();
     updateMsgAnimSelector(msgAnim);
     updateMsgAnimDescription(msgAnim);
+    
+    const chatTheme = getChatTheme();
+    updateChatThemeSelector(chatTheme);
+    updateChatThemeDescription(chatTheme);
   }
 
-  // Initialize theme, accent, night mode, and message animation immediately (runs synchronously)
+  // Initialize theme, accent, night mode, message animation, and chat theme immediately (runs synchronously)
   initTheme();
   initAccent();
   initNightMode();
   initMsgAnimation();
+  initChatTheme();
 
   // Expose API globally
   window.CinqTheme = {
@@ -890,7 +1044,16 @@
     updateMsgAnimDescription,
     playMsgAnimPreview,
     MSG_ANIMATIONS,
-    MSG_ANIM_NAMES
+    MSG_ANIM_NAMES,
+    // Chat Theme API
+    setChatTheme,
+    getChatTheme: getCurrentChatTheme,
+    updateChatThemeSelector,
+    updateChatThemeDescription,
+    updateChatThemePreview,
+    CHAT_THEMES,
+    CHAT_THEME_NAMES,
+    CHAT_THEME_DESCRIPTIONS
   };
 
   // Also expose simple toggleTheme function for onclick handlers
@@ -900,5 +1063,6 @@
   window.setNightMode = setNightMode;
   window.toggleNightMode = toggleNightMode;
   window.setMsgAnimation = setMsgAnimation;
+  window.setChatTheme = setChatTheme;
 
 })();

@@ -7,6 +7,25 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [2.3.0] - 2025-02-01
+
+### ✨ Added (Nouvelles fonctionnalités)
+
+#### Contact Insights (Statistiques de relation)
+- **Bouton Insights dans le chat header** — Accédez aux statistiques de votre relation avec un contact
+- **Messages échangés** — Nombre total de messages, envoyés et reçus
+- **Historique de relation** — Date du premier contact et de la dernière conversation
+- **Jours de relation** — Nombre de jours depuis le premier message
+- **Statistiques avancées** :
+  - Moyenne de messages par jour
+  - Record de jours consécutifs avec messages (streak)
+  - Série actuelle de jours consécutifs
+  - Jour de la semaine le plus actif
+  - Taux de réponse (sous 24h)
+- API endpoint `/api/contact-insights` pour récupérer les statistiques
+
+---
+
 ## [2.2.0] - 2025-02-01
 
 ### ✨ Added (Nouvelles fonctionnalités)
