@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Découvrez les dernières mises à jour de Cinq. Nouvelles fonctionnalités, améliorations et corrections de bugs.">
+    <meta name="keywords" content="cinq, changelog, mises à jour, release notes, nouveautés">
+    <meta name="author" content="Cinq">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/changelog">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Changelog — Cinq">
+    <meta property="og:description" content="Les dernières mises à jour de Cinq, l'anti-réseau social.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/changelog">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Changelog — Cinq">
+    <meta name="twitter:description" content="Les dernières mises à jour de Cinq.">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS for smooth transitions -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization (before body to prevent flash) -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+    
+    <style>
+        .changelog-container {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .changelog-header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        
+        .changelog-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        
+        .changelog-logo svg {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .changelog-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .changelog-subtitle {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Release Card */
+        .release {
+            position: relative;
+            margin-bottom: 3rem;
+            padding-left: 2rem;
+        }
+        
+        .release::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: -2rem;
+            width: 2px;
+            background: var(--color-border);
+        }
+        
+        .release:last-child::before {
+            bottom: 0;
+        }
+        
+        .release-dot {
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--color-brand);
+            border: 3px solid var(--color-bg-primary);
+            box-shadow: 0 0 0 2px var(--color-brand);
+        }
+        
+        .release.major .release-dot {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            box-shadow: 0 0 0 2px #a855f7, 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+        
+        .release-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        
+        .release-version {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        .release-date {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            background: var(--color-bg-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+        }
+        
+        .release-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+        }
+        
+        .release-title {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+        
+        /* Change Categories */
+        .change-category {
+            margin-bottom: 1.5rem;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+        
+        .category-header.added {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+        
+        .category-header.changed {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+        
+        .category-header.fixed {
+            background: rgba(249, 115, 22, 0.15);
+            color: #f97316;
+        }
+        
+        .category-header.security {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        
+        .category-header svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .change-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .change-item {
+            position: relative;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            transition: all 0.2s ease;
+        }
+        
+        .change-item:hover {
+            border-color: var(--color-brand);
+            transform: translateX(4px);
+        }
+        
+        .change-item strong {
+            color: var(--color-text-primary);
+        }
+        
+        .change-item code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--color-bg-tertiary);
+            padding: 0.125rem 0.375rem;
+            border-radius: var(--radius-sm);
+            color: var(--color-text-muted);
+        }
+        
+        /* Subcategory */
+        .subcategory {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--color-border);
+        }
+        
+        /* Stats Box */
+        .stats-box {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stats-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        /* Navigation */
+        .changelog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 4rem;
+        }
+        
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            border-color: var(--color-brand);
+            color: var(--color-text-primary);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-full);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--color-brand);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--color-text-secondary);
+        }
+        
+        [data-theme="light"] .theme-toggle .icon-moon,
+        [data-theme="dark"] .theme-toggle .icon-sun {
+            display: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 640px) {
+            .changelog-container {
+                padding: 2rem 1rem;
+            }
+            
+            .changelog-title {
+                font-size: 2rem;
+            }
+            
+            .release {
+                padding-left: 1.5rem;
+            }
+            
+            .release-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer le thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <main class="changelog-container">
+        <!-- Header -->
+        <header class="changelog-header">
+            <a href="/" class="changelog-logo" aria-label="Cinq - Accueil">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="50,5 95,35 80,90 20,90 5,35" fill="url(#grad)" stroke="url(#grad)" stroke-width="2"/>
+                    <text x="50" y="62" text-anchor="middle" font-size="32" font-weight="700" fill="white" font-family="Space Grotesk, sans-serif">5</text>
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#a855f7"/>
+                            <stop offset="100%" style="stop-color:#6366f1"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>cinq</span>
+            </a>
+            <h1 class="changelog-title">Changelog</h1>
+            <p class="changelog-subtitle">
+                Toutes les mises à jour, nouvelles fonctionnalités et corrections de Cinq.
+            </p>
+        </header>
+
+        <!-- Releases -->
+        <section class="releases">
+            <!-- v2.0.0 -->
+            <article class="release major">
+                <div class="release-dot"></div>
+                <div class="release-header">
+                    <span class="release-version">v2.0.0</span>
+                    <span class="release-date">1 Février 2025</span>
+                    <span class="release-badge">Major</span>
+                </div>
+                <p class="release-title">🌙 Night Sprint Edition</p>
+                
+                <!-- Added -->
+                <div class="change-category">
+                    <div class="category-header added">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        Nouvelles fonctionnalités
+                    </div>
+                    
+                    <p class="subcategory">UX & Interface</p>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Système d'onboarding complet</strong> pour guider les nouveaux utilisateurs</li>
+                        <li class="change-item"><strong>Chat style WhatsApp</strong> avec bulles, timestamps, read receipts et typing indicator</li>
+                        <li class="change-item"><strong>Infinite scroll</strong> avec pagination cursor-based pour des performances optimales</li>
+                        <li class="change-item"><strong>Micro-animations</strong> et transitions fluides sur tous les composants</li>
+                        <li class="change-item"><strong>Landing page redesign</strong> avec meilleur taux de conversion</li>
+                    </ul>
+                    
+                    <p class="subcategory">PWA & Mobile</p>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Expérience PWA améliorée</strong> pour une vraie app mobile</li>
+                        <li class="change-item"><strong>Push notifications</strong> pour ne rien manquer de vos proches</li>
+                        <li class="change-item"><strong>Mobile UX polish</strong> : keyboard handling, viewport-fit, touch targets 44px</li>
+                    </ul>
+                    
+                    <p class="subcategory">Design System</p>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Design System v3.1</strong> entièrement documenté</li>
+                        <li class="change-item"><strong>WOW Animations v2</strong> : effects premium (pentagon signature, orbital particles, gradient mesh)</li>
+                        <li class="change-item"><strong>Nouveau logo</strong> (pentagon + 'cinq'), header transparent au scroll</li>
+                    </ul>
+                </div>
+                
+                <!-- Changed -->
+                <div class="change-category">
+                    <div class="category-header changed">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                        Améliorations
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Optimisation queries API</strong> + élimination des N+1 queries</li>
+                        <li class="change-item"><strong>Pages refactorisées</strong> : settings, redeem, register, login, gift</li>
+                        <li class="change-item"><strong>Accessibilité WCAG AA</strong> : contrastes, touch targets, skip links, support reduced motion</li>
+                    </ul>
+                </div>
+                
+                <!-- Fixed -->
+                <div class="change-category">
+                    <div class="category-header fixed">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Corrections
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Theme toggle</strong> fonctionnel sur toutes les pages</li>
+                        <li class="change-item"><strong>Early theme init</strong> pour éviter le flash FOUC</li>
+                        <li class="change-item"><strong>Typography</strong> : Space Grotesk utilisé partout</li>
+                        <li class="change-item"><strong>SVG icons</strong> remplacent les emojis sur toutes les pages</li>
+                        <li class="change-item"><strong>Footer overlap</strong> corrigé avec background solide</li>
+                    </ul>
+                </div>
+                
+                <!-- Security -->
+                <div class="change-category">
+                    <div class="category-header security">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        Sécurité
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>XSS Prevention</strong> améliorée dans showToast()</li>
+                        <li class="change-item"><strong>Input validation</strong> renforcée (password, content, dates)</li>
+                        <li class="change-item"><strong>Rate limiting</strong> corrigé dans upload-avatar.js et upload-image.js</li>
+                    </ul>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-box">
+                    <div class="stats-title">📊 Night Sprint Stats</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">50+</div>
+                            <div class="stat-label">Commits</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">60+</div>
+                            <div class="stat-label">Fichiers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">+15k</div>
+                            <div class="stat-label">Lignes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">14</div>
+                            <div class="stat-label">Batches</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">18</div>
+                            <div class="stat-label">Agents</div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- v1.1.0 -->
+            <article class="release">
+                <div class="release-dot"></div>
+                <div class="release-header">
+                    <span class="release-version">v1.1.0</span>
+                    <span class="release-date">31 Janvier 2025</span>
+                </div>
+                
+                <div class="change-category">
+                    <div class="category-header added">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        Nouvelles fonctionnalités
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Mode clair/sombre</strong> avec toggle sur toutes les pages</li>
+                        <li class="change-item"><strong>Icons SVG</strong> pour remplacer les emojis (accessibilité)</li>
+                        <li class="change-item"><strong>Rule of Five</strong> signature design elements</li>
+                    </ul>
+                </div>
+                
+                <div class="change-category">
+                    <div class="category-header fixed">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Corrections
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item">Theme toggle sur landing</li>
+                        <li class="change-item">Fonts Space Grotesk partout</li>
+                        <li class="change-item">Footer overlap résolu</li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- v1.0.0 -->
+            <article class="release major">
+                <div class="release-dot"></div>
+                <div class="release-header">
+                    <span class="release-version">v1.0.0</span>
+                    <span class="release-date">30 Janvier 2025</span>
+                    <span class="release-badge">Initial</span>
+                </div>
+                <p class="release-title">🚀 Premier lancement de Cinq</p>
+                
+                <div class="change-category">
+                    <div class="category-header added">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        Fonctionnalités de lancement
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Gift Model</strong> — Système de codes cadeaux pour inviter vos proches</li>
+                        <li class="change-item"><strong>Auth System</strong> — Inscription uniquement par code cadeau</li>
+                        <li class="change-item"><strong>Contacts</strong> — Limite stricte de 5 contacts maximum</li>
+                        <li class="change-item"><strong>Messaging</strong> — Chat basique entre contacts</li>
+                        <li class="change-item"><strong>Feed & Posts</strong> — Partage avec vos 5 contacts uniquement</li>
+                        <li class="change-item"><strong>PWA</strong> — Progressive Web App fonctionnelle</li>
+                        <li class="change-item"><strong>Push Notifications</strong> — Notifications pour les proposals</li>
+                    </ul>
+                </div>
+                
+                <div class="change-category">
+                    <div class="category-header changed">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        Architecture
+                    </div>
+                    <ul class="change-list">
+                        <li class="change-item"><strong>Netlify Functions</strong> — Serverless backend</li>
+                        <li class="change-item"><strong>Supabase</strong> — PostgreSQL + Auth</li>
+                        <li class="change-item"><strong>BTCPay Server</strong> — Paiements crypto</li>
+                    </ul>
+                </div>
+            </article>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="changelog-nav">
+            <a href="/" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Accueil
+            </a>
+            <a href="/about" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                À propos
+            </a>
+            <a href="https://github.com/your-repo/cinq" class="nav-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                GitHub
+            </a>
+        </nav>
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--color-text-muted); font-size: 0.875rem;">
+        <p>Fait avec ❤️ pour Cinq — L'anti-réseau social</p>
+    </footer>
+</body>
+</html>
