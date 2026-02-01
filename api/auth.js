@@ -22,9 +22,9 @@ export default async function handler(req, res) {
 
     const action = req.query.action || req.body?.action;
 
-    // Stricter rate limiting for auth endpoints
+    // Stricter rate limiting for auth endpoints (async)
     if (['register', 'login'].includes(action)) {
-        if (!checkRateLimit(req, res, { ...RATE_LIMITS.AUTH, keyPrefix: `auth:${action}` })) {
+        if (!(await checkRateLimit(req, res, { ...RATE_LIMITS.AUTH, keyPrefix: `auth:${action}` }))) {
             return;
         }
     }

@@ -13,7 +13,7 @@
  * - DELETE ?id=xxx - Remove contact
  */
 
-import { supabase, requireAuth, getUserEmail, getUserProfile, handleCors } from './_supabase.js';
+import { supabase, requireAuth, getUserEmail, getUserProfile, handleCors, getCachedUserContacts, invalidateUserCache } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, isValidEmail } from './_validation.js';
 import { logError, createErrorResponse } from './_error-logger.js';
@@ -27,9 +27,9 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Rate limiting
+    // Rate limiting (now async)
     const rateLimitConfig = req.method === 'GET' ? RATE_LIMITS.READ : RATE_LIMITS.CREATE;
-    if (!checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'contacts', userId: user.id })) {
+    if (!(await checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'contacts', userId: user.id }))) {
         return;
     }
 

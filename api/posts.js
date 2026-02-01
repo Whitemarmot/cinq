@@ -8,7 +8,7 @@
  * - DELETE ?id=xxx - Delete own post
  */
 
-import { supabase, requireAuth, getUserInfo, handleCors } from './_supabase.js';
+import { supabase, requireAuth, getUserInfo, handleCors, getCachedPostsFeed, invalidateUserCache } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, sanitizeText } from './_validation.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
@@ -31,9 +31,9 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Rate limiting
+    // Rate limiting (now async)
     const rateLimitConfig = req.method === 'GET' ? RATE_LIMITS.READ : RATE_LIMITS.CREATE;
-    if (!checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'posts', userId: user.id })) {
+    if (!(await checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'posts', userId: user.id }))) {
         return;
     }
 
@@ -337,6 +337,67 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
 }
 
 async function getFeed(res, user, limit, offset, cursor = null) {
+    // For cursor or offset-based pagination, use traditional query
+    if (cursor || offset > 0) {
+        return getFeedUncached(res, user, limit, offset, cursor);
+    }
+    
+    // Use cached feed for page 0 (most common case)
+    const page = 0;
+    const cachedPosts = await getCachedPostsFeed(user.id, page, limit);
+    
+    // Enhance with additional data not cached for performance
+    const postIds = cachedPosts.map(p => p.id);
+    
+    // Get user's poll votes for these posts
+    const userPollVotes = await getUserPollVotes(user.id, postIds);
+    
+    // Get reply counts for all posts
+    const replyCounts = await getReplyCountsForPosts(postIds);
+    
+    // Get post views for user's own posts (seen by feature)
+    const postViews = await getPostViewsForOwner(user.id, postIds);
+    
+    // Enrich cached posts with real-time data
+    const enriched = cachedPosts.map(post => {
+        const enrichedPost = { 
+            ...post, 
+            reply_count: replyCounts[post.id] || 0
+        };
+        
+        if (post.poll_options) {
+            enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
+            enrichedPost.poll_total_votes = post.poll_votes 
+                ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
+                : 0;
+        }
+        
+        // Add seen_by for user's own recent posts
+        if (post.user_id === user.id && postViews[post.id]) {
+            enrichedPost.seen_by = postViews[post.id];
+        }
+        
+        return enrichedPost;
+    });
+    
+    // Generate next cursor (created_at of last post)
+    const nextCursor = cachedPosts.length === limit && cachedPosts.length > 0 
+        ? cachedPosts[cachedPosts.length - 1].created_at 
+        : null;
+    
+    return res.json({ 
+        posts: enriched, 
+        count: cachedPosts.length,
+        nextCursor,
+        hasMore: cachedPosts.length === limit,
+        cached: true // Debug info
+    });
+}
+
+/**
+ * Original uncached getFeed function for pagination beyond page 0
+ */
+async function getFeedUncached(res, user, limit, offset, cursor = null) {
     // Get contact IDs
     const { data: contacts } = await supabase
         .from('contacts')
@@ -348,11 +409,24 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     
     const now = new Date().toISOString();
     
-    // Build query - exclude replies (only show root posts)
-    // Also exclude scheduled posts that haven't been published yet
+    // Build optimized query - only select needed fields for performance
     let query = supabase
         .from('posts')
-        .select('*')
+        .select(`
+            id,
+            content,
+            created_at,
+            user_id,
+            image_url,
+            is_private,
+            scheduled_at,
+            poll_options,
+            poll_votes,
+            users!posts_user_id_fkey(
+                display_name,
+                avatar_url
+            )
+        `)
         .in('user_id', allUserIds)
         .is('parent_id', null)
         .or(`scheduled_at.is.null,scheduled_at.lte.${now}`)
@@ -360,55 +434,49 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     
     // Cursor-based pagination (preferred) or offset-based fallback
     if (cursor) {
-        // Get posts older than cursor
         query = query.lt('created_at', cursor);
     } else if (offset > 0) {
-        // Fallback to offset for backwards compat
         query = query.range(offset, offset + limit - 1);
     }
     
-    // Always limit results
     query = query.limit(limit);
     
     const { data: posts, error } = await query;
     
     if (error) throw error;
     
-    // Get user's poll votes for these posts
+    // Get user's poll votes and other dynamic data
     const postIds = posts.map(p => p.id);
-    const userPollVotes = await getUserPollVotes(user.id, postIds);
+    const [userPollVotes, replyCounts, postViews] = await Promise.all([
+        getUserPollVotes(user.id, postIds),
+        getReplyCountsForPosts(postIds),
+        getPostViewsForOwner(user.id, postIds)
+    ]);
     
-    // Get reply counts for all posts
-    const replyCounts = await getReplyCountsForPosts(postIds);
-    
-    // Get post views for user's own posts (seen by feature)
-    const postViews = await getPostViewsForOwner(user.id, postIds);
-    
-    // Enrich with author info (cached)
-    const authorCache = {};
-    const enriched = await Promise.all(posts.map(async (post) => {
-        if (!authorCache[post.user_id]) {
-            authorCache[post.user_id] = await getUserInfo(post.user_id);
-        }
+    // Enrich with real-time data
+    const enriched = posts.map(post => {
         const enrichedPost = { 
             ...post, 
-            author: authorCache[post.user_id],
+            author: post.users,
             reply_count: replyCounts[post.id] || 0
         };
+        
         if (post.poll_options) {
             enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
             enrichedPost.poll_total_votes = post.poll_votes 
                 ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
                 : 0;
         }
-        // Add seen_by for user's own recent posts
+        
         if (post.user_id === user.id && postViews[post.id]) {
             enrichedPost.seen_by = postViews[post.id];
         }
+        
+        // Clean up the users join
+        delete enrichedPost.users;
         return enrichedPost;
-    }));
+    });
     
-    // Generate next cursor (created_at of last post)
     const nextCursor = posts.length === limit && posts.length > 0 
         ? posts[posts.length - 1].created_at 
         : null;

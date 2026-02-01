@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Rate limiting
+    // Rate limiting (now async)
     const rateLimitConfig = req.method === 'POST' ? RATE_LIMITS.CREATE : RATE_LIMITS.READ;
-    if (!checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'messages', userId: user.id })) {
+    if (!(await checkRateLimit(req, res, { ...rateLimitConfig, keyPrefix: 'messages', userId: user.id }))) {
         return;
     }
 

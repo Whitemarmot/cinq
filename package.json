@@ -28,6 +28,7 @@
     "canvas-confetti": "^1.9.4",
     "jszip": "^3.10.1",
     "qrcode": "^1.5.4",
+    "redis": "^4.7.0",
     "web-push": "^3.6.7"
   },
   "engines": {
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@axe-core/cli": "^4.11.0",
     "@playwright/test": "^1.58.1",
+    "@pwabuilder/cli": "^0.0.17",
     "@vitest/coverage-v8": "^2.1.9",
     "axe-core": "^4.11.1",
     "clean-css-cli": "^5.6.3",

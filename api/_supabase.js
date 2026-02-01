@@ -3,9 +3,11 @@
  * 
  * Single source of truth for database access across all API endpoints.
  * Eliminates duplicated initialization and auth logic.
+ * Enhanced with caching and query optimization.
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { cached, CACHE_KEYS, CACHE_TTL, del } from './_cache.js';
 
 // ===== SINGLETON SUPABASE CLIENT =====
 export const supabase = createClient(
@@ -180,4 +182,206 @@ export function handleCors(req, res, methods = ['GET', 'POST', 'OPTIONS']) {
     }
     
     return false; // Continue processing
+}
+
+// ===== OPTIMIZED QUERY HELPERS =====
+
+/**
+ * Get user profile with caching - optimized for frequent access
+ * @param {string} userId - User UUID
+ * @param {boolean} forceRefresh - Bypass cache
+ * @returns {Promise<Object>} Profile object
+ */
+export async function getCachedUserProfile(userId, forceRefresh = false) {
+    const cacheKey = CACHE_KEYS.userProfile(userId);
+    
+    if (forceRefresh) {
+        await del(cacheKey);
+    }
+    
+    return await cached(cacheKey, async () => {
+        const { data } = await supabase
+            .from('users')
+            .select('display_name, avatar_url, bio, email, status_emoji, status_text, created_at')
+            .eq('id', userId)
+            .single();
+        return data || {};
+    }, CACHE_TTL.USER_PROFILE);
+}
+
+/**
+ * Get user contacts with caching
+ * @param {string} userId - User UUID
+ * @returns {Promise<Array>} Array of contacts
+ */
+export async function getCachedUserContacts(userId) {
+    const cacheKey = CACHE_KEYS.userContacts(userId);
+    
+    return await cached(cacheKey, async () => {
+        const { data } = await supabase
+            .from('contacts')
+            .select(`
+                id,
+                contact_id,
+                status,
+                created_at,
+                users!contacts_contact_id_fkey(
+                    id,
+                    display_name,
+                    avatar_url,
+                    status_emoji,
+                    status_text
+                )
+            `)
+            .eq('user_id', userId)
+            .eq('status', 'accepted')
+            .order('created_at', { ascending: false });
+        
+        return data || [];
+    }, CACHE_TTL.CONTACTS);
+}
+
+/**
+ * Get optimized posts feed with minimal data and caching
+ * @param {string} userId - User UUID
+ * @param {number} page - Page number (0-based)
+ * @param {number} limit - Items per page
+ * @returns {Promise<Array>} Array of posts
+ */
+export async function getCachedPostsFeed(userId, page = 0, limit = 20) {
+    const cacheKey = CACHE_KEYS.userFeed(userId, page);
+    
+    return await cached(cacheKey, async () => {
+        // Get user's contacts first
+        const contacts = await getCachedUserContacts(userId);
+        const contactIds = contacts.map(c => c.contact_id);
+        const allUserIds = [userId, ...contactIds];
+        
+        // Optimized query - only select needed fields
+        const { data } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                content,
+                created_at,
+                user_id,
+                image_url,
+                is_private,
+                reply_to_id,
+                users!posts_user_id_fkey(
+                    display_name,
+                    avatar_url
+                )
+            `)
+            .in('user_id', allUserIds)
+            .eq('is_private', false)
+            .order('created_at', { ascending: false })
+            .range(page * limit, (page + 1) * limit - 1);
+        
+        return data || [];
+    }, CACHE_TTL.POSTS_FEED);
+}
+
+/**
+ * Get unread notifications count with short caching
+ * @param {string} userId - User UUID
+ * @returns {Promise<number>} Count of unread notifications
+ */
+export async function getCachedNotificationCount(userId) {
+    const cacheKey = CACHE_KEYS.userNotifications(userId);
+    
+    return await cached(cacheKey, async () => {
+        const { count } = await supabase
+            .from('notifications')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .is('read_at', null);
+        
+        return count || 0;
+    }, CACHE_TTL.NOTIFICATIONS);
+}
+
+/**
+ * Get user statistics with caching
+ * @param {string} userId - User UUID
+ * @returns {Promise<Object>} User stats object
+ */
+export async function getCachedUserStats(userId) {
+    const cacheKey = CACHE_KEYS.userStats(userId);
+    
+    return await cached(cacheKey, async () => {
+        // Execute multiple queries in parallel
+        const [postsCount, contactsCount, messagesCount] = await Promise.all([
+            supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+            supabase.from('contacts').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'accepted'),
+            supabase.from('messages').select('*', { count: 'exact', head: true }).eq('sender_id', userId)
+        ]);
+        
+        return {
+            postsCount: postsCount.count || 0,
+            contactsCount: contactsCount.count || 0,
+            messagesCount: messagesCount.count || 0
+        };
+    }, CACHE_TTL.USER_STATS);
+}
+
+/**
+ * Invalidate user-related caches when data changes
+ * @param {string} userId - User UUID
+ * @param {string[]} types - Types to invalidate ['profile', 'contacts', 'feed', 'stats']
+ */
+export async function invalidateUserCache(userId, types = ['profile', 'contacts', 'feed', 'stats']) {
+    const promises = [];
+    
+    if (types.includes('profile')) {
+        promises.push(del(CACHE_KEYS.userProfile(userId)));
+    }
+    
+    if (types.includes('contacts')) {
+        promises.push(del(CACHE_KEYS.userContacts(userId)));
+    }
+    
+    if (types.includes('feed')) {
+        // Invalidate all feed pages
+        for (let page = 0; page < 5; page++) {
+            promises.push(del(CACHE_KEYS.userFeed(userId, page)));
+        }
+    }
+    
+    if (types.includes('stats')) {
+        promises.push(del(CACHE_KEYS.userStats(userId)));
+        promises.push(del(CACHE_KEYS.userNotifications(userId)));
+    }
+    
+    await Promise.all(promises);
+}
+
+// ===== CONNECTION OPTIMIZATION =====
+
+/**
+ * Batch multiple Supabase queries into a single transaction where possible
+ * @param {Array} operations - Array of { table, operation, data } objects
+ * @returns {Promise<Array>} Results array
+ */
+export async function batchQueries(operations) {
+    // For now, execute in parallel since Supabase doesn't support transactions in JS
+    // In the future, could use stored procedures for true transactions
+    return await Promise.all(
+        operations.map(op => {
+            const query = supabase.from(op.table);
+            
+            switch (op.operation) {
+                case 'insert':
+                    return query.insert(op.data);
+                case 'update':
+                    return query.update(op.data).match(op.match);
+                case 'delete':
+                    return query.delete().match(op.match);
+                case 'select':
+                    return query.select(op.select).match(op.match);
+                default:
+                    throw new Error(`Unknown operation: ${op.operation}`);
+            }
+        })
+    );
 }
