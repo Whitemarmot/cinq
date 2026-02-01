@@ -13,8 +13,13 @@
   const STORAGE_KEY = 'cinq_theme';
   const ACCENT_STORAGE_KEY = 'cinq_accent';
   const SUNRISE_CACHE_KEY = 'cinq_sunrise_data';
+  const NIGHT_MODE_KEY = 'cinq_night_mode';
   const THEME_COLOR_DARK = '#0e0e12';
   const THEME_COLOR_LIGHT = '#faf9f7';
+  
+  // Night Mode Settings (22:00 - 07:00)
+  const NIGHT_MODE_START = 22; // 22:00
+  const NIGHT_MODE_END = 7;    // 07:00
   
   // Available accent colors
   const ACCENTS = ['indigo', 'violet', 'rose', 'green', 'orange'];
@@ -509,6 +514,189 @@
     applyAccent(accent, false);
   }
 
+  // ===== NIGHT MODE (AUTOMATIC EYE COMFORT) =====
+
+  let nightModeTimer = null;
+
+  /**
+   * Check if current time is within night mode hours (22:00 - 07:00)
+   * @returns {boolean}
+   */
+  function isNightTime() {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= NIGHT_MODE_START || hour < NIGHT_MODE_END;
+  }
+
+  /**
+   * Get night mode preference from localStorage
+   * @returns {boolean}
+   */
+  function getNightModeEnabled() {
+    try {
+      return localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+    } catch (e) {}
+    return false;
+  }
+
+  /**
+   * Save night mode preference to localStorage
+   * @param {boolean} enabled
+   */
+  function saveNightMode(enabled) {
+    try {
+      localStorage.setItem(NIGHT_MODE_KEY, enabled ? 'true' : 'false');
+    } catch (e) {}
+  }
+
+  /**
+   * Apply night mode filter
+   * @param {boolean} active - Whether night mode should be visually active
+   * @param {boolean} [withTransition=true] - Animate the change
+   */
+  function applyNightMode(active, withTransition = true) {
+    const html = document.documentElement;
+
+    if (withTransition) {
+      html.classList.add('night-mode-transitioning');
+      setTimeout(() => html.classList.remove('night-mode-transitioning'), 1100);
+    }
+
+    html.setAttribute('data-night-mode', active ? 'active' : 'inactive');
+
+    // Dispatch event for listeners
+    window.dispatchEvent(new CustomEvent('nightmodechange', {
+      detail: { active }
+    }));
+  }
+
+  /**
+   * Update night mode based on current time
+   */
+  function updateNightMode() {
+    if (!getNightModeEnabled()) {
+      applyNightMode(false, true);
+      return;
+    }
+
+    const shouldBeActive = isNightTime();
+    const currentState = document.documentElement.getAttribute('data-night-mode') === 'active';
+
+    if (shouldBeActive !== currentState) {
+      applyNightMode(shouldBeActive, true);
+      
+      // Show indicator briefly when night mode activates
+      if (shouldBeActive) {
+        showNightModeIndicator();
+      }
+    }
+  }
+
+  /**
+   * Show a brief indicator when night mode activates
+   */
+  function showNightModeIndicator() {
+    let indicator = document.getElementById('night-mode-indicator');
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.id = 'night-mode-indicator';
+      indicator.className = 'night-mode-indicator';
+      indicator.innerHTML = '<span class="night-icon">🌙</span><span>Mode Nuit activé</span>';
+      document.body.appendChild(indicator);
+    }
+
+    // Show and then hide after 3 seconds
+    requestAnimationFrame(() => {
+      indicator.classList.add('visible');
+      setTimeout(() => {
+        indicator.classList.remove('visible');
+      }, 3000);
+    });
+  }
+
+  /**
+   * Enable or disable automatic night mode
+   * @param {boolean} enabled
+   */
+  function setNightMode(enabled) {
+    saveNightMode(enabled);
+    manageNightModeTimer(enabled);
+    
+    if (enabled) {
+      updateNightMode();
+    } else {
+      applyNightMode(false, true);
+    }
+
+    updateNightModeToggle(enabled);
+  }
+
+  /**
+   * Toggle night mode on/off
+   * @returns {boolean} New state
+   */
+  function toggleNightMode() {
+    const current = getNightModeEnabled();
+    setNightMode(!current);
+    return !current;
+  }
+
+  /**
+   * Manage the timer that checks for night mode transitions
+   * @param {boolean} enable
+   */
+  function manageNightModeTimer(enable) {
+    if (nightModeTimer) {
+      clearInterval(nightModeTimer);
+      nightModeTimer = null;
+    }
+
+    if (enable) {
+      // Check every minute for time transitions
+      nightModeTimer = setInterval(updateNightMode, 60000);
+    }
+  }
+
+  /**
+   * Update night mode toggle UI (for settings page)
+   * @param {boolean} enabled
+   */
+  function updateNightModeToggle(enabled) {
+    const toggle = document.getElementById('btn-night-mode-toggle');
+    if (toggle) {
+      toggle.classList.toggle('active', enabled);
+      toggle.setAttribute('aria-pressed', enabled);
+    }
+
+    // Update description
+    const desc = document.getElementById('night-mode-description');
+    if (desc) {
+      if (enabled) {
+        const isActive = isNightTime();
+        desc.textContent = isActive 
+          ? '🌙 Mode nuit actif (22h-7h)'
+          : '☀️ Mode nuit activé, en attente de 22h';
+      } else {
+        desc.textContent = 'Réduit la luminosité entre 22h et 7h';
+      }
+    }
+  }
+
+  /**
+   * Initialize night mode on page load
+   */
+  function initNightMode() {
+    const enabled = getNightModeEnabled();
+    
+    if (enabled) {
+      manageNightModeTimer(true);
+      const shouldBeActive = isNightTime();
+      applyNightMode(shouldBeActive, false);
+    } else {
+      applyNightMode(false, false);
+    }
+  }
+
   // Auto-initialize if script is loaded after DOM is ready
   if (document.readyState === 'loading') {
     // DOM not ready, wait for it
@@ -530,9 +718,10 @@
     updateAccentSelector(accent);
   }
 
-  // Initialize theme and accent immediately (runs synchronously)
+  // Initialize theme, accent, and night mode immediately (runs synchronously)
   initTheme();
   initAccent();
+  initNightMode();
 
   // Expose API globally
   window.CinqTheme = {
@@ -549,12 +738,22 @@
     getAccent,
     updateAccentSelector,
     ACCENTS,
-    ACCENT_NAMES
+    ACCENT_NAMES,
+    // Night Mode API
+    setNightMode,
+    toggleNightMode,
+    getNightModeEnabled,
+    isNightTime,
+    updateNightModeToggle,
+    NIGHT_MODE_START,
+    NIGHT_MODE_END
   };
 
   // Also expose simple toggleTheme function for onclick handlers
   window.toggleTheme = toggleTheme;
   window.setTheme = setTheme;
   window.setAccent = setAccent;
+  window.setNightMode = setNightMode;
+  window.toggleNightMode = toggleNightMode;
 
 })();

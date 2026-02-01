@@ -187,6 +187,87 @@
             desc.textContent = 'Couleur ' + name + ' appliquée aux boutons et éléments interactifs.';
         }
         
+        // Night Mode settings functions
+        var NIGHT_MODE_KEY = 'cinq_night_mode';
+        var NIGHT_MODE_START = 22;
+        var NIGHT_MODE_END = 7;
+        
+        function isNightTime() {
+            var now = new Date();
+            var hour = now.getHours();
+            return hour >= NIGHT_MODE_START || hour < NIGHT_MODE_END;
+        }
+        
+        function getNightModeEnabled() {
+            try {
+                return localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+            } catch (e) {}
+            return false;
+        }
+        
+        function toggleNightModeFromSettings() {
+            var current = getNightModeEnabled();
+            var newState = !current;
+            
+            // Save to localStorage
+            localStorage.setItem(NIGHT_MODE_KEY, newState ? 'true' : 'false');
+            
+            // Update toggle UI
+            var toggle = document.getElementById('btn-night-mode-toggle');
+            if (toggle) {
+                toggle.classList.toggle('active', newState);
+                toggle.setAttribute('aria-pressed', newState);
+            }
+            
+            // Apply night mode
+            var h = document.documentElement;
+            h.classList.add('night-mode-transitioning');
+            
+            if (newState && isNightTime()) {
+                h.setAttribute('data-night-mode', 'active');
+            } else {
+                h.setAttribute('data-night-mode', 'inactive');
+            }
+            
+            setTimeout(function() { h.classList.remove('night-mode-transitioning'); }, 1100);
+            
+            // Update description
+            updateNightModeDescription(newState);
+        }
+        
+        function updateNightModeDescription(enabled) {
+            var desc = document.getElementById('night-mode-description');
+            if (!desc) return;
+            
+            if (enabled) {
+                var isActive = isNightTime();
+                desc.textContent = isActive 
+                    ? '🌙 Mode nuit actif (22h-7h)'
+                    : '☀️ Mode nuit activé, en attente de 22h';
+            } else {
+                desc.textContent = 'Réduit la luminosité entre 22h et 7h';
+            }
+        }
+        
+        function initNightModeSettings() {
+            var enabled = getNightModeEnabled();
+            
+            // Update toggle state
+            var toggle = document.getElementById('btn-night-mode-toggle');
+            if (toggle) {
+                toggle.classList.toggle('active', enabled);
+                toggle.setAttribute('aria-pressed', enabled);
+            }
+            
+            // Update description
+            updateNightModeDescription(enabled);
+            
+            // Apply current state
+            if (enabled && isNightTime()) {
+                document.documentElement.setAttribute('data-night-mode', 'active');
+            }
+        }
+        
         // Listen for system changes (auto mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', function(e) {
@@ -216,6 +297,9 @@
             var accentPref = localStorage.getItem('cinq_accent') || 'indigo';
             updateAccentSelector(accentPref);
             updateAccentDescription(accentPref);
+            
+            // Initialize night mode toggle
+            initNightModeSettings();
             
             // For sunrise mode, set up periodic check and update
             if (pref === 'sunrise') {
@@ -1642,6 +1726,18 @@
                             <p class="settings-item-subtitle">Affiche le feed en liste sans images</p>
                         </div>
                         <button id="btn-compact-toggle" class="toggle-switch" data-pref="compactMode" onclick="toggleCompactMode(this)" aria-label="Activer le mode compact"></button>
+                    </div>
+                    
+                    <!-- Mode nuit automatique -->
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span>🌙</span>
+                                <span>Mode Nuit automatique</span>
+                            </p>
+                            <p class="settings-item-subtitle" id="night-mode-description">Réduit la luminosité entre 22h et 7h</p>
+                        </div>
+                        <button id="btn-night-mode-toggle" class="toggle-switch" onclick="toggleNightModeFromSettings()" aria-label="Activer le mode nuit automatique" aria-pressed="false"></button>
                     </div>
                 </div>
             </section>
