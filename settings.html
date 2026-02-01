@@ -1982,7 +1982,8 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <div class="form-row" style="margin-bottom: var(--space-2);">
-                                        <input type="file" id="avatar-file" accept="image/*" style="display: none;">
+                                        <label for="avatar-file" class="sr-only">Sélectionner une photo de profil</label>
+                                        <input type="file" id="avatar-file" accept="image/*" style="display: none;" aria-label="Choisir une photo de profil">
                                         <button id="btn-upload-avatar" class="form-btn btn-enhanced">Choisir une photo</button>
                                         <button id="btn-remove-avatar" class="form-btn btn-enhanced" style="display: none;">Supprimer</button>
                                     </div>

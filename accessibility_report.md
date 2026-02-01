@@ -1,26 +1,18 @@
 # 🎯 Accessibility Audit Report - Projet Cinq
 
-**Generated:** 2026-02-01T08:08:37.185Z  
+**Generated:** 2026-02-01T08:10:27.519Z  
 **Total Files Audited:** 44  
 **Files with Issues:** 30  
-**Total Issues Found:** 57
+**Total Issues Found:** 46
 
 ## 📊 Summary by Severity
 
-- 🚨 **Errors:** 13 (Critical - Must Fix)
+- 🚨 **Errors:** 2 (Critical - Must Fix)
 - ⚠️  **Warnings:** 44 (Important - Should Fix)
 
 ✅ **14 files have no accessibility issues detected**
 
-## 🚨 CRITICAL ERRORS (13) - Fix First
-
-### `invite.html` - 1 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[2]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" class="link-input" id="invite-link" readonly>`
+## 🚨 CRITICAL ERRORS (2) - Fix First
 
 ### `resource-hints.html` - 2 error(s)
 
@@ -33,80 +25,6 @@
    - **Element:** `head`
    - **Issue:** Page is missing a title element
    - **Fix:** Add <title> element with descriptive page title
-
-### `settings.html` - 1 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[1]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="file" id="avatar-file" accept="image/*" style="display: none;">`
-
-### `starred.html` - 1 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[0]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="search" class="search-input" id="search-input" placeholder="Rechercher dans les favoris..." oninput="filterMessages()">`
-
-### `stories.html` - 8 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[0]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input 
-                    type="text" 
-                    class="story-reply-input" 
-                    id="story-reply-input" 
-                    placeholder="Répondre à la story..."
-                    maxlength="500"
-                    oninput="updateReplySendBtn()"
-                    onkeypress="handleReplyKeypress(event)"
-                >`
-
-2. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[1]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="file" id="story-image-input" accept="image/*" style="display: none;" onchange="handleStoryImage(event)">`
-
-3. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[6]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn active" style="background: #1a1a2e;" onclick="selectBgColor('#1a1a2e', this...`
-
-4. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[7]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onc...`
-
-5. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[8]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" onc...`
-
-6. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[9]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" onc...`
-
-7. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[10]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" onc...`
-
-8. **WCAG 4.1.2 - Buttons must have accessible names**
-   - **Element:** `button[11]`
-   - **Issue:** Button has no accessible text or label
-   - **Fix:** Add text content or aria-label attribute
-   - **Code:** `<button class="color-btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" onc...`
 
 ## ⚠️ WARNINGS (44) - Important Improvements
 
@@ -348,9 +266,8 @@
 
 ## 📋 Issues by Rule Type
 
-- **WCAG 1.3.1:** 25 issue(s)
 - **WCAG 2.4.1:** 24 issue(s)
-- **WCAG 4.1.2:** 6 issue(s)
+- **WCAG 1.3.1:** 20 issue(s)
 - **WCAG 3.1.1:** 1 issue(s)
 - **WCAG 2.4.2:** 1 issue(s)
 
