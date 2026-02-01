@@ -44,6 +44,12 @@
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.css">
     
+    <!-- QR Code styles -->
+    <link rel="stylesheet" href="/css/qr-code.css">
+    
+    <!-- Message Templates styles -->
+    <link rel="stylesheet" href="/css/message-templates.css">
+    
     <!-- Theme initialization -->
     <script>
         (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
@@ -1515,6 +1521,54 @@
                 </div>
             </section>
 
+            <!-- Section: QR Code Contact -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="3" height="3"/>
+                        <path d="M14 21h3"/>
+                        <path d="M21 14v3"/>
+                        <path d="M21 21h.01"/>
+                    </svg>
+                    QR Code Contact
+                </h2>
+                
+                <div class="settings-card" style="padding: var(--space-4);">
+                    <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+                        Partage ton profil avec un QR code ou scanne celui d'un ami pour l'ajouter à tes contacts.
+                    </p>
+                    
+                    <div class="qr-add-contact-row">
+                        <button class="qr-add-contact-btn" onclick="showMyQRCode()" id="btn-show-qr">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="3" height="3"/>
+                                <path d="M14 21h3"/>
+                                <path d="M21 14v3"/>
+                                <path d="M21 21h.01"/>
+                            </svg>
+                            <span>Mon QR Code</span>
+                        </button>
+                        
+                        <button class="qr-add-contact-btn" onclick="scanQRCode()" id="btn-scan-qr">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                                <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                                <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                                <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                                <line x1="7" y1="12" x2="17" y2="12"/>
+                            </svg>
+                            <span>Scanner</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Section: Statistiques -->
             <section class="settings-section">
                 <h2 class="section-header">
@@ -1639,6 +1693,37 @@
                 
                 <p class="settings-item-subtitle" style="margin-top: var(--space-2); padding: 0 var(--space-2);">
                     💡 Ton statut est visible par tes contacts dans l'app.
+                </p>
+            </section>
+
+            <!-- Section: Message Templates -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Message Templates
+                </h2>
+                
+                <div class="settings-card" style="padding: var(--space-4);">
+                    <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+                        📝 Crée des templates pour tes messages récurrents : anniversaires, remerciements, bienvenue...
+                    </p>
+                    
+                    <!-- Add new template button -->
+                    <button class="template-add-btn" onclick="CinqTemplates.openAddModal()" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Créer un template
+                    </button>
+                    
+                    <!-- Templates list -->
+                    <div id="templates-list" style="margin-top: var(--space-4);">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+                
+                <p class="settings-item-subtitle" style="margin-top: var(--space-2); padding: 0 var(--space-2);">
+                    💡 Insère tes templates rapidement dans le chat avec le bouton 📝
                 </p>
             </section>
 
@@ -2187,6 +2272,62 @@
     </div>
 
     <!-- ============================================ -->
+    <!-- Modal: Template Editor -->
+    <!-- ============================================ -->
+    <div id="template-modal" class="template-modal-overlay" role="dialog" aria-labelledby="template-modal-title" aria-modal="true">
+        <div class="template-modal">
+            <div class="template-modal-header">
+                <h3 id="template-modal-title" class="template-modal-title">Nouveau template</h3>
+                <button type="button" class="template-modal-close" onclick="CinqTemplates.closeModal()" aria-label="Fermer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="template-form" class="template-modal-body">
+                <input type="hidden" id="template-id">
+                
+                <div class="template-form-group">
+                    <label for="template-name-input" class="template-form-label">Nom du template</label>
+                    <input type="text" id="template-name-input" class="template-form-input" placeholder="Ex: Anniversaire ami" maxlength="50" required>
+                </div>
+                
+                <div class="template-form-group">
+                    <label for="template-content-input" class="template-form-label">Message</label>
+                    <textarea id="template-content-input" class="template-form-textarea" placeholder="Écris ton message template..." maxlength="280" required></textarea>
+                    <span class="template-char-count" id="template-char-count">0/280</span>
+                </div>
+                
+                <div class="template-form-row">
+                    <div class="template-form-group">
+                        <label for="template-emoji-input" class="template-form-label">Emoji</label>
+                        <input type="text" id="template-emoji-input" class="template-form-input" placeholder="📝" maxlength="4" style="text-align: center;">
+                    </div>
+                    
+                    <div class="template-form-group">
+                        <label for="template-category-input" class="template-form-label">Catégorie</label>
+                        <select id="template-category-input" class="template-form-select">
+                            <option value="custom">⭐ Personnalisés</option>
+                            <option value="birthday">🎂 Anniversaire</option>
+                            <option value="welcome">👋 Bienvenue</option>
+                            <option value="thanks">🙏 Remerciements</option>
+                            <option value="encourage">💪 Encouragement</option>
+                            <option value="greetings">👋 Salutations</option>
+                            <option value="misc">📝 Divers</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="template-modal-footer" style="margin: calc(-1 * var(--space-4)); margin-top: var(--space-4); padding: var(--space-4); border-top: 1px solid var(--color-border);">
+                    <button type="button" class="template-modal-btn template-modal-btn-cancel" onclick="CinqTemplates.closeModal()">Annuler</button>
+                    <button type="submit" class="template-modal-btn template-modal-btn-save">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
     <!-- Toast Container -->
     <!-- ============================================ -->
     <div id="toast-container" class="toast-container"></div>
@@ -2197,6 +2338,7 @@
     <script defer src="/fun.js"></script>
     <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script defer src="/js/user-profile.js"></script>
+    <script defer src="/js/message-templates.js"></script>
     <script>
         // ============================================
         // DOM Elements
@@ -3507,6 +3649,11 @@
                 // Initialize compact mode toggle from localStorage
                 initCompactModeToggle();
                 
+                // Initialize message templates list
+                if (typeof CinqTemplates !== 'undefined') {
+                    CinqTemplates.renderSettingsList();
+                }
+                
                 showScreen('settings');
                 
             } catch (err) {
@@ -3516,6 +3663,74 @@
         }
         
         init();
+    </script>
+
+    <!-- QR Code functionality -->
+    <script src="/js/qr-code.js"></script>
+    <script>
+        // QR Code handlers for settings page
+        async function showMyQRCode() {
+            try {
+                const profile = await UserProfile.loadProfile();
+                if (!profile) {
+                    showToast({ message: 'Profil non trouvé', type: 'error' });
+                    return;
+                }
+                window.CinqQR.showProfileQRModal(profile);
+            } catch (e) {
+                console.error('QR Code error:', e);
+                showToast({ message: 'Erreur lors de la génération du QR code', type: 'error' });
+            }
+        }
+        
+        function scanQRCode() {
+            window.CinqQR.showScannerModal(async (result) => {
+                if (result && (result.userId || result.username)) {
+                    try {
+                        // Fetch the profile to get display name
+                        const queryParam = result.userId 
+                            ? `id=${result.userId}` 
+                            : `user=${encodeURIComponent(result.username)}`;
+                        const res = await fetch(`/api/profile?${queryParam}`);
+                        
+                        if (!res.ok) {
+                            showToast({ message: 'Profil non trouvé', type: 'error' });
+                            return;
+                        }
+                        
+                        const data = await res.json();
+                        const profile = data.profile;
+                        
+                        // Show confirmation dialog
+                        if (confirm(`Ajouter ${profile.display_name} à tes contacts ?`)) {
+                            // Add as contact via API
+                            const addRes = await fetch('/api/contacts/add', {
+                                method: 'POST',
+                                headers: authHeaders(),
+                                body: JSON.stringify({ user_id: profile.id })
+                            });
+                            
+                            if (addRes.ok) {
+                                showToast({ 
+                                    message: `${profile.display_name} ajouté à tes contacts !`, 
+                                    type: 'success' 
+                                });
+                                triggerHaptic('success');
+                            } else {
+                                const err = await addRes.json();
+                                showToast({ 
+                                    message: err.error || 'Impossible d\'ajouter ce contact', 
+                                    type: 'error' 
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Contact add error:', e);
+                        showToast({ message: 'Erreur lors de l\'ajout du contact', type: 'error' });
+                    }
+                }
+            });
+        }
     </script>
 
     <!-- Easter Eggs 🥚 -->
