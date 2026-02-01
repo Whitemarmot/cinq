@@ -58,6 +58,9 @@
     <!-- Shared utilities (escapeHtml, authHeaders, showToast, etc.) -->
     <script src="/js/shared.js"></script>
     
+    <!-- Supabase Client for Realtime -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
     <style>
         /* ===== ACCESSIBILITY: SKIP LINK ===== */
         .skip-link {
@@ -6107,8 +6110,13 @@
         
         // escapeHtml() now provided by /js/shared.js
 
-        // ===== KEYBOARD =====
+        // ===== KEYBOARD SHORTCUTS =====
+        // See KEYBOARD-SHORTCUTS.md for full documentation
         document.addEventListener('keydown', (e) => {
+            const isInputFocused = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+            const isMod = e.ctrlKey || e.metaKey;
+            
+            // Escape: Close modals/overlays (works even in inputs)
             if (e.key === 'Escape') {
                 closeImageModal();
                 if (document.getElementById('search-overlay').classList.contains('open')) closeSearch();
@@ -6117,6 +6125,38 @@
                 else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
                 else if (document.getElementById('delete-account-modal').classList.contains('open')) closeDeleteAccountModal();
                 document.querySelectorAll('.post-menu.open').forEach(m => m.classList.remove('open'));
+                return;
+            }
+            
+            // Skip shortcuts if typing in an input
+            if (isInputFocused) return;
+            
+            // Ctrl+1-5: Quick switch to contact chat
+            if (isMod && e.key >= '1' && e.key <= '5') {
+                e.preventDefault();
+                const contactIndex = parseInt(e.key) - 1;
+                if (contacts[contactIndex]) {
+                    openChat(contacts[contactIndex]);
+                    showToast({ type: 'info', message: `Chat avec ${contacts[contactIndex].contact?.display_name || 'Contact ' + (contactIndex + 1)}`, duration: 1500 });
+                } else {
+                    showToast({ type: 'warning', message: `Pas de contact en position ${e.key}`, duration: 1500 });
+                }
+                return;
+            }
+            
+            // Ctrl+N: New message (switch to contacts tab)
+            if (isMod && e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                switchTab('contacts');
+                showToast({ type: 'info', message: 'Choisis un contact pour écrire', duration: 2000 });
+                return;
+            }
+            
+            // Ctrl+F: Open search
+            if (isMod && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                openSearch();
+                return;
             }
         });
         
