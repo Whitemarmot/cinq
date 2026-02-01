@@ -488,12 +488,92 @@ const CinqPremium = (function() {
     }
     
     // ============================================
+    // Render Premium Card in Settings
+    // ============================================
+    
+    async function renderSettingsCard() {
+        const container = document.getElementById('premium-card');
+        if (!container) return;
+        
+        const status = await loadStatus();
+        
+        if (!status) {
+            container.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: var(--color-text-muted);">
+                    <p>Connecte-toi pour voir ton statut premium</p>
+                </div>
+            `;
+            return;
+        }
+        
+        if (status.isPremium) {
+            container.innerHTML = `
+                <div class="premium-active-card" style="padding: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 2em;">✨</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 1.1em;">5² Premium</div>
+                            <div style="color: var(--color-text-muted); font-size: 0.9em;">
+                                Membre depuis ${status.premiumSince ? new Date(status.premiumSince).toLocaleDateString('fr-FR') : 'toujours'}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div style="text-align: center; padding: 12px; background: var(--color-bg-tertiary); border-radius: 8px;">
+                            <div style="font-size: 1.5em; font-weight: 600;">${status.contactCount}/${status.contactLimit}</div>
+                            <div style="font-size: 0.85em; color: var(--color-text-muted);">Contacts</div>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: var(--color-bg-tertiary); border-radius: 8px;">
+                            <div style="font-size: 1.5em; font-weight: 600;">∞</div>
+                            <div style="font-size: 0.85em; color: var(--color-text-muted);">À vie</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div style="padding: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 2em;">⭐</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 1.1em;">Passe à 5²</div>
+                            <div style="color: var(--color-text-muted); font-size: 0.9em;">
+                                ${status.contactCount}/${status.contactLimit} contacts utilisés
+                            </div>
+                        </div>
+                    </div>
+                    <ul style="margin: 16px 0; padding-left: 0; list-style: none;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--color-primary);">✓</span> 25 contacts au lieu de 5
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--color-primary);">✓</span> Badge ✨ sur ton profil
+                        </li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--color-primary);">✓</span> Soutenir Cinq ❤️
+                        </li>
+                    </ul>
+                    <button onclick="CinqPremium.startCheckout()" 
+                            style="width: 100%; padding: 14px; font-size: 1em; font-weight: 600; 
+                                   background: linear-gradient(135deg, var(--color-primary), var(--color-violet)); 
+                                   color: white; border: none; border-radius: 12px; cursor: pointer;">
+                        Débloquer 5² — 4.99€ à vie
+                    </button>
+                    <p style="text-align: center; margin-top: 12px; font-size: 0.85em; color: var(--color-text-muted);">
+                        Paiement unique, pas d'abonnement
+                    </p>
+                </div>
+            `;
+        }
+    }
+    
+    // ============================================
     // Init
     // ============================================
     
-    function init() {
+    async function init() {
         injectStyles();
-        loadStatus();
+        await renderSettingsCard();
     }
     
     // Auto-init when DOM is ready
