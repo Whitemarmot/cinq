@@ -761,6 +761,18 @@ const CinqApp = (function() {
     });
     
     scrollToBottom();
+    
+    // === Smart Replies Integration ===
+    // Show smart reply suggestions for the last received message
+    if (window.CinqSmartReplies && window.CinqSmartReplies.isActive()) {
+      const chatInput = $('section-chat');
+      if (chatInput) {
+        const inputArea = chatInput.querySelector('.chat-input-area') || $('message-form')?.parentElement;
+        if (inputArea) {
+          window.CinqSmartReplies.processMessages(messages, currentUser?.id, inputArea);
+        }
+      }
+    }
   }
   
   /**

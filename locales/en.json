@@ -149,5 +149,11 @@
     "minutesAgo": "{n} min ago",
     "hoursAgo": "{n}h ago",
     "daysAgo": "{n}d ago"
+  },
+  "dailyPrompt": {
+    "badge": "Today's idea",
+    "hint": "Click to use this idea",
+    "dismiss": "Hide suggestion",
+    "fallback": "Share something with your 5!"
   }
 }

@@ -2983,6 +2983,210 @@
             font-family: monospace;
             font-size: 0.7rem;
         }
+
+        /* ===== DAILY PROMPT ===== */
+        .daily-prompt {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .daily-prompt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-brand) 0%, #a855f7 50%, var(--color-brand) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 200% 0; }
+            50% { background-position: 0 0; }
+        }
+        
+        .daily-prompt:hover {
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+        }
+        
+        .daily-prompt-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .daily-prompt-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.6rem;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            border-radius: var(--radius-full, 9999px);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .daily-prompt-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .daily-prompt-dismiss {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+        
+        .daily-prompt:hover .daily-prompt-dismiss {
+            opacity: 1;
+        }
+        
+        .daily-prompt-dismiss:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .daily-prompt-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .daily-prompt-emoji {
+            font-size: 2rem;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .daily-prompt-text {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            line-height: 1.4;
+        }
+        
+        .daily-prompt-arrow {
+            color: var(--color-brand);
+            opacity: 0;
+            transform: translateX(-5px);
+            transition: all 0.2s;
+        }
+        
+        .daily-prompt:hover .daily-prompt-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .daily-prompt-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .daily-prompt-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .daily-prompt-hint svg {
+            width: 12px;
+            height: 12px;
+        }
+        
+        .daily-prompt.hidden {
+            display: none;
+        }
+        
+        .daily-prompt.collapsed {
+            padding: 0.75rem 1rem;
+        }
+        
+        .daily-prompt.collapsed .daily-prompt-content {
+            gap: 0.5rem;
+        }
+        
+        .daily-prompt.collapsed .daily-prompt-emoji {
+            font-size: 1.25rem;
+        }
+        
+        .daily-prompt.collapsed .daily-prompt-text {
+            font-size: 0.875rem;
+        }
+        
+        .daily-prompt.collapsed .daily-prompt-footer {
+            display: none;
+        }
+        
+        /* Animation d'entrée */
+        .daily-prompt.animate-in {
+            animation: prompt-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        @keyframes prompt-slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Mode lecture compact */
+        [data-reading-mode="true"] .daily-prompt {
+            padding: 0.75rem 1rem;
+        }
+        
+        [data-reading-mode="true"] .daily-prompt .daily-prompt-emoji {
+            font-size: 1.5rem;
+        }
+        
+        /* Mode compact */
+        [data-compact-mode="true"] .daily-prompt {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        [data-compact-mode="true"] .daily-prompt .daily-prompt-emoji {
+            font-size: 1.5rem;
+        }
+        
+        [data-compact-mode="true"] .daily-prompt .daily-prompt-footer {
+            margin-top: 0.5rem;
+        }
     </style>
     
     <!-- Confetti celebrations -->
@@ -3106,6 +3310,40 @@
                 <button class="focus-mode-btn" onclick="bypassFocusMode()">
                     <span>👀</span> Afficher quand même
                 </button>
+            </div>
+        </div>
+
+        <!-- Daily Prompt -->
+        <div class="daily-prompt hidden" id="daily-prompt" role="region" aria-label="Suggestion du jour" onclick="useDailyPrompt()">
+            <div class="daily-prompt-header">
+                <span class="daily-prompt-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    Idée du jour
+                </span>
+            </div>
+            <button class="daily-prompt-dismiss" onclick="dismissDailyPrompt(event)" aria-label="Masquer la suggestion">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="daily-prompt-content">
+                <span class="daily-prompt-emoji" id="daily-prompt-emoji">💡</span>
+                <span class="daily-prompt-text" id="daily-prompt-text">Chargement...</span>
+                <svg class="daily-prompt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+            <div class="daily-prompt-footer">
+                <span class="daily-prompt-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"></path>
+                    </svg>
+                    Clique pour utiliser cette idée
+                </span>
             </div>
         </div>
 
@@ -3311,6 +3549,10 @@
         let isRefreshing = false;
         const PTR_THRESHOLD = 80;
 
+        // ===== DAILY PROMPT STATE =====
+        let currentDailyPrompt = null;
+        const DAILY_PROMPT_DISMISSED_KEY = 'cinq_daily_prompt_dismissed';
+
         // ===== AUTH =====
         // getToken() and authHeaders() now provided by /js/shared.js
 
@@ -3379,6 +3621,102 @@
             hideFocusMode();
             // Store bypass in session storage (resets on new tab)
             sessionStorage.setItem('cinq_focus_bypass', 'true');
+        }
+
+        // ===== DAILY PROMPT =====
+        async function loadDailyPrompt() {
+            try {
+                // Check if already dismissed today
+                const dismissedDate = localStorage.getItem(DAILY_PROMPT_DISMISSED_KEY);
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (dismissedDate === today) {
+                    return; // Already dismissed today
+                }
+                
+                const res = await fetch(`${API_URL}/daily-prompt`);
+                if (!res.ok) return;
+                
+                const data = await res.json();
+                if (!data.success || !data.prompt) return;
+                
+                currentDailyPrompt = data.prompt;
+                showDailyPrompt(data.prompt);
+            } catch (e) {
+                console.error('Failed to load daily prompt:', e);
+            }
+        }
+        
+        function showDailyPrompt(prompt) {
+            const container = document.getElementById('daily-prompt');
+            const emojiEl = document.getElementById('daily-prompt-emoji');
+            const textEl = document.getElementById('daily-prompt-text');
+            
+            if (!container || !emojiEl || !textEl) return;
+            
+            emojiEl.textContent = prompt.emoji || '💡';
+            textEl.textContent = prompt.text || 'Partage quelque chose avec tes 5 !';
+            
+            container.classList.remove('hidden');
+            container.classList.add('animate-in');
+        }
+        
+        function dismissDailyPrompt(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const container = document.getElementById('daily-prompt');
+            if (!container) return;
+            
+            // Store dismissal with today's date
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem(DAILY_PROMPT_DISMISSED_KEY, today);
+            
+            // Animate out
+            container.style.transition = 'all 0.3s ease';
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(-10px) scale(0.95)';
+            
+            setTimeout(() => {
+                container.classList.add('hidden');
+                container.style.opacity = '';
+                container.style.transform = '';
+            }, 300);
+        }
+        
+        function useDailyPrompt() {
+            if (!currentDailyPrompt) return;
+            
+            const textarea = document.getElementById('post-content');
+            if (!textarea) return;
+            
+            // Focus and set a starter text
+            textarea.focus();
+            
+            // If textarea is empty, add a conversation starter
+            if (!textarea.value.trim()) {
+                // Add the emoji and a space for the user to continue
+                textarea.value = currentDailyPrompt.emoji + ' ';
+                textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+            }
+            
+            // Trigger input event to update char count and enable button
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            // Scroll to composer
+            const composer = document.getElementById('composer');
+            if (composer) {
+                composer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Dismiss the prompt after use
+            dismissDailyPrompt();
+            
+            // Show a subtle toast
+            if (typeof showToast === 'function') {
+                showToast(`${currentDailyPrompt.emoji} ${currentDailyPrompt.text}`, 'info');
+            }
         }
 
         // ===== INIT =====
@@ -3473,6 +3811,9 @@
                 
                 // Load trending tags (non-blocking)
                 loadTrendingTags();
+                
+                // Load daily prompt (non-blocking)
+                loadDailyPrompt();
                 
             } catch (e) {
                 console.error('Init error:', e);

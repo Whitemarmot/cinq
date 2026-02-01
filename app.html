@@ -10035,6 +10035,305 @@
             modal.setAttribute('aria-hidden', 'true');
         }
         
+        // ===== WALLPAPER SYSTEM =====
+        const WALLPAPER_OPTIONS = {
+            colors: [
+                { id: 'none', type: 'none', label: 'Par défaut' },
+                { id: 'c1', type: 'color', value: '#1a1a2e' },
+                { id: 'c2', type: 'color', value: '#16213e' },
+                { id: 'c3', type: 'color', value: '#0f3460' },
+                { id: 'c4', type: 'color', value: '#1b2838' },
+                { id: 'c5', type: 'color', value: '#2d132c' },
+                { id: 'c6', type: 'color', value: '#1a1a2e' },
+                { id: 'c7', type: 'color', value: '#0d1b2a' },
+                { id: 'c8', type: 'color', value: '#1b263b' },
+                { id: 'c9', type: 'color', value: '#2c3e50' },
+                { id: 'c10', type: 'color', value: '#34495e' },
+                { id: 'c11', type: 'color', value: '#1e3a5f' },
+                { id: 'c12', type: 'color', value: '#0a192f' }
+            ],
+            gradients: [
+                { id: 'g1', type: 'gradient', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { id: 'g2', type: 'gradient', value: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+                { id: 'g3', type: 'gradient', value: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { id: 'g4', type: 'gradient', value: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+                { id: 'g5', type: 'gradient', value: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+                { id: 'g6', type: 'gradient', value: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+                { id: 'g7', type: 'gradient', value: 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)' },
+                { id: 'g8', type: 'gradient', value: 'linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%)' },
+                { id: 'g9', type: 'gradient', value: 'linear-gradient(135deg, #141e30 0%, #243b55 100%)' },
+                { id: 'g10', type: 'gradient', value: 'linear-gradient(135deg, #232526 0%, #414345 100%)' },
+                { id: 'g11', type: 'gradient', value: 'linear-gradient(135deg, #ff6b4a 0%, #ff9068 100%)' },
+                { id: 'g12', type: 'gradient', value: 'linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%)' }
+            ],
+            patterns: [
+                { id: 'p1', type: 'pattern', bg: '#1a1a2e', pattern: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)', size: '20px 20px', label: 'Points' },
+                { id: 'p2', type: 'pattern', bg: '#16213e', pattern: 'linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)', size: '20px 20px', label: 'Grille' },
+                { id: 'p3', type: 'pattern', bg: '#0f3460', pattern: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.02) 10px, rgba(255,255,255,0.02) 20px)', size: '28px 28px', label: 'Diagonales' },
+                { id: 'p4', type: 'pattern', bg: '#1a1a2e', pattern: 'radial-gradient(circle at 50% 50%, rgba(255,107,74,0.1) 0%, transparent 50%)', size: '60px 60px', label: 'Lueur' },
+                { id: 'p5', type: 'pattern', bg: '#0d1b2a', pattern: 'linear-gradient(30deg, rgba(255,255,255,0.02) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.02) 87.5%, rgba(255,255,255,0.02)), linear-gradient(150deg, rgba(255,255,255,0.02) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.02) 87.5%, rgba(255,255,255,0.02)), linear-gradient(30deg, rgba(255,255,255,0.02) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.02) 87.5%, rgba(255,255,255,0.02)), linear-gradient(150deg, rgba(255,255,255,0.02) 12%, transparent 12.5%, transparent 87%, rgba(255,255,255,0.02) 87.5%, rgba(255,255,255,0.02)), linear-gradient(60deg, rgba(255,255,255,0.05) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0.05)), linear-gradient(60deg, rgba(255,255,255,0.05) 25%, transparent 25.5%, transparent 75%, rgba(255,255,255,0.05) 75%, rgba(255,255,255,0.05))', size: '40px 70px', label: 'Hexagones' },
+                { id: 'p6', type: 'pattern', bg: '#1b263b', pattern: 'linear-gradient(135deg, rgba(255,107,74,0.05) 25%, transparent 25%), linear-gradient(225deg, rgba(255,107,74,0.05) 25%, transparent 25%), linear-gradient(45deg, rgba(255,107,74,0.05) 25%, transparent 25%), linear-gradient(315deg, rgba(255,107,74,0.05) 25%, transparent 25%)', size: '40px 40px', label: 'Losanges' },
+                { id: 'p7', type: 'pattern', bg: '#2d132c', pattern: 'radial-gradient(circle, rgba(255,107,74,0.08) 2px, transparent 2px)', size: '30px 30px', label: 'Bulles' },
+                { id: 'p8', type: 'pattern', bg: '#1a1a2e', pattern: 'repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(255,255,255,0.03) 35px, rgba(255,255,255,0.03) 36px)', size: '36px 36px', label: 'Lignes' }
+            ],
+            images: [
+                { id: 'i1', type: 'image', url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80', label: 'Montagne' },
+                { id: 'i2', type: 'image', url: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=800&q=80', label: 'Océan' },
+                { id: 'i3', type: 'image', url: 'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=800&q=80', label: 'Nuit étoilée' },
+                { id: 'i4', type: 'image', url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80', label: 'Forêt' },
+                { id: 'i5', type: 'image', url: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800&q=80', label: 'Abstrait bleu' },
+                { id: 'i6', type: 'image', url: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&q=80', label: 'Dégradé rose' },
+                { id: 'i7', type: 'image', url: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=800&q=80', label: 'Abstrait violet' },
+                { id: 'i8', type: 'image', url: 'https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?w=800&q=80', label: 'Dégradé vert' }
+            ]
+        };
+        
+        let currentWallpaperCategory = 'colors';
+        let selectedWallpaper = null;
+        
+        function getWallpaperStorageKey(contactId) {
+            return `cinq_wallpaper_${contactId}`;
+        }
+        
+        function loadWallpaperForContact(contactId) {
+            try {
+                const stored = localStorage.getItem(getWallpaperStorageKey(contactId));
+                return stored ? JSON.parse(stored) : null;
+            } catch (e) {
+                console.error('Error loading wallpaper:', e);
+                return null;
+            }
+        }
+        
+        function saveWallpaperForContact(contactId, wallpaper) {
+            try {
+                if (wallpaper && wallpaper.id !== 'none') {
+                    localStorage.setItem(getWallpaperStorageKey(contactId), JSON.stringify(wallpaper));
+                } else {
+                    localStorage.removeItem(getWallpaperStorageKey(contactId));
+                }
+            } catch (e) {
+                console.error('Error saving wallpaper:', e);
+            }
+        }
+        
+        function applyWallpaperToChat(wallpaper) {
+            const chatMessages = document.getElementById('chat-messages');
+            const wallpaperBtn = document.getElementById('chat-wallpaper-btn');
+            
+            if (!chatMessages) return;
+            
+            // Reset styles
+            chatMessages.style.background = '';
+            chatMessages.style.backgroundImage = '';
+            chatMessages.style.backgroundColor = '';
+            chatMessages.style.backgroundSize = '';
+            chatMessages.classList.remove('has-wallpaper');
+            wallpaperBtn?.classList.remove('has-wallpaper');
+            
+            if (!wallpaper || wallpaper.id === 'none') return;
+            
+            chatMessages.classList.add('has-wallpaper');
+            wallpaperBtn?.classList.add('has-wallpaper');
+            
+            switch (wallpaper.type) {
+                case 'color':
+                    chatMessages.style.backgroundColor = wallpaper.value;
+                    break;
+                case 'gradient':
+                    chatMessages.style.background = wallpaper.value;
+                    break;
+                case 'pattern':
+                    chatMessages.style.backgroundColor = wallpaper.bg;
+                    chatMessages.style.backgroundImage = wallpaper.pattern;
+                    chatMessages.style.backgroundSize = wallpaper.size;
+                    break;
+                case 'image':
+                    chatMessages.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${wallpaper.url}')`;
+                    chatMessages.style.backgroundSize = 'cover';
+                    chatMessages.style.backgroundPosition = 'center';
+                    break;
+                case 'custom':
+                    chatMessages.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${wallpaper.url}')`;
+                    chatMessages.style.backgroundSize = 'cover';
+                    chatMessages.style.backgroundPosition = 'center';
+                    break;
+            }
+        }
+        
+        function openWallpaperModal() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('wallpaper-modal');
+            currentWallpaperCategory = 'colors';
+            selectedWallpaper = loadWallpaperForContact(currentChatContact.id);
+            
+            renderWallpaperGrid();
+            updateWallpaperPreview();
+            updateCategoryButtons();
+            
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+        
+        function closeWallpaperModal() {
+            const modal = document.getElementById('wallpaper-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            selectedWallpaper = null;
+        }
+        
+        function switchWallpaperCategory(category) {
+            currentWallpaperCategory = category;
+            updateCategoryButtons();
+            renderWallpaperGrid();
+            
+            // Show/hide custom URL input for images category
+            const customUrlDiv = document.getElementById('wallpaper-custom-url');
+            if (customUrlDiv) {
+                customUrlDiv.style.display = category === 'images' ? 'block' : 'none';
+            }
+        }
+        
+        function updateCategoryButtons() {
+            document.querySelectorAll('.wallpaper-category-btn').forEach(btn => {
+                const isActive = btn.dataset.category === currentWallpaperCategory;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive);
+            });
+        }
+        
+        function renderWallpaperGrid() {
+            const grid = document.getElementById('wallpaper-grid');
+            if (!grid) return;
+            
+            const options = WALLPAPER_OPTIONS[currentWallpaperCategory] || [];
+            
+            grid.innerHTML = options.map(opt => {
+                const isSelected = selectedWallpaper?.id === opt.id;
+                let style = '';
+                let className = `wallpaper-option ${opt.type} ${isSelected ? 'selected' : ''}`;
+                
+                switch (opt.type) {
+                    case 'none':
+                        className += ' none';
+                        break;
+                    case 'color':
+                        style = `--wp-color: ${opt.value}`;
+                        break;
+                    case 'gradient':
+                        style = `--wp-gradient: ${opt.value}`;
+                        break;
+                    case 'pattern':
+                        style = `--wp-bg: ${opt.bg}; --wp-pattern: ${opt.pattern}; --wp-size: ${opt.size}`;
+                        break;
+                    case 'image':
+                        style = `background-image: url('${opt.url}')`;
+                        break;
+                }
+                
+                return `
+                    <div class="${className}" 
+                         style="${style}"
+                         onclick="selectWallpaper('${opt.id}', '${currentWallpaperCategory}')"
+                         role="option"
+                         aria-selected="${isSelected}"
+                         aria-label="${opt.label || opt.type}"
+                         tabindex="0">
+                        ${opt.type === 'none' ? '✕' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectWallpaper(optionId, category) {
+            const options = WALLPAPER_OPTIONS[category] || [];
+            const option = options.find(o => o.id === optionId);
+            
+            if (!option) return;
+            
+            selectedWallpaper = option;
+            renderWallpaperGrid();
+            updateWallpaperPreview();
+        }
+        
+        function updateWallpaperPreview() {
+            const preview = document.getElementById('wallpaper-preview');
+            if (!preview) return;
+            
+            // Reset styles
+            preview.style.background = '';
+            preview.style.backgroundImage = '';
+            preview.style.backgroundColor = '';
+            preview.style.backgroundSize = '';
+            
+            if (!selectedWallpaper || selectedWallpaper.id === 'none') {
+                preview.style.background = 'var(--color-bg-primary)';
+                return;
+            }
+            
+            switch (selectedWallpaper.type) {
+                case 'color':
+                    preview.style.backgroundColor = selectedWallpaper.value;
+                    break;
+                case 'gradient':
+                    preview.style.background = selectedWallpaper.value;
+                    break;
+                case 'pattern':
+                    preview.style.backgroundColor = selectedWallpaper.bg;
+                    preview.style.backgroundImage = selectedWallpaper.pattern;
+                    preview.style.backgroundSize = selectedWallpaper.size;
+                    break;
+                case 'image':
+                case 'custom':
+                    preview.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${selectedWallpaper.url}')`;
+                    preview.style.backgroundSize = 'cover';
+                    preview.style.backgroundPosition = 'center';
+                    break;
+            }
+        }
+        
+        function previewCustomWallpaper() {
+            const input = document.getElementById('wallpaper-url-input');
+            const url = input?.value?.trim();
+            
+            if (!url) return;
+            
+            selectedWallpaper = {
+                id: 'custom',
+                type: 'custom',
+                url: url
+            };
+            
+            renderWallpaperGrid();
+            updateWallpaperPreview();
+        }
+        
+        function applyWallpaper() {
+            if (!currentChatContact) {
+                closeWallpaperModal();
+                return;
+            }
+            
+            saveWallpaperForContact(currentChatContact.id, selectedWallpaper);
+            applyWallpaperToChat(selectedWallpaper);
+            
+            closeWallpaperModal();
+            showToast({ 
+                type: 'success', 
+                message: selectedWallpaper?.id === 'none' ? 'Fond d\'écran réinitialisé' : 'Fond d\'écran appliqué ! 🎨', 
+                duration: 2000 
+            });
+        }
+        
+        // Load wallpaper when opening a chat
+        function initChatWallpaper() {
+            if (!currentChatContact) return;
+            
+            const wallpaper = loadWallpaperForContact(currentChatContact.id);
+            applyWallpaperToChat(wallpaper);
+        }
+        
         async function exportConversation(format) {
             if (!currentChatContact) return;
             
