@@ -13,14 +13,18 @@ import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, sanitizeText } from './_validation.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 import { processMentions } from './notifications.js';
+import { savePostTags } from './tags.js';
 
 const MAX_CONTENT_LENGTH = 1000;
 const MAX_IMAGE_URL_LENGTH = 2000;
 const MAX_FETCH_LIMIT = 100;
 const DEFAULT_FETCH_LIMIT = 50;
+const MIN_POLL_OPTIONS = 2;
+const MAX_POLL_OPTIONS = 4;
+const MAX_POLL_OPTION_LENGTH = 100;
 
 export default async function handler(req, res) {
-    if (handleCors(req, res, ['GET', 'POST', 'DELETE', 'OPTIONS'])) return;
+    if (handleCors(req, res, ['GET', 'POST', 'DELETE', 'PATCH', 'OPTIONS'])) return;
 
     const user = await requireAuth(req, res);
     if (!user) return;
@@ -42,6 +46,10 @@ export default async function handler(req, res) {
 
         if (req.method === 'DELETE') {
             return handleDeletePost(req, res, user);
+        }
+        
+        if (req.method === 'PATCH') {
+            return handlePollVote(req, res, user);
         }
 
         return res.status(405).json({ error: 'Method not allowed' });
@@ -139,7 +147,21 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
     if (error) throw error;
     
     const authorInfo = await getUserInfo(userId);
-    const enriched = posts.map(post => ({ ...post, author: authorInfo }));
+    
+    // Get user's poll votes for these posts
+    const postIds = posts.map(p => p.id);
+    const userPollVotes = await getUserPollVotes(user.id, postIds);
+    
+    const enriched = posts.map(post => {
+        const enrichedPost = { ...post, author: authorInfo };
+        if (post.poll_options) {
+            enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
+            enrichedPost.poll_total_votes = post.poll_votes 
+                ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
+                : 0;
+        }
+        return enrichedPost;
+    });
     
     // Generate next cursor (created_at of last post)
     const nextCursor = posts.length === limit && posts.length > 0 
@@ -187,13 +209,24 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     
     if (error) throw error;
     
+    // Get user's poll votes for these posts
+    const postIds = posts.map(p => p.id);
+    const userPollVotes = await getUserPollVotes(user.id, postIds);
+    
     // Enrich with author info (cached)
     const authorCache = {};
     const enriched = await Promise.all(posts.map(async (post) => {
         if (!authorCache[post.user_id]) {
             authorCache[post.user_id] = await getUserInfo(post.user_id);
         }
-        return { ...post, author: authorCache[post.user_id] };
+        const enrichedPost = { ...post, author: authorCache[post.user_id] };
+        if (post.poll_options) {
+            enrichedPost.user_poll_vote = userPollVotes[post.id] ?? null;
+            enrichedPost.poll_total_votes = post.poll_votes 
+                ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
+                : 0;
+        }
+        return enrichedPost;
     }));
     
     // Generate next cursor (created_at of last post)
@@ -210,10 +243,31 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     });
 }
 
+/**
+ * Get user's poll votes for a list of posts
+ * @returns {Object} { postId: optionIndex }
+ */
+async function getUserPollVotes(userId, postIds) {
+    if (!postIds || postIds.length === 0) return {};
+    
+    const { data: votes } = await supabase
+        .from('poll_votes')
+        .select('post_id, option_index')
+        .eq('user_id', userId)
+        .in('post_id', postIds);
+    
+    if (!votes) return {};
+    
+    return votes.reduce((acc, vote) => {
+        acc[vote.post_id] = vote.option_index;
+        return acc;
+    }, {});
+}
+
 // ===== POST - Create post =====
 
 async function handleCreatePost(req, res, user) {
-    const { content, image_url } = req.body;
+    const { content, image_url, poll_options } = req.body;
     
     // Validate content
     if (!content || typeof content !== 'string') {
@@ -236,14 +290,29 @@ async function handleCreatePost(req, res, user) {
         return res.status(400).json({ error: validatedImageUrl.error });
     }
     
+    // Validate poll options if provided
+    const validatedPollOptions = validatePollOptions(poll_options);
+    if (validatedPollOptions.error) {
+        return res.status(400).json({ error: validatedPollOptions.error });
+    }
+    
+    // Build post data
+    const postData = {
+        user_id: user.id,
+        content: sanitizedContent,
+        image_url: validatedImageUrl.url
+    };
+    
+    // Add poll options if valid
+    if (validatedPollOptions.options) {
+        postData.poll_options = validatedPollOptions.options;
+        postData.poll_votes = {}; // Initialize empty votes object {optionIndex: count}
+    }
+    
     // Create post
     const { data: post, error } = await supabase
         .from('posts')
-        .insert({
-            user_id: user.id,
-            content: sanitizedContent,
-            image_url: validatedImageUrl.url
-        })
+        .insert(postData)
         .select()
         .single();
     
@@ -255,12 +324,57 @@ async function handleCreatePost(req, res, user) {
     processMentions(sanitizedContent, user.id, 'post_mention', post.id)
         .catch(e => logError(e, { context: 'processMentions', postId: post.id }));
     
-    logInfo('Post created', { postId: post.id, userId: user.id });
+    // Extract and save hashtags (fire and forget)
+    savePostTags(post.id, sanitizedContent)
+        .catch(e => logError(e, { context: 'savePostTags', postId: post.id }));
+    
+    logInfo('Post created', { postId: post.id, userId: user.id, hasPoll: !!validatedPollOptions.options });
+    
+    // Add poll metadata for response
+    const responsePost = { ...post, author: authorInfo };
+    if (post.poll_options) {
+        responsePost.poll_total_votes = 0;
+        responsePost.user_poll_vote = null;
+    }
     
     return res.status(201).json({
         success: true,
-        post: { ...post, author: authorInfo }
+        post: responsePost
     });
+}
+
+function validatePollOptions(pollOptions) {
+    if (!pollOptions) return { options: null };
+    
+    if (!Array.isArray(pollOptions)) {
+        return { error: 'Les options de sondage doivent être un tableau' };
+    }
+    
+    if (pollOptions.length < MIN_POLL_OPTIONS || pollOptions.length > MAX_POLL_OPTIONS) {
+        return { error: `Le sondage doit avoir entre ${MIN_POLL_OPTIONS} et ${MAX_POLL_OPTIONS} options` };
+    }
+    
+    const sanitizedOptions = [];
+    for (const option of pollOptions) {
+        if (typeof option !== 'string') {
+            return { error: 'Chaque option doit être du texte' };
+        }
+        
+        const sanitized = sanitizeText(option, { maxLength: MAX_POLL_OPTION_LENGTH });
+        if (sanitized.length === 0) {
+            return { error: 'Les options ne peuvent pas être vides' };
+        }
+        
+        sanitizedOptions.push(sanitized);
+    }
+    
+    // Check for duplicates
+    const uniqueOptions = new Set(sanitizedOptions.map(o => o.toLowerCase()));
+    if (uniqueOptions.size !== sanitizedOptions.length) {
+        return { error: 'Les options doivent être uniques' };
+    }
+    
+    return { options: sanitizedOptions };
 }
 
 function validateImageUrl(imageUrl) {
@@ -318,4 +432,93 @@ async function handleDeletePost(req, res, user) {
     if (error) throw error;
     
     return res.json({ success: true });
+}
+
+// ===== PATCH - Vote on poll =====
+
+async function handlePollVote(req, res, user) {
+    const { action } = req.query;
+    
+    if (action !== 'vote') {
+        return res.status(400).json({ error: 'Action invalide' });
+    }
+    
+    const { post_id, option_index } = req.body;
+    
+    if (!post_id || !isValidUUID(post_id)) {
+        return res.status(400).json({ error: 'post_id invalide' });
+    }
+    
+    if (typeof option_index !== 'number' || option_index < 0) {
+        return res.status(400).json({ error: 'option_index invalide' });
+    }
+    
+    // Get the post
+    const { data: post, error: postError } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', post_id)
+        .single();
+    
+    if (postError || !post) {
+        return res.status(404).json({ error: 'Post non trouvé' });
+    }
+    
+    // Check if post has a poll
+    if (!post.poll_options || !Array.isArray(post.poll_options)) {
+        return res.status(400).json({ error: 'Ce post n\'a pas de sondage' });
+    }
+    
+    // Check if option_index is valid
+    if (option_index >= post.poll_options.length) {
+        return res.status(400).json({ error: 'Option invalide' });
+    }
+    
+    // Check if user already voted
+    const { data: existingVote } = await supabase
+        .from('poll_votes')
+        .select('id')
+        .eq('post_id', post_id)
+        .eq('user_id', user.id)
+        .single();
+    
+    if (existingVote) {
+        return res.status(400).json({ error: 'Tu as déjà voté sur ce sondage' });
+    }
+    
+    // Record the vote
+    const { error: voteError } = await supabase
+        .from('poll_votes')
+        .insert({
+            post_id,
+            user_id: user.id,
+            option_index
+        });
+    
+    if (voteError) throw voteError;
+    
+    // Update the aggregated votes on the post
+    const currentVotes = post.poll_votes || {};
+    currentVotes[option_index] = (currentVotes[option_index] || 0) + 1;
+    
+    const { error: updateError } = await supabase
+        .from('posts')
+        .update({ poll_votes: currentVotes })
+        .eq('id', post_id);
+    
+    if (updateError) throw updateError;
+    
+    // Calculate total votes
+    const totalVotes = Object.values(currentVotes).reduce((sum, count) => sum + count, 0);
+    
+    logInfo('Poll vote recorded', { postId: post_id, userId: user.id, optionIndex: option_index });
+    
+    return res.json({
+        success: true,
+        poll: {
+            votes: currentVotes,
+            userVote: option_index,
+            totalVotes
+        }
+    });
 }
