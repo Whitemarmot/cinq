@@ -8005,6 +8005,233 @@
             }
         }
 
+        // ===== PINNED MESSAGES =====
+        let pinnedMessages = [];
+        let pinnedMessageIds = new Set();
+        
+        async function loadPinnedMessages() {
+            if (!currentChatContact) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/pinned-messages?contact_id=${currentChatContact.contact_user_id}`, { 
+                    headers: authHeaders() 
+                });
+                
+                if (!res.ok) {
+                    pinnedMessages = [];
+                    pinnedMessageIds = new Set();
+                    updatePinnedMessagesUI();
+                    return;
+                }
+                
+                const data = await res.json();
+                pinnedMessages = data.pinned_messages || [];
+                pinnedMessageIds = new Set(pinnedMessages.map(pm => pm.id));
+                updatePinnedMessagesUI();
+            } catch (e) {
+                console.error('Failed to load pinned messages:', e);
+                pinnedMessages = [];
+                pinnedMessageIds = new Set();
+                updatePinnedMessagesUI();
+            }
+        }
+        
+        function updatePinnedMessagesUI() {
+            const pinBtn = document.getElementById('chat-pin-btn');
+            const pinCount = document.getElementById('pin-count');
+            const listContainer = document.getElementById('pinned-messages-list');
+            const contactName = currentChatContact?.contact?.display_name || 'Contact';
+            
+            // Update pin count badge
+            if (pinnedMessages.length > 0) {
+                pinCount.textContent = pinnedMessages.length;
+                pinCount.style.display = 'flex';
+                pinBtn.classList.add('has-pins');
+            } else {
+                pinCount.style.display = 'none';
+                pinBtn.classList.remove('has-pins');
+            }
+            
+            // Render pinned messages list
+            if (pinnedMessages.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="pinned-messages-empty">
+                        Aucun message épinglé
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            pinnedMessages.forEach(msg => {
+                const isSent = msg.sender_id === user.id;
+                const sender = isSent ? 'Toi' : contactName;
+                let contentPreview = '';
+                
+                if (msg.is_ping) {
+                    contentPreview = '👋 Coucou';
+                } else if (msg.sticker_id) {
+                    contentPreview = '🎨 Sticker';
+                } else if (msg.gif_url) {
+                    contentPreview = '🖼️ GIF';
+                } else if (msg.file_url) {
+                    contentPreview = '📎 ' + (msg.file_name || 'Fichier');
+                } else {
+                    contentPreview = msg.content || '';
+                }
+                
+                html += `
+                    <div class="pinned-message-item" onclick="scrollToMessage('${msg.id}')" data-msg-id="${msg.id}">
+                        <div class="pinned-message-content">
+                            <div class="pinned-message-text">${escapeHtml(contentPreview)}</div>
+                            <div class="pinned-message-meta">${sender} • ${formatMessageTime(msg.created_at)}</div>
+                        </div>
+                        <button class="pinned-message-unpin" onclick="event.stopPropagation(); unpinMessage('${msg.id}')" type="button" aria-label="Désépingler">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            listContainer.innerHTML = html;
+        }
+        
+        function togglePinnedMessagesSection() {
+            const section = document.getElementById('pinned-messages-section');
+            const pinBtn = document.getElementById('chat-pin-btn');
+            const isOpen = section.classList.contains('open');
+            
+            if (isOpen) {
+                section.classList.remove('open');
+                pinBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                section.classList.add('open');
+                pinBtn.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        function scrollToMessage(messageId) {
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            if (msgEl) {
+                // Close pinned section
+                document.getElementById('pinned-messages-section').classList.remove('open');
+                document.getElementById('chat-pin-btn').setAttribute('aria-expanded', 'false');
+                
+                // Scroll to message
+                msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight animation
+                msgEl.style.transition = 'all 0.3s';
+                msgEl.style.boxShadow = '0 0 0 3px var(--color-brand)';
+                setTimeout(() => {
+                    msgEl.style.boxShadow = '';
+                }, 1500);
+            }
+        }
+        
+        async function pinMessage(messageId) {
+            if (!currentChatContact) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/pinned-messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        message_id: messageId, 
+                        contact_id: currentChatContact.contact_user_id 
+                    })
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    showToast({ type: 'error', message: data.error || 'Impossible d\'épingler' });
+                    return;
+                }
+                
+                // Update local state
+                pinnedMessageIds.add(messageId);
+                
+                // Reload pinned messages
+                await loadPinnedMessages();
+                
+                // Update pin button on message
+                updateMessagePinButton(messageId, true);
+                
+                showToast({ type: 'success', message: 'Message épinglé 📌' });
+                triggerHaptic('success');
+            } catch (e) {
+                console.error('Pin failed:', e);
+                showToast({ type: 'error', message: 'Erreur lors de l\'épinglage' });
+            }
+        }
+        
+        async function unpinMessage(messageId) {
+            try {
+                const res = await fetch(`${API_URL}/pinned-messages?message_id=${messageId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    showToast({ type: 'error', message: 'Impossible de désépingler' });
+                    return;
+                }
+                
+                // Update local state
+                pinnedMessageIds.delete(messageId);
+                
+                // Reload pinned messages
+                await loadPinnedMessages();
+                
+                // Update pin button on message
+                updateMessagePinButton(messageId, false);
+                
+                showToast({ type: 'success', message: 'Message désépinglé' });
+                triggerHaptic('tap');
+            } catch (e) {
+                console.error('Unpin failed:', e);
+                showToast({ type: 'error', message: 'Erreur lors de la suppression' });
+            }
+        }
+        
+        function togglePinMessage(messageId) {
+            if (pinnedMessageIds.has(messageId)) {
+                unpinMessage(messageId);
+            } else {
+                pinMessage(messageId);
+            }
+        }
+        
+        function updateMessagePinButton(messageId, isPinned) {
+            const btn = document.querySelector(`[data-pin-msg-id="${messageId}"]`);
+            if (btn) {
+                if (isPinned) {
+                    btn.classList.add('pinned');
+                    btn.setAttribute('aria-label', 'Désépingler');
+                } else {
+                    btn.classList.remove('pinned');
+                    btn.setAttribute('aria-label', 'Épingler');
+                }
+            }
+        }
+        
+        function getPinButtonHtml(messageId) {
+            const isPinned = pinnedMessageIds.has(messageId);
+            return `
+                <button class="message-action-btn ${isPinned ? 'pinned' : ''}" 
+                        onclick="togglePinMessage('${messageId}')" 
+                        data-pin-msg-id="${messageId}"
+                        type="button" 
+                        aria-label="${isPinned ? 'Désépingler' : 'Épingler'}">
+                    <svg viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
+                    </svg>
+                </button>
+            `;
+        }
+
         // ===== VOICE MESSAGES =====
         let mediaRecorder = null;
         let audioChunks = [];
