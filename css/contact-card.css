@@ -1,0 +1,363 @@
+/**
+ * ==========================================================================
+ * CINQ - Contact Card Styles
+ * ==========================================================================
+ * 
+ * Styles for the contact card generation modal.
+ */
+
+/* ===== Contact Card Modal ===== */
+.contact-card-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.contact-card-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.contact-card-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.contact-card-content {
+    position: relative;
+    background: var(--color-bg-secondary, #1a1a2e);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.3s ease;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(99, 102, 241, 0.1);
+}
+
+.contact-card-visible .contact-card-content {
+    transform: scale(1) translateY(0);
+}
+
+.contact-card-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted, #888);
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.contact-card-close:hover {
+    background: var(--color-bg-hover, rgba(255, 255, 255, 0.1));
+    color: var(--color-text-primary, #fff);
+    transform: rotate(90deg);
+}
+
+/* ===== Header ===== */
+.contact-card-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.contact-card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #fff);
+    margin: 0 0 0.375rem;
+}
+
+.contact-card-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted, #888);
+    margin: 0;
+}
+
+/* ===== Card Preview ===== */
+.contact-card-preview {
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.contact-card-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-text-muted, #888);
+    font-size: 0.875rem;
+}
+
+.contact-card-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: contact-card-spin 0.8s linear infinite;
+}
+
+@keyframes contact-card-spin {
+    to { transform: rotate(360deg); }
+}
+
+.contact-card-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    box-shadow: 
+        0 10px 40px -10px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.contact-card-image:hover {
+    transform: scale(1.02);
+}
+
+/* ===== Theme Selector ===== */
+.contact-card-themes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.03));
+    border-radius: 0.75rem;
+}
+
+.theme-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted, #888);
+    margin-right: 0.375rem;
+}
+
+.theme-btn {
+    width: 36px;
+    height: 36px;
+    padding: 3px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+    transform: scale(1.1);
+}
+
+.theme-btn.active {
+    border-color: var(--color-brand, #6366f1);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.theme-preview {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Actions ===== */
+.contact-card-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.contact-card-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.contact-card-btn-secondary {
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.05));
+    color: var(--color-text-primary, #fff);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+}
+
+.contact-card-btn-secondary:hover {
+    background: var(--color-bg-hover, rgba(255, 255, 255, 0.1));
+    border-color: var(--color-brand, #6366f1);
+}
+
+.contact-card-btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: #fff;
+}
+
+.contact-card-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.contact-card-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ===== Profile Page Button ===== */
+.contact-card-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 0.75rem);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.contact-card-profile-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+    transform: translateY(-2px);
+}
+
+.contact-card-profile-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 520px) {
+    .contact-card-content {
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+        margin: 0.5rem;
+    }
+    
+    .contact-card-preview {
+        padding: 0.75rem;
+        min-height: 200px;
+    }
+    
+    .contact-card-actions {
+        flex-direction: column;
+    }
+    
+    .contact-card-btn {
+        padding: 1rem;
+    }
+    
+    .contact-card-themes {
+        flex-wrap: wrap;
+    }
+    
+    .theme-label {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+}
+
+/* ===== Light Theme ===== */
+[data-theme="light"] .contact-card-content {
+    background: #fff;
+    border-color: #e5e7eb;
+}
+
+[data-theme="light"] .contact-card-close {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+[data-theme="light"] .contact-card-close:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+[data-theme="light"] .contact-card-preview,
+[data-theme="light"] .contact-card-themes {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+[data-theme="light"] .contact-card-btn-secondary {
+    background: #f3f4f6;
+    color: #1f2937;
+    border-color: #e5e7eb;
+}
+
+[data-theme="light"] .contact-card-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+[data-theme="light"] .contact-card-image {
+    box-shadow: 
+        0 10px 40px -10px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Animations ===== */
+@keyframes card-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.contact-card-loading::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(99, 102, 241, 0.1),
+        transparent
+    );
+    background-size: 200% 100%;
+    animation: card-shimmer 1.5s infinite;
+}

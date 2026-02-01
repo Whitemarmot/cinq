@@ -1187,6 +1187,31 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
+        
+        .share-btn.read-later {
+            transition: all 0.2s;
+        }
+        
+        .share-btn.read-later:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .share-btn.read-later.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .share-btn.read-later.animating {
+            animation: read-later-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes read-later-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
 
         /* ===== RICH MEDIA PREVIEWS ===== */
         .link-preview {
@@ -2281,6 +2306,202 @@
             cursor: not-allowed;
         }
         
+        /* ===== SCHEDULE PICKER ===== */
+        .schedule-picker {
+            display: none;
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            animation: slideDown 0.2s ease;
+        }
+        
+        .schedule-picker.visible {
+            display: block;
+        }
+        
+        .schedule-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .schedule-picker-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .schedule-remove-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .schedule-remove-btn:hover {
+            background: var(--color-danger);
+            border-color: var(--color-danger);
+            color: white;
+        }
+        
+        .schedule-picker-inputs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .schedule-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .schedule-input-group label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+        
+        .schedule-input {
+            padding: 0.5rem 0.75rem;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .schedule-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .schedule-preview {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            text-align: center;
+            margin-bottom: 0.75rem;
+            min-height: 1.2rem;
+        }
+        
+        .schedule-preview.error {
+            color: var(--color-danger);
+        }
+        
+        .schedule-confirm-btn {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .schedule-confirm-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .schedule-confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Scheduled indicator */
+        .scheduled-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.625rem 0.875rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid var(--color-brand);
+            border-radius: var(--radius-md);
+            color: var(--color-brand);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .scheduled-indicator svg {
+            flex-shrink: 0;
+        }
+        
+        .scheduled-indicator span {
+            flex: 1;
+        }
+        
+        .scheduled-indicator-remove {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+            color: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+        
+        .scheduled-indicator-remove:hover {
+            opacity: 1;
+            background: var(--color-brand);
+            color: white;
+        }
+        
+        /* Scheduled post badge in feed */
+        .post-scheduled-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            border-radius: var(--radius-sm);
+            color: var(--color-brand);
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .post-scheduled-badge svg {
+            width: 10px;
+            height: 10px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         /* Poll display in posts */
         .post-poll {
             margin-top: 0.75rem;
@@ -3289,6 +3510,9 @@
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                     </svg>
                 </button>
+                <a href="/read-later.html" class="back-btn" aria-label="À lire plus tard" title="À lire plus tard" style="padding: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </a>
                 <a href="/bookmarks.html" class="back-btn" aria-label="Voir mes favoris" title="Favoris" style="padding: 0.5rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                 </a>
@@ -3446,6 +3670,12 @@
                     <button class="composer-btn giphy-trigger-btn" id="gif-btn" onclick="toggleGifPicker()" aria-label="Ajouter un GIF">
                         GIF
                     </button>
+                    <button class="composer-btn" id="schedule-btn" onclick="toggleScheduler()" aria-label="Programmer le post">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        Programmer
+                    </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <span class="char-count" id="char-count" aria-live="polite">0/280</span>
@@ -3453,6 +3683,35 @@
                         Poster
                     </button>
                 </div>
+            </div>
+            <!-- Schedule picker -->
+            <div class="schedule-picker" id="schedule-picker">
+                <div class="schedule-picker-header">
+                    <span class="schedule-picker-title">🕐 Programmer le post</span>
+                    <button class="schedule-remove-btn" onclick="cancelSchedule()" aria-label="Annuler la programmation">×</button>
+                </div>
+                <div class="schedule-picker-inputs">
+                    <div class="schedule-input-group">
+                        <label for="schedule-date">Date</label>
+                        <input type="date" id="schedule-date" class="schedule-input">
+                    </div>
+                    <div class="schedule-input-group">
+                        <label for="schedule-time">Heure</label>
+                        <input type="time" id="schedule-time" class="schedule-input" value="09:00">
+                    </div>
+                </div>
+                <div class="schedule-preview" id="schedule-preview"></div>
+                <button class="schedule-confirm-btn" id="schedule-confirm-btn" onclick="confirmSchedule()">
+                    ✓ Confirmer la programmation
+                </button>
+            </div>
+            <!-- Scheduled indicator (shown when post is scheduled) -->
+            <div class="scheduled-indicator" id="scheduled-indicator" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span id="scheduled-indicator-text">Programmé pour...</span>
+                <button class="scheduled-indicator-remove" onclick="cancelSchedule()" aria-label="Annuler la programmation">×</button>
             </div>
         </div>
 
@@ -3533,6 +3792,88 @@
         
         // Bookmarks state
         let bookmarksCache = {}; // { postId: true/false }
+        
+        // Read Later state (localStorage)
+        let readLaterCache = {}; // { postId: true/false }
+        
+        // ===== READ LATER FUNCTIONS =====
+        function loadReadLaterCache() {
+            try {
+                const stored = localStorage.getItem('cinq_read_later');
+                const items = stored ? JSON.parse(stored) : [];
+                readLaterCache = {};
+                items.forEach(item => {
+                    if (item.post && item.post.id) {
+                        readLaterCache[item.post.id] = true;
+                    }
+                });
+            } catch (e) {
+                console.error('Failed to load read later cache:', e);
+                readLaterCache = {};
+            }
+        }
+        
+        function isInReadLater(postId) {
+            return readLaterCache[postId] || false;
+        }
+        
+        function toggleReadLater(postId, btnElement) {
+            const isCurrentlyInList = isInReadLater(postId);
+            const btn = document.getElementById(`readlater-btn-${postId}`);
+            const text = document.getElementById(`readlater-text-${postId}`);
+            
+            // Animate
+            if (btn) {
+                btn.classList.add('animating');
+                setTimeout(() => btn.classList.remove('animating'), 300);
+            }
+            
+            try {
+                const stored = localStorage.getItem('cinq_read_later');
+                let items = stored ? JSON.parse(stored) : [];
+                
+                if (isCurrentlyInList) {
+                    // Remove from list
+                    items = items.filter(item => item.post.id !== postId);
+                    readLaterCache[postId] = false;
+                    
+                    if (btn) {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                        btn.setAttribute('aria-label', 'Lire plus tard');
+                    }
+                    if (text) text.textContent = 'Plus tard';
+                    
+                    showToast({ type: 'success', message: '📖 Retiré de la liste de lecture' });
+                } else {
+                    // Add to list
+                    const post = posts.find(p => p.id === postId);
+                    if (post) {
+                        items.unshift({
+                            post: post,
+                            addedAt: new Date().toISOString(),
+                            isRead: false
+                        });
+                        readLaterCache[postId] = true;
+                        
+                        if (btn) {
+                            btn.classList.add('active');
+                            btn.setAttribute('aria-pressed', 'true');
+                            btn.setAttribute('aria-label', 'Retirer de la liste de lecture');
+                        }
+                        if (text) text.textContent = 'Dans la liste';
+                        
+                        showToast({ type: 'success', message: '⏰ Ajouté à "Lire plus tard"' });
+                    }
+                }
+                
+                localStorage.setItem('cinq_read_later', JSON.stringify(items));
+                
+            } catch (e) {
+                console.error('Toggle read later error:', e);
+                showToast({ type: 'error', message: 'Erreur lors de la sauvegarde' });
+            }
+        }
         
         // ===== PAGINATION STATE (CURSOR-BASED) =====
         let nextCursor = null;  // ISO date string of last post
@@ -3772,6 +4113,9 @@
             try {
                 session = JSON.parse(sessionStr);
                 user = session.user;
+                
+                // Load Read Later cache from localStorage
+                loadReadLaterCache();
                 
                 // Update composer
                 const initial = (user.email || '?')[0].toUpperCase();
@@ -4389,6 +4733,135 @@
             }
             
             return options;
+        }
+        
+        // ===== POST SCHEDULING =====
+        let schedulerEnabled = false;
+        let scheduledDateTime = null; // ISO string of scheduled time
+        
+        function toggleScheduler() {
+            const picker = document.getElementById('schedule-picker');
+            const btn = document.getElementById('schedule-btn');
+            
+            schedulerEnabled = !schedulerEnabled;
+            
+            if (schedulerEnabled) {
+                picker.classList.add('visible');
+                btn.classList.add('active');
+                
+                // Set default date to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('schedule-date').value = tomorrow.toISOString().split('T')[0];
+                document.getElementById('schedule-date').min = new Date().toISOString().split('T')[0];
+                
+                // Update preview
+                updateSchedulePreview();
+                
+                // Add event listeners
+                document.getElementById('schedule-date').addEventListener('change', updateSchedulePreview);
+                document.getElementById('schedule-time').addEventListener('change', updateSchedulePreview);
+            } else {
+                picker.classList.remove('visible');
+                btn.classList.remove('active');
+                scheduledDateTime = null;
+                document.getElementById('scheduled-indicator').style.display = 'none';
+            }
+        }
+        
+        function updateSchedulePreview() {
+            const dateInput = document.getElementById('schedule-date');
+            const timeInput = document.getElementById('schedule-time');
+            const preview = document.getElementById('schedule-preview');
+            const confirmBtn = document.getElementById('schedule-confirm-btn');
+            
+            if (!dateInput.value || !timeInput.value) {
+                preview.textContent = 'Sélectionne une date et une heure';
+                preview.classList.remove('error');
+                confirmBtn.disabled = true;
+                return;
+            }
+            
+            const scheduledDate = new Date(`${dateInput.value}T${timeInput.value}`);
+            const now = new Date();
+            const minDate = new Date(now.getTime() + 5 * 60 * 1000); // 5 min in future
+            const maxDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+            
+            if (scheduledDate < minDate) {
+                preview.textContent = '⚠️ La date doit être au moins 5 minutes dans le futur';
+                preview.classList.add('error');
+                confirmBtn.disabled = true;
+                return;
+            }
+            
+            if (scheduledDate > maxDate) {
+                preview.textContent = '⚠️ La date ne peut pas dépasser 30 jours';
+                preview.classList.add('error');
+                confirmBtn.disabled = true;
+                return;
+            }
+            
+            // Format the date nicely
+            const formatter = new Intl.DateTimeFormat('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            preview.textContent = `📅 ${formatter.format(scheduledDate)}`;
+            preview.classList.remove('error');
+            confirmBtn.disabled = false;
+        }
+        
+        function confirmSchedule() {
+            const dateInput = document.getElementById('schedule-date');
+            const timeInput = document.getElementById('schedule-time');
+            
+            if (!dateInput.value || !timeInput.value) {
+                showToast({ type: 'error', message: 'Sélectionne une date et une heure' });
+                return;
+            }
+            
+            scheduledDateTime = new Date(`${dateInput.value}T${timeInput.value}`).toISOString();
+            
+            // Hide the picker
+            document.getElementById('schedule-picker').classList.remove('visible');
+            
+            // Show the indicator
+            const indicator = document.getElementById('scheduled-indicator');
+            const indicatorText = document.getElementById('scheduled-indicator-text');
+            
+            const formatter = new Intl.DateTimeFormat('fr-FR', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            indicatorText.textContent = `Programmé pour ${formatter.format(new Date(scheduledDateTime))}`;
+            indicator.style.display = 'flex';
+            
+            // Update post button text
+            const postBtn = document.getElementById('post-btn');
+            postBtn.textContent = 'Programmer';
+            
+            showToast({ type: 'success', message: '🕐 Post programmé !' });
+        }
+        
+        function cancelSchedule() {
+            schedulerEnabled = false;
+            scheduledDateTime = null;
+            
+            document.getElementById('schedule-picker').classList.remove('visible');
+            document.getElementById('schedule-btn').classList.remove('active');
+            document.getElementById('scheduled-indicator').style.display = 'none';
+            
+            // Reset post button text
+            const postBtn = document.getElementById('post-btn');
+            postBtn.textContent = 'Poster';
         }
         
         // ===== POLL VOTING =====
@@ -5217,6 +5690,10 @@
                     <button onclick="toggleBookmark('${post.id}')" class="share-btn bookmark ${bookmarksCache[post.id] ? 'active' : ''}" id="bookmark-btn-${post.id}" aria-label="${bookmarksCache[post.id] ? 'Retirer des favoris' : 'Ajouter aux favoris'}" aria-pressed="${bookmarksCache[post.id] ? 'true' : 'false'}">
                         <svg viewBox="0 0 24 24" fill="${bookmarksCache[post.id] ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                         <span id="bookmark-text-${post.id}">${bookmarksCache[post.id] ? 'Enregistré' : 'Enregistrer'}</span>
+                    </button>
+                    <button onclick="toggleReadLater('${post.id}', this)" class="share-btn read-later ${isInReadLater(post.id) ? 'active' : ''}" id="readlater-btn-${post.id}" aria-label="${isInReadLater(post.id) ? 'Retirer de la liste de lecture' : 'Lire plus tard'}" aria-pressed="${isInReadLater(post.id) ? 'true' : 'false'}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span id="readlater-text-${post.id}">${isInReadLater(post.id) ? 'Dans la liste' : 'Plus tard'}</span>
                     </button>
                     <a href="/p/${post.id}" class="share-btn link" aria-label="Voir le post">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
