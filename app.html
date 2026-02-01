@@ -3569,6 +3569,36 @@
             color: var(--color-brand);
         }
         
+        /* GIF Button in chat */
+        .gif-btn {
+            padding: var(--space-2) var(--space-3);
+            font-size: 0.7rem !important;
+            border-radius: var(--radius-md) !important;
+            height: 32px;
+            min-width: 40px;
+        }
+        
+        .gif-btn:hover {
+            transform: scale(1.05) !important;
+        }
+        
+        .gif-btn.active {
+            box-shadow: 0 0 0 2px var(--color-brand);
+        }
+        
+        /* GIF content in chat */
+        .chat-message.gif .gif-content {
+            max-width: 250px;
+            margin-bottom: var(--space-2);
+        }
+        
+        .chat-message.gif .gif-content img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--radius-lg);
+            display: block;
+        }
+        
         /* Sticker Picker */
         .sticker-picker {
             position: absolute;
@@ -5424,6 +5454,9 @@
             <button style="margin-top:var(--space-4);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeDeleteAccountModal()" type="button">Annuler</button>
         </div>
     </div>
+
+    <!-- GIPHY Integration -->
+    <script src="/js/giphy.js"></script>
 
     <script>
         const API_URL = '/api';
@@ -8081,6 +8114,85 @@
             picker.classList.remove('open');
             btn.classList.remove('active');
             btn.setAttribute('aria-expanded', 'false');
+        }
+        
+        // ===== GIF FUNCTIONS =====
+        function toggleGifPicker() {
+            const btn = document.getElementById('gif-btn');
+            
+            if (window.CinqGiphy?.isOpen()) {
+                window.CinqGiphy.closePicker();
+                btn.classList.remove('active');
+            } else {
+                // Close sticker picker if open
+                closeStickerPicker();
+                
+                window.CinqGiphy?.openPicker((gif) => {
+                    sendGif(gif);
+                }, btn);
+                btn.classList.add('active');
+                triggerHaptic?.('tap');
+            }
+        }
+        
+        async function sendGif(gif) {
+            if (!currentChatContact || !gif) return;
+            
+            const btn = document.getElementById('gif-btn');
+            btn.classList.remove('active');
+            triggerHaptic?.('tap');
+            
+            // Get the GIF URL
+            const gifUrl = gif.images.original?.url || gif.images.standard?.url;
+            
+            // Optimistic GIF display
+            const optimisticGif = {
+                id: 'temp-gif-' + Date.now(),
+                sender_id: user.id,
+                gif_url: gifUrl,
+                created_at: new Date().toISOString()
+            };
+            
+            const container = document.getElementById('chat-messages');
+            const gifEl = document.createElement('div');
+            gifEl.className = 'chat-message gif sent';
+            gifEl.id = `msg-${optimisticGif.id}`;
+            gifEl.setAttribute('role', 'article');
+            gifEl.setAttribute('aria-label', `Tu as envoyé un GIF`);
+            
+            const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+            
+            gifEl.innerHTML = `
+                <div class="gif-content giphy-content-gif">
+                    <img src="${escapeHtml(gifUrl)}" alt="GIF" loading="lazy">
+                    <span class="giphy-badge">GIF</span>
+                </div>
+                <div class="chat-message-meta">
+                    <span class="chat-message-time">${formatMessageTime(optimisticGif.created_at)}</span>
+                    <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
+                </div>
+            `;
+            
+            container.appendChild(gifEl);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            
+            try {
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        contact_id: currentChatContact.contact_user_id, 
+                        gif_url: gifUrl 
+                    })
+                });
+                triggerHaptic?.('success');
+                // Refresh to sync with server
+                loadMessages();
+            } catch (e) {
+                triggerHaptic?.('error');
+                showToast({ type: 'error', message: 'Le GIF n\'est pas passé 😕' });
+                removeOptimisticMessage?.(optimisticGif.id);
+            }
         }
         
         async function sendSticker(stickerId) {
