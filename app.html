@@ -1832,6 +1832,72 @@
             max-width: 60px;
         }
         
+        /* Last seen status */
+        .contact-last-seen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-size: 9px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .contact-last-seen.online {
+            color: #22c55e;
+        }
+        
+        .contact-last-seen-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-text-muted);
+            flex-shrink: 0;
+        }
+        
+        .contact-last-seen.online .contact-last-seen-dot {
+            background: #22c55e;
+            box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+            animation: online-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes online-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+        
+        .contact-last-seen-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Chat header last seen */
+        .chat-last-seen {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .chat-last-seen.online {
+            color: #22c55e;
+        }
+        
+        .chat-last-seen-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        .chat-last-seen.online .chat-last-seen-dot {
+            animation: online-pulse 2s ease-in-out infinite;
+        }
+        
         /* Post author status */
         .post-author-status {
             display: flex;
@@ -3237,6 +3303,425 @@
         
         .chat-input-area.voice-mode .voice-preview {
             display: flex;
+        }
+        
+        /* ===== FILE ATTACHMENT BUTTON ===== */
+        .attach-btn {
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s var(--ease-spring);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+        }
+        
+        .attach-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            color: var(--color-text-primary);
+            transform: scale(1.1) rotate(-10deg);
+        }
+        
+        .attach-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .attach-btn.uploading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .attach-btn.uploading svg {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Hidden file input */
+        .attach-input {
+            display: none;
+        }
+        
+        /* ===== FILE ATTACHMENT PREVIEW ===== */
+        .file-preview {
+            display: none;
+            align-items: center;
+            gap: var(--space-2);
+            flex: 1;
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            min-width: 0;
+        }
+        
+        .file-preview.visible {
+            display: flex;
+        }
+        
+        .file-preview-icon {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-brand-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        
+        .file-preview-icon.pdf { background: #fee2e2; color: #dc2626; }
+        .file-preview-icon.doc, .file-preview-icon.docx { background: #dbeafe; color: #2563eb; }
+        .file-preview-icon.xls, .file-preview-icon.xlsx { background: #dcfce7; color: #16a34a; }
+        .file-preview-icon.ppt, .file-preview-icon.pptx { background: #fef3c7; color: #d97706; }
+        .file-preview-icon.zip, .file-preview-icon.rar, .file-preview-icon.7z { background: #f3e8ff; color: #9333ea; }
+        .file-preview-icon.txt, .file-preview-icon.csv { background: #f1f5f9; color: #475569; }
+        
+        .file-preview-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .file-preview-name {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-preview-meta {
+            font-size: 10px;
+            color: var(--color-text-muted);
+        }
+        
+        .file-preview-delete {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--color-error-muted);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-error);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .file-preview-delete:hover {
+            background: var(--color-error);
+            color: white;
+        }
+        
+        /* Hide text input when showing file preview */
+        .chat-input-area.file-mode .chat-input {
+            display: none;
+        }
+        
+        .chat-input-area.file-mode .file-preview {
+            display: flex;
+        }
+        
+        /* ===== FILE ATTACHMENT IN CHAT MESSAGE ===== */
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            margin-top: var(--space-2);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+            text-decoration: none;
+            color: inherit;
+            min-width: 200px;
+            max-width: 280px;
+        }
+        
+        .chat-message.received .file-attachment {
+            background: var(--color-bg-tertiary);
+        }
+        
+        .file-attachment:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .chat-message.received .file-attachment:hover {
+            background: var(--color-bg-hover);
+        }
+        
+        .file-attachment-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+        }
+        
+        .chat-message.received .file-attachment-icon {
+            background: var(--color-bg-elevated);
+        }
+        
+        .file-attachment-icon.pdf { background: #fee2e2; color: #dc2626; }
+        .file-attachment-icon.doc, .file-attachment-icon.docx { background: #dbeafe; color: #2563eb; }
+        .file-attachment-icon.xls, .file-attachment-icon.xlsx { background: #dcfce7; color: #16a34a; }
+        .file-attachment-icon.ppt, .file-attachment-icon.pptx { background: #fef3c7; color: #d97706; }
+        .file-attachment-icon.zip, .file-attachment-icon.rar, .file-attachment-icon.7z { background: #f3e8ff; color: #9333ea; }
+        .file-attachment-icon.txt, .file-attachment-icon.csv { background: #f1f5f9; color: #475569; }
+        
+        .file-attachment-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .file-attachment-name {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-attachment-meta {
+            font-size: 11px;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .file-attachment-download {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.received .file-attachment-download {
+            background: var(--color-brand-muted);
+            color: var(--color-brand);
+        }
+        
+        .file-attachment:hover .file-attachment-download {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .chat-message.received .file-attachment:hover .file-attachment-download {
+            background: var(--color-brand);
+            color: white;
+        }
+        
+        /* ===== STICKERS ===== */
+        .sticker-btn {
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s var(--ease-spring);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+        }
+        
+        .sticker-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            color: var(--color-text-primary);
+            transform: scale(1.1);
+        }
+        
+        .sticker-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .sticker-btn.active {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        /* Sticker Picker */
+        .sticker-picker {
+            position: absolute;
+            bottom: calc(100% + var(--space-2));
+            left: 0;
+            right: 0;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--space-4);
+            z-index: var(--z-dropdown);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.25s var(--ease-spring);
+            max-height: 280px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sticker-picker.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .sticker-picker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .sticker-picker-title {
+            font-family: var(--font-display);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .sticker-picker-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--color-bg-tertiary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            transition: all 0.2s;
+        }
+        
+        .sticker-picker-close:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-2);
+            overflow-y: auto;
+            padding-right: var(--space-2);
+        }
+        
+        .sticker-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sticker-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .sticker-grid::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: var(--radius-full);
+        }
+        
+        .sticker-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius-lg);
+            background: var(--color-bg-tertiary);
+            border: 1px solid transparent;
+            cursor: pointer;
+            padding: var(--space-2);
+            transition: all 0.2s var(--ease-spring);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sticker-item:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            transform: scale(1.1);
+        }
+        
+        .sticker-item:active {
+            transform: scale(0.95);
+        }
+        
+        .sticker-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* Sticker in chat message */
+        .chat-message.sticker {
+            background: transparent !important;
+            padding: var(--space-2) !important;
+            max-width: 120px;
+        }
+        
+        .chat-message.sticker::after {
+            display: none;
+        }
+        
+        .chat-message.sticker .sticker-content {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .chat-message.sticker .sticker-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: sticker-pop 0.4s var(--ease-spring);
+        }
+        
+        @keyframes sticker-pop {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        
+        .chat-message.sticker .chat-message-meta {
+            justify-content: center;
+            margin-top: var(--space-1);
+        }
+        
+        .chat-message.sticker.sent {
+            margin-left: auto;
+        }
+        
+        .chat-message.sticker.received {
+            margin-right: auto;
         }
         
         /* ===== MODALS ===== */
@@ -4747,8 +5232,88 @@
                 </svg>
                 <span class="voice-timer" id="voice-timer">0:00</span>
             </button>
+            <button class="attach-btn" id="attach-btn" onclick="document.getElementById('attach-input').click()" type="button" aria-label="Joindre un fichier">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                </svg>
+            </button>
+            <input type="file" class="attach-input" id="attach-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.zip,.rar,.7z,.gz,.tar,.json,.xml" onchange="handleFileSelect(event)">
+            <button class="sticker-btn" id="sticker-btn" onclick="toggleStickerPicker()" type="button" aria-label="Envoyer un sticker" aria-expanded="false" aria-controls="sticker-picker">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                    <line x1="9" y1="9" x2="9.01" y2="9"/>
+                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+                </svg>
+            </button>
+            <!-- Sticker Picker -->
+            <div class="sticker-picker" id="sticker-picker" role="dialog" aria-modal="false" aria-labelledby="sticker-picker-title">
+                <div class="sticker-picker-header">
+                    <span class="sticker-picker-title" id="sticker-picker-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 2L22 9L18 21H6L2 9L12 2Z"/>
+                        </svg>
+                        Stickers Cinq
+                    </span>
+                    <button class="sticker-picker-close" onclick="closeStickerPicker()" type="button" aria-label="Fermer le sélecteur de stickers">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="sticker-grid" id="sticker-grid" role="listbox" aria-label="Liste des stickers">
+                    <button class="sticker-item" onclick="sendSticker('cinq')" type="button" role="option" aria-label="Sticker Cinq">
+                        <img src="/assets/stickers/cinq.svg" alt="Cinq" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('love')" type="button" role="option" aria-label="Sticker Cœur">
+                        <img src="/assets/stickers/love.svg" alt="Cœur" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('hug')" type="button" role="option" aria-label="Sticker Câlin">
+                        <img src="/assets/stickers/hug.svg" alt="Câlin" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('laugh')" type="button" role="option" aria-label="Sticker Rire">
+                        <img src="/assets/stickers/laugh.svg" alt="Rire" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('thinking')" type="button" role="option" aria-label="Sticker Pensif">
+                        <img src="/assets/stickers/thinking.svg" alt="Pensif" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('fire')" type="button" role="option" aria-label="Sticker Feu">
+                        <img src="/assets/stickers/fire.svg" alt="Feu" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('star')" type="button" role="option" aria-label="Sticker Étoile">
+                        <img src="/assets/stickers/star.svg" alt="Étoile" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('party')" type="button" role="option" aria-label="Sticker Fête">
+                        <img src="/assets/stickers/party.svg" alt="Fête" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('cool')" type="button" role="option" aria-label="Sticker Cool">
+                        <img src="/assets/stickers/cool.svg" alt="Cool" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('sleepy')" type="button" role="option" aria-label="Sticker Fatigué">
+                        <img src="/assets/stickers/sleepy.svg" alt="Fatigué" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('coffee')" type="button" role="option" aria-label="Sticker Café">
+                        <img src="/assets/stickers/coffee.svg" alt="Café" loading="lazy">
+                    </button>
+                    <button class="sticker-item" onclick="sendSticker('sad')" type="button" role="option" aria-label="Sticker Triste">
+                        <img src="/assets/stickers/sad.svg" alt="Triste" loading="lazy">
+                    </button>
+                </div>
+            </div>
             <label for="chat-input" class="sr-only">Écrire un message</label>
             <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="500" autocomplete="off">
+            <div class="file-preview" id="file-preview">
+                <div class="file-preview-icon" id="file-preview-icon">📄</div>
+                <div class="file-preview-info">
+                    <div class="file-preview-name" id="file-preview-name">fichier.pdf</div>
+                    <div class="file-preview-meta" id="file-preview-meta">PDF • 1.2 Mo</div>
+                </div>
+                <button class="file-preview-delete" onclick="cancelFileAttachment()" type="button" aria-label="Supprimer le fichier">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
             <div class="voice-preview" id="voice-preview">
                 <div class="voice-preview-waveform" id="voice-preview-waveform"></div>
                 <span class="voice-preview-duration" id="voice-preview-duration">0:00</span>
@@ -4992,6 +5557,9 @@
                 setupComposer();
                 setupChatInput();
                 
+                // Restore drafts if any
+                restoreDraftPost();
+                
                 // Setup lazy loading
                 setupLazyLoading();
                 
@@ -5178,6 +5746,119 @@
             }
         }
 
+        // ===== DRAFTS SYSTEM =====
+        const DRAFT_KEY_APP_POST = 'cinq_draft_post_app';
+        const DRAFT_KEY_CHAT_PREFIX = 'cinq_draft_chat_';
+        const DRAFT_SAVE_DELAY = 500; // ms
+        let draftSaveTimeout = null;
+        let chatDraftSaveTimeout = null;
+        
+        function saveDraftPost() {
+            const textarea = document.getElementById('post-content');
+            if (!textarea) return;
+            
+            const content = textarea.value.trim();
+            if (content) {
+                localStorage.setItem(DRAFT_KEY_APP_POST, JSON.stringify({
+                    content: textarea.value,
+                    imageUrl: currentImageUrl || null,
+                    savedAt: Date.now()
+                }));
+            } else {
+                localStorage.removeItem(DRAFT_KEY_APP_POST);
+            }
+        }
+        
+        function restoreDraftPost() {
+            try {
+                const saved = localStorage.getItem(DRAFT_KEY_APP_POST);
+                if (!saved) return;
+                
+                const draft = JSON.parse(saved);
+                const textarea = document.getElementById('post-content');
+                const charCount = document.getElementById('char-count');
+                const postBtn = document.getElementById('post-btn');
+                
+                if (draft.content && textarea) {
+                    textarea.value = draft.content;
+                    const len = draft.content.length;
+                    charCount.textContent = `${len}/1000`;
+                    
+                    charCount.classList.remove('warning', 'error');
+                    if (len > 900) charCount.classList.add('error');
+                    else if (len > 700) charCount.classList.add('warning');
+                    
+                    postBtn.disabled = len === 0 || len > 1000;
+                }
+                
+                if (draft.imageUrl) {
+                    currentImageUrl = draft.imageUrl;
+                    const preview = document.getElementById('image-preview');
+                    const img = document.getElementById('preview-img');
+                    if (preview && img) {
+                        img.src = draft.imageUrl;
+                        preview.classList.add('visible');
+                    }
+                }
+                
+                if (draft.content) {
+                    showToast({ type: 'success', message: '📝 Brouillon restauré' });
+                }
+            } catch (e) {
+                console.error('Error restoring post draft:', e);
+                localStorage.removeItem(DRAFT_KEY_APP_POST);
+            }
+        }
+        
+        function clearDraftPost() {
+            localStorage.removeItem(DRAFT_KEY_APP_POST);
+        }
+        
+        function scheduleDraftPostSave() {
+            clearTimeout(draftSaveTimeout);
+            draftSaveTimeout = setTimeout(saveDraftPost, DRAFT_SAVE_DELAY);
+        }
+        
+        // Chat drafts per contact
+        function saveChatDraft(contactId, content) {
+            if (!contactId) return;
+            const key = DRAFT_KEY_CHAT_PREFIX + contactId;
+            if (content && content.trim()) {
+                localStorage.setItem(key, JSON.stringify({
+                    content: content,
+                    savedAt: Date.now()
+                }));
+            } else {
+                localStorage.removeItem(key);
+            }
+        }
+        
+        function restoreChatDraft(contactId) {
+            if (!contactId) return '';
+            try {
+                const key = DRAFT_KEY_CHAT_PREFIX + contactId;
+                const saved = localStorage.getItem(key);
+                if (!saved) return '';
+                
+                const draft = JSON.parse(saved);
+                return draft.content || '';
+            } catch (e) {
+                return '';
+            }
+        }
+        
+        function clearChatDraft(contactId) {
+            if (!contactId) return;
+            localStorage.removeItem(DRAFT_KEY_CHAT_PREFIX + contactId);
+        }
+        
+        function scheduleChatDraftSave(contactId, content) {
+            clearTimeout(chatDraftSaveTimeout);
+            chatDraftSaveTimeout = setTimeout(() => {
+                saveChatDraft(contactId, content);
+            }, DRAFT_SAVE_DELAY);
+        }
+
         // ===== POSTS (FEED) =====
         // ===== MENTION AUTOCOMPLETE STATE =====
         let mentionAutocomplete = null;
@@ -5208,6 +5889,9 @@
                 
                 // Check for @mention trigger
                 handleMentionInput(textarea);
+                
+                // Auto-save draft
+                scheduleDraftPostSave();
             });
             
             textarea.addEventListener('keydown', (e) => {
@@ -5484,6 +6168,9 @@
                 document.getElementById('post-content').value = '';
                 document.getElementById('char-count').textContent = '0/1000';
                 removeImage();
+                
+                // Clear saved draft after successful post
+                clearDraftPost();
                 
                 showToast({ type: 'success', message: 'Envoyé à tes 5 !' });
                 
@@ -6068,6 +6755,11 @@
                         broadcastTypingState(false);
                     }
                 }, 2000);
+                
+                // Auto-save chat draft
+                if (currentChatContact) {
+                    scheduleChatDraftSave(currentChatContact.contact_user_id, input.value);
+                }
             });
             
             input.addEventListener('keypress', (e) => {
@@ -6223,8 +6915,17 @@
             chatPanel.setAttribute('aria-hidden', 'false');
             chatOverlay.classList.add('open');
             
-            // Focus on chat input
-            setTimeout(() => document.getElementById('chat-input').focus(), 100);
+            // Focus on chat input and restore any saved draft
+            setTimeout(() => {
+                const chatInput = document.getElementById('chat-input');
+                const sendBtn = document.getElementById('send-btn');
+                const savedDraft = restoreChatDraft(contact.contact_user_id);
+                if (savedDraft) {
+                    chatInput.value = savedDraft;
+                    sendBtn.disabled = !savedDraft.trim();
+                }
+                chatInput.focus();
+            }, 100);
             
             // Setup focus trap
             setupFocusTrap(chatPanel);
@@ -6237,6 +6938,14 @@
         }
 
         function closeChat() {
+            // Save current chat draft before closing
+            if (currentChatContact) {
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput && chatInput.value.trim()) {
+                    saveChatDraft(currentChatContact.contact_user_id, chatInput.value);
+                }
+            }
+            
             const chatPanel = document.getElementById('chat-panel');
             const chatOverlay = document.getElementById('chat-overlay');
             
@@ -6341,6 +7050,28 @@
                 
                 if (msg.is_ping) {
                     html += `<div class="chat-message ping" role="article" aria-label="${sender} a envoyé un coucou"><span aria-hidden="true">👋</span></div>`;
+                } else if (msg.sticker_id) {
+                    // Sticker message
+                    let receiptHtml = '';
+                    if (isSent) {
+                        const readStatus = msg.read_at ? 'read' : 'delivered';
+                        const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+                        const doubleCheckIcon = `<svg viewBox="0 0 20 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/><path d="M5 5.5L9 9.5L18.5 1"/></svg>`;
+                        receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
+                    }
+                    
+                    const stickerName = getStickerName(msg.sticker_id);
+                    html += `
+                        <div class="chat-message sticker ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un sticker ${stickerName}">
+                            <div class="sticker-content">
+                                <img src="/assets/stickers/${escapeHtml(msg.sticker_id)}.svg" alt="${stickerName}" loading="lazy">
+                            </div>
+                            <div class="chat-message-meta">
+                                <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
+                                ${receiptHtml}
+                            </div>
+                        </div>
+                    `;
                 } else if (msg.voice_url) {
                     // Voice message
                     const duration = msg.voice_duration || 0;
@@ -6370,6 +7101,27 @@
                                     </div>
                                     <span class="voice-duration" id="voice-duration-${msg.id}" data-duration="${duration}">${durationStr}</span>
                                 </div>
+                            </div>
+                            <div class="chat-message-meta">
+                                <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
+                                ${receiptHtml}
+                            </div>
+                        </div>
+                    `;
+                } else if (msg.file_url) {
+                    // File attachment message
+                    let receiptHtml = '';
+                    if (isSent) {
+                        const readStatus = msg.read_at ? 'read' : 'delivered';
+                        const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+                        const doubleCheckIcon = `<svg viewBox="0 0 20 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/><path d="M5 5.5L9 9.5L18.5 1"/></svg>`;
+                        receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
+                    }
+                    
+                    html += `
+                        <div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un fichier">
+                            <div class="chat-message-content">
+                                ${renderFileAttachment(msg.file_url, msg.file_name, msg.file_size, msg.file_type)}
                             </div>
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
@@ -6431,6 +7183,12 @@
                 return;
             }
             
+            // Check if we're sending a file attachment
+            if (inputArea.classList.contains('file-mode') && pendingFileAttachment) {
+                await sendFileMessage();
+                return;
+            }
+            
             const input = document.getElementById('chat-input');
             const content = input.value.trim();
             if (!content || !currentChatContact) return;
@@ -6462,6 +7220,11 @@
             
             addOptimisticMessage(optimisticMsg);
             input.value = '';
+            
+            // Clear saved chat draft after sending
+            if (currentChatContact) {
+                clearChatDraft(currentChatContact.contact_user_id);
+            }
 
             try {
                 const res = await fetch(`${API_URL}/messages`, {
@@ -6716,6 +7479,235 @@
             document.getElementById('voice-timer').textContent = '0:00';
             
             triggerHaptic('tap');
+        }
+        
+        // ===== FILE ATTACHMENTS =====
+        let pendingFileAttachment = null;
+        
+        const FILE_ICONS = {
+            pdf: '📕',
+            doc: '📘',
+            docx: '📘',
+            xls: '📗',
+            xlsx: '📗',
+            ppt: '📙',
+            pptx: '📙',
+            txt: '📄',
+            csv: '📊',
+            rtf: '📄',
+            zip: '📦',
+            rar: '📦',
+            '7z': '📦',
+            gz: '📦',
+            tar: '📦',
+            json: '📋',
+            xml: '📋',
+        };
+        
+        const FILE_TYPE_LABELS = {
+            pdf: 'PDF',
+            doc: 'Word',
+            docx: 'Word',
+            xls: 'Excel',
+            xlsx: 'Excel',
+            ppt: 'PowerPoint',
+            pptx: 'PowerPoint',
+            txt: 'Texte',
+            csv: 'CSV',
+            rtf: 'RTF',
+            zip: 'ZIP',
+            rar: 'RAR',
+            '7z': '7-Zip',
+            gz: 'GZip',
+            tar: 'TAR',
+            json: 'JSON',
+            xml: 'XML',
+        };
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 o';
+            const k = 1024;
+            const sizes = ['o', 'Ko', 'Mo', 'Go'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        function getFileExtension(filename) {
+            return filename.split('.').pop().toLowerCase();
+        }
+        
+        function getFileIcon(ext) {
+            return FILE_ICONS[ext] || '📄';
+        }
+        
+        function getFileTypeLabel(ext) {
+            return FILE_TYPE_LABELS[ext] || ext.toUpperCase();
+        }
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Reset input so same file can be selected again
+            event.target.value = '';
+            
+            // Validate file size (10MB max)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast({ type: 'error', title: 'Fichier trop grand', message: 'Taille max: 10 Mo' });
+                return;
+            }
+            
+            // Get file info
+            const ext = getFileExtension(file.name);
+            const icon = getFileIcon(ext);
+            const typeLabel = getFileTypeLabel(ext);
+            const sizeFormatted = formatFileSize(file.size);
+            
+            // Store pending file
+            pendingFileAttachment = {
+                file: file,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                ext: ext
+            };
+            
+            // Update preview UI
+            const iconEl = document.getElementById('file-preview-icon');
+            const nameEl = document.getElementById('file-preview-name');
+            const metaEl = document.getElementById('file-preview-meta');
+            const inputArea = document.getElementById('chat-input-area');
+            const sendBtn = document.getElementById('send-btn');
+            
+            iconEl.textContent = icon;
+            iconEl.className = `file-preview-icon ${ext}`;
+            nameEl.textContent = file.name;
+            metaEl.textContent = `${typeLabel} • ${sizeFormatted}`;
+            
+            // Switch to file mode
+            inputArea.classList.add('file-mode');
+            inputArea.classList.remove('voice-mode');
+            sendBtn.disabled = false;
+            
+            triggerHaptic('tap');
+        }
+        
+        function cancelFileAttachment() {
+            const inputArea = document.getElementById('chat-input-area');
+            const sendBtn = document.getElementById('send-btn');
+            const chatInput = document.getElementById('chat-input');
+            
+            pendingFileAttachment = null;
+            
+            inputArea.classList.remove('file-mode');
+            sendBtn.disabled = !chatInput.value.trim();
+            
+            triggerHaptic('tap');
+        }
+        
+        async function sendFileMessage() {
+            if (!pendingFileAttachment || !currentChatContact) return;
+            
+            const sendBtn = document.getElementById('send-btn');
+            const attachBtn = document.getElementById('attach-btn');
+            sendBtn.disabled = true;
+            sendBtn.classList.add('sending');
+            attachBtn.classList.add('uploading');
+            
+            try {
+                // Convert file to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(pendingFileAttachment.file);
+                });
+                
+                // Upload file
+                const uploadRes = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        file: base64,
+                        contentType: pendingFileAttachment.type,
+                        fileName: pendingFileAttachment.name
+                    })
+                });
+                
+                if (!uploadRes.ok) {
+                    const data = await uploadRes.json();
+                    throw new Error(data.error || 'Échec upload');
+                }
+                
+                const uploadData = await uploadRes.json();
+                
+                // Send message with file attachment info
+                const messageContent = `📎 ${uploadData.fileName}`;
+                const res = await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        contact_id: currentChatContact.contact_user_id,
+                        content: messageContent,
+                        file_url: uploadData.url,
+                        file_name: uploadData.fileName,
+                        file_size: uploadData.fileSize,
+                        file_type: uploadData.fileType
+                    })
+                });
+                
+                if (!res.ok) throw new Error('Échec envoi');
+                
+                // Clear file state
+                cancelFileAttachment();
+                
+                triggerHaptic('success');
+                showToast({ type: 'success', message: '📎 Fichier envoyé !' });
+                
+                // Refresh messages
+                loadMessages();
+                
+            } catch (e) {
+                console.error('File send error:', e);
+                triggerHaptic('error');
+                showToast({ type: 'error', title: 'Échec envoi', message: e.message || 'Réessaie ?' });
+            } finally {
+                sendBtn.classList.remove('sending');
+                attachBtn.classList.remove('uploading');
+                const chatInput = document.getElementById('chat-input');
+                const inputArea = document.getElementById('chat-input-area');
+                sendBtn.disabled = !chatInput.value.trim() && !inputArea.classList.contains('file-mode');
+            }
+        }
+        
+        // Render file attachment in chat message
+        function renderFileAttachment(fileUrl, fileName, fileSize, fileType) {
+            const ext = fileType || getFileExtension(fileName);
+            const icon = getFileIcon(ext);
+            const typeLabel = getFileTypeLabel(ext);
+            const sizeFormatted = formatFileSize(fileSize || 0);
+            
+            return `
+                <a href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener noreferrer" class="file-attachment" download="${escapeHtml(fileName)}">
+                    <div class="file-attachment-icon ${ext}">${icon}</div>
+                    <div class="file-attachment-info">
+                        <div class="file-attachment-name">${escapeHtml(fileName)}</div>
+                        <div class="file-attachment-meta">
+                            <span>${typeLabel}</span>
+                            <span>•</span>
+                            <span>${sizeFormatted}</span>
+                        </div>
+                    </div>
+                    <div class="file-attachment-download">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </div>
+                </a>
+            `;
         }
         
         async function sendVoiceMessage() {
@@ -7512,6 +8504,57 @@
             }
             
             return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined });
+        }
+        
+        // Format last seen timestamp for contacts
+        function formatLastSeen(lastSeenAt) {
+            if (!lastSeenAt) return { text: 'Hors ligne', isOnline: false };
+            
+            const lastSeen = new Date(lastSeenAt);
+            const now = new Date();
+            const diffMs = now - lastSeen;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            // Online if seen within last 2 minutes
+            if (diffMinutes < 2) {
+                return { text: 'En ligne', isOnline: true };
+            }
+            
+            // Just now (2-5 minutes)
+            if (diffMinutes < 5) {
+                return { text: 'À l\'instant', isOnline: false };
+            }
+            
+            // Minutes (5-59)
+            if (diffMinutes < 60) {
+                return { text: `Vu il y a ${diffMinutes} min`, isOnline: false };
+            }
+            
+            // Hours (1-23)
+            if (diffHours < 24) {
+                return { text: `Vu il y a ${diffHours}h`, isOnline: false };
+            }
+            
+            // Yesterday
+            if (diffDays === 1) {
+                return { text: 'Vu hier', isOnline: false };
+            }
+            
+            // Days (2-6)
+            if (diffDays < 7) {
+                return { text: `Vu il y a ${diffDays}j`, isOnline: false };
+            }
+            
+            // Weeks
+            const diffWeeks = Math.floor(diffDays / 7);
+            if (diffWeeks < 4) {
+                return { text: `Vu il y a ${diffWeeks} sem.`, isOnline: false };
+            }
+            
+            // More than a month
+            return { text: 'Vu il y a longtemps', isOnline: false };
         }
         
         // escapeHtml() now provided by /js/shared.js
