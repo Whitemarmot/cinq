@@ -9,7 +9,7 @@ const UserProfile = (function() {
     // ========================================
     // Configuration
     // ========================================
-    const API_BASE = '/.netlify/functions';
+    const API_BASE = '/api';
     const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNnrT412YHQ';
     
@@ -179,7 +179,7 @@ const UserProfile = (function() {
             throw new Error('Aucune modification');
         }
         
-        const data = await apiCall('user-profile', 'PATCH', filteredUpdates);
+        const data = await apiCall('user-profile', 'PUT', filteredUpdates);
         _profile = { ..._profile, ...filteredUpdates };
         return data;
     }

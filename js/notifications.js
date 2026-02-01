@@ -196,7 +196,7 @@ window.CinqNotifications = (function() {
         return { success: false, message: 'Non connecté' };
       }
       
-      const response = await fetch('/.netlify/functions/push-subscribe', {
+      const response = await fetch('/api/push-subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ window.CinqNotifications = (function() {
         // Notify server
         const token = await window.Cinq.getAccessToken();
         if (token) {
-          await fetch('/.netlify/functions/push-subscribe', {
+          await fetch('/api/push-subscribe', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -727,7 +727,7 @@ window.CinqNotifications = (function() {
       
       const lastCheck = localStorage.getItem(CONFIG.STORAGE_KEY_LAST_CHECK) || '0';
       
-      const response = await fetch(`/.netlify/functions/messages?since=${lastCheck}&count=true`, {
+      const response = await fetch(`/api/messages?since=${lastCheck}&count=true`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
