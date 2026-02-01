@@ -74,7 +74,7 @@ export default async function handler(req, res) {
 // ===== GET - List posts =====
 
 async function handleGetPosts(req, res, user) {
-    const { limit, offset, user_id, cursor, parent_id } = req.query;
+    const { limit, offset, user_id, cursor, parent_id, scheduled } = req.query;
     
     // Parse and validate pagination params
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || DEFAULT_FETCH_LIMIT), MAX_FETCH_LIMIT);
@@ -82,6 +82,11 @@ async function handleGetPosts(req, res, user) {
     
     // Parse cursor (ISO date string for cursor-based pagination)
     const parsedCursor = cursor ? parseCursor(cursor) : null;
+    
+    // Get scheduled posts for current user
+    if (scheduled === 'true') {
+        return getScheduledPosts(res, user, safeLimit, safeOffset, parsedCursor);
+    }
     
     // Get replies to a specific post
     if (parent_id) {
@@ -111,6 +116,56 @@ function parseCursor(cursorStr) {
     } catch {
         return null;
     }
+}
+
+/**
+ * Get user's scheduled posts (not yet published)
+ */
+async function getScheduledPosts(res, user, limit, offset, cursor = null) {
+    const now = new Date().toISOString();
+    
+    // Build query - get posts scheduled for the future
+    let query = supabase
+        .from('posts')
+        .select('*')
+        .eq('user_id', user.id)
+        .not('scheduled_at', 'is', null)
+        .gt('scheduled_at', now)
+        .is('parent_id', null)
+        .order('scheduled_at', { ascending: true }); // Nearest scheduled first
+    
+    // Cursor-based pagination
+    if (cursor) {
+        query = query.gt('scheduled_at', cursor);
+    } else if (offset > 0) {
+        query = query.range(offset, offset + limit - 1);
+    }
+    
+    query = query.limit(limit);
+    
+    const { data: posts, error } = await query;
+    
+    if (error) throw error;
+    
+    const authorInfo = await getUserInfo(user.id);
+    
+    const enriched = posts.map(post => ({
+        ...post,
+        author: authorInfo,
+        is_scheduled: true
+    }));
+    
+    // Generate next cursor
+    const nextCursor = posts.length === limit && posts.length > 0 
+        ? posts[posts.length - 1].scheduled_at 
+        : null;
+    
+    return res.json({
+        posts: enriched,
+        count: posts.length,
+        nextCursor,
+        hasMore: posts.length === limit
+    });
 }
 
 /**
@@ -192,7 +247,8 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
     }
     
     // Check access: must be self or contact
-    if (userId !== user.id) {
+    const isOwnProfile = userId === user.id;
+    if (!isOwnProfile) {
         const { data: contact } = await supabase
             .from('contacts')
             .select('id')
@@ -205,13 +261,22 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
         }
     }
     
+    const now = new Date().toISOString();
+    
     // Build query - exclude replies (only show root posts)
+    // For other users, exclude scheduled posts that haven't been published yet
     let query = supabase
         .from('posts')
         .select('*')
         .eq('user_id', userId)
-        .is('parent_id', null)
-        .order('created_at', { ascending: false });
+        .is('parent_id', null);
+    
+    // Only filter scheduled posts when viewing someone else's profile
+    if (!isOwnProfile) {
+        query = query.or(`scheduled_at.is.null,scheduled_at.lte.${now}`);
+    }
+    
+    query = query.order('created_at', { ascending: false });
     
     // Cursor-based pagination (preferred) or offset-based
     if (cursor) {
@@ -281,12 +346,16 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     const contactIds = contacts?.map(c => c.contact_user_id) || [];
     const allUserIds = [user.id, ...contactIds];
     
+    const now = new Date().toISOString();
+    
     // Build query - exclude replies (only show root posts)
+    // Also exclude scheduled posts that haven't been published yet
     let query = supabase
         .from('posts')
         .select('*')
         .in('user_id', allUserIds)
         .is('parent_id', null)
+        .or(`scheduled_at.is.null,scheduled_at.lte.${now}`)
         .order('created_at', { ascending: false });
     
     // Cursor-based pagination (preferred) or offset-based fallback
@@ -401,7 +470,7 @@ async function getUserPollVotes(userId, postIds) {
 // ===== POST - Create post =====
 
 async function handleCreatePost(req, res, user) {
-    const { content, image_url, is_gif, poll_options, parent_id, format } = req.body;
+    const { content, image_url, is_gif, poll_options, parent_id, format, scheduled_at } = req.body;
     
     // Validate content
     if (!content || typeof content !== 'string') {
@@ -463,6 +532,16 @@ async function handleCreatePost(req, res, user) {
     // Validate format if provided
     const validatedFormat = validateFormat(format);
     
+    // Validate scheduled_at if provided (not allowed in replies)
+    if (parent_id && scheduled_at) {
+        return res.status(400).json({ error: 'La programmation n\'est pas autorisée pour les réponses' });
+    }
+    
+    const validatedScheduledAt = validateScheduledAt(scheduled_at);
+    if (validatedScheduledAt.error) {
+        return res.status(400).json({ error: validatedScheduledAt.error });
+    }
+    
     // Build post data
     const postData = {
         user_id: user.id,
@@ -470,7 +549,8 @@ async function handleCreatePost(req, res, user) {
         image_url: validatedImageUrl.url,
         is_gif: !!is_gif && !!validatedImageUrl.url, // Only set is_gif if there's actually an image
         parent_id: parent_id || null,
-        format: validatedFormat
+        format: validatedFormat,
+        scheduled_at: validatedScheduledAt.scheduledAt
     };
     
     // Add poll options if valid
@@ -510,7 +590,9 @@ async function handleCreatePost(req, res, user) {
         userId: user.id, 
         hasPoll: !!validatedPollOptions.options,
         isReply: !!parent_id,
-        parentId: parent_id || null
+        parentId: parent_id || null,
+        isScheduled: !!validatedScheduledAt.scheduledAt,
+        scheduledAt: validatedScheduledAt.scheduledAt || null
     });
     
     // Add poll metadata for response
@@ -519,10 +601,14 @@ async function handleCreatePost(req, res, user) {
         responsePost.poll_total_votes = 0;
         responsePost.user_poll_vote = null;
     }
+    if (post.scheduled_at) {
+        responsePost.is_scheduled = true;
+    }
     
     return res.status(201).json({
         success: true,
-        post: responsePost
+        post: responsePost,
+        scheduled: !!validatedScheduledAt.scheduledAt
     });
 }
 
@@ -542,6 +628,38 @@ async function createReplyNotification(recipientId, senderId, replyId, parentPos
             });
     } catch (e) {
         logError(e, { context: 'createReplyNotification' });
+    }
+}
+
+/**
+ * Validate scheduled_at timestamp
+ * @param {string} scheduledAt - ISO date string for when to publish
+ * @returns {Object} { scheduledAt: string|null, error?: string }
+ */
+function validateScheduledAt(scheduledAt) {
+    if (!scheduledAt) return { scheduledAt: null };
+    
+    try {
+        const date = new Date(scheduledAt);
+        if (isNaN(date.getTime())) {
+            return { error: 'Format de date invalide' };
+        }
+        
+        const now = new Date();
+        const minScheduleTime = new Date(now.getTime() + 5 * 60 * 1000); // At least 5 minutes in the future
+        const maxScheduleTime = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // Max 30 days in the future
+        
+        if (date < minScheduleTime) {
+            return { error: 'La date de programmation doit être au moins 5 minutes dans le futur' };
+        }
+        
+        if (date > maxScheduleTime) {
+            return { error: 'La date de programmation ne peut pas dépasser 30 jours' };
+        }
+        
+        return { scheduledAt: date.toISOString() };
+    } catch {
+        return { error: 'Format de date invalide' };
     }
 }
 

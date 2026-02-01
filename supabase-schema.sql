@@ -239,6 +239,23 @@ BEGIN
     END IF;
 END $$;
 
+-- Add voice message columns if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='voice_url') THEN
+        ALTER TABLE messages ADD COLUMN voice_url TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='voice_duration') THEN
+        ALTER TABLE messages ADD COLUMN voice_duration REAL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='voice_waveform') THEN
+        ALTER TABLE messages ADD COLUMN voice_waveform JSONB;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='voice_transcript') THEN
+        ALTER TABLE messages ADD COLUMN voice_transcript TEXT;
+    END IF;
+END $$;
+
 -- Add reply_to_id column if not exists (reply to message feature)
 DO $$ 
 BEGIN 
@@ -392,6 +409,18 @@ BEGIN
         ALTER TABLE posts ADD COLUMN is_gif BOOLEAN DEFAULT FALSE;
     END IF;
 END $$;
+
+-- Add scheduled_at column if not exists (Post Scheduling feature)
+-- NULL = published immediately, timestamp = scheduled for that time
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='scheduled_at') THEN
+        ALTER TABLE posts ADD COLUMN scheduled_at TIMESTAMPTZ DEFAULT NULL;
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_posts_scheduled ON posts(scheduled_at) WHERE scheduled_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_posts_user_scheduled ON posts(user_id, scheduled_at) WHERE scheduled_at IS NOT NULL;
 
 -- ============================================
 -- ANALYTICS EVENTS (server-side)
