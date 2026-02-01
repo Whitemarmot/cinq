@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Post — Cinq</title>
+    
+    <!-- SEO (will be updated dynamically) -->
+    <meta name="description" content="Découvre ce post sur Cinq — Le réseau social de ton cercle proche.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Open Graph (will be updated dynamically) -->
+    <meta property="og:title" content="Post — Cinq" id="og-title">
+    <meta property="og:description" content="Découvre ce post sur Cinq." id="og-description">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cinq.app/post" id="og-url">
+    <meta property="og:image" content="https://cinq.app/og-image.png" id="og-image">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Post — Cinq" id="twitter-title">
+    <meta name="twitter:description" content="Découvre ce post sur Cinq." id="twitter-description">
+    <meta name="twitter:image" content="https://cinq.app/og-image.png" id="twitter-image">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        .post-page {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-bg-primary);
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .post-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .back-btn, .cta-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .back-btn {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .cta-btn {
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            color: white;
+            border: none;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .post-content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .post-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            animation: fade-in 0.5s ease;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .post-author-info {
+            flex: 1;
+        }
+        
+        .post-author-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .post-time {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+        }
+        
+        .post-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 1rem;
+        }
+        
+        .post-image {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .post-image img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+        }
+        
+        .share-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .share-label {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .share-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            transform: translateY(-2px);
+        }
+        
+        .share-btn.twitter:hover { border-color: #1da1f2; color: #1da1f2; }
+        .share-btn.whatsapp:hover { border-color: #25d366; color: #25d366; }
+        .share-btn.copy:hover { border-color: var(--color-brand); color: var(--color-brand); }
+        .share-btn.copy.copied { 
+            background: var(--color-brand-muted); 
+            border-color: var(--color-brand); 
+            color: var(--color-brand);
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .error-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-text {
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .join-cta {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .join-cta p {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="toast-container" id="toast-container"></div>
+    
+    <main class="post-page">
+        <header class="post-header">
+            <a href="/" class="post-logo">5</a>
+            <div class="header-actions">
+                <a href="/feed.html" class="back-btn">← Feed</a>
+                <a href="/register.html" class="cta-btn">Rejoindre</a>
+            </div>
+        </header>
+        
+        <div class="post-content-wrapper" id="post-container">
+            <!-- Loading state -->
+            <div class="loading-state" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Chargement du post...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = '/api';
+        
+        async function loadPost() {
+            // Get post ID from URL (supports both /post.html?id=xxx and /p/xxx formats)
+            let postId = null;
+            
+            // Check query parameter first
+            const params = new URLSearchParams(window.location.search);
+            postId = params.get('id');
+            
+            // If not found, try path format /p/:id
+            if (!postId) {
+                const pathMatch = window.location.pathname.match(/\/p\/([a-f0-9-]+)/i);
+                if (pathMatch) {
+                    postId = pathMatch[1];
+                }
+            }
+            
+            if (!postId) {
+                showError('Post non trouvé', 'L\'ID du post est manquant.');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/post?id=${postId}`);
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Post non trouvé');
+                }
+                
+                const post = data.post;
+                
+                // Update meta tags for OG/Twitter
+                updateMetaTags(post);
+                
+                // Render post
+                renderPost(post);
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                showError('Post non trouvé', e.message);
+            }
+        }
+        
+        function updateMetaTags(post) {
+            const postUrl = `${window.location.origin}/p/${post.id}`;
+            const ogImageUrl = `${window.location.origin}/api/og-image?id=${post.id}`;
+            const title = `${post.author.display_name} sur Cinq`;
+            const description = post.content.substring(0, 200) + (post.content.length > 200 ? '...' : '');
+            
+            document.title = title;
+            
+            // Update canonical URL
+            let canonical = document.querySelector('link[rel="canonical"]');
+            if (!canonical) {
+                canonical = document.createElement('link');
+                canonical.rel = 'canonical';
+                document.head.appendChild(canonical);
+            }
+            canonical.href = postUrl;
+            
+            // Update OG tags
+            document.getElementById('og-title').content = title;
+            document.getElementById('og-description').content = description;
+            document.getElementById('og-url').content = postUrl;
+            document.getElementById('og-image').content = ogImageUrl;
+            
+            // Update Twitter tags
+            document.getElementById('twitter-title').content = title;
+            document.getElementById('twitter-description').content = description;
+            document.getElementById('twitter-image').content = ogImageUrl;
+            
+            // Update meta description
+            document.querySelector('meta[name="description"]').content = description;
+        }
+        
+        function renderPost(post) {
+            const container = document.getElementById('post-container');
+            const authorInitial = (post.author.display_name || '?')[0].toUpperCase();
+            const postUrl = window.location.href;
+            const shareText = encodeURIComponent(`${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}`);
+            const shareUrl = encodeURIComponent(postUrl);
+            
+            // Format time
+            const time = formatTime(post.created_at);
+            
+            // Avatar
+            const avatarContent = post.author.avatar_url 
+                ? `<img src="${escapeHtml(post.author.avatar_url)}" alt="${escapeHtml(post.author.display_name)}">`
+                : authorInitial;
+            
+            // Image
+            const imageHtml = post.image_url 
+                ? `<div class="post-image"><img src="${escapeHtml(post.image_url)}" alt="Image du post"></div>`
+                : '';
+            
+            container.innerHTML = `
+                <article class="post-card">
+                    <div class="post-author">
+                        <div class="post-avatar">${avatarContent}</div>
+                        <div class="post-author-info">
+                            <div class="post-author-name">${escapeHtml(post.author.display_name)}</div>
+                            <time class="post-time">${time}</time>
+                        </div>
+                    </div>
+                    
+                    <div class="post-text">${escapeHtml(post.content)}</div>
+                    ${imageHtml}
+                    
+                    <div class="share-section">
+                        <div class="share-label">Partager</div>
+                        <div class="share-buttons">
+                            <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" 
+                               target="_blank" rel="noopener noreferrer" 
+                               class="share-btn twitter">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                Twitter
+                            </a>
+                            <a href="https://wa.me/?text=${shareText}%20${shareUrl}" 
+                               target="_blank" rel="noopener noreferrer"
+                               class="share-btn whatsapp">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                WhatsApp
+                            </a>
+                            <button onclick="copyLink()" class="share-btn copy" id="copy-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                <span id="copy-text">Copier le lien</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+                
+                <div class="join-cta">
+                    <p>✨ Envie de rejoindre le cercle ?</p>
+                    <a href="/register.html" class="cta-btn">Créer mon compte Cinq</a>
+                </div>
+            `;
+        }
+        
+        function showError(title, message) {
+            const container = document.getElementById('post-container');
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">😢</div>
+                    <div class="error-title">${escapeHtml(title)}</div>
+                    <div class="error-text">${escapeHtml(message)}</div>
+                    <a href="/" class="cta-btn">Retour à l'accueil</a>
+                </div>
+            `;
+        }
+        
+        async function copyLink() {
+            const url = window.location.href;
+            try {
+                await navigator.clipboard.writeText(url);
+                const btn = document.getElementById('copy-btn');
+                const text = document.getElementById('copy-text');
+                btn.classList.add('copied');
+                text.textContent = 'Copié !';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    text.textContent = 'Copier le lien';
+                }, 2000);
+            } catch (e) {
+                showToast({ type: 'error', message: 'Impossible de copier' });
+            }
+        }
+        
+        // Load post on init
+        loadPost();
+    </script>
+</body>
+</html>

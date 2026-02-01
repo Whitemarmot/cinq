@@ -1,6 +1,12 @@
 {
   "version": 2,
   "framework": null,
+  "rewrites": [
+    {
+      "source": "/p/:id",
+      "destination": "/post.html?id=:id"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
