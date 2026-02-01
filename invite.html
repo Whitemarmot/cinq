@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Inviter sur Cinq — L'anti-réseau social</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Invite tes proches sur Cinq. Génère des liens personnalisés et suis l'état de tes invitations.">
+    <meta name="keywords" content="cinq, invitation, lien, partage, réseau social, anti-réseau, proches">
+    <meta name="author" content="Cinq">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/invite">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Inviter sur Cinq">
+    <meta property="og:description" content="Invite tes proches sur l'anti-réseau social. 5 proches, pas de likes, pas d'algorithme.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/invite">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Inviter sur Cinq">
+    <meta name="twitter:description" content="Invite tes proches sur l'anti-réseau social.">
+    <meta name="twitter:image" content="https://cinq.app/og-image.png">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.getElementById('theme-color-meta');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+    <style>
+        /* ===== CSS VARIABLES (inherited from design system) ===== */
+        :root {
+            --cinq-gradient: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #fbbf24 100%);
+            --color-brand: #ff6b4a;
+            --color-brand-light: #ff8a6a;
+            --color-brand-glow: rgba(255, 107, 74, 0.4);
+            --color-brand-muted: rgba(255, 107, 74, 0.1);
+            --color-bg-primary: #0c0c0f;
+            --color-bg-secondary: #141419;
+            --color-bg-tertiary: #1a1a21;
+            --color-bg-elevated: #222230;
+            --color-text-primary: #fafafa;
+            --color-text-secondary: #a1a1aa;
+            --color-text-muted: #71717a;
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-border-subtle: rgba(255, 255, 255, 0.04);
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+            --shadow-glow: 0 0 40px var(--color-brand-glow);
+            --shadow-glow-sm: 0 0 20px var(--color-brand-glow);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --glass-highlight: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+        }
+        
+        [data-theme="light"] {
+            --color-bg-primary: #faf9f7;
+            --color-bg-secondary: #f5f4f2;
+            --color-bg-tertiary: #efeeed;
+            --color-bg-elevated: #ffffff;
+            --color-text-primary: #18181b;
+            --color-text-secondary: #52525b;
+            --color-text-muted: #a1a1aa;
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-border-subtle: rgba(0, 0, 0, 0.04);
+            --color-brand-glow: rgba(255, 107, 74, 0.25);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* ===== RESET ===== */
+        *, *::before, *::after { box-sizing: border-box; }
+        * { margin: 0; padding: 0; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            line-height: 1.2;
+        }
+        
+        a { color: inherit; text-decoration: none; }
+        
+        /* ===== LAYOUT ===== */
+        .invite-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-5);
+            padding-top: calc(var(--space-5) + 60px);
+        }
+        
+        .invite-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* ===== HEADER ===== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: rgba(12, 12, 15, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        
+        [data-theme="light"] .site-header {
+            background: rgba(250, 249, 247, 0.9);
+        }
+        
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-logo-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .header-logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--color-bg-elevated);
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
+        }
+        
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+        
+        .header-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .header-back-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+        
+        .page-logo {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px var(--color-brand-glow));
+            margin-bottom: var(--space-4);
+            display: inline-block;
+            position: relative;
+        }
+        
+        .page-logo::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            background: conic-gradient(
+                from 0deg,
+                rgba(255, 107, 74, 0.3) 0deg,
+                rgba(255, 138, 106, 0.2) 72deg,
+                rgba(251, 191, 36, 0.15) 144deg,
+                rgba(167, 139, 250, 0.2) 216deg,
+                rgba(255, 107, 74, 0.3) 288deg
+            );
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            opacity: 0.4;
+            z-index: -1;
+            filter: blur(18px);
+            animation: pentagon-pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pentagon-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+        
+        .page-title {
+            font-size: var(--text-2xl);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+        
+        .page-subtitle {
+            color: var(--color-text-muted);
+            font-size: var(--text-base);
+        }
+        
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-6);
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            animation: card-enter 0.4s var(--ease-out-expo);
+            margin-bottom: var(--space-6);
+        }
+        
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: var(--space-6);
+            right: var(--space-6);
+            height: 1px;
+            background: var(--glass-highlight);
+            pointer-events: none;
+        }
+        
+        .card-title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .card-title svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--color-brand);
+        }
+        
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        
+        .form-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted), var(--shadow-glow-sm);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+        
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: var(--text-base);
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .btn-primary {
+            background: var(--cinq-gradient);
+            color: white;
+            box-shadow: 0 4px 20px var(--color-brand-glow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-brand);
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+        }
+        
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        /* ===== PREVIEW CARD ===== */
+        .preview-section {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .preview-label {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-4);
+        }
+        
+        .invite-preview {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            background: var(--cinq-gradient);
+            padding: var(--space-6);
+            text-align: center;
+            position: relative;
+        }
+        
+        .preview-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid var(--color-brand);
+        }
+        
+        .preview-logo {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .preview-body {
+            padding: var(--space-8) var(--space-6);
+            text-align: center;
+        }
+        
+        .preview-from {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-2);
+        }
+        
+        .preview-name {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+            color: var(--color-brand);
+        }
+        
+        .preview-message {
+            color: var(--color-text-secondary);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: var(--space-6);
+            padding: 0 var(--space-4);
+        }
+        
+        .preview-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            background: var(--cinq-gradient);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+        }
+        
+        /* ===== LINK OUTPUT ===== */
+        .link-output {
+            display: none;
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .link-output.visible {
+            display: block;
+            animation: fade-in 0.3s ease;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .link-box {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+        }
+        
+        .link-input {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-brand);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            font-family: monospace;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .share-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .share-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .share-btn.whatsapp:hover { border-color: #25D366; color: #25D366; }
+        .share-btn.telegram:hover { border-color: #0088cc; color: #0088cc; }
+        .share-btn.email:hover { border-color: #ea4335; color: #ea4335; }
+        .share-btn.sms:hover { border-color: #34C759; color: #34C759; }
+        
+        .copy-feedback {
+            font-size: var(--text-sm);
+            color: var(--color-success);
+            margin-top: var(--space-2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .copy-feedback.visible {
+            opacity: 1;
+        }
+        
+        /* ===== INVITATIONS LIST ===== */
+        .invitations-list {
+            list-style: none;
+        }
+        
+        .invitation-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-3);
+            transition: border-color 0.2s ease;
+        }
+        
+        .invitation-item:hover {
+            border-color: var(--color-brand);
+        }
+        
+        .invitation-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .invitation-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: var(--text-base);
+        }
+        
+        .invitation-details {
+            flex: 1;
+        }
+        
+        .invitation-name {
+            font-weight: 600;
+            font-size: var(--text-base);
+            margin-bottom: 2px;
+        }
+        
+        .invitation-meta {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .invitation-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .invitation-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--color-warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .invitation-status.accepted {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--color-success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .invitation-status.expired {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--color-error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .invitation-status.opened {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .invitation-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--color-text-muted);
+        }
+        
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--color-text-muted);
+            margin-bottom: var(--space-4);
+            opacity: 0.5;
+        }
+        
+        .empty-state p {
+            font-size: var(--text-sm);
+        }
+        
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        @media (max-width: 500px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stat-card {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ===== FOOTER ===== */
+        .page-footer {
+            margin-top: auto;
+            padding: var(--space-6);
+            text-align: center;
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .page-footer a {
+            color: var(--color-brand);
+            transition: opacity 0.2s;
+        }
+        
+        .page-footer a:hover {
+            opacity: 0.8;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .invite-page {
+                padding: var(--space-4);
+                padding-top: calc(var(--space-4) + 60px);
+            }
+            
+            .card {
+                padding: var(--space-5);
+            }
+            
+            .page-logo {
+                font-size: 2.5rem;
+            }
+            
+            .page-title {
+                font-size: var(--text-xl);
+            }
+            
+            .preview-body {
+                padding: var(--space-6) var(--space-4);
+            }
+            
+            .invitation-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+            
+            .invitation-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+        
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-6);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            padding: var(--space-1);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .tab-btn.active {
+            background: var(--cinq-gradient);
+            color: white;
+            box-shadow: 0 2px 10px var(--color-brand-glow);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fade-in 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <a href="/" class="header-logo">
+            <span class="header-logo-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 2L29.5 11.5L24.5 27.5H7.5L2.5 11.5L16 2Z" stroke="url(#logo-gradient)" stroke-width="2" fill="none"/>
+                    <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-gradient)">5</text>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b4a"/>
+                            <stop offset="100%" style="stop-color:#ff8a6a"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </span>
+            <span class="header-logo-text">cinq</span>
+        </a>
+        <nav class="header-nav">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" type="button">
+                <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <a href="/feed.html" class="header-back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Retour
+            </a>
+        </nav>
+    </header>
+
+    <main class="invite-page">
+        <div class="invite-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-logo">5</div>
+                <h1 class="page-title">Invite tes proches</h1>
+                <p class="page-subtitle">Génère des liens personnalisés et suis leur parcours</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" data-tab="create" role="tab" aria-selected="true">
+                    Créer une invitation
+                </button>
+                <button class="tab-btn" data-tab="track" role="tab" aria-selected="false">
+                    Mes invitations
+                </button>
+            </div>
+            
+            <!-- Tab: Create Invitation -->
+            <div class="tab-content active" id="tab-create" role="tabpanel">
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Personnalise ton invitation
+                    </h2>
+                    
+                    <form id="invite-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="recipient-name">Prénom du destinataire</label>
+                                <input type="text" id="recipient-name" class="form-input" placeholder="Marie" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="sender-name">Ton prénom</label>
+                                <input type="text" id="sender-name" class="form-input" placeholder="Thomas">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="personal-message">Message personnel (optionnel)</label>
+                            <textarea id="personal-message" class="form-input form-textarea" placeholder="Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social où on se concentre sur les vrais liens. J'aimerais que tu fasses partie de mes 5 proches 💛"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Générer le lien d'invitation
+                        </button>
+                    </form>
+                    
+                    <!-- Preview -->
+                    <div class="preview-section">
+                        <div class="preview-label">Aperçu de l'invitation</div>
+                        <div class="invite-preview">
+                            <div class="preview-header">
+                                <div class="preview-logo">5</div>
+                            </div>
+                            <div class="preview-body">
+                                <div class="preview-from">Invitation de</div>
+                                <div class="preview-name" id="preview-sender">Thomas</div>
+                                <p class="preview-message" id="preview-message">"Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social où on se concentre sur les vrais liens."</p>
+                                <div class="preview-cta">
+                                    Rejoindre Cinq
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Link Output -->
+                    <div class="link-output" id="link-output">
+                        <div class="preview-label">Ton lien d'invitation</div>
+                        <div class="link-box">
+                            <input type="text" class="link-input" id="invite-link" readonly>
+                            <button class="btn btn-secondary btn-icon" onclick="copyLink()" aria-label="Copier le lien">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </button>
+                        </div>
+                        <div class="copy-feedback" id="copy-feedback">✓ Lien copié !</div>
+                        
+                        <div class="share-buttons">
+                            <button class="share-btn whatsapp" onclick="shareWhatsApp()">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                WhatsApp
+                            </button>
+                            <button class="share-btn telegram" onclick="shareTelegram()">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                                Telegram
+                            </button>
+                            <button class="share-btn email" onclick="shareEmail()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Email
+                            </button>
+                            <button class="share-btn sms" onclick="shareSMS()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                SMS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Track Invitations -->
+            <div class="tab-content" id="tab-track" role="tabpanel">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Invitations envoyées</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-opened">0</div>
+                        <div class="stat-label">Liens ouverts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-accepted">0</div>
+                        <div class="stat-label">Inscriptions</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Suivi des invitations
+                    </h2>
+                    
+                    <ul class="invitations-list" id="invitations-list">
+                        <!-- Dynamic content -->
+                    </ul>
+                    
+                    <div class="empty-state" id="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <p>Tu n'as pas encore envoyé d'invitation.<br>Crée ta première invitation pour commencer !</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="page-footer">
+            <a href="/help.html">Aide</a> · <a href="/privacy.html">Confidentialité</a> · <a href="/">cinq.app</a>
+        </footer>
+    </main>
+
+    <script>
+        // ===== TAB NAVIGATION =====
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`tab-${tab}`).classList.add('active');
+            });
+        });
+        
+        // ===== INVITATION STORAGE =====
+        const STORAGE_KEY = 'cinq_invitations';
+        
+        function getInvitations() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch {
+                return [];
+            }
+        }
+        
+        function saveInvitation(invitation) {
+            const invitations = getInvitations();
+            invitations.unshift(invitation);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(invitations));
+            renderInvitations();
+            updateStats();
+        }
+        
+        function generateInviteCode() {
+            return 'inv_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        }
+        
+        // ===== FORM HANDLING =====
+        const form = document.getElementById('invite-form');
+        const recipientInput = document.getElementById('recipient-name');
+        const senderInput = document.getElementById('sender-name');
+        const messageInput = document.getElementById('personal-message');
+        const previewSender = document.getElementById('preview-sender');
+        const previewMessage = document.getElementById('preview-message');
+        const linkOutput = document.getElementById('link-output');
+        const inviteLink = document.getElementById('invite-link');
+        
+        // Live preview
+        senderInput.addEventListener('input', () => {
+            previewSender.textContent = senderInput.value || 'Ton ami(e)';
+        });
+        
+        messageInput.addEventListener('input', () => {
+            const msg = messageInput.value || "Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social où on se concentre sur les vrais liens.";
+            previewMessage.textContent = `"${msg}"`;
+        });
+        
+        // Form submit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const recipientName = recipientInput.value.trim();
+            const senderName = senderInput.value.trim() || 'Un ami';
+            const message = messageInput.value.trim();
+            const code = generateInviteCode();
+            
+            // Build URL with params
+            const params = new URLSearchParams({
+                code: code,
+                from: senderName,
+                to: recipientName
+            });
+            if (message) {
+                params.set('msg', message.substring(0, 200));
+            }
+            
+            const url = `https://cinq.app/register?${params.toString()}`;
+            inviteLink.value = url;
+            linkOutput.classList.add('visible');
+            
+            // Save invitation
+            const invitation = {
+                id: code,
+                recipientName,
+                senderName,
+                message,
+                url,
+                createdAt: new Date().toISOString(),
+                status: 'pending',
+                openedAt: null,
+                acceptedAt: null
+            };
+            saveInvitation(invitation);
+            
+            // Scroll to link
+            linkOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        
+        // ===== COPY & SHARE =====
+        let currentUrl = '';
+        
+        function copyLink() {
+            const url = inviteLink.value;
+            currentUrl = url;
+            navigator.clipboard.writeText(url).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.classList.add('visible');
+                setTimeout(() => feedback.classList.remove('visible'), 2000);
+            });
+        }
+        
+        function shareWhatsApp() {
+            const url = inviteLink.value;
+            const text = `Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social 💛 ${url}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        function shareTelegram() {
+            const url = inviteLink.value;
+            const text = `Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social 💛`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        function shareEmail() {
+            const url = inviteLink.value;
+            const subject = `Je t'invite sur Cinq !`;
+            const body = `Hey !\n\nJe t'invite à rejoindre Cinq, l'anti-réseau social où on se concentre sur les vrais liens.\n\n${url}\n\nÀ bientôt ! 💛`;
+            window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+        }
+        
+        function shareSMS() {
+            const url = inviteLink.value;
+            const text = `Hey ! Je t'invite sur Cinq 💛 ${url}`;
+            // iOS uses &body=, Android uses ?body=
+            const separator = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?';
+            window.open(`sms:${separator}body=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        // ===== RENDER INVITATIONS =====
+        function renderInvitations() {
+            const list = document.getElementById('invitations-list');
+            const emptyState = document.getElementById('empty-state');
+            const invitations = getInvitations();
+            
+            if (invitations.length === 0) {
+                list.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            list.innerHTML = invitations.map(inv => {
+                const initial = inv.recipientName.charAt(0).toUpperCase();
+                const date = new Date(inv.createdAt);
+                const formattedDate = date.toLocaleDateString('fr-FR', { 
+                    day: 'numeric', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const statusLabels = {
+                    pending: 'En attente',
+                    opened: 'Lien ouvert',
+                    accepted: 'Inscrit(e)',
+                    expired: 'Expiré'
+                };
+                
+                return `
+                    <li class="invitation-item" data-id="${inv.id}">
+                        <div class="invitation-info">
+                            <div class="invitation-avatar">${initial}</div>
+                            <div class="invitation-details">
+                                <div class="invitation-name">${escapeHtml(inv.recipientName)}</div>
+                                <div class="invitation-meta">Envoyée le ${formattedDate}</div>
+                            </div>
+                        </div>
+                        <div class="invitation-status ${inv.status}">${statusLabels[inv.status]}</div>
+                        <div class="invitation-actions">
+                            <button class="btn btn-secondary btn-icon" onclick="copyInviteLink('${inv.url}')" aria-label="Copier le lien">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </button>
+                            <button class="btn btn-secondary btn-icon" onclick="resendInvite('${inv.id}')" aria-label="Renvoyer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                            </button>
+                            <button class="btn btn-secondary btn-icon" onclick="deleteInvite('${inv.id}')" aria-label="Supprimer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function copyInviteLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                // Could show a toast notification here
+                alert('Lien copié !');
+            });
+        }
+        
+        function resendInvite(id) {
+            const invitations = getInvitations();
+            const inv = invitations.find(i => i.id === id);
+            if (inv) {
+                shareWhatsAppDirect(inv.url);
+            }
+        }
+        
+        function shareWhatsAppDirect(url) {
+            const text = `Hey ! Je t'invite à rejoindre Cinq, l'anti-réseau social 💛 ${url}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+        
+        function deleteInvite(id) {
+            if (!confirm('Supprimer cette invitation ?')) return;
+            
+            const invitations = getInvitations();
+            const filtered = invitations.filter(i => i.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+            renderInvitations();
+            updateStats();
+        }
+        
+        // ===== STATS =====
+        function updateStats() {
+            const invitations = getInvitations();
+            
+            document.getElementById('stat-total').textContent = invitations.length;
+            document.getElementById('stat-opened').textContent = invitations.filter(i => i.status === 'opened' || i.status === 'accepted').length;
+            document.getElementById('stat-accepted').textContent = invitations.filter(i => i.status === 'accepted').length;
+        }
+        
+        // ===== DEMO DATA (for showcase) =====
+        function loadDemoData() {
+            const existing = getInvitations();
+            if (existing.length > 0) return;
+            
+            // Add some demo invitations
+            const demoInvitations = [
+                {
+                    id: 'inv_demo1',
+                    recipientName: 'Marie',
+                    senderName: 'Thomas',
+                    message: "Hey ! Tu me manques. J'aimerais qu'on reste connectés sur Cinq.",
+                    url: 'https://cinq.app/register?code=inv_demo1&from=Thomas&to=Marie',
+                    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    status: 'accepted'
+                },
+                {
+                    id: 'inv_demo2',
+                    recipientName: 'Lucas',
+                    senderName: 'Thomas',
+                    message: '',
+                    url: 'https://cinq.app/register?code=inv_demo2&from=Thomas&to=Lucas',
+                    createdAt: new Date(Date.now() - 86400000).toISOString(),
+                    status: 'opened'
+                },
+                {
+                    id: 'inv_demo3',
+                    recipientName: 'Sophie',
+                    senderName: 'Thomas',
+                    message: "Rejoins-moi sur Cinq !",
+                    url: 'https://cinq.app/register?code=inv_demo3&from=Thomas&to=Sophie',
+                    createdAt: new Date(Date.now() - 3600000).toISOString(),
+                    status: 'pending'
+                }
+            ];
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(demoInvitations));
+        }
+        
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDemoData();
+            renderInvitations();
+            updateStats();
+        });
+    </script>
+</body>
+</html>
