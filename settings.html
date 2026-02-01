@@ -1022,6 +1022,164 @@
                 transform: none;
             }
         }
+        
+        /* ===== USER STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        
+        .stat-card {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--color-border-active);
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: var(--space-1);
+        }
+        
+        .stat-card-wide {
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3);
+            text-align: left;
+        }
+        
+        .stat-card-wide .stat-icon {
+            font-size: 1.5rem;
+        }
+        
+        .stat-card-wide .stat-info {
+            flex: 1;
+        }
+        
+        .stat-card-wide .stat-value {
+            font-size: var(--text-lg);
+        }
+        
+        /* Activity Chart */
+        .activity-chart-container {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+        }
+        
+        .activity-chart-title {
+            font-size: var(--text-sm);
+            font-weight: 500;
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .activity-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: var(--space-1);
+        }
+        
+        .activity-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .activity-bar {
+            width: 100%;
+            max-width: 32px;
+            background: var(--color-bg-elevated);
+            border-radius: var(--radius-sm);
+            position: relative;
+            height: 60px;
+            overflow: hidden;
+        }
+        
+        .activity-bar-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--cinq-gradient);
+            border-radius: var(--radius-sm);
+            transition: height 0.5s var(--ease-out-expo);
+        }
+        
+        .activity-bar-label {
+            font-size: 9px;
+            color: var(--color-text-muted);
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .activity-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-4);
+            margin-top: var(--space-3);
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .activity-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .activity-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .activity-legend-dot.messages {
+            background: var(--color-brand);
+        }
+        
+        .activity-legend-dot.posts {
+            background: #a78bfa;
+        }
+        
+        .stats-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-6);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
     </style>
 </head>
 <body>
@@ -1122,6 +1280,133 @@
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <!-- Section: Statistiques -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    Mes statistiques
+                </h2>
+                
+                <div class="settings-card">
+                    <div id="stats-loading" class="stats-loading">
+                        Chargement des statistiques...
+                    </div>
+                    
+                    <div id="stats-content" class="hidden" style="padding: var(--space-4);">
+                        <!-- Stats Grid -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="stat-messages">-</div>
+                                <div class="stat-label">Messages envoyés</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="stat-posts">-</div>
+                                <div class="stat-label">Posts publiés</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="stat-contacts">-</div>
+                                <div class="stat-label">Contacts</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="stat-days">-</div>
+                                <div class="stat-label">Jours membre</div>
+                            </div>
+                            <div class="stat-card stat-card-wide">
+                                <span class="stat-icon">🎂</span>
+                                <div class="stat-info">
+                                    <div class="stat-label">Membre depuis</div>
+                                    <div class="stat-value" id="stat-member-since">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Activity Chart -->
+                        <div class="activity-chart-container">
+                            <div class="activity-chart-title">
+                                📊 Activité des 8 dernières semaines
+                            </div>
+                            <div class="activity-chart" id="activity-chart">
+                                <!-- Bars will be generated by JS -->
+                            </div>
+                            <div class="activity-legend">
+                                <div class="activity-legend-item">
+                                    <span class="activity-legend-dot messages"></span>
+                                    <span>Messages</span>
+                                </div>
+                                <div class="activity-legend-item">
+                                    <span class="activity-legend-dot posts"></span>
+                                    <span>Posts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="stats-error" class="hidden" style="padding: var(--space-4); text-align: center; color: var(--color-text-muted); font-size: var(--text-sm);">
+                        Impossible de charger les statistiques
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Mon Statut -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    Mon Statut
+                </h2>
+                
+                <div class="settings-card">
+                    <div class="settings-form">
+                        <!-- Status Preview -->
+                        <div class="form-group">
+                            <label class="form-label">Aperçu</label>
+                            <div id="status-preview" class="status-preview" style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--color-bg-tertiary); border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+                                <span id="status-preview-emoji" style="font-size: 1.5rem;">😊</span>
+                                <span id="status-preview-text" style="color: var(--color-text-muted); font-size: var(--text-sm);">Aucun statut</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Emoji Picker -->
+                        <div class="form-group">
+                            <label for="status-emoji" class="form-label">Emoji</label>
+                            <div class="emoji-picker-grid" style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                                <button type="button" class="emoji-btn" data-emoji="😊" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">😊</button>
+                                <button type="button" class="emoji-btn" data-emoji="🎉" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">🎉</button>
+                                <button type="button" class="emoji-btn" data-emoji="💼" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">💼</button>
+                                <button type="button" class="emoji-btn" data-emoji="🏠" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">🏠</button>
+                                <button type="button" class="emoji-btn" data-emoji="✈️" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">✈️</button>
+                                <button type="button" class="emoji-btn" data-emoji="🎮" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">🎮</button>
+                                <button type="button" class="emoji-btn" data-emoji="📚" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">📚</button>
+                                <button type="button" class="emoji-btn" data-emoji="🏃" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">🏃</button>
+                                <button type="button" class="emoji-btn" data-emoji="🎵" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">🎵</button>
+                                <button type="button" class="emoji-btn" data-emoji="☕" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">☕</button>
+                                <button type="button" class="emoji-btn" data-emoji="💤" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">💤</button>
+                                <button type="button" class="emoji-btn" data-emoji="❤️" onclick="selectStatusEmoji(this)" style="width: 40px; height: 40px; border-radius: var(--radius-lg); border: 1px solid var(--color-border); background: var(--color-bg-tertiary); cursor: pointer; font-size: 1.25rem; transition: all 0.2s;">❤️</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Text -->
+                        <div class="form-group">
+                            <label for="status-text" class="form-label">Message (60 caractères max)</label>
+                            <div class="form-row">
+                                <input type="text" id="status-text" class="form-input" placeholder="Que fais-tu ?" maxlength="60" oninput="updateStatusPreview()">
+                            </div>
+                            <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1);"><span id="status-char-count">0</span>/60</p>
+                        </div>
+                        
+                        <!-- Save / Clear buttons -->
+                        <div class="form-group" style="display: flex; gap: var(--space-2);">
+                            <button id="btn-save-status" class="form-btn form-btn-primary" style="flex: 1;" onclick="saveUserStatus()">Enregistrer</button>
+                            <button id="btn-clear-status" class="form-btn" style="flex-shrink: 0;" onclick="clearUserStatus()">Effacer</button>
+                        </div>
+                        <p id="status-message" class="form-message hidden"></p>
+                    </div>
+                </div>
+                
+                <p class="settings-item-subtitle" style="margin-top: var(--space-2); padding: 0 var(--space-2);">
+                    💡 Ton statut est visible par tes contacts dans l'app.
+                </p>
             </section>
 
             <!-- Section: Apparence -->
@@ -1273,6 +1558,65 @@
                                 🌴 Mode vacances activé
                             </p>
                             <p class="settings-item-subtitle">Les notifications sont désactivées et tes contacts reçoivent un message automatique.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Mode Focus -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Mode Focus
+                </h2>
+                
+                <div class="settings-card">
+                    <!-- Toggle focus mode -->
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span id="focus-status-icon">🎯</span>
+                                <span id="focus-status-text">Mode Focus</span>
+                            </p>
+                            <p id="focus-status-desc" class="settings-item-subtitle">Masque le feed pendant tes heures de travail</p>
+                        </div>
+                        <button id="btn-focus-toggle" class="toggle-switch" data-pref="focus" onclick="toggleFocusMode(this)" aria-label="Activer le mode focus"></button>
+                    </div>
+                    
+                    <!-- Focus hours configuration -->
+                    <div id="focus-hours-container" class="settings-form" style="border-top: 1px solid var(--color-border); display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Heures de focus</label>
+                            <div class="form-row" style="gap: var(--space-3); align-items: center;">
+                                <div style="flex: 1;">
+                                    <label for="focus-start" class="form-label" style="font-size: var(--text-xs);">Début</label>
+                                    <input type="time" id="focus-start" class="form-input" value="09:00">
+                                </div>
+                                <span style="color: var(--color-text-muted); padding-top: var(--space-4);">→</span>
+                                <div style="flex: 1;">
+                                    <label for="focus-end" class="form-label" style="font-size: var(--text-xs);">Fin</label>
+                                    <input type="time" id="focus-end" class="form-input" value="18:00">
+                                </div>
+                            </div>
+                            <div style="margin-top: var(--space-3); text-align: right;">
+                                <button id="btn-save-focus-hours" class="form-btn form-btn-primary">Enregistrer</button>
+                            </div>
+                        </div>
+                        <p id="focus-hours-result" class="form-message hidden"></p>
+                        <p class="settings-item-subtitle" style="margin-top: var(--space-2);">
+                            💡 Pendant ces heures, le feed affichera "Mode Focus actif" pour t'aider à te concentrer.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Info box when focus mode is active -->
+                <div id="focus-active-info" class="push-card hidden" style="margin-top: var(--space-3); background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3);">
+                    <div class="push-card-content">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title" style="color: var(--color-brand);">
+                                🎯 Mode Focus actif
+                            </p>
+                            <p class="settings-item-subtitle" id="focus-active-hours">Le feed sera masqué de 09:00 à 18:00.</p>
                         </div>
                     </div>
                 </div>
@@ -2234,6 +2578,117 @@
         $('btn-save-vacation-message').addEventListener('click', saveVacationMessage);
         
         // ============================================
+        // Focus Mode
+        // ============================================
+        let focusModeEnabled = false;
+        
+        function updateFocusUI(isEnabled, startTime = '09:00', endTime = '18:00') {
+            focusModeEnabled = isEnabled;
+            const toggle = $('btn-focus-toggle');
+            const icon = $('focus-status-icon');
+            const text = $('focus-status-text');
+            const desc = $('focus-status-desc');
+            const hoursContainer = $('focus-hours-container');
+            const activeInfo = $('focus-active-info');
+            const activeHours = $('focus-active-hours');
+            const startInput = $('focus-start');
+            const endInput = $('focus-end');
+            
+            if (startTime) startInput.value = startTime;
+            if (endTime) endInput.value = endTime;
+            
+            if (isEnabled) {
+                toggle.classList.add('active');
+                icon.textContent = '🎯';
+                text.textContent = 'Mode Focus actif';
+                desc.textContent = 'Le feed est masqué pendant tes heures de travail';
+                hoursContainer.style.display = 'block';
+                activeInfo.classList.remove('hidden');
+                activeHours.textContent = `Le feed sera masqué de ${startTime} à ${endTime}.`;
+            } else {
+                toggle.classList.remove('active');
+                icon.textContent = '🎯';
+                text.textContent = 'Mode Focus';
+                desc.textContent = 'Masque le feed pendant tes heures de travail';
+                hoursContainer.style.display = 'none';
+                activeInfo.classList.add('hidden');
+            }
+        }
+        
+        async function toggleFocusMode(button) {
+            const willBeActive = !button.classList.contains('active');
+            const startTime = $('focus-start').value || '09:00';
+            const endTime = $('focus-end').value || '18:00';
+            
+            button.disabled = true;
+            
+            try {
+                await UserProfile.updateProfile({ 
+                    focus_mode: willBeActive,
+                    focus_start: startTime,
+                    focus_end: endTime
+                });
+                updateFocusUI(willBeActive, startTime, endTime);
+                
+                if (willBeActive) {
+                    showToast('Mode Focus activé 🎯');
+                    logUserActivity('focus_enabled', { start: startTime, end: endTime });
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = `Mode Focus activé de ${startTime} à ${endTime}.`;
+                } else {
+                    showToast('Mode Focus désactivé');
+                    logUserActivity('focus_disabled');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Mode Focus désactivé.';
+                }
+            } catch (err) {
+                console.error('Toggle focus mode error:', err);
+                showToast('Erreur', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        async function saveFocusHours() {
+            const startTime = $('focus-start').value;
+            const endTime = $('focus-end').value;
+            const btn = $('btn-save-focus-hours');
+            
+            if (!startTime || !endTime) {
+                showMessage('focus-hours-result', 'Heures invalides', true);
+                return;
+            }
+            
+            // Validate that start < end
+            if (startTime >= endTime) {
+                showMessage('focus-hours-result', 'L\'heure de fin doit être après l\'heure de début', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                await UserProfile.updateProfile({ 
+                    focus_start: startTime,
+                    focus_end: endTime
+                });
+                showMessage('focus-hours-result', 'Heures enregistrées ✓', false);
+                $('focus-active-hours').textContent = `Le feed sera masqué de ${startTime} à ${endTime}.`;
+                setTimeout(() => hideMessage('focus-hours-result'), 3000);
+                showToast('Heures de focus mises à jour ✓');
+            } catch (err) {
+                console.error('Save focus hours error:', err);
+                showMessage('focus-hours-result', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            }
+        }
+        
+        $('btn-save-focus-hours').addEventListener('click', saveFocusHours);
+        
+        // ============================================
         // Activity Log
         // ============================================
         let activityOffset = 0;
@@ -2323,6 +2778,137 @@
         
         $('activity-log-more').addEventListener('click', () => loadActivityLog(true));
         
+        // ============================================
+        // User Status (WhatsApp-style)
+        // ============================================
+        let selectedStatusEmoji = null;
+        
+        function selectStatusEmoji(button) {
+            // Remove active state from all emoji buttons
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.style.borderColor = 'var(--color-border)';
+                btn.style.background = 'var(--color-bg-tertiary)';
+                btn.style.transform = 'scale(1)';
+            });
+            
+            // Set active state on selected button
+            button.style.borderColor = 'var(--color-brand)';
+            button.style.background = 'var(--color-brand-muted)';
+            button.style.transform = 'scale(1.1)';
+            
+            selectedStatusEmoji = button.dataset.emoji;
+            updateStatusPreview();
+        }
+        
+        function updateStatusPreview() {
+            const textInput = $('status-text');
+            const previewEmoji = $('status-preview-emoji');
+            const previewText = $('status-preview-text');
+            const charCount = $('status-char-count');
+            
+            const emoji = selectedStatusEmoji || '😊';
+            const text = textInput.value.trim() || 'Aucun statut';
+            
+            previewEmoji.textContent = emoji;
+            previewText.textContent = text;
+            previewText.style.color = textInput.value.trim() ? 'var(--color-text-primary)' : 'var(--color-text-muted)';
+            
+            charCount.textContent = textInput.value.length;
+        }
+        
+        function updateStatusUI(emoji, text) {
+            selectedStatusEmoji = emoji;
+            
+            // Update emoji selection
+            document.querySelectorAll('.emoji-btn').forEach(btn => {
+                if (btn.dataset.emoji === emoji) {
+                    btn.style.borderColor = 'var(--color-brand)';
+                    btn.style.background = 'var(--color-brand-muted)';
+                    btn.style.transform = 'scale(1.1)';
+                } else {
+                    btn.style.borderColor = 'var(--color-border)';
+                    btn.style.background = 'var(--color-bg-tertiary)';
+                    btn.style.transform = 'scale(1)';
+                }
+            });
+            
+            // Update text input
+            const textInput = $('status-text');
+            textInput.value = text || '';
+            
+            updateStatusPreview();
+        }
+        
+        async function saveUserStatus() {
+            const btn = $('btn-save-status');
+            const textInput = $('status-text');
+            const statusText = textInput.value.trim();
+            
+            if (statusText.length > 60) {
+                showMessage('status-message', 'Message trop long (max 60 caractères)', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                await UserProfile.updateProfile({ 
+                    status_emoji: selectedStatusEmoji,
+                    status_text: statusText || null
+                });
+                showMessage('status-message', 'Statut enregistré ✓', false);
+                setTimeout(() => hideMessage('status-message'), 3000);
+                showToast('Statut mis à jour ✓');
+                logUserActivity('status_updated', { emoji: selectedStatusEmoji, text: statusText });
+            } catch (err) {
+                console.error('Save status error:', err);
+                showMessage('status-message', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            }
+        }
+        
+        async function clearUserStatus() {
+            const btn = $('btn-clear-status');
+            
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                await UserProfile.updateProfile({ 
+                    status_emoji: null,
+                    status_text: null
+                });
+                
+                selectedStatusEmoji = null;
+                $('status-text').value = '';
+                
+                // Reset emoji buttons
+                document.querySelectorAll('.emoji-btn').forEach(btn => {
+                    btn.style.borderColor = 'var(--color-border)';
+                    btn.style.background = 'var(--color-bg-tertiary)';
+                    btn.style.transform = 'scale(1)';
+                });
+                
+                updateStatusPreview();
+                showMessage('status-message', 'Statut effacé ✓', false);
+                setTimeout(() => hideMessage('status-message'), 3000);
+                showToast('Statut effacé');
+                logUserActivity('status_cleared');
+            } catch (err) {
+                console.error('Clear status error:', err);
+                showMessage('status-message', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Effacer';
+            }
+        }
+        
+        // Add event listener for status text input
+        $('status-text').addEventListener('input', updateStatusPreview);
+        
         // Helper to log activity from settings page
         async function logUserActivity(activityType, metadata = {}) {
             try {
@@ -2340,6 +2926,102 @@
             } catch (e) {
                 // Silent fail - don't break main flow
             }
+        }
+        
+        // ============================================
+        // User Stats
+        // ============================================
+        async function loadUserStats() {
+            const loadingEl = $('stats-loading');
+            const contentEl = $('stats-content');
+            const errorEl = $('stats-error');
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) {
+                    loadingEl.classList.add('hidden');
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                const response = await fetch('/api/user-stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Update stats
+                $('stat-messages').textContent = formatNumber(data.messages_sent);
+                $('stat-posts').textContent = formatNumber(data.posts_count);
+                $('stat-contacts').textContent = data.contacts_count + '/5';
+                $('stat-days').textContent = formatNumber(data.member_days);
+                
+                // Format member since date
+                if (data.member_since) {
+                    const date = new Date(data.member_since);
+                    $('stat-member-since').textContent = date.toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                }
+                
+                // Render activity chart
+                renderActivityChart(data.weekly_activity);
+                
+                loadingEl.classList.add('hidden');
+                contentEl.classList.remove('hidden');
+                
+            } catch (err) {
+                console.error('Error loading user stats:', err);
+                loadingEl.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+            }
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return num.toString();
+        }
+        
+        function renderActivityChart(weeklyData) {
+            const chartEl = $('activity-chart');
+            if (!chartEl || !weeklyData || weeklyData.length === 0) return;
+            
+            // Find max value for scaling
+            const maxValue = Math.max(
+                ...weeklyData.map(w => w.messages + w.posts),
+                1 // Minimum 1 to avoid division by zero
+            );
+            
+            chartEl.innerHTML = weeklyData.map(week => {
+                const total = week.messages + week.posts;
+                const heightPercent = Math.max((total / maxValue) * 100, 5); // Min 5% height for visibility
+                
+                // Create gradient effect for messages vs posts
+                const messagePercent = total > 0 ? (week.messages / total) * 100 : 50;
+                
+                return `
+                    <div class="activity-bar-wrapper">
+                        <div class="activity-bar" title="${week.messages} messages, ${week.posts} posts">
+                            <div class="activity-bar-fill" style="height: ${heightPercent}%; background: linear-gradient(to top, var(--color-brand) ${messagePercent}%, #a78bfa ${messagePercent}%);"></div>
+                        </div>
+                        <span class="activity-bar-label">${week.week_label}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Animate bars in
+            setTimeout(() => {
+                chartEl.querySelectorAll('.activity-bar-fill').forEach((bar, i) => {
+                    bar.style.transition = `height 0.5s var(--ease-out-expo) ${i * 0.05}s`;
+                });
+            }, 100);
         }
         
         // ============================================
@@ -2366,6 +3048,19 @@
                     updateVacationUI(
                         profile.vacation_mode || false, 
                         profile.vacation_message || 'Je suis en vacances ! Je te réponds dès mon retour 🌴'
+                    );
+                    
+                    // Load focus mode state
+                    updateFocusUI(
+                        profile.focus_mode || false,
+                        profile.focus_start || '09:00',
+                        profile.focus_end || '18:00'
+                    );
+                    
+                    // Load user status
+                    updateStatusUI(
+                        profile.status_emoji || null,
+                        profile.status_text || ''
                     );
                 } catch (e) {
                     $('display-name').value = UserProfile.getEmailPrefix(user.email);
@@ -2394,6 +3089,9 @@
                 
                 // Load activity log
                 loadActivityLog();
+                
+                // Load user stats
+                loadUserStats();
                 
                 showScreen('settings');
                 
