@@ -65,6 +65,14 @@
         })();
     </script>
     
+    <!-- Reading mode initialization (prevent flash) -->
+    <script>
+        (function() {
+            var isReading = localStorage.getItem('cinq_reading_mode') === 'true';
+            document.documentElement.setAttribute('data-reading-mode', isReading ? 'true' : 'false');
+        })();
+    </script>
+    
     <!-- Shared utilities -->
     <script src="/js/shared.js"></script>
     
@@ -2398,6 +2406,88 @@
         [data-compact-mode="true"] .giphy-content-gif {
             display: none !important;
         }
+        
+        /* ===== MODE LECTURE ===== */
+        /* Focus sur le contenu, masque les distractions */
+        
+        .reading-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .reading-mode-toggle:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.05);
+        }
+        
+        .reading-mode-toggle svg {
+            color: var(--color-text-secondary);
+            transition: all 0.2s ease;
+        }
+        
+        .reading-mode-toggle.active {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+        }
+        
+        .reading-mode-toggle.active svg {
+            color: var(--color-brand);
+        }
+        
+        /* Éléments masqués en mode lecture */
+        [data-reading-mode="true"] .composer {
+            display: none !important;
+        }
+        
+        [data-reading-mode="true"] .post-reactions {
+            display: none !important;
+        }
+        
+        [data-reading-mode="true"] .post-actions {
+            display: none !important;
+        }
+        
+        [data-reading-mode="true"] .giphy-content-gif {
+            display: none !important;
+        }
+        
+        /* Indicateur mode lecture actif */
+        [data-reading-mode="true"] .feed-title::after {
+            content: " 📖";
+            font-size: 0.9em;
+        }
+        
+        /* Posts en mode lecture: plus aérés */
+        [data-reading-mode="true"] .post-card {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--color-border);
+            border-radius: 0;
+        }
+        
+        [data-reading-mode="true"] .post-content {
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        /* Animation de transition */
+        .composer,
+        .post-reactions,
+        .post-actions,
+        .post-card {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -2442,6 +2532,12 @@
                 Feed
             </span>
             <div class="header-actions">
+                <button class="reading-mode-toggle" id="reading-mode-toggle" onclick="toggleReadingMode()" aria-label="Activer/désactiver le mode lecture" title="Mode Lecture">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                </button>
                 <a href="/bookmarks.html" class="back-btn" aria-label="Voir mes favoris" title="Favoris" style="padding: 0.5rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                 </a>
@@ -2739,9 +2835,42 @@
             document.documentElement.setAttribute('data-compact-mode', isCompact ? 'true' : 'false');
         }
         
+        // ===== READING MODE =====
+        function initReadingMode() {
+            const isReading = localStorage.getItem('cinq_reading_mode') === 'true';
+            document.documentElement.setAttribute('data-reading-mode', isReading ? 'true' : 'false');
+            const toggle = document.getElementById('reading-mode-toggle');
+            if (toggle && isReading) {
+                toggle.classList.add('active');
+            }
+        }
+        
+        function toggleReadingMode() {
+            const current = localStorage.getItem('cinq_reading_mode') === 'true';
+            const newValue = !current;
+            localStorage.setItem('cinq_reading_mode', newValue ? 'true' : 'false');
+            document.documentElement.setAttribute('data-reading-mode', newValue ? 'true' : 'false');
+            
+            const toggle = document.getElementById('reading-mode-toggle');
+            if (toggle) {
+                toggle.classList.toggle('active', newValue);
+            }
+            
+            // Announce change for screen readers
+            const srAnnounce = document.getElementById('sr-announce');
+            if (srAnnounce) {
+                srAnnounce.textContent = newValue ? 'Mode lecture activé' : 'Mode lecture désactivé';
+            }
+            
+            // Show toast
+            showToast(newValue ? '📖 Mode Lecture activé' : '💬 Mode normal activé');
+        }
+        
         async function init() {
             // Initialize compact mode early for no flash
             initCompactMode();
+            // Initialize reading mode
+            initReadingMode();
             
             const sessionStr = localStorage.getItem('cinq_session');
             if (!sessionStr) {
