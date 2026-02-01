@@ -174,6 +174,55 @@
         document.addEventListener('DOMContentLoaded', function() {
             var pref = localStorage.getItem('cinq_theme') || 'dark';
             updateThemeSelector(pref);
+            updateThemeDescription(pref);
+            
+            // For sunrise mode, set up periodic check and update
+            if (pref === 'sunrise') {
+                // Check every minute if theme needs to change
+                setInterval(function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    var shouldBe = getSunrisePref();
+                    if (currentTheme !== shouldBe) {
+                        var h = document.documentElement;
+                        h.classList.add('theme-transitioning');
+                        h.setAttribute('data-theme', shouldBe);
+                        var m = document.querySelector('meta[name="theme-color"]');
+                        if(m) m.content = shouldBe === 'light' ? '#faf9f7' : '#0e0e12';
+                        setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
+                    }
+                }, 60000);
+                
+                // Fetch real sunrise/sunset if geolocation available
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        fetch('https://api.sunrise-sunset.org/json?lat=' + pos.coords.latitude + '&lng=' + pos.coords.longitude + '&formatted=0')
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                if (data.status === 'OK') {
+                                    var sr = new Date(data.results.sunrise);
+                                    var ss = new Date(data.results.sunset);
+                                    localStorage.setItem('cinq_sunrise_data', JSON.stringify({
+                                        date: new Date().toDateString(),
+                                        sunrise: sr.getHours() + sr.getMinutes() / 60,
+                                        sunset: ss.getHours() + ss.getMinutes() / 60
+                                    }));
+                                    updateThemeDescription('sunrise');
+                                    // Check if theme needs updating
+                                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                                    var shouldBe = getSunrisePref();
+                                    if (currentTheme !== shouldBe) {
+                                        var h = document.documentElement;
+                                        h.classList.add('theme-transitioning');
+                                        h.setAttribute('data-theme', shouldBe);
+                                        var m = document.querySelector('meta[name="theme-color"]');
+                                        if(m) m.content = shouldBe === 'light' ? '#faf9f7' : '#0e0e12';
+                                        setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
+                                    }
+                                }
+                            });
+                    }, null, { timeout: 5000, maximumAge: 86400000 });
+                }
+            }
         });
     </script>
     

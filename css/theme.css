@@ -211,6 +211,30 @@ html.theme-transitioning *::after {
   flex-shrink: 0;
 }
 
+/* 4-option theme selector (compact) */
+.theme-selector-4 .theme-selector-option {
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  font-size: var(--text-xs, 0.75rem);
+  gap: var(--space-1, 0.25rem);
+}
+
+.theme-selector-4 .theme-selector-option svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Responsive: stack on very small screens */
+@media (max-width: 400px) {
+  .theme-selector-4 {
+    flex-wrap: wrap;
+  }
+  
+  .theme-selector-4 .theme-selector-option {
+    flex: 1 1 45%;
+    min-width: 0;
+  }
+}
+
 /* ============================================
    DARK MODE SPECIFIC ADJUSTMENTS
    ============================================ */
