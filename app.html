@@ -36,7 +36,8 @@
     <!-- Google Fonts — Distinctive Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     
     <!-- Critical CSS (inline for fastest FCP) -->
     <link rel="stylesheet" href="/css/critical.min.css">
@@ -4561,7 +4562,7 @@
                 ` : '';
                 
                 return `
-                    <article class="post-card" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
+                    <article class="post-card" data-post-id="${post.id}" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
                         <div class="post-header">
                             <div class="post-author">
                                 <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${avatarHtml}</div>
@@ -5694,7 +5695,8 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeImageModal();
-                if (currentChatContact) closeChat();
+                if (document.getElementById('search-overlay').classList.contains('open')) closeSearch();
+                else if (currentChatContact) closeChat();
                 else if (document.getElementById('gift-modal').classList.contains('open')) closeGiftModal();
                 else if (document.getElementById('add-contact-modal').classList.contains('open')) closeAddContactModal();
                 else if (document.getElementById('delete-account-modal').classList.contains('open')) closeDeleteAccountModal();
