@@ -1,0 +1,1507 @@
+openapi: 3.0.3
+info:
+  title: Cinq API
+  description: |
+    API pour Cinq, une plateforme sociale minimaliste limitée à 5 contacts.
+    
+    ## Authentification
+    La plupart des endpoints nécessitent un token JWT Bearer dans le header `Authorization`.
+    
+    ```
+    Authorization: Bearer <token>
+    ```
+    
+    ## Rate Limiting
+    Les endpoints sont protégés par rate limiting. Les limites varient selon:
+    - **Public**: 30 req/min
+    - **Read**: 60 req/min  
+    - **Create**: 30 req/min
+    - **Auth**: 5 req/min
+    
+    ## Codes d'erreur
+    - `400` - Requête invalide
+    - `401` - Non authentifié
+    - `403` - Accès refusé
+    - `404` - Ressource non trouvée
+    - `409` - Conflit (doublon)
+    - `429` - Trop de requêtes
+    - `500` - Erreur serveur
+    
+  version: 1.0.0
+  contact:
+    name: Cinq Support
+  license:
+    name: MIT
+
+servers:
+  - url: https://cinq-three.vercel.app/api
+    description: Production
+  - url: http://localhost:3000/api
+    description: Development
+
+tags:
+  - name: Auth
+    description: Authentification et gestion de session
+  - name: Contacts
+    description: Gestion des 5 contacts
+  - name: Messages
+    description: Messagerie directe
+  - name: Proposals
+    description: Propositions de rendez-vous
+  - name: Posts
+    description: Feed social
+  - name: Profile
+    description: Profil utilisateur et GDPR
+  - name: Gift
+    description: Codes d'invitation
+  - name: Waitlist
+    description: Liste d'attente publique
+  - name: Push
+    description: Notifications push
+  - name: Upload
+    description: Upload d'images
+  - name: Stats
+    description: Statistiques (admin)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT Supabase
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Email ou mot de passe incorrect"
+        hint:
+          type: string
+          example: "Vérifie tes identifiants et réessaie"
+        field:
+          type: string
+          example: "email"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        display_name:
+          type: string
+          example: "Jean Dupont"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://example.com/avatar.jpg"
+        bio:
+          type: string
+          example: "Hello world!"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Session:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: "bearer"
+        expires_in:
+          type: integer
+          example: 3600
+        refresh_token:
+          type: string
+
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_user_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        contact:
+          $ref: '#/components/schemas/User'
+        mutual:
+          type: boolean
+          description: Contact réciproque
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        receiver_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          maxLength: 2000
+        is_ping:
+          type: boolean
+          default: false
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Proposal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        receiver_id:
+          type: string
+          format: uuid
+        proposed_at:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 200
+          nullable: true
+        message:
+          type: string
+          maxLength: 500
+          nullable: true
+        status:
+          type: string
+          enum: [pending, accepted, declined]
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          maxLength: 1000
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        author:
+          $ref: '#/components/schemas/User'
+
+    GiftCode:
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: '^CINQ-[A-Z0-9]{4}-[A-Z0-9]{4}$'
+          example: "CINQ-AB12-CD34"
+        status:
+          type: string
+          enum: [active, redeemed, expired]
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    PushSubscription:
+      type: object
+      required:
+        - endpoint
+      properties:
+        endpoint:
+          type: string
+          format: uri
+        keys:
+          type: object
+          properties:
+            p256dh:
+              type: string
+            auth:
+              type: string
+
+paths:
+  # ============ AUTH ============
+  /auth:
+    post:
+      tags: [Auth]
+      summary: Inscription ou connexion
+      description: |
+        Actions disponibles:
+        - `register`: Créer un compte (nécessite code cadeau)
+        - `login`: Se connecter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - title: Register
+                  type: object
+                  required: [action, email, password, giftCode]
+                  properties:
+                    action:
+                      type: string
+                      enum: [register]
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+                      minLength: 8
+                      maxLength: 128
+                      description: Min 8 caractères, doit contenir lettres et chiffres
+                    giftCode:
+                      type: string
+                      pattern: '^CINQ-[A-Z0-9]{4}-[A-Z0-9]{4}$'
+                - title: Login
+                  type: object
+                  required: [action, email, password]
+                  properties:
+                    action:
+                      type: string
+                      enum: [login]
+                    email:
+                      type: string
+                      format: email
+                    password:
+                      type: string
+            examples:
+              register:
+                summary: Inscription
+                value:
+                  action: register
+                  email: "nouveau@example.com"
+                  password: "MonMotDePasse123"
+                  giftCode: "CINQ-AB12-CD34"
+              login:
+                summary: Connexion
+                value:
+                  action: login
+                  email: "user@example.com"
+                  password: "MonMotDePasse123"
+      responses:
+        '200':
+          description: Authentification réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: "Bienvenue sur Cinq ! 🎉"
+                  user:
+                    $ref: '#/components/schemas/User'
+                  session:
+                    $ref: '#/components/schemas/Session'
+                  isNewUser:
+                    type: boolean
+        '400':
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Mot de passe trop court (min 8 caractères)"
+                field: "password"
+        '401':
+          description: Identifiants incorrects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Email déjà inscrit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags: [Auth]
+      summary: Obtenir l'utilisateur courant
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [me]
+      responses:
+        '200':
+          description: Informations utilisateur
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  profile:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ============ CONTACTS ============
+  /contacts:
+    get:
+      tags: [Contacts]
+      summary: Lister les contacts ou chercher un utilisateur
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum: [search, followers]
+          description: |
+            - `search`: Rechercher par email
+            - `followers`: Voir qui vous suit
+            - (vide): Lister vos contacts
+        - name: search
+          in: query
+          schema:
+            type: string
+            format: email
+          description: Email à rechercher (avec action=search)
+      responses:
+        '200':
+          description: Liste des contacts
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - title: Contacts List
+                    type: object
+                    properties:
+                      contacts:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Contact'
+                      count:
+                        type: integer
+                        example: 3
+                      max:
+                        type: integer
+                        example: 5
+                  - title: Search Result
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      alreadyContact:
+                        type: boolean
+                  - title: Followers List
+                    type: object
+                    properties:
+                      followers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            user_id:
+                              type: string
+                              format: uuid
+                            email:
+                              type: string
+                            display_name:
+                              type: string
+                            youFollowBack:
+                              type: boolean
+                      count:
+                        type: integer
+              examples:
+                contacts:
+                  summary: Liste contacts
+                  value:
+                    contacts:
+                      - id: "abc-123"
+                        contact_user_id: "def-456"
+                        contact:
+                          id: "def-456"
+                          email: "ami@example.com"
+                          display_name: "Mon Ami"
+                        mutual: true
+                    count: 1
+                    max: 5
+        '401':
+          description: Non authentifié
+        '404':
+          description: Utilisateur non trouvé (recherche)
+
+    post:
+      tags: [Contacts]
+      summary: Ajouter un contact
+      description: Ajoute un contact par ID ou email. Maximum 5 contacts.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contactId:
+                  type: string
+                  format: uuid
+                email:
+                  type: string
+                  format: email
+            examples:
+              byId:
+                summary: Par ID
+                value:
+                  contactId: "123e4567-e89b-12d3-a456-426614174000"
+              byEmail:
+                summary: Par email
+                value:
+                  email: "ami@example.com"
+      responses:
+        '201':
+          description: Contact ajouté
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  contact:
+                    $ref: '#/components/schemas/Contact'
+        '400':
+          description: Limite atteinte ou auto-ajout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Limite atteinte ! Tu as déjà 5 contacts."
+        '409':
+          description: Déjà en contact
+
+    delete:
+      tags: [Contacts]
+      summary: Supprimer un contact
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID de la relation contact (pas l'user ID)
+      responses:
+        '200':
+          description: Contact supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+  # ============ MESSAGES ============
+  /messages:
+    get:
+      tags: [Messages]
+      summary: Récupérer les messages ou le nombre de non-lus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: contact_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: ID du contact pour l'historique
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: before
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Pagination par timestamp
+        - name: since
+          in: query
+          schema:
+            type: string
+          description: Timestamp en millisecondes pour polling
+        - name: count
+          in: query
+          schema:
+            type: string
+            enum: ["true", "false"]
+          description: Inclure le dernier message non-lu
+      responses:
+        '200':
+          description: Messages ou compteur
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - title: Message History
+                    type: object
+                    properties:
+                      messages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Message'
+                  - title: Unread Count
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      newCount:
+                        type: integer
+                      latestMessage:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          senderId:
+                            type: string
+                          senderName:
+                            type: string
+                          content:
+                            type: string
+                          isPing:
+                            type: boolean
+              examples:
+                messages:
+                  summary: Historique
+                  value:
+                    messages:
+                      - id: "msg-123"
+                        sender_id: "user-1"
+                        receiver_id: "user-2"
+                        content: "Salut !"
+                        is_ping: false
+                        read_at: null
+                        created_at: "2024-01-15T10:30:00Z"
+                unread:
+                  summary: Polling
+                  value:
+                    success: true
+                    newCount: 3
+                    latestMessage:
+                      id: "msg-456"
+                      senderId: "user-1"
+                      senderName: "Jean"
+                      content: "Tu es là ?"
+                      isPing: false
+        '403':
+          description: Pas en contact
+
+    post:
+      tags: [Messages]
+      summary: Envoyer un message ou ping
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contact_id]
+              properties:
+                contact_id:
+                  type: string
+                  format: uuid
+                content:
+                  type: string
+                  maxLength: 2000
+                  description: Contenu du message (ignoré si is_ping=true)
+                is_ping:
+                  type: boolean
+                  default: false
+                  description: Envoyer un simple ping 👋
+            examples:
+              message:
+                summary: Message texte
+                value:
+                  contact_id: "123e4567-e89b-12d3-a456-426614174000"
+                  content: "Hey, ça va ?"
+              ping:
+                summary: Ping
+                value:
+                  contact_id: "123e4567-e89b-12d3-a456-426614174000"
+                  is_ping: true
+      responses:
+        '201':
+          description: Message envoyé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    $ref: '#/components/schemas/Message'
+
+  # ============ PROPOSALS ============
+  /proposals:
+    get:
+      tags: [Proposals]
+      summary: Lister les propositions de RDV
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: contact_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filtrer par contact
+      responses:
+        '200':
+          description: Liste des propositions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Proposal'
+
+    post:
+      tags: [Proposals]
+      summary: Proposer un rendez-vous
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contact_id, proposed_at]
+              properties:
+                contact_id:
+                  type: string
+                  format: uuid
+                proposed_at:
+                  type: string
+                  format: date-time
+                  description: Date/heure proposée (doit être dans le futur, max 1 an)
+                location:
+                  type: string
+                  maxLength: 200
+                message:
+                  type: string
+                  maxLength: 500
+            example:
+              contact_id: "123e4567-e89b-12d3-a456-426614174000"
+              proposed_at: "2024-02-15T18:00:00Z"
+              location: "Café de Flore, Paris"
+              message: "Ça te dit un café ?"
+      responses:
+        '201':
+          description: Proposition créée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  proposal:
+                    $ref: '#/components/schemas/Proposal'
+        '400':
+          description: Date invalide
+
+    patch:
+      tags: [Proposals]
+      summary: Accepter ou décliner une proposition
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proposal_id, action]
+              properties:
+                proposal_id:
+                  type: string
+                  format: uuid
+                action:
+                  type: string
+                  enum: [accept, decline]
+            examples:
+              accept:
+                summary: Accepter
+                value:
+                  proposal_id: "123e4567-e89b-12d3-a456-426614174000"
+                  action: accept
+              decline:
+                summary: Décliner
+                value:
+                  proposal_id: "123e4567-e89b-12d3-a456-426614174000"
+                  action: decline
+      responses:
+        '200':
+          description: Réponse enregistrée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  proposal:
+                    $ref: '#/components/schemas/Proposal'
+        '404':
+          description: Proposition non trouvée
+
+  # ============ POSTS ============
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Récupérer le feed ou les posts d'un utilisateur
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: ID utilisateur spécifique (doit être soi-même ou un contact)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: cursor
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Pagination par curseur (created_at du dernier post)
+      responses:
+        '200':
+          description: Liste des posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+                  count:
+                    type: integer
+                  contactCount:
+                    type: integer
+                    description: Nombre de contacts (feed uniquement)
+                  nextCursor:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  hasMore:
+                    type: boolean
+
+    post:
+      tags: [Posts]
+      summary: Créer un post
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+                image_url:
+                  type: string
+                  format: uri
+                  maxLength: 2000
+            example:
+              content: "Belle journée aujourd'hui ! ☀️"
+              image_url: "https://example.com/photo.jpg"
+      responses:
+        '201':
+          description: Post créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  post:
+                    $ref: '#/components/schemas/Post'
+
+    delete:
+      tags: [Posts]
+      summary: Supprimer un post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Post supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '403':
+          description: Pas propriétaire du post
+        '404':
+          description: Post non trouvé
+
+  # ============ USER PROFILE ============
+  /user-profile:
+    get:
+      tags: [Profile]
+      summary: Obtenir le profil ou exporter les données (GDPR)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum: [export]
+          description: "export: télécharger toutes vos données (GDPR)"
+      responses:
+        '200':
+          description: Profil ou export de données
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - title: Profile
+                    type: object
+                    properties:
+                      profile:
+                        $ref: '#/components/schemas/User'
+                      stats:
+                        type: object
+                        properties:
+                          contactCount:
+                            type: integer
+                          maxContacts:
+                            type: integer
+                            example: 5
+                  - title: GDPR Export
+                    type: object
+                    properties:
+                      exportDate:
+                        type: string
+                        format: date-time
+                      user:
+                        $ref: '#/components/schemas/User'
+                      contacts:
+                        type: array
+                        items:
+                          type: object
+                      messages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Message'
+                      proposals:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Proposal'
+                      giftCodesCreated:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GiftCode'
+
+    put:
+      tags: [Profile]
+      summary: Mettre à jour le profil
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  maxLength: 50
+                avatar_url:
+                  type: string
+                  format: uri
+                bio:
+                  type: string
+                  maxLength: 200
+            example:
+              display_name: "Jean D."
+              bio: "Passionné de café ☕"
+      responses:
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  profile:
+                    $ref: '#/components/schemas/User'
+
+    delete:
+      tags: [Profile]
+      summary: Supprimer le compte (irréversible)
+      description: |
+        ⚠️ **ATTENTION**: Cette action est irréversible.
+        
+        Supprime définitivement:
+        - Votre profil
+        - Tous vos messages
+        - Toutes vos propositions
+        - Tous vos contacts
+        - Vos abonnements push
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirmation]
+              properties:
+                confirmation:
+                  type: string
+                  enum: [SUPPRIMER]
+                  description: Doit être exactement "SUPPRIMER"
+            example:
+              confirmation: "SUPPRIMER"
+      responses:
+        '200':
+          description: Compte supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: "Compte supprimé définitivement. Adieu ! 👋"
+        '400':
+          description: Confirmation manquante
+
+  # ============ GIFT ============
+  /gift:
+    post:
+      tags: [Gift]
+      summary: Créer un code d'invitation
+      description: |
+        Crée un nouveau code cadeau. 
+        - Authentification optionnelle (pour tracer le créateur)
+        - Limite: 5 codes actifs par utilisateur
+        - Validité: 30 jours
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [create]
+      responses:
+        '200':
+          description: Code créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  code:
+                    type: string
+                    example: "CINQ-AB12-CD34"
+                  gift:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                      expiresAt:
+                        type: string
+                        format: date-time
+                      shareUrl:
+                        type: string
+                        format: uri
+                        example: "https://cinq-three.vercel.app/register.html?code=CINQ-AB12-CD34"
+        '400':
+          description: Limite de codes atteinte
+
+    get:
+      tags: [Gift]
+      summary: Vérifier ou lister les codes
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [verify, list]
+        - name: code
+          in: query
+          schema:
+            type: string
+            pattern: '^CINQ-[A-Z0-9]{4}-[A-Z0-9]{4}$'
+          description: Code à vérifier (avec action=verify)
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - title: Verify Result
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                      reason:
+                        type: string
+                        description: Raison si invalide
+                      gifter:
+                        type: string
+                        description: Nom du créateur si valide
+                  - title: List Result
+                    type: object
+                    properties:
+                      gifts:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GiftCode'
+              examples:
+                valid:
+                  summary: Code valide
+                  value:
+                    valid: true
+                    gifter: "Jean"
+                invalid:
+                  summary: Code invalide
+                  value:
+                    valid: false
+                    reason: "Code déjà utilisé"
+
+  # ============ WAITLIST ============
+  /waitlist:
+    get:
+      tags: [Waitlist]
+      summary: Obtenir le nombre d'inscrits
+      responses:
+        '200':
+          description: Compteur
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 1234
+
+    post:
+      tags: [Waitlist]
+      summary: S'inscrire à la liste d'attente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+            example:
+              email: "interested@example.com"
+      responses:
+        '200':
+          description: Inscription réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                    description: Nouveau total
+        '409':
+          description: Déjà inscrit
+
+  # ============ PUSH ============
+  /push-subscribe:
+    post:
+      tags: [Push]
+      summary: S'abonner aux notifications push
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subscription]
+              properties:
+                subscription:
+                  $ref: '#/components/schemas/PushSubscription'
+            example:
+              subscription:
+                endpoint: "https://fcm.googleapis.com/fcm/send/..."
+                keys:
+                  p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUlsOktJhVe0F2YEX..."
+                  auth: "tBHItJI5svbpez7KI4CCXg=="
+      responses:
+        '200':
+          description: Abonnement activé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: "Notifications activées"
+
+    delete:
+      tags: [Push]
+      summary: Se désabonner des notifications push
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint]
+              properties:
+                endpoint:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Abonnement désactivé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: "Notifications désactivées"
+
+  # ============ UPLOAD ============
+  /upload-avatar:
+    post:
+      tags: [Upload]
+      summary: Uploader un avatar
+      description: |
+        Upload une image de profil en base64.
+        - Formats: JPEG, PNG, GIF, WebP
+        - Taille max: 2 Mo
+        - Rate limit: 5/minute
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [image, contentType]
+              properties:
+                image:
+                  type: string
+                  format: byte
+                  description: Image en base64 (avec ou sans préfixe data:...)
+                contentType:
+                  type: string
+                  enum: [image/jpeg, image/png, image/gif, image/webp]
+      responses:
+        '200':
+          description: Avatar uploadé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  avatarUrl:
+                    type: string
+                    format: uri
+                  avatar_url:
+                    type: string
+                    format: uri
+        '400':
+          description: Image invalide ou trop grande
+
+    delete:
+      tags: [Upload]
+      summary: Supprimer l'avatar
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Avatar supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /upload-image:
+    post:
+      tags: [Upload]
+      summary: Uploader une image pour un post ou générer avec IA
+      description: |
+        Upload une image ou génère une image avec l'IA.
+        
+        **Upload:**
+        - Formats: JPEG, PNG, GIF, WebP
+        - Taille max: 5 Mo
+        - Rate limit: 10/minute
+        
+        **Génération IA:**
+        - Utilise SDXL Lightning via Replicate
+        - Rate limit: 5/heure
+        - Prompt max: 500 caractères
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: action
+          in: query
+          schema:
+            type: string
+            enum: [generate]
+          description: "generate: utiliser l'IA pour créer une image"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - title: Upload
+                  type: object
+                  required: [image, contentType]
+                  properties:
+                    image:
+                      type: string
+                      format: byte
+                    contentType:
+                      type: string
+                      enum: [image/jpeg, image/png, image/gif, image/webp]
+                - title: Generate
+                  type: object
+                  required: [action, prompt]
+                  properties:
+                    action:
+                      type: string
+                      enum: [generate]
+                    prompt:
+                      type: string
+                      maxLength: 500
+            examples:
+              upload:
+                summary: Upload image
+                value:
+                  image: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+                  contentType: "image/jpeg"
+              generate:
+                summary: Génération IA
+                value:
+                  action: generate
+                  prompt: "Un chat mignon avec des lunettes de soleil"
+      responses:
+        '200':
+          description: Image uploadée ou générée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  url:
+                    type: string
+                    format: uri
+                  generated:
+                    type: boolean
+                    description: true si généré par IA
+                  prompt:
+                    type: string
+                    description: Prompt utilisé (si génération)
+
+  # ============ STATS ============
+  /stats:
+    get:
+      tags: [Stats]
+      summary: Statistiques de la plateforme (admin)
+      description: |
+        ⚠️ **Admin only**
+        
+        Authentification requise via:
+        - Header `x-admin-secret`
+        - Ou email dans la liste ADMIN_EMAILS
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month, all]
+            default: week
+        - name: x-admin-secret
+          in: header
+          schema:
+            type: string
+          description: Secret admin
+      responses:
+        '200':
+          description: Statistiques
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totals:
+                    type: object
+                    properties:
+                      users:
+                        type: integer
+                      messages:
+                        type: integer
+                      proposals:
+                        type: integer
+                      posts:
+                        type: integer
+                      gift_codes:
+                        type: integer
+                      active_gift_codes:
+                        type: integer
+                      waitlist:
+                        type: integer
+                  derived:
+                    type: object
+                    properties:
+                      messages_per_user:
+                        type: string
+                        example: "12.50"
+                      gift_redemption_rate:
+                        type: string
+                        example: "75.0%"
+                      conversion_rate:
+                        type: string
+                        example: "25.0%"
+        '403':
+          description: Accès admin requis
