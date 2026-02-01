@@ -386,7 +386,7 @@ async function getUserPollVotes(userId, postIds) {
 // ===== POST - Create post =====
 
 async function handleCreatePost(req, res, user) {
-    const { content, image_url, is_gif, poll_options } = req.body;
+    const { content, image_url, is_gif, poll_options, parent_id } = req.body;
     
     // Validate content
     if (!content || typeof content !== 'string') {
@@ -403,13 +403,43 @@ async function handleCreatePost(req, res, user) {
         return res.status(400).json({ error: 'Le contenu ne peut pas être vide' });
     }
     
+    // Validate parent_id if replying to a post
+    let parentPost = null;
+    if (parent_id) {
+        if (!isValidUUID(parent_id)) {
+            return res.status(400).json({ error: 'Format parent_id invalide' });
+        }
+        
+        // Check parent post exists
+        const { data: parent, error: parentError } = await supabase
+            .from('posts')
+            .select('id, user_id, parent_id')
+            .eq('id', parent_id)
+            .single();
+        
+        if (parentError || !parent) {
+            return res.status(404).json({ error: 'Post parent non trouvé' });
+        }
+        
+        // Prevent nested replies (replies to replies)
+        if (parent.parent_id !== null) {
+            return res.status(400).json({ error: 'Les réponses imbriquées ne sont pas autorisées' });
+        }
+        
+        parentPost = parent;
+    }
+    
     // Validate image URL
     const validatedImageUrl = validateImageUrl(image_url);
     if (validatedImageUrl.error) {
         return res.status(400).json({ error: validatedImageUrl.error });
     }
     
-    // Validate poll options if provided
+    // Validate poll options if provided (not allowed in replies)
+    if (parent_id && poll_options) {
+        return res.status(400).json({ error: 'Les sondages ne sont pas autorisés dans les réponses' });
+    }
+    
     const validatedPollOptions = validatePollOptions(poll_options);
     if (validatedPollOptions.error) {
         return res.status(400).json({ error: validatedPollOptions.error });
@@ -420,7 +450,8 @@ async function handleCreatePost(req, res, user) {
         user_id: user.id,
         content: sanitizedContent,
         image_url: validatedImageUrl.url,
-        is_gif: !!is_gif && !!validatedImageUrl.url // Only set is_gif if there's actually an image
+        is_gif: !!is_gif && !!validatedImageUrl.url, // Only set is_gif if there's actually an image
+        parent_id: parent_id || null
     };
     
     // Add poll options if valid
@@ -441,17 +472,30 @@ async function handleCreatePost(req, res, user) {
     const authorInfo = await getUserInfo(user.id);
     
     // Process @mentions and create notifications (fire and forget)
-    processMentions(sanitizedContent, user.id, 'post_mention', post.id)
+    const mentionType = parent_id ? 'reply_mention' : 'post_mention';
+    processMentions(sanitizedContent, user.id, mentionType, post.id)
         .catch(e => logError(e, { context: 'processMentions', postId: post.id }));
+    
+    // If this is a reply, notify the parent post author (if not self)
+    if (parentPost && parentPost.user_id !== user.id) {
+        createReplyNotification(parentPost.user_id, user.id, post.id, parent_id)
+            .catch(e => logError(e, { context: 'createReplyNotification', postId: post.id }));
+    }
     
     // Extract and save hashtags (fire and forget)
     savePostTags(post.id, sanitizedContent)
         .catch(e => logError(e, { context: 'savePostTags', postId: post.id }));
     
-    logInfo('Post created', { postId: post.id, userId: user.id, hasPoll: !!validatedPollOptions.options });
+    logInfo('Post created', { 
+        postId: post.id, 
+        userId: user.id, 
+        hasPoll: !!validatedPollOptions.options,
+        isReply: !!parent_id,
+        parentId: parent_id || null
+    });
     
     // Add poll metadata for response
-    const responsePost = { ...post, author: authorInfo };
+    const responsePost = { ...post, author: authorInfo, reply_count: 0 };
     if (post.poll_options) {
         responsePost.poll_total_votes = 0;
         responsePost.user_poll_vote = null;
@@ -461,6 +505,25 @@ async function handleCreatePost(req, res, user) {
         success: true,
         post: responsePost
     });
+}
+
+/**
+ * Create a notification for a reply to a post
+ */
+async function createReplyNotification(recipientId, senderId, replyId, parentPostId) {
+    try {
+        await supabase
+            .from('notifications')
+            .insert({
+                user_id: recipientId,
+                type: 'reply',
+                from_user_id: senderId,
+                post_id: replyId,
+                related_post_id: parentPostId
+            });
+    } catch (e) {
+        logError(e, { context: 'createReplyNotification' });
+    }
 }
 
 function validatePollOptions(pollOptions) {

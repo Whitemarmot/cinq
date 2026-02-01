@@ -7857,7 +7857,10 @@
                     }
                     
                     html += `
-                        <div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} dit">
+                        <div class="chat-message ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} dit">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             <div class="chat-message-content">${renderMentions(msg.content)}</div>
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
