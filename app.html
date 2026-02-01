@@ -3457,6 +3457,146 @@
             letter-spacing: 0.05em;
         }
         
+        /* ===== REPLY PREVIEW (above input) ===== */
+        .reply-preview {
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border-top: 1px solid var(--color-border);
+            animation: slideDown 0.2s ease-out;
+        }
+        
+        .reply-preview.hidden {
+            display: none;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .reply-preview-content {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+        }
+        
+        .reply-preview-bar {
+            width: 3px;
+            height: 32px;
+            background: var(--color-brand);
+            border-radius: var(--radius-full);
+            flex-shrink: 0;
+        }
+        
+        .reply-preview-text {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .reply-preview-author {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-brand);
+        }
+        
+        .reply-preview-message {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .reply-preview-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .reply-preview-close:hover {
+            background: var(--color-bg-elevated);
+            color: var(--color-text);
+        }
+        
+        .reply-preview-close svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* ===== REPLY QUOTE (in message) ===== */
+        .reply-quote {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: var(--space-2) var(--space-3);
+            margin-bottom: var(--space-2);
+            background: rgba(0, 0, 0, 0.15);
+            border-left: 3px solid var(--color-brand);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reply-quote:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+        
+        .reply-quote-author {
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--color-brand-light, #a78bfa);
+        }
+        
+        .reply-quote-text {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .chat-message.sent .reply-quote {
+            border-left: none;
+            border-right: 3px solid var(--color-brand);
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+        
+        /* Message highlight flash when scrolling to quoted message */
+        .chat-message.highlight-flash {
+            animation: highlightPulse 1.5s ease-out;
+        }
+        
+        @keyframes highlightPulse {
+            0%, 100% {
+                background: transparent;
+            }
+            20%, 50% {
+                background: rgba(99, 102, 241, 0.2);
+            }
+        }
+        
         .chat-input-area {
             display: flex;
             gap: var(--space-2);
@@ -6145,6 +6285,12 @@
             font-family: inherit;
         }
         
+        .schedule-char-count {
+            display: block;
+            text-align: right;
+            margin-top: var(--space-1);
+        }
+        
         .schedule-datetime {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -7225,7 +7371,8 @@
             <div class="schedule-form">
                 <div class="schedule-input-group">
                     <label for="schedule-message">Message</label>
-                    <textarea class="schedule-input schedule-textarea" id="schedule-message" placeholder="Écris ton message ici..." maxlength="500"></textarea>
+                    <textarea class="schedule-input schedule-textarea" id="schedule-message" placeholder="Écris ton message ici..." maxlength="280"></textarea>
+                    <span class="char-count schedule-char-count" id="schedule-char-count">0/280</span>
                 </div>
                 
                 <div class="schedule-input-group">
@@ -10237,11 +10384,27 @@
                         receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
                     }
                     
+                    // Build reply quote HTML if this message is a reply
+                    let replyQuoteHtml = '';
+                    if (msg.reply_to && msg.reply_to.id) {
+                        const replyContent = msg.reply_to.is_ping 
+                            ? '👋 Coucou' 
+                            : (msg.reply_to.content || '').slice(0, 60) + ((msg.reply_to.content || '').length > 60 ? '…' : '');
+                        const replyAuthor = msg.reply_to.is_mine ? 'Toi' : contactName;
+                        replyQuoteHtml = `
+                            <div class="reply-quote" onclick="scrollToMessage('${msg.reply_to.id}')" role="button" tabindex="0" aria-label="Voir le message original">
+                                <span class="reply-quote-author">${escapeHtml(replyAuthor)}</span>
+                                <span class="reply-quote-text">${escapeHtml(replyContent)}</span>
+                            </div>
+                        `;
+                    }
+                    
                     html += `
                         <div class="chat-message ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} dit">
                             <div class="chat-message-actions">
                                 ${getPinButtonHtml(msg.id)}
                             </div>
+                            ${replyQuoteHtml}
                             <div class="chat-message-content">${renderMentions(msg.content)}</div>
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
@@ -10316,11 +10479,17 @@
                 created_at: new Date().toISOString(),
                 is_ping: false,
                 read_at: null,
-                _sending: true
+                _sending: true,
+                reply_to_id: replyingTo?.id || null,
+                reply_to: replyingTo ? { ...replyingTo } : null
             };
+            
+            // Store reply info before clearing
+            const replyToId = replyingTo?.id || null;
             
             addOptimisticMessage(optimisticMsg);
             input.value = '';
+            clearReplyingTo(); // Clear reply state after capturing
             
             // Reset character counter
             const charCount = document.getElementById('chat-char-count');
@@ -10335,10 +10504,15 @@
             }
 
             try {
+                const messageData = { contact_id: currentChatContact.contact_user_id, content };
+                if (replyToId) {
+                    messageData.reply_to_id = replyToId;
+                }
+                
                 const res = await fetch(`${API_URL}/messages`, {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ contact_id: currentChatContact.contact_user_id, content })
+                    body: JSON.stringify(messageData)
                 });
                 
                 if (!res.ok) throw new Error('Échec envoi');
@@ -10661,6 +10835,91 @@
                     </svg>
                 </button>
             `;
+        }
+
+        // ===== REPLY TO MESSAGE =====
+        
+        // Set the message being replied to
+        function setReplyingTo(messageId) {
+            // Find the message in the current messages list
+            const container = document.getElementById('chat-messages');
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            
+            if (!msgEl) return;
+            
+            // Get message content from the DOM
+            const contentEl = msgEl.querySelector('.chat-message-content');
+            const content = contentEl ? contentEl.textContent.trim() : '';
+            const isPing = msgEl.classList.contains('ping');
+            const isSent = msgEl.classList.contains('sent');
+            
+            replyingTo = {
+                id: messageId,
+                content: isPing ? '👋 Coucou' : content,
+                is_mine: isSent
+            };
+            
+            renderReplyPreview();
+            document.getElementById('chat-input')?.focus();
+        }
+        
+        // Clear the reply state
+        function clearReplyingTo() {
+            replyingTo = null;
+            renderReplyPreview();
+        }
+        
+        // Render the reply preview above the input
+        function renderReplyPreview() {
+            let preview = document.getElementById('reply-preview');
+            const inputArea = document.getElementById('chat-input-area');
+            
+            // Create preview element if it doesn't exist
+            if (!preview && inputArea) {
+                preview = document.createElement('div');
+                preview.id = 'reply-preview';
+                preview.className = 'reply-preview';
+                inputArea.insertBefore(preview, inputArea.firstChild);
+            }
+            
+            if (!preview) return;
+            
+            if (!replyingTo) {
+                preview.classList.add('hidden');
+                preview.innerHTML = '';
+                return;
+            }
+            
+            const contactName = currentChatContact?.contact?.display_name || 
+                              currentChatContact?.contact?.email?.split('@')[0] || 'Contact';
+            const authorName = replyingTo.is_mine ? 'Toi' : contactName;
+            const content = (replyingTo.content || '').slice(0, 80) + ((replyingTo.content || '').length > 80 ? '…' : '');
+            
+            preview.innerHTML = `
+                <div class="reply-preview-content">
+                    <div class="reply-preview-bar"></div>
+                    <div class="reply-preview-text">
+                        <span class="reply-preview-author">${escapeHtml(authorName)}</span>
+                        <span class="reply-preview-message">${escapeHtml(content)}</span>
+                    </div>
+                    <button class="reply-preview-close" onclick="clearReplyingTo()" type="button" aria-label="Annuler la réponse">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            preview.classList.remove('hidden');
+        }
+        
+        // Scroll to a specific message and highlight it
+        function scrollToMessage(messageId) {
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            if (msgEl) {
+                msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                msgEl.classList.add('highlight-flash');
+                setTimeout(() => msgEl.classList.remove('highlight-flash'), 1500);
+            }
         }
 
         // ===== STARRED MESSAGES =====
@@ -13756,6 +14015,7 @@
             const messageInput = document.getElementById('schedule-message');
             const dateInput = document.getElementById('schedule-date');
             const timeInput = document.getElementById('schedule-time');
+            const charCount = document.getElementById('schedule-char-count');
             
             // Pre-fill message from chat input if available
             const chatInput = document.getElementById('chat-input');
@@ -13763,6 +14023,29 @@
                 messageInput.value = chatInput.value.trim();
             } else {
                 messageInput.value = '';
+            }
+            
+            // Update character counter
+            const len = messageInput.value.length;
+            if (charCount) {
+                charCount.textContent = `${len}/280`;
+                charCount.classList.remove('warning', 'error');
+                if (len > 250) charCount.classList.add('error');
+                else if (len > 220) charCount.classList.add('warning');
+            }
+            
+            // Setup character counter listener if not already done
+            if (!messageInput.hasAttribute('data-char-listener')) {
+                messageInput.setAttribute('data-char-listener', 'true');
+                messageInput.addEventListener('input', () => {
+                    const l = messageInput.value.length;
+                    if (charCount) {
+                        charCount.textContent = `${l}/280`;
+                        charCount.classList.remove('warning', 'error');
+                        if (l > 250) charCount.classList.add('error');
+                        else if (l > 220) charCount.classList.add('warning');
+                    }
+                });
             }
             
             // Set default date/time (1 hour from now)

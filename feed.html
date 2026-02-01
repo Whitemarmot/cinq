@@ -1799,7 +1799,13 @@
         .reply-composer-actions {
             display: flex;
             justify-content: flex-end;
+            align-items: center;
             gap: 0.5rem;
+        }
+        
+        .reply-char-count {
+            font-size: 0.7rem;
+            margin-right: auto;
         }
         
         .reply-cancel-btn {
@@ -3201,7 +3207,7 @@
                     </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span class="char-count" id="char-count" aria-live="polite">0/1000</span>
+                    <span class="char-count" id="char-count" aria-live="polite">0/280</span>
                     <button class="post-btn" id="post-btn" onclick="submitPost()" disabled aria-label="Publier le post">
                         Poster
                     </button>
@@ -3560,13 +3566,13 @@
                 if (draft.content && textarea) {
                     textarea.value = draft.content;
                     const len = draft.content.length;
-                    charCount.textContent = `${len}/1000`;
+                    charCount.textContent = `${len}/280`;
                     
                     charCount.classList.remove('warning', 'error');
-                    if (len > 900) charCount.classList.add('error');
-                    else if (len > 700) charCount.classList.add('warning');
+                    if (len > 250) charCount.classList.add('error');
+                    else if (len > 220) charCount.classList.add('warning');
                     
-                    postBtn.disabled = len === 0 || len > 1000;
+                    postBtn.disabled = len === 0 || len > 280;
                 }
                 
                 if (draft.imageUrl) {
@@ -3640,13 +3646,13 @@
             
             textarea.addEventListener('input', (e) => {
                 const len = textarea.value.length;
-                charCount.textContent = `${len}/1000`;
+                charCount.textContent = `${len}/280`;
                 
                 charCount.classList.remove('warning', 'error');
-                if (len > 900) charCount.classList.add('error');
-                else if (len > 700) charCount.classList.add('warning');
+                if (len > 250) charCount.classList.add('error');
+                else if (len > 220) charCount.classList.add('warning');
                 
-                postBtn.disabled = len === 0 || len > 1000;
+                postBtn.disabled = len === 0 || len > 280;
                 
                 // Check for @mention trigger
                 handleMentionInput(textarea);
@@ -4360,7 +4366,7 @@
                 
                 // Reset composer
                 document.getElementById('post-content').value = '';
-                document.getElementById('char-count').textContent = '0/1000';
+                document.getElementById('char-count').textContent = '0/280';
                 document.getElementById('file-input').value = '';
                 document.getElementById('ai-prompt').value = '';
                 document.getElementById('ai-prompt-container').style.display = 'none';
@@ -4886,9 +4892,10 @@
                                 class="reply-composer-input" 
                                 id="reply-input-${post.id}" 
                                 placeholder="Écrire une réponse..."
-                                maxlength="1000"
+                                maxlength="280"
                             ></textarea>
                             <div class="reply-composer-actions">
+                                <span class="char-count reply-char-count" id="reply-char-count-${post.id}">0/280</span>
                                 <button class="reply-cancel-btn" onclick="toggleReplies('${post.id}')">Annuler</button>
                                 <button class="reply-submit-btn" id="reply-submit-${post.id}" onclick="submitReply('${post.id}')" disabled>Répondre</button>
                             </div>
@@ -5481,8 +5488,18 @@
                     input.setAttribute('data-listener', 'true');
                     input.addEventListener('input', () => {
                         const submitBtn = document.getElementById(`reply-submit-${postId}`);
+                        const charCount = document.getElementById(`reply-char-count-${postId}`);
+                        const len = input.value.length;
+                        
                         if (submitBtn) {
-                            submitBtn.disabled = !input.value.trim();
+                            submitBtn.disabled = !input.value.trim() || len > 280;
+                        }
+                        
+                        if (charCount) {
+                            charCount.textContent = `${len}/280`;
+                            charCount.classList.remove('warning', 'error');
+                            if (len > 250) charCount.classList.add('error');
+                            else if (len > 220) charCount.classList.add('warning');
                         }
                     });
                     input.addEventListener('keydown', (e) => {
