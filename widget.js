@@ -51,13 +51,13 @@
         styles.id = 'cinq-widget-styles';
         styles.textContent = `
             .cinq-widget {
-                --cinq-coral: #ff6b4a;
-                --cinq-coral-light: #ff8a6a;
-                --cinq-coral-dark: #e85a3a;
+                --cinq-coral: #6366f1;
+                --cinq-coral-light: #8b5cf6;
+                --cinq-coral-dark: #a855f7;
                 --cinq-gold: #fbbf24;
                 --cinq-lavender: #a78bfa;
                 --cinq-mint: #34d399;
-                --cinq-gradient: linear-gradient(135deg, #ff6b4a, #ff8a6a, #ffb08c);
+                --cinq-gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #ffb08c);
                 --cinq-gradient-hover: linear-gradient(135deg, #ff7d5c, #ff9b7c, #ffc09c);
                 
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -101,7 +101,7 @@
 
             .cinq-widget-card:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(255, 107, 74, 0.15);
+                box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
             }
 
             /* Header with gradient */
@@ -154,7 +154,7 @@
                 height: 72px;
                 border-radius: 50%;
                 border: 3px solid var(--cinq-coral);
-                box-shadow: 0 4px 12px rgba(255, 107, 74, 0.3);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
                 object-fit: cover;
                 background: var(--bg-tertiary);
             }
@@ -234,13 +234,13 @@
                 text-align: center;
                 margin: 16px 20px 20px;
                 transition: all 0.2s ease;
-                box-shadow: 0 4px 12px rgba(255, 107, 74, 0.25);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
             }
 
             .cinq-widget-cta:hover {
                 background: var(--cinq-gradient-hover);
                 transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(255, 107, 74, 0.35);
+                box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
             }
 
             .cinq-widget-cta:active {
