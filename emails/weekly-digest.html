@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Ton récap de la semaine - Cinq</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f7;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .email-wrapper {
+      width: 100%;
+      background-color: #f4f4f7;
+      padding: 40px 20px;
+    }
+    
+    .email-content {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      padding: 48px 40px;
+      text-align: center;
+    }
+    
+    .logo {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+      margin: 0 0 8px 0;
+    }
+    
+    .date-range {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .body-content {
+      padding: 48px 40px;
+    }
+    
+    .greeting {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 24px 0;
+    }
+    
+    .intro-message {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #4a4a68;
+      margin: 0 0 32px 0;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      background: linear-gradient(135deg, #faf5ff 0%, #fdf2f8 100%);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+    
+    .stats-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #7c3aed;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 20px 0;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: #7c3aed;
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #6b6b8a;
+      margin: 8px 0 0 0;
+    }
+    
+    /* Activity Section */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .activity-list {
+      margin-bottom: 32px;
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px;
+      background-color: #f8f9fc;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .activity-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .activity-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    
+    .activity-content {
+      flex: 1;
+    }
+    
+    .activity-text {
+      font-size: 15px;
+      color: #1a1a2e;
+      margin: 0 0 4px 0;
+      line-height: 1.4;
+    }
+    
+    .activity-text strong {
+      color: #7c3aed;
+    }
+    
+    .activity-time {
+      font-size: 12px;
+      color: #8a8aa3;
+      margin: 0;
+    }
+    
+    /* Upcoming Events */
+    .upcoming-section {
+      background-color: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    
+    .upcoming-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #92400e;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .event-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px dashed #fde68a;
+    }
+    
+    .event-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .event-date {
+      background-color: #fef3c7;
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      margin-right: 16px;
+      min-width: 50px;
+    }
+    
+    .event-day {
+      font-size: 20px;
+      font-weight: 800;
+      color: #92400e;
+      margin: 0;
+      line-height: 1;
+    }
+    
+    .event-month {
+      font-size: 11px;
+      color: #b45309;
+      margin: 4px 0 0 0;
+      text-transform: uppercase;
+    }
+    
+    .event-details {
+      flex: 1;
+    }
+    
+    .event-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin: 0 0 2px 0;
+    }
+    
+    .event-person {
+      font-size: 13px;
+      color: #6b6b8a;
+      margin: 0;
+    }
+    
+    /* Suggestions */
+    .suggestions-section {
+      margin-bottom: 32px;
+    }
+    
+    .suggestion-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .suggestion-icon {
+      width: 48px;
+      height: 48px;
+      background-color: #dcfce7;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 16px;
+    }
+    
+    .suggestion-content {
+      flex: 1;
+    }
+    
+    .suggestion-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #166534;
+      margin: 0 0 4px 0;
+    }
+    
+    .suggestion-text {
+      font-size: 13px;
+      color: #4a4a68;
+      margin: 0;
+    }
+    
+    .suggestion-link {
+      color: #16a34a;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    /* CTA */
+    .cta-container {
+      text-align: center;
+      margin: 40px 0 0 0;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 16px 40px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(161, 140, 209, 0.4);
+    }
+    
+    .footer {
+      background-color: #f8f9fc;
+      padding: 32px 40px;
+      text-align: center;
+      border-top: 1px solid #eaeaef;
+    }
+    
+    .footer-text {
+      font-size: 13px;
+      color: #8a8aa3;
+      line-height: 1.6;
+      margin: 0 0 16px 0;
+    }
+    
+    .email-prefs {
+      font-size: 12px;
+      color: #a0a0b8;
+    }
+    
+    .email-prefs a {
+      color: #a18cd1;
+      text-decoration: none;
+    }
+    
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #0d0d14 !important;
+      }
+      
+      .email-wrapper {
+        background-color: #0d0d14 !important;
+      }
+      
+      .email-content {
+        background-color: #1a1a2e !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      .greeting {
+        color: #ffffff !important;
+      }
+      
+      .intro-message {
+        color: #b8b8d0 !important;
+      }
+      
+      .stats-section {
+        background: linear-gradient(135deg, #2d2045 0%, #352040 100%) !important;
+      }
+      
+      .stats-title {
+        color: #c4b5fd !important;
+      }
+      
+      .stat-number {
+        color: #c4b5fd !important;
+      }
+      
+      .stat-label {
+        color: #9090aa !important;
+      }
+      
+      .section-title {
+        color: #ffffff !important;
+      }
+      
+      .activity-item {
+        background-color: #252542 !important;
+      }
+      
+      .activity-text {
+        color: #e0e0f0 !important;
+      }
+      
+      .activity-text strong {
+        color: #c4b5fd !important;
+      }
+      
+      .upcoming-section {
+        background-color: #2d2815 !important;
+        border-color: #5c4a1f !important;
+      }
+      
+      .upcoming-title {
+        color: #fcd34d !important;
+      }
+      
+      .event-date {
+        background-color: #3d3515 !important;
+      }
+      
+      .event-day {
+        color: #fcd34d !important;
+      }
+      
+      .event-month {
+        color: #fbbf24 !important;
+      }
+      
+      .event-item {
+        border-bottom-color: #5c4a1f !important;
+      }
+      
+      .event-name {
+        color: #ffffff !important;
+      }
+      
+      .suggestion-card {
+        background: linear-gradient(135deg, #1a2e1a 0%, #1c2e1c 100%) !important;
+        border-color: #2d5a2d !important;
+      }
+      
+      .suggestion-icon {
+        background-color: #2d4a2d !important;
+      }
+      
+      .suggestion-title {
+        color: #86efac !important;
+      }
+      
+      .suggestion-text {
+        color: #b8b8d0 !important;
+      }
+      
+      .suggestion-link {
+        color: #4ade80 !important;
+      }
+      
+      .footer {
+        background-color: #151524 !important;
+        border-top-color: #2a2a45 !important;
+      }
+    }
+    
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-wrapper {
+        padding: 20px 16px !important;
+      }
+      
+      .header {
+        padding: 36px 24px !important;
+      }
+      
+      .body-content {
+        padding: 32px 24px !important;
+      }
+      
+      .greeting {
+        font-size: 22px !important;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+      }
+      
+      .stat-number {
+        font-size: 24px !important;
+      }
+      
+      .activity-item {
+        padding: 14px !important;
+      }
+      
+      .activity-avatar {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 15px !important;
+      }
+      
+      .cta-button {
+        padding: 14px 32px !important;
+        font-size: 15px !important;
+      }
+      
+      .footer {
+        padding: 24px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-content">
+      <!-- Header -->
+      <div class="header">
+        <h1 class="logo">cinq</h1>
+        <p class="date-range">📅 Semaine du {{start_date}} au {{end_date}}</p>
+      </div>
+      
+      <!-- Body -->
+      <div class="body-content">
+        <h2 class="greeting">Hey {{name}} ! 👋</h2>
+        
+        <p class="intro-message">
+          Voici ce qui s'est passé cette semaine dans ton cercle Cinq. Quelques mouvements intéressants à ne pas manquer !
+        </p>
+        
+        <!-- Stats -->
+        <div class="stats-section">
+          <p class="stats-title">📊 Cette semaine en chiffres</p>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <p class="stat-number">{{new_wishes}}</p>
+              <p class="stat-label">Nouveaux souhaits</p>
+            </div>
+            <div class="stat-item">
+              <p class="stat-number">{{reserved}}</p>
+              <p class="stat-label">Réservés</p>
+            </div>
+            <div class="stat-item">
+              <p class="stat-number">{{new_contacts}}</p>
+              <p class="stat-label">Nouveaux contacts</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Activity -->
+        <h3 class="section-title">🔔 Activité récente</h3>
+        <div class="activity-list">
+          {{#each activities}}
+          <div class="activity-item">
+            <div class="activity-avatar">{{this.avatar}}</div>
+            <div class="activity-content">
+              <p class="activity-text"><strong>{{this.name}}</strong> {{this.action}}</p>
+              <p class="activity-time">{{this.time}}</p>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        
+        <!-- Upcoming Events -->
+        {{#if events}}
+        <div class="upcoming-section">
+          <h3 class="upcoming-title">🎂 Événements à venir</h3>
+          {{#each events}}
+          <div class="event-item">
+            <div class="event-date">
+              <p class="event-day">{{this.day}}</p>
+              <p class="event-month">{{this.month}}</p>
+            </div>
+            <div class="event-details">
+              <p class="event-name">{{this.event_name}}</p>
+              <p class="event-person">{{this.person}}</p>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{/if}}
+        
+        <!-- Suggestion -->
+        <div class="suggestions-section">
+          <h3 class="section-title">💡 Suggestion</h3>
+          <div class="suggestion-card">
+            <div class="suggestion-icon">{{suggestion_icon}}</div>
+            <div class="suggestion-content">
+              <p class="suggestion-title">{{suggestion_title}}</p>
+              <p class="suggestion-text">{{suggestion_text}}</p>
+            </div>
+            <a href="{{suggestion_url}}" class="suggestion-link">Voir →</a>
+          </div>
+        </div>
+        
+        <div class="cta-container">
+          <a href="{{app_url}}" class="cta-button">Ouvrir Cinq</a>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-text">
+          Cinq – La liste qui compte vraiment<br>
+          Made with ❤️ in Paris
+        </p>
+        
+        <p class="email-prefs">
+          Tu reçois ce récap hebdomadaire car tu es inscrit·e sur Cinq.<br>
+          <a href="{{preferences_url}}">Modifier la fréquence</a> · <a href="{{unsubscribe_url}}">Se désinscrire</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

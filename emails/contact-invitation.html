@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{{sender_name}} t'invite sur Cinq!</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    :root {
+      color-scheme: light dark;
+      supported-color-schemes: light dark;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f7;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .email-wrapper {
+      width: 100%;
+      background-color: #f4f4f7;
+      padding: 40px 20px;
+    }
+    
+    .email-content {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 48px 40px;
+      text-align: center;
+    }
+    
+    .logo {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+      margin: 0 0 24px 0;
+    }
+    
+    .avatar-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .avatar {
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #4facfe;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .connection-line {
+      width: 40px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
+    }
+    
+    .avatar-you {
+      background: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-size: 24px;
+    }
+    
+    .body-content {
+      padding: 48px 40px;
+    }
+    
+    .invitation-badge {
+      background: linear-gradient(135deg, #e0f4ff 0%, #d4f8ff 100%);
+      border-radius: 50px;
+      padding: 8px 20px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+    
+    .invitation-badge-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0891b2;
+      margin: 0;
+    }
+    
+    .greeting {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 20px 0;
+      line-height: 1.3;
+    }
+    
+    .sender-name {
+      color: #4facfe;
+    }
+    
+    .message {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #4a4a68;
+      margin: 0 0 24px 0;
+    }
+    
+    .personal-message {
+      background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 100%);
+      border-left: 4px solid #4facfe;
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+      margin: 32px 0;
+    }
+    
+    .personal-message-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0891b2;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 8px 0;
+    }
+    
+    .personal-message-text {
+      font-size: 15px;
+      color: #1a1a2e;
+      line-height: 1.6;
+      margin: 0;
+      font-style: italic;
+    }
+    
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    
+    .benefit-card {
+      background-color: #f8f9fc;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .benefit-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .benefit-text {
+      font-size: 14px;
+      color: #4a4a68;
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    .cta-container {
+      text-align: center;
+      margin: 40px 0;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 18px 48px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(79, 172, 254, 0.4);
+    }
+    
+    .secondary-cta {
+      text-align: center;
+      margin-top: 16px;
+    }
+    
+    .secondary-link {
+      font-size: 14px;
+      color: #4facfe;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer {
+      background-color: #f8f9fc;
+      padding: 32px 40px;
+      text-align: center;
+      border-top: 1px solid #eaeaef;
+    }
+    
+    .footer-text {
+      font-size: 13px;
+      color: #8a8aa3;
+      line-height: 1.6;
+      margin: 0 0 16px 0;
+    }
+    
+    .unsubscribe {
+      font-size: 12px;
+      color: #a0a0b8;
+    }
+    
+    .unsubscribe a {
+      color: #4facfe;
+      text-decoration: none;
+    }
+    
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #0d0d14 !important;
+      }
+      
+      .email-wrapper {
+        background-color: #0d0d14 !important;
+      }
+      
+      .email-content {
+        background-color: #1a1a2e !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3) !important;
+      }
+      
+      .invitation-badge {
+        background: linear-gradient(135deg, #1e3a5f 0%, #1e4a5f 100%) !important;
+      }
+      
+      .invitation-badge-text {
+        color: #67e8f9 !important;
+      }
+      
+      .greeting {
+        color: #ffffff !important;
+      }
+      
+      .message {
+        color: #b8b8d0 !important;
+      }
+      
+      .personal-message {
+        background: linear-gradient(135deg, #1a2a3f 0%, #1a3040 100%) !important;
+        border-left-color: #4facfe !important;
+      }
+      
+      .personal-message-label {
+        color: #67e8f9 !important;
+      }
+      
+      .personal-message-text {
+        color: #e0e0f0 !important;
+      }
+      
+      .benefit-card {
+        background-color: #252542 !important;
+      }
+      
+      .benefit-text {
+        color: #b8b8d0 !important;
+      }
+      
+      .footer {
+        background-color: #151524 !important;
+        border-top-color: #2a2a45 !important;
+      }
+    }
+    
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-wrapper {
+        padding: 20px 16px !important;
+      }
+      
+      .header {
+        padding: 36px 24px !important;
+      }
+      
+      .avatar {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 22px !important;
+      }
+      
+      .body-content {
+        padding: 32px 24px !important;
+      }
+      
+      .greeting {
+        font-size: 22px !important;
+      }
+      
+      .benefits-grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .cta-button {
+        padding: 16px 36px !important;
+        font-size: 15px !important;
+      }
+      
+      .footer {
+        padding: 24px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-content">
+      <!-- Header -->
+      <div class="header">
+        <h1 class="logo">cinq</h1>
+        <div class="avatar-container">
+          <div class="avatar">{{sender_initial}}</div>
+          <div class="connection-line"></div>
+          <div class="avatar avatar-you">?</div>
+        </div>
+      </div>
+      
+      <!-- Body -->
+      <div class="body-content">
+        <div class="invitation-badge">
+          <p class="invitation-badge-text">✉️ Invitation personnelle</p>
+        </div>
+        
+        <h2 class="greeting">
+          <span class="sender-name">{{sender_name}}</span> t'invite à rejoindre son cercle sur Cinq
+        </h2>
+        
+        <p class="message">
+          Tu as été invité·e à faire partie du cercle proche de {{sender_name}} sur Cinq. Rejoins-le/la pour découvrir sa liste de souhaits et partager la tienne !
+        </p>
+        
+        {{#if personal_message}}
+        <div class="personal-message">
+          <p class="personal-message-label">Message de {{sender_name}}</p>
+          <p class="personal-message-text">"{{personal_message}}"</p>
+        </div>
+        {{/if}}
+        
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">🎁</div>
+            <p class="benefit-text">Découvre ses envies</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">💝</div>
+            <p class="benefit-text">Offre le cadeau parfait</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🔒</div>
+            <p class="benefit-text">Réservation secrète</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🤝</div>
+            <p class="benefit-text">Cercle privé</p>
+          </div>
+        </div>
+        
+        <div class="cta-container">
+          <a href="{{invitation_url}}" class="cta-button">Accepter l'invitation →</a>
+        </div>
+        
+        <div class="secondary-cta">
+          <a href="{{learn_more_url}}" class="secondary-link">En savoir plus sur Cinq</a>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-text">
+          Cinq – La liste qui compte vraiment<br>
+          Made with ❤️ in Paris
+        </p>
+        
+        <p class="unsubscribe">
+          Tu reçois cet email car {{sender_name}} t'a invité·e.<br>
+          <a href="{{block_url}}">Ne plus recevoir d'invitations de cette personne</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
