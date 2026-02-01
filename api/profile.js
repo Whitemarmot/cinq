@@ -19,23 +19,58 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { id } = req.query;
+        const { id, user: username } = req.query;
         
-        if (!id) {
-            return res.status(400).json({ error: 'id requis' });
+        // Support both id and username lookup
+        if (!id && !username) {
+            return res.status(400).json({ error: 'id ou user requis' });
         }
         
-        if (!isValidUUID(id)) {
-            return res.status(400).json({ error: 'Format id invalide' });
+        let user;
+        let userError;
+        
+        if (id) {
+            // Lookup by UUID
+            if (!isValidUUID(id)) {
+                return res.status(400).json({ error: 'Format id invalide' });
+            }
+            
+            const result = await supabase
+                .from('users')
+                .select('id, display_name, avatar_url, bio, created_at')
+                .eq('id', id)
+                .eq('banned', false)
+                .single();
+            user = result.data;
+            userError = result.error;
+        } else if (username) {
+            // Lookup by username (display_name or email prefix)
+            // First try display_name (case-insensitive)
+            let result = await supabase
+                .from('users')
+                .select('id, display_name, avatar_url, bio, created_at')
+                .ilike('display_name', username)
+                .eq('banned', false)
+                .limit(1)
+                .single();
+            
+            // If not found by display_name, try email prefix
+            if (result.error || !result.data) {
+                result = await supabase
+                    .from('users')
+                    .select('id, display_name, avatar_url, bio, created_at')
+                    .ilike('email', `${username}@%`)
+                    .eq('banned', false)
+                    .limit(1)
+                    .single();
+            }
+            
+            user = result.data;
+            userError = result.error;
         }
         
-        // Fetch user profile
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('id, display_name, avatar_url, bio, created_at')
-            .eq('id', id)
-            .eq('banned', false)
-            .single();
+        // Use id variable to store user id for later queries
+        const userId = user?.id;
         
         if (userError || !user) {
             return res.status(404).json({ error: 'Profil non trouvé' });
@@ -45,7 +80,7 @@ export default async function handler(req, res) {
         const { data: posts, error: postsError } = await supabase
             .from('posts')
             .select('id, content, image_url, created_at')
-            .eq('user_id', id)
+            .eq('user_id', userId)
             .order('created_at', { ascending: false })
             .limit(MAX_PUBLIC_POSTS);
         
@@ -57,7 +92,7 @@ export default async function handler(req, res) {
         const { count: contactCount } = await supabase
             .from('contacts')
             .select('*', { count: 'exact', head: true })
-            .eq('user_id', id);
+            .eq('user_id', userId);
         
         // Return public profile
         return res.json({

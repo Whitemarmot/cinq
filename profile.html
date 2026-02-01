@@ -415,17 +415,20 @@
         const API_URL = '/api';
         
         async function loadProfile() {
-            // Get user ID from URL
+            // Get user ID or username from URL
             const params = new URLSearchParams(window.location.search);
             const userId = params.get('id');
+            const username = params.get('user');
             
-            if (!userId) {
+            if (!userId && !username) {
                 showError('Profil non trouvé', 'L\'ID utilisateur est manquant.');
                 return;
             }
             
             try {
-                const res = await fetch(`${API_URL}/profile?id=${userId}`);
+                // Support both id and username lookup
+                const queryParam = userId ? `id=${userId}` : `user=${encodeURIComponent(username)}`;
+                const res = await fetch(`${API_URL}/profile?${queryParam}`);
                 const data = await res.json();
                 
                 if (!res.ok) {
