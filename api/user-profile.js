@@ -153,7 +153,7 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio, vacation_mode, vacation_message, focus_mode, focus_start, focus_end } = req.body;
+    const { display_name, avatar_url, bio, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, status_emoji, status_text } = req.body;
 
     const updates = {};
     
@@ -215,6 +215,33 @@ async function handleUpdateProfile(req, res, user) {
             return res.status(400).json({ error: 'Format d\'heure invalide (HH:MM)', field: 'focus_end' });
         }
         updates.focus_end = focus_end;
+    }
+    
+    // User status (WhatsApp-style)
+    if (status_emoji !== undefined) {
+        // Allow null to clear status, or validate emoji (simple check: not too long)
+        if (status_emoji === null || status_emoji === '') {
+            updates.status_emoji = null;
+        } else if (typeof status_emoji === 'string' && status_emoji.length <= 10) {
+            updates.status_emoji = status_emoji;
+        } else {
+            return res.status(400).json({ error: 'Emoji de statut invalide', field: 'status_emoji' });
+        }
+    }
+    
+    if (status_text !== undefined) {
+        // Allow null to clear status, or validate text (max 60 chars)
+        if (status_text === null || status_text === '') {
+            updates.status_text = null;
+        } else if (typeof status_text === 'string') {
+            const trimmed = status_text.trim();
+            if (trimmed.length > 60) {
+                return res.status(400).json({ error: 'Le texte du statut ne peut pas dépasser 60 caractères', field: 'status_text' });
+            }
+            updates.status_text = trimmed.length > 0 ? trimmed : null;
+        } else {
+            return res.status(400).json({ error: 'Texte de statut invalide', field: 'status_text' });
+        }
     }
 
     if (Object.keys(updates).length === 0) {

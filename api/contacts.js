@@ -187,7 +187,7 @@ async function listContacts(res, user) {
     // Batch fetch user profiles (avoid N+1 queries)
     const { data: profiles } = await supabase
         .from('users')
-        .select('id, email, display_name, avatar_url')
+        .select('id, email, display_name, avatar_url, status_emoji, status_text')
         .in('id', contactIds);
     
     const profileMap = (profiles || []).reduce((acc, p) => {
@@ -210,7 +210,9 @@ async function listContacts(res, user) {
             id: c.contact_user_id, 
             email: profileMap[c.contact_user_id]?.email || null,
             display_name: profileMap[c.contact_user_id]?.display_name || null,
-            avatar_url: profileMap[c.contact_user_id]?.avatar_url || null
+            avatar_url: profileMap[c.contact_user_id]?.avatar_url || null,
+            status_emoji: profileMap[c.contact_user_id]?.status_emoji || null,
+            status_text: profileMap[c.contact_user_id]?.status_text || null
         },
         mutual: mutualSet.has(c.contact_user_id)
     }));

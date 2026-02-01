@@ -1179,6 +1179,140 @@
             background: var(--color-error);
         }
         
+        /* ===== STORIES INDICATOR ===== */
+        .stories-bar {
+            display: flex;
+            gap: var(--space-3);
+            padding: var(--space-3) 0;
+            margin-bottom: var(--space-4);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .stories-bar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .story-ring-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            min-width: 72px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s var(--ease-spring);
+        }
+        
+        .story-ring-item:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        .story-ring-item:active {
+            transform: scale(0.95);
+        }
+        
+        .story-ring-wrapper {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            padding: 3px;
+            background: var(--cinq-gradient);
+        }
+        
+        .story-ring-wrapper.no-story {
+            background: var(--color-border);
+        }
+        
+        .story-ring-wrapper.add-story {
+            background: transparent;
+            border: 2px dashed var(--color-border);
+        }
+        
+        .story-ring-wrapper.add-story:hover {
+            border-color: var(--color-brand);
+        }
+        
+        .story-ring-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--color-bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--color-text-primary);
+            overflow: hidden;
+            border: 3px solid var(--color-bg-primary);
+        }
+        
+        .story-ring-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .story-ring-add-icon {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--color-bg-primary);
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .story-ring-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-secondary);
+            max-width: 64px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .story-ring-item.own .story-ring-label {
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+        
+        .stories-bar-empty {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .stories-bar-empty:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .stories-bar-empty svg {
+            flex-shrink: 0;
+        }
+        
         /* Posts */
         .posts-list {
             display: flex;
@@ -1651,6 +1785,81 @@
             white-space: nowrap;
             padding: 0 4px;
             font-weight: 500;
+        }
+        
+        /* User Status Display */
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .user-status-emoji {
+            flex-shrink: 0;
+        }
+        
+        .user-status-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .contact-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 10px;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .contact-status-emoji {
+            flex-shrink: 0;
+            font-size: 10px;
+        }
+        
+        .contact-status-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 60px;
+        }
+        
+        /* Post author status */
+        .post-author-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+        
+        .post-author-status-emoji {
+            flex-shrink: 0;
+        }
+        
+        .post-author-status-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 150px;
+        }
+        
+        /* Chat header status */
+        .chat-contact-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
         }
         
         .empty-plus {
@@ -4302,6 +4511,20 @@
         <main class="app-content" id="main-content">
             <!-- TAB: FEED (DEFAULT) -->
             <section class="tab-panel active" id="tab-feed" role="tabpanel" aria-labelledby="nav-feed" tabindex="0">
+                <!-- Stories Bar -->
+                <div class="stories-bar" id="stories-bar" role="region" aria-label="Stories de tes proches">
+                    <!-- Add story button -->
+                    <a href="/stories.html" class="story-ring-item own" aria-label="Ajouter une story">
+                        <div class="story-ring-wrapper add-story">
+                            <div class="story-ring-avatar" id="story-own-avatar">?</div>
+                            <span class="story-ring-add-icon" aria-hidden="true">+</span>
+                        </div>
+                        <span class="story-ring-label">Ta story</span>
+                    </a>
+                    <!-- Stories will be loaded here -->
+                    <div id="stories-list-inline"></div>
+                </div>
+                
                 <!-- Composer -->
                 <div class="composer" role="region" aria-label="Créer un nouveau post">
                     <div class="composer-header">
@@ -4499,7 +4722,10 @@
         <div class="chat-header">
             <div class="chat-contact-info">
                 <div class="chat-contact-avatar" id="chat-contact-avatar" aria-hidden="true">?</div>
-                <h2 class="chat-contact-name" id="chat-contact-name"></h2>
+                <div>
+                    <h2 class="chat-contact-name" id="chat-contact-name"></h2>
+                    <div class="chat-contact-status" id="chat-contact-status"></div>
+                </div>
             </div>
             <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
                 <span aria-hidden="true">×</span>
@@ -4776,7 +5002,7 @@
                 initSupabaseRealtime();
                 
                 // Load data
-                await Promise.all([loadProfile(), loadContacts(), loadPosts()]);
+                await Promise.all([loadProfile(), loadContacts(), loadPosts(), loadStoriesBar()]);
                 startPolling();
                 initPushNotifications();
                 
@@ -5336,6 +5562,16 @@
                     </div>
                 ` : '';
                 
+                // Build status HTML if available
+                const statusEmoji = author.status_emoji;
+                const statusText = author.status_text;
+                const statusHtml = (statusEmoji || statusText) ? `
+                    <div class="post-author-status">
+                        ${statusEmoji ? `<span class="post-author-status-emoji">${statusEmoji}</span>` : ''}
+                        ${statusText ? `<span class="post-author-status-text">${escapeHtml(statusText)}</span>` : ''}
+                    </div>
+                ` : '';
+                
                 return `
                     <article class="post-card" data-post-id="${post.id}" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
                         <div class="post-header">
@@ -5346,6 +5582,7 @@
                                         ${escapeHtml(displayName)}
                                         ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
                                     </span>
+                                    ${statusHtml}
                                     <div class="post-time"><time datetime="${post.created_at}">${time}</time></div>
                                 </div>
                             </div>
@@ -5402,6 +5639,75 @@
         
         function closeImageModal() {
             document.getElementById('image-modal').classList.remove('open');
+        }
+        
+        // ===== STORIES BAR =====
+        async function loadStoriesBar() {
+            try {
+                const res = await fetch(`${API_URL}/stories`, { headers: authHeaders() });
+                
+                if (!res.ok) {
+                    console.warn('Stories API not available yet');
+                    return;
+                }
+                
+                const data = await res.json();
+                const grouped = data.grouped || [];
+                
+                renderStoriesBar(grouped);
+                
+                // Update own avatar in story ring
+                if (currentUser?.avatar_url) {
+                    const ownAvatar = document.getElementById('story-own-avatar');
+                    if (ownAvatar) {
+                        ownAvatar.innerHTML = `<img src="${escapeHtml(currentUser.avatar_url)}" alt="">`;
+                    }
+                } else if (currentUser?.display_name || currentUser?.email) {
+                    const initial = (currentUser.display_name || currentUser.email).charAt(0).toUpperCase();
+                    const ownAvatar = document.getElementById('story-own-avatar');
+                    if (ownAvatar) {
+                        ownAvatar.textContent = initial;
+                    }
+                }
+            } catch (e) {
+                console.warn('Error loading stories:', e);
+            }
+        }
+        
+        function renderStoriesBar(grouped) {
+            const container = document.getElementById('stories-list-inline');
+            if (!container) return;
+            
+            // Filter out own stories (we already show "Ta story" button)
+            const othersStories = grouped.filter(g => !g.isOwn);
+            
+            if (othersStories.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = othersStories.map(group => {
+                const avatar = group.user?.avatar_url 
+                    ? `<img src="${escapeHtml(group.user.avatar_url)}" alt="">`
+                    : escapeHtml(getInitialFromName(group.user?.display_name || group.user?.email));
+                
+                const name = group.user?.display_name || group.user?.email?.split('@')[0] || 'Anonyme';
+                const truncatedName = name.length > 8 ? name.substring(0, 8) + '…' : name;
+                
+                return `
+                    <a href="/stories.html" class="story-ring-item" aria-label="Voir les stories de ${escapeHtml(name)}">
+                        <div class="story-ring-wrapper">
+                            <div class="story-ring-avatar">${avatar}</div>
+                        </div>
+                        <span class="story-ring-label">${escapeHtml(truncatedName)}</span>
+                    </a>
+                `;
+            }).join('');
+        }
+        
+        function getInitialFromName(name) {
+            if (!name) return '?';
+            return name.charAt(0).toUpperCase();
         }
 
         // ===== CONTACTS =====
@@ -5478,6 +5784,28 @@
                     
                     slot.appendChild(avatarSlot);
                     slot.appendChild(nameDiv);
+                    
+                    // Add status if available
+                    const statusEmoji = contact.contact?.status_emoji;
+                    const statusText = contact.contact?.status_text;
+                    if (statusEmoji || statusText) {
+                        const statusDiv = document.createElement('div');
+                        statusDiv.className = 'contact-status';
+                        statusDiv.setAttribute('aria-hidden', 'true');
+                        if (statusEmoji) {
+                            const emojiSpan = document.createElement('span');
+                            emojiSpan.className = 'contact-status-emoji';
+                            emojiSpan.textContent = statusEmoji;
+                            statusDiv.appendChild(emojiSpan);
+                        }
+                        if (statusText) {
+                            const textSpan = document.createElement('span');
+                            textSpan.className = 'contact-status-text';
+                            textSpan.textContent = statusText;
+                            statusDiv.appendChild(textSpan);
+                        }
+                        slot.appendChild(statusDiv);
+                    }
                     
                     if (unread > 0) {
                         const badge = document.createElement('div');
@@ -5870,6 +6198,18 @@
             const initial = name.charAt(0).toUpperCase();
             
             document.getElementById('chat-contact-name').textContent = name;
+            
+            // Display contact status in chat header
+            const statusEmoji = contact.contact?.status_emoji;
+            const statusText = contact.contact?.status_text;
+            const chatStatus = document.getElementById('chat-contact-status');
+            if (statusEmoji || statusText) {
+                chatStatus.innerHTML = `${statusEmoji ? `<span>${statusEmoji}</span>` : ''}${statusText ? `<span>${escapeHtml(statusText)}</span>` : ''}`;
+                chatStatus.style.display = 'flex';
+            } else {
+                chatStatus.innerHTML = '';
+                chatStatus.style.display = 'none';
+            }
             
             const chatAvatar = document.getElementById('chat-contact-avatar');
             chatAvatar.innerHTML = avatarUrl 

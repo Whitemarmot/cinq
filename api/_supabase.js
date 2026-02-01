@@ -66,7 +66,7 @@ export async function getUserEmail(userId) {
 }
 
 /**
- * Get user profile (display_name, avatar_url, bio) from public.users
+ * Get user profile (display_name, avatar_url, bio, status) from public.users
  * @param {string} userId - User UUID
  * @returns {Promise<Object>} Profile object (may be empty)
  */
@@ -74,7 +74,7 @@ export async function getUserProfile(userId) {
     try {
         const { data } = await supabase
             .from('users')
-            .select('display_name, avatar_url, bio, email')
+            .select('display_name, avatar_url, bio, email, status_emoji, status_text')
             .eq('id', userId)
             .single();
         return data || {};
@@ -98,7 +98,9 @@ export async function getUserInfo(userId) {
         id: userId,
         email,
         display_name: profile.display_name || null,
-        avatar_url: profile.avatar_url || null
+        avatar_url: profile.avatar_url || null,
+        status_emoji: profile.status_emoji || null,
+        status_text: profile.status_text || null
     };
 }
 
