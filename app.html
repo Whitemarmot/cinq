@@ -7604,7 +7604,12 @@
             subscribeToTypingChannel(contact.contact_user_id);
             
             loadMessages();
+            loadPinnedMessages();
             messagePollingInterval = setInterval(loadMessages, 3000);
+            
+            // Reset pinned messages section state
+            document.getElementById('pinned-messages-section').classList.remove('open');
+            document.getElementById('chat-pin-btn').setAttribute('aria-expanded', 'false');
             
             // Show quick replies when chat opens
             showQuickReplies();
@@ -7652,6 +7657,11 @@
                 clearInterval(messagePollingInterval);
                 messagePollingInterval = null;
             }
+            
+            // Reset pinned messages
+            pinnedMessages = [];
+            pinnedMessageIds = new Set();
+            document.getElementById('pinned-messages-section').classList.remove('open');
             
             // Hide quick replies
             hideQuickReplies();
@@ -7738,7 +7748,10 @@
                     
                     const stickerName = getStickerName(msg.sticker_id);
                     html += `
-                        <div class="chat-message sticker ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un sticker ${stickerName}">
+                        <div class="chat-message sticker ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a envoyé un sticker ${stickerName}">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             <div class="sticker-content">
                                 <img src="/assets/stickers/${escapeHtml(msg.sticker_id)}.svg" alt="${stickerName}" loading="lazy">
                             </div>
@@ -7759,7 +7772,10 @@
                     }
                     
                     html += `
-                        <div class="chat-message gif ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un GIF">
+                        <div class="chat-message gif ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a envoyé un GIF">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             <div class="gif-content giphy-content-gif">
                                 <img src="${escapeHtml(msg.gif_url)}" alt="GIF" loading="lazy">
                                 <span class="giphy-badge">GIF</span>
@@ -7788,7 +7804,10 @@
                     }
                     
                     html += `
-                        <div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un message vocal de ${durationStr}">
+                        <div class="chat-message ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a envoyé un message vocal de ${durationStr}">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             <div class="chat-message-content">
                                 <div class="voice-message">
                                     <button class="voice-play-btn" id="voice-play-${msg.id}" onclick="playVoiceMessage('${msg.id}', '${escapeHtml(msg.voice_url)}')" type="button" aria-label="Écouter le message vocal">
@@ -7817,7 +7836,10 @@
                     }
                     
                     html += `
-                        <div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un fichier">
+                        <div class="chat-message ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a envoyé un fichier">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             <div class="chat-message-content">
                                 ${renderFileAttachment(msg.file_url, msg.file_name, msg.file_size, msg.file_type)}
                             </div>
@@ -7838,7 +7860,10 @@
                     }
                     
                     html += `
-                        <div class="chat-message location ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a partagé sa position">
+                        <div class="chat-message location ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a partagé sa position">
+                            <div class="chat-message-actions">
+                                ${getPinButtonHtml(msg.id)}
+                            </div>
                             ${renderLocationMessage(msg, isSent)}
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>

@@ -4137,8 +4137,16 @@
                 </div>
             `;
             
+            // Reply count and button
+            const replyCount = post.reply_count || 0;
+            const replyBtnText = replyCount > 0 ? `${replyCount} réponse${replyCount > 1 ? 's' : ''}` : 'Répondre';
+            
             const shareHtml = `
                 <div class="post-actions">
+                    <button onclick="toggleReplies('${post.id}')" class="reply-toggle-btn" id="reply-btn-${post.id}" aria-label="Répondre au post" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span id="reply-count-${post.id}">${replyBtnText}</span>
+                    </button>
                     <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(postUrl)}" 
                        target="_blank" rel="noopener noreferrer" 
                        class="share-btn twitter" 
@@ -4168,6 +4176,28 @@
                 </div>
             `;
             
+            // Replies section (will be populated dynamically)
+            const repliesSectionHtml = `
+                <div class="replies-section" id="replies-section-${post.id}">
+                    <div class="replies-list" id="replies-list-${post.id}"></div>
+                    <div class="reply-composer" id="reply-composer-${post.id}">
+                        <div class="reply-composer-avatar">${(user.display_name || user.email || '?')[0].toUpperCase()}</div>
+                        <div class="reply-composer-form">
+                            <textarea 
+                                class="reply-composer-input" 
+                                id="reply-input-${post.id}" 
+                                placeholder="Écrire une réponse..."
+                                maxlength="1000"
+                            ></textarea>
+                            <div class="reply-composer-actions">
+                                <button class="reply-cancel-btn" onclick="toggleReplies('${post.id}')">Annuler</button>
+                                <button class="reply-submit-btn" id="reply-submit-${post.id}" onclick="submitReply('${post.id}')" disabled>Répondre</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
             return `
                 <article class="post-card ${newPostClass}" style="animation-delay: ${animDelay}s;" aria-label="Post de ${escapeHtml(displayName)}" data-post-id="${post.id}">
                     <div class="post-header">
@@ -4189,6 +4219,7 @@
                     <div class="post-previews" data-post-id-preview="${post.id}"></div>
                     ${reactionsHtml}
                     ${shareHtml}
+                    ${repliesSectionHtml}
                 </article>
             `;
         }
@@ -4520,6 +4551,294 @@
             }
         }
 
+        // ===== THREADS / REPLIES =====
+        const repliesCache = {}; // { postId: { replies: [], loaded: false, hasMore: false, cursor: null } }
+        
+        /**
+         * Toggle replies section visibility
+         */
+        async function toggleReplies(postId) {
+            const section = document.getElementById(`replies-section-${postId}`);
+            const btn = document.getElementById(`reply-btn-${postId}`);
+            const input = document.getElementById(`reply-input-${postId}`);
+            
+            if (!section) return;
+            
+            const isOpen = section.classList.contains('open');
+            
+            if (isOpen) {
+                // Close
+                section.classList.remove('open');
+                btn?.classList.remove('active');
+                btn?.setAttribute('aria-expanded', 'false');
+            } else {
+                // Open
+                section.classList.add('open');
+                btn?.classList.add('active');
+                btn?.setAttribute('aria-expanded', 'true');
+                
+                // Load replies if not already loaded
+                if (!repliesCache[postId]?.loaded) {
+                    await loadReplies(postId);
+                }
+                
+                // Focus input
+                setTimeout(() => input?.focus(), 100);
+                
+                // Setup input event listener for submit button state
+                if (input && !input.hasAttribute('data-listener')) {
+                    input.setAttribute('data-listener', 'true');
+                    input.addEventListener('input', () => {
+                        const submitBtn = document.getElementById(`reply-submit-${postId}`);
+                        if (submitBtn) {
+                            submitBtn.disabled = !input.value.trim();
+                        }
+                    });
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && input.value.trim()) {
+                            submitReply(postId);
+                        }
+                    });
+                }
+            }
+        }
+        
+        /**
+         * Load replies for a post
+         */
+        async function loadReplies(postId, loadMore = false) {
+            const list = document.getElementById(`replies-list-${postId}`);
+            if (!list) return;
+            
+            const cache = repliesCache[postId] || { replies: [], loaded: false, hasMore: false, cursor: null };
+            
+            // Show loading state
+            if (!loadMore) {
+                list.innerHTML = `
+                    <div class="replies-loading">
+                        <span class="spinner"></span>
+                        Chargement des réponses...
+                    </div>
+                `;
+            }
+            
+            try {
+                let url = `${API_URL}/posts?parent_id=${postId}&limit=10`;
+                if (loadMore && cache.cursor) {
+                    url += `&cursor=${encodeURIComponent(cache.cursor)}`;
+                }
+                
+                const res = await fetch(url, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur de chargement');
+                
+                const newReplies = data.replies || [];
+                
+                // Update cache
+                repliesCache[postId] = {
+                    replies: loadMore ? [...cache.replies, ...newReplies] : newReplies,
+                    loaded: true,
+                    hasMore: data.hasMore || false,
+                    cursor: data.nextCursor || null
+                };
+                
+                // Render replies
+                renderReplies(postId);
+                
+            } catch (e) {
+                console.error('Load replies error:', e);
+                if (!loadMore) {
+                    list.innerHTML = `
+                        <div class="replies-loading" style="color: var(--color-error);">
+                            Erreur de chargement des réponses
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        /**
+         * Render replies for a post
+         */
+        function renderReplies(postId) {
+            const list = document.getElementById(`replies-list-${postId}`);
+            if (!list) return;
+            
+            const cache = repliesCache[postId];
+            if (!cache || !cache.replies) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            if (cache.replies.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            const repliesHtml = cache.replies.map((reply, index) => renderReply(reply, index)).join('');
+            
+            let viewMoreHtml = '';
+            if (cache.hasMore) {
+                viewMoreHtml = `
+                    <button class="view-more-replies" onclick="loadReplies('${postId}', true)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        Voir plus de réponses
+                    </button>
+                `;
+            }
+            
+            list.innerHTML = repliesHtml + viewMoreHtml;
+        }
+        
+        /**
+         * Render a single reply
+         */
+        function renderReply(reply, index = 0) {
+            const author = reply.author || {};
+            const isOwn = reply.user_id === user.id;
+            const initial = (author.display_name || author.email || '?')[0].toUpperCase();
+            const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
+            const time = formatTime(reply.created_at);
+            
+            const deleteBtn = isOwn ? `
+                <button class="reply-delete-btn" onclick="deleteReply('${reply.id}', '${reply.parent_id}')" aria-label="Supprimer la réponse">×</button>
+            ` : '';
+            
+            const imageHtml = reply.image_url ? `
+                <div class="reply-image">
+                    <img src="${escapeHtml(reply.image_url)}" alt="Image de la réponse" onclick="openImageModal('${escapeHtml(reply.image_url)}')" loading="lazy">
+                </div>
+            ` : '';
+            
+            return `
+                <div class="reply-card" style="animation-delay: ${index * 0.05}s;" data-reply-id="${reply.id}">
+                    ${deleteBtn}
+                    <div class="reply-header">
+                        <div class="reply-avatar ${isOwn ? 'own' : ''}">${initial}</div>
+                        <span class="reply-author-name">
+                            ${escapeHtml(displayName)}
+                            ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
+                        </span>
+                        <time class="reply-time" datetime="${reply.created_at}">${time}</time>
+                    </div>
+                    <div class="reply-content">${linkifyContent(renderMentions(reply.content))}</div>
+                    ${imageHtml}
+                </div>
+            `;
+        }
+        
+        /**
+         * Submit a reply to a post
+         */
+        async function submitReply(postId) {
+            const input = document.getElementById(`reply-input-${postId}`);
+            const submitBtn = document.getElementById(`reply-submit-${postId}`);
+            
+            if (!input) return;
+            
+            const content = input.value.trim();
+            if (!content) return;
+            
+            // Disable button and show loading
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '...';
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/posts`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        content,
+                        parent_id: postId
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur lors de la publication');
+                
+                // Add new reply to cache
+                if (!repliesCache[postId]) {
+                    repliesCache[postId] = { replies: [], loaded: true, hasMore: false, cursor: null };
+                }
+                repliesCache[postId].replies.push(data.post);
+                
+                // Re-render replies
+                renderReplies(postId);
+                
+                // Clear input
+                input.value = '';
+                
+                // Update reply count in button
+                const post = posts.find(p => p.id === postId);
+                if (post) {
+                    post.reply_count = (post.reply_count || 0) + 1;
+                    updateReplyCountUI(postId, post.reply_count);
+                }
+                
+                showToast({ type: 'success', message: '✓ Réponse publiée !' });
+                
+            } catch (e) {
+                console.error('Submit reply error:', e);
+                showToast({ type: 'error', message: e.message });
+            } finally {
+                if (submitBtn) {
+                    submitBtn.textContent = 'Répondre';
+                    submitBtn.disabled = !input.value.trim();
+                }
+            }
+        }
+        
+        /**
+         * Delete a reply
+         */
+        async function deleteReply(replyId, parentId) {
+            if (!confirm('Supprimer cette réponse ?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/posts?id=${replyId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Remove from cache
+                if (repliesCache[parentId]) {
+                    repliesCache[parentId].replies = repliesCache[parentId].replies.filter(r => r.id !== replyId);
+                    renderReplies(parentId);
+                }
+                
+                // Update reply count
+                const post = posts.find(p => p.id === parentId);
+                if (post && post.reply_count > 0) {
+                    post.reply_count--;
+                    updateReplyCountUI(parentId, post.reply_count);
+                }
+                
+                showToast({ type: 'success', message: 'Réponse supprimée' });
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        /**
+         * Update the reply count display in the UI
+         */
+        function updateReplyCountUI(postId, count) {
+            const countEl = document.getElementById(`reply-count-${postId}`);
+            if (countEl) {
+                countEl.textContent = count > 0 ? `${count} réponse${count > 1 ? 's' : ''}` : 'Répondre';
+            }
+        }
+
         // ===== KEYBOARD SHORTCUTS =====
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -4527,6 +4846,14 @@
                 document.querySelectorAll('.post-menu.open').forEach(m => {
                     m.classList.remove('open');
                     m.previousElementSibling?.setAttribute('aria-expanded', 'false');
+                });
+                // Close any open replies section
+                document.querySelectorAll('.replies-section.open').forEach(s => {
+                    s.classList.remove('open');
+                    const postId = s.id.replace('replies-section-', '');
+                    const btn = document.getElementById(`reply-btn-${postId}`);
+                    btn?.classList.remove('active');
+                    btn?.setAttribute('aria-expanded', 'false');
                 });
             }
         });
