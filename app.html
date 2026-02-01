@@ -54,6 +54,7 @@
     
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/message-animations.css">
     
     <!-- QR Code & Contact Card -->
     <link rel="stylesheet" href="/css/qr-code.css">
@@ -67,6 +68,9 @@
     
     <!-- Message Formatting (text size, color, alignment) -->
     <link rel="stylesheet" href="/css/message-formatting.min.css">
+    
+    <!-- Message Search -->
+    <link rel="stylesheet" href="/css/message-search.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
@@ -2563,6 +2567,49 @@
             display: block;
         }
         
+        /* Chat nickname button */
+        .chat-nickname-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .chat-nickname-btn:hover {
+            background: rgba(255, 107, 74, 0.1);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .chat-nickname-btn.has-nickname {
+            background: rgba(255, 107, 74, 0.1);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .chat-nickname-btn .nickname-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-brand);
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .chat-nickname-btn.has-nickname .nickname-indicator {
+            display: block;
+        }
+        
         /* Chat wallpaper button */
         .chat-wallpaper-btn {
             width: 32px;
@@ -2609,6 +2656,33 @@
             background: var(--color-success-muted, rgba(34, 197, 94, 0.1));
             border-color: var(--color-success, #22c55e);
             color: var(--color-success, #22c55e);
+        }
+        
+        /* Chat search button */
+        .chat-search-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-search-btn:hover {
+            background: var(--color-brand-muted, rgba(99, 102, 241, 0.1));
+            border-color: var(--color-brand, #6366f1);
+            color: var(--color-brand, #6366f1);
+        }
+        
+        .chat-search-btn.active {
+            background: var(--color-brand-muted, rgba(99, 102, 241, 0.2));
+            border-color: var(--color-brand, #6366f1);
+            color: var(--color-brand, #6366f1);
         }
         
         /* Export modal options */
@@ -8009,6 +8083,12 @@
                     </svg>
                     <span class="note-indicator"></span>
                 </button>
+                <button class="chat-nickname-btn" id="chat-nickname-btn" onclick="openNicknameModal()" type="button" aria-label="Surnom personnalisé" title="Surnom">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>
+                    </svg>
+                    <span class="nickname-indicator"></span>
+                </button>
                 <button class="chat-header-pin-btn" id="chat-pin-btn" onclick="togglePinnedMessagesSection()" type="button" aria-label="Messages épinglés" aria-expanded="false">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
@@ -8025,9 +8105,49 @@
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
                 </button>
+                <button class="chat-search-btn" id="chat-search-btn" onclick="CinqMessageSearch.toggle()" type="button" aria-label="Rechercher dans les messages" title="Rechercher">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                </button>
                 <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
                     <span aria-hidden="true">×</span>
                 </button>
+            </div>
+        </div>
+        <!-- Message Search Panel -->
+        <div class="message-search-panel" id="message-search-panel" role="search" aria-label="Rechercher dans les messages">
+            <div class="message-search-input-wrapper">
+                <svg class="message-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" class="message-search-input" id="message-search-input" placeholder="Rechercher dans les messages..." aria-label="Rechercher dans les messages" autocomplete="off" spellcheck="false">
+                <button class="message-search-clear" id="message-search-clear" type="button" aria-label="Effacer la recherche">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="message-search-info">
+                <div class="message-search-count" id="message-search-result-count"></div>
+                <div class="message-search-nav">
+                    <button class="message-search-nav-btn" id="message-search-prev" type="button" aria-label="Résultat précédent" disabled>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="18 15 12 9 6 15"/>
+                        </svg>
+                    </button>
+                    <span class="message-search-position" id="message-search-position"></span>
+                    <button class="message-search-nav-btn" id="message-search-next" type="button" aria-label="Résultat suivant" disabled>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="message-search-shortcuts">
+                <span class="message-search-shortcut"><kbd>Enter</kbd> Suivant</span>
+                <span class="message-search-shortcut"><kbd>Shift</kbd>+<kbd>Enter</kbd> Précédent</span>
+                <span class="message-search-shortcut"><kbd>Esc</kbd> Fermer</span>
             </div>
         </div>
         <!-- Pinned Messages Section -->
@@ -8475,6 +8595,37 @@
         </div>
     </div>
 
+    <!-- Nickname Modal (Contact Nicknames) -->
+    <div class="modal-overlay" id="nickname-modal" role="dialog" aria-modal="true" aria-labelledby="nickname-modal-title" aria-hidden="true">
+        <div class="modal">
+            <h2 class="modal-title" id="nickname-modal-title">
+                <span aria-hidden="true">🏷️</span>
+                Surnom personnalisé
+            </h2>
+            <p id="nickname-contact-name" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);"></p>
+            <input 
+                type="text"
+                id="nickname-input" 
+                class="settings-input" 
+                placeholder="Ex: Maman, Bestie, Chef..."
+                maxlength="50"
+                style="width: 100%; margin-bottom: var(--space-3);"
+            />
+            <div class="private-note-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>Ce surnom est visible uniquement par toi et remplace le nom affiché.</span>
+            </div>
+            <div style="display: flex; gap: var(--space-3); justify-content: flex-end; margin-top: var(--space-4);">
+                <button class="modal-btn secondary" onclick="closeNicknameModal()" type="button">Annuler</button>
+                <button class="modal-btn primary" id="save-nickname-btn" onclick="saveNickname()" type="button">
+                    <span aria-hidden="true">💾</span> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Export Conversation Modal -->
     <div class="modal-overlay" id="export-modal" role="dialog" aria-modal="true" aria-labelledby="export-modal-title" aria-hidden="true">
         <div class="modal">
@@ -8613,6 +8764,9 @@
     
     <!-- Voice Transcription -->
     <script src="/js/voice-transcription.js"></script>
+    
+    <!-- Message Search -->
+    <script src="/js/message-search.js"></script>
 
     <script>
         const API_URL = '/api';
@@ -9861,7 +10015,7 @@
             list.innerHTML = '';
             
             archivedContacts.forEach(contact => {
-                const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                const name = getContactDisplayName(contact, '?');
                 const initial = name.charAt(0).toUpperCase();
                 const avatarUrl = contact.contact?.avatar_url;
                 
@@ -10197,6 +10351,109 @@
             const hasNote = !!currentChatContact.private_note;
             noteBtn.classList.toggle('has-note', hasNote);
             noteBtn.setAttribute('title', hasNote ? 'Note privée (1)' : 'Note privée');
+        }
+
+        // ===== CONTACT NICKNAMES =====
+        // Helper function to get contact display name (nickname > display_name > email)
+        function getContactDisplayName(contact, fallback = 'Contact') {
+            if (!contact) return fallback;
+            // Check for nickname first (personal, visible only to current user)
+            if (contact.nickname) return contact.nickname;
+            // Then check contact's display_name
+            if (contact.contact?.display_name) return contact.contact.display_name;
+            // Fallback to email username
+            if (contact.contact?.email) return contact.contact.email.split('@')[0];
+            return fallback;
+        }
+        
+        function openNicknameModal() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('nickname-modal');
+            const input = document.getElementById('nickname-input');
+            const contactNameEl = document.getElementById('nickname-contact-name');
+            
+            // Show original name (not nickname) so user knows who they're naming
+            const originalName = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            contactNameEl.textContent = `Définir un surnom pour ${originalName}`;
+            
+            // Load existing nickname
+            input.value = currentChatContact.nickname || '';
+            
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            setTimeout(() => input.focus(), 100);
+        }
+        
+        function closeNicknameModal() {
+            const modal = document.getElementById('nickname-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        async function saveNickname() {
+            if (!currentChatContact) return;
+            
+            const input = document.getElementById('nickname-input');
+            const nicknameValue = input.value.trim();
+            const contactId = currentChatContact.id;
+            
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}&action=nickname`, {
+                    method: 'PATCH',
+                    headers: {
+                        ...authHeaders(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nickname: nicknameValue || null })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la sauvegarde');
+                }
+                
+                // Update local contact data
+                currentChatContact.nickname = data.nickname;
+                
+                // Update contacts array
+                const contactIndex = contacts.findIndex(c => c.id === contactId);
+                if (contactIndex !== -1) {
+                    contacts[contactIndex].nickname = data.nickname;
+                }
+                
+                // Update UI to reflect new nickname
+                updateChatHeaderName();
+                updateNicknameButtonState();
+                renderContacts(); // Re-render contact list to show nickname
+                
+                closeNicknameModal();
+                showToast({ 
+                    type: 'success', 
+                    message: nicknameValue ? `Surnom "${nicknameValue}" enregistré 🏷️` : 'Surnom supprimé',
+                    duration: 2000 
+                });
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        function updateChatHeaderName() {
+            const headerName = document.getElementById('chat-contact-name');
+            if (!headerName || !currentChatContact) return;
+            headerName.textContent = getContactDisplayName(currentChatContact);
+        }
+        
+        function updateNicknameButtonState() {
+            const nicknameBtn = document.getElementById('chat-nickname-btn');
+            if (!nicknameBtn || !currentChatContact) return;
+            
+            const hasNickname = !!currentChatContact.nickname;
+            nicknameBtn.classList.toggle('has-nickname', hasNickname);
+            nicknameBtn.setAttribute('title', hasNickname ? `Surnom: ${currentChatContact.nickname}` : 'Définir un surnom');
         }
 
         // ===== CONVERSATION EXPORT =====
@@ -10836,15 +11093,17 @@
                 slot.setAttribute('role', 'listitem');
                 
                 if (contact) {
-                    const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                    const name = getContactDisplayName(contact, '?');
                     const initial = name.charAt(0).toUpperCase();
                     const avatarUrl = contact.contact?.avatar_url;
                     const unread = unreadCounts[contact.contact_user_id] || 0;
                     const isFavorite = contact.is_favorite || false;
+                    const hasNickname = !!contact.nickname;
                     
                     const favoriteText = isFavorite ? ' (favori)' : '';
+                    const nicknameText = hasNickname ? ` (surnom: ${contact.nickname})` : '';
                     const unreadText = unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : '';
-                    slot.setAttribute('aria-label', `${escapeHtml(name)}${favoriteText}${unreadText}. Appuie pour ouvrir la conversation`);
+                    slot.setAttribute('aria-label', `${escapeHtml(name)}${favoriteText}${nicknameText}${unreadText}. Appuie pour ouvrir la conversation`);
                     
                     // Favorite button
                     const favoriteBtn = document.createElement('button');
@@ -11100,7 +11359,7 @@
             slot.tabIndex = 0;
             slot.setAttribute('role', 'listitem');
             
-            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+            const name = getContactDisplayName(contact, '?');
             const initial = name.charAt(0).toUpperCase();
             const avatarUrl = contact.contact?.avatar_url;
             const unread = unreadCounts[contact.contact_user_id] || 0;
@@ -11676,11 +11935,12 @@
             unreadCounts[contact.contact_user_id] = 0;
             renderContacts();
             
-            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
+            const name = getContactDisplayName(contact);
             const avatarUrl = contact.contact?.avatar_url;
             const initial = name.charAt(0).toUpperCase();
             
             document.getElementById('chat-contact-name').textContent = name;
+            updateNicknameButtonState();
             
             // Display contact status and last seen in chat header
             const statusEmoji = contact.contact?.status_emoji;
@@ -11814,6 +12074,11 @@
             
             // Clear any pending reply
             clearReplyingTo();
+            
+            // Reset message search
+            if (window.CinqMessageSearch) {
+                CinqMessageSearch.reset();
+            }
             
             currentChatContact = null;
             if (messagePollingInterval) {
@@ -12114,6 +12379,12 @@
                 if (inputArea) {
                     window.CinqSmartReplies.processMessages(messages, user?.id, inputArea);
                 }
+            }
+            
+            // === Message Search Integration ===
+            // Refresh search highlights if search is active
+            if (window.CinqMessageSearch && CinqMessageSearch.isOpen()) {
+                CinqMessageSearch.refresh();
             }
         }
 
@@ -13196,7 +13467,7 @@
             }
             
             container.innerHTML = availableContacts.map(contact => {
-                const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
+                const name = getContactDisplayName(contact, 'Contact');
                 const email = contact.contact?.email || '';
                 const initial = name.charAt(0).toUpperCase();
                 

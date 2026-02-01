@@ -188,7 +188,7 @@ async function listContacts(req, res, user) {
     
     let query = supabase
         .from('contacts')
-        .select('id, contact_user_id, created_at, is_favorite, archived, muted_until, private_note, contact_group')
+        .select('id, contact_user_id, created_at, is_favorite, archived, muted_until, private_note, contact_group, nickname')
         .eq('user_id', user.id);
     
     // Filter by archived status
@@ -489,6 +489,33 @@ async function handlePatch(req, res, user) {
         return res.json({ 
             success: true, 
             private_note: noteValue,
+            contact: data
+        });
+    }
+
+    // Handle nickname update (personal nickname visible only to current user)
+    if (action === 'nickname') {
+        const { nickname } = req.body;
+        
+        // Allow null/empty to clear the nickname, otherwise validate max length (50 chars)
+        const nicknameValue = nickname ? nickname.trim().slice(0, 50) : null;
+        
+        const { data, error } = await supabase
+            .from('contacts')
+            .update({ nickname: nicknameValue })
+            .eq('id', contactId)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Log activity
+        logActivity(user.id, 'contact_nickname_updated', { contact_id: contactId }, req);
+
+        return res.json({ 
+            success: true, 
+            nickname: nicknameValue,
             contact: data
         });
     }
