@@ -143,7 +143,8 @@ CREATE INDEX IF NOT EXISTS idx_contacts_archived ON contacts(user_id, archived);
 CREATE OR REPLACE FUNCTION check_contact_limit()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF (SELECT COUNT(*) FROM contacts WHERE user_id = NEW.user_id) >= 5 THEN
+    -- Only count non-archived contacts towards the limit
+    IF (SELECT COUNT(*) FROM contacts WHERE user_id = NEW.user_id AND (archived IS NULL OR archived = FALSE)) >= 5 THEN
         RAISE EXCEPTION 'Maximum 5 contacts allowed';
     END IF;
     RETURN NEW;
