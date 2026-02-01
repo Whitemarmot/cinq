@@ -143,14 +143,16 @@
     </script>
     
     <style>
-        /* ===== CSS VARIABLES ===== */
+        /* ===== CSS VARIABLES — BRAND.MD COMPLIANT ===== */
         :root {
-            --cinq-gradient: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #fbbf24 100%);
-            --cinq-gradient-hover: linear-gradient(135deg, #ff8a6a 0%, #fbbf24 100%);
-            --color-brand: #ff6b4a;
-            --color-brand-light: #ff8a6a;
-            --color-brand-glow: rgba(255, 107, 74, 0.4);
-            --color-brand-muted: rgba(255, 107, 74, 0.1);
+            /* Primary Gradient: Indigo → Violet → Purple */
+            --cinq-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --cinq-gradient-hover: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #a855f7 100%);
+            --color-brand: #6366f1;
+            --color-brand-light: #8b5cf6;
+            --color-brand-purple: #a855f7;
+            --color-brand-glow: rgba(99, 102, 241, 0.4);
+            --color-brand-muted: rgba(99, 102, 241, 0.1);
             --color-bg-primary: #0c0c0f;
             --color-bg-secondary: #141419;
             --color-bg-tertiary: #1a1a21;
@@ -334,7 +336,7 @@
             pointer-events: none;
             z-index: -2;
             opacity: 0.02;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%236366f1' stroke-width='0.5' opacity='0.8'/%3E%3C/svg%3E");
             background-size: 60px 60px;
             animation: pentagon-drift 60s linear infinite;
         }
@@ -1377,8 +1379,9 @@
                     <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-gradient)">5</text>
                     <defs>
                         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff6b4a"/>
-                            <stop offset="100%" style="stop-color:#ff8a6a"/>
+                            <stop offset="0%" style="stop-color:#6366f1"/>
+                            <stop offset="50%" style="stop-color:#8b5cf6"/>
+                            <stop offset="100%" style="stop-color:#a855f7"/>
                         </linearGradient>
                     </defs>
                 </svg>

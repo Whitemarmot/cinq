@@ -1957,6 +1957,41 @@
                             <p id="name-message" class="form-message hidden"></p>
                         </div>
                         
+                        <!-- Avatar -->
+                        <div class="form-group" style="padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+                            <label class="form-label">Photo de profil</label>
+                            <div style="display: flex; gap: var(--space-3); align-items: flex-start;">
+                                <div id="avatar-preview" style="
+                                    width: 64px; 
+                                    height: 64px; 
+                                    border-radius: 50%; 
+                                    background: var(--color-bg-tertiary); 
+                                    display: flex; 
+                                    align-items: center; 
+                                    justify-content: center; 
+                                    border: 2px solid var(--color-border);
+                                    overflow: hidden;
+                                    flex-shrink: 0;
+                                ">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </div>
+                                <div style="flex: 1;">
+                                    <div class="form-row" style="margin-bottom: var(--space-2);">
+                                        <input type="file" id="avatar-file" accept="image/*" style="display: none;">
+                                        <button id="btn-upload-avatar" class="form-btn">Choisir une photo</button>
+                                        <button id="btn-remove-avatar" class="form-btn" style="display: none;">Supprimer</button>
+                                    </div>
+                                    <p style="color: var(--color-text-muted); font-size: var(--text-xs);">
+                                        Formats acceptés: JPEG, PNG, GIF, WebP (max 2 Mo)
+                                    </p>
+                                </div>
+                            </div>
+                            <p id="avatar-message" class="form-message hidden"></p>
+                        </div>
+                        
                         <!-- Email -->
                         <div class="form-group" style="padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
                             <label for="user-email" class="form-label">Adresse email</label>
@@ -3305,6 +3340,149 @@
         });
         
         // ============================================
+        // Avatar Upload
+        // ============================================
+        function updateAvatarPreview(imageUrl) {
+            const preview = $('avatar-preview');
+            const removeBtn = $('btn-remove-avatar');
+            
+            if (imageUrl) {
+                preview.innerHTML = `<img src="${imageUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
+                removeBtn.style.display = 'inline-block';
+            } else {
+                preview.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                `;
+                removeBtn.style.display = 'none';
+            }
+        }
+        
+        function resizeImage(file, maxWidth = 512, quality = 0.8) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = () => {
+                    const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+                    canvas.width = img.width * ratio;
+                    canvas.height = img.height * ratio;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+        
+        $('btn-upload-avatar').addEventListener('click', () => {
+            $('avatar-file').click();
+        });
+        
+        $('avatar-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showMessage('avatar-message', 'Format non supporté. Utilisez JPEG, PNG, GIF ou WebP.', true);
+                return;
+            }
+            
+            // Validate file size (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('avatar-message', 'Image trop grande. Taille maximum: 2 Mo.', true);
+                return;
+            }
+            
+            const uploadBtn = $('btn-upload-avatar');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Upload...';
+            hideMessage('avatar-message');
+            
+            try {
+                // Resize image for better performance
+                const resizedImage = await resizeImage(file);
+                
+                const token = UserProfile.getSession()?.access_token;
+                const response = await fetch('/api/upload-avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        image: resizedImage,
+                        contentType: 'image/jpeg'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erreur upload');
+                }
+                
+                // Update preview and UI
+                updateAvatarPreview(result.avatarUrl);
+                showMessage('avatar-message', 'Avatar mis à jour ✓', false);
+                setTimeout(() => hideMessage('avatar-message'), 3000);
+                showToast('Avatar mis à jour ✓');
+                logUserActivity('avatar_uploaded');
+                
+            } catch (err) {
+                console.error('Avatar upload error:', err);
+                showMessage('avatar-message', err.message, true);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Choisir une photo';
+                // Reset file input
+                e.target.value = '';
+            }
+        });
+        
+        $('btn-remove-avatar').addEventListener('click', async () => {
+            if (!confirm('Supprimer votre photo de profil ?')) return;
+            
+            const btn = $('btn-remove-avatar');
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                const response = await fetch('/api/upload-avatar', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erreur suppression');
+                }
+                
+                updateAvatarPreview(null);
+                showMessage('avatar-message', 'Avatar supprimé ✓', false);
+                setTimeout(() => hideMessage('avatar-message'), 3000);
+                showToast('Avatar supprimé');
+                logUserActivity('avatar_removed');
+            } catch (err) {
+                console.error('Remove avatar error:', err);
+                showMessage('avatar-message', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Supprimer';
+            }
+        });
+        
+        // ============================================
         // Logout
         // ============================================
         $('btn-logout').addEventListener('click', async () => {
@@ -4296,6 +4474,9 @@
                 try {
                     const profile = await UserProfile.loadProfile();
                     $('display-name').value = profile.display_name || UserProfile.getEmailPrefix(user.email);
+                    
+                    // Load avatar
+                    updateAvatarPreview(profile.avatar_url);
                     
                     // Load vacation mode state
                     updateVacationUI(

@@ -7,7 +7,7 @@
  * What makes CINQ unique:
  * - Pentagon/5-point geometry as visual motif
  * - 5-based spacing scale (5, 10, 15, 20, 25...)
- * - Warm coral gradients with golden undertones
+ * - Indigo to Purple gradients with mystical undertones
  * - Asymmetric compositions with intentional balance
  * - Light & Dark themes with smooth transitions
  */
@@ -22,29 +22,29 @@
    Support for light/dark mode via data-theme attribute
    ============================================ */
 :root {
-  /* ===== BRAND COLORS (Theme-independent) ===== */
-  --cinq-coral: #ff6b4a;
-  --cinq-coral-light: #ff8a6a;
-  --cinq-coral-dark: #e85a3a;
-  --cinq-gold: #fbbf24;
-  --cinq-lavender: #a78bfa;
-  --cinq-mint: #34d399;
+  /* ===== BRAND COLORS (Theme-independent) — BRAND.MD COMPLIANT ===== */
+  --cinq-indigo: #6366f1;
+  --cinq-violet: #8b5cf6;
+  --cinq-purple: #a855f7;
+  --cinq-success: #10b981;
+  --cinq-warning: #f59e0b;
+  --cinq-error: #ef4444;
   
-  /* ===== THE SIGNATURE GRADIENTS ===== */
-  --cinq-gradient: linear-gradient(135deg, #ff6b4a 0%, #ff8a6a 50%, #ffb08c 100%);
-  --cinq-gradient-hover: linear-gradient(135deg, #ff7d5c 0%, #ff9b7c 50%, #ffc09c 100%);
-  --cinq-gradient-subtle: linear-gradient(135deg, rgba(255, 107, 74, 0.12) 0%, rgba(255, 138, 106, 0.08) 100%);
-  --cinq-gradient-glow: linear-gradient(135deg, rgba(255, 107, 74, 0.4) 0%, rgba(255, 176, 140, 0.2) 100%);
+  /* ===== THE SIGNATURE GRADIENTS — PRIMARY: INDIGO → VIOLET → PURPLE ===== */
+  --cinq-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  --cinq-gradient-hover: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #c084fc 100%);
+  --cinq-gradient-subtle: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+  --cinq-gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(168, 85, 247, 0.2) 100%);
   
   /* Pentagon gradient - the unique signature */
   --cinq-pentagon-gradient: conic-gradient(
     from 0deg,
-    var(--cinq-coral) 0deg,
-    var(--cinq-coral-light) 72deg,
-    var(--cinq-gold) 144deg,
-    var(--cinq-lavender) 216deg,
-    var(--cinq-coral) 288deg,
-    var(--cinq-coral) 360deg
+    var(--cinq-indigo) 0deg,
+    var(--cinq-violet) 72deg,
+    var(--cinq-purple) 144deg,
+    var(--cinq-indigo) 216deg,
+    var(--cinq-violet) 288deg,
+    var(--cinq-indigo) 360deg
   );
   
   /* ===== TYPOGRAPHY ===== */
@@ -102,10 +102,10 @@
   --shadow-xl: 0 24px 48px -8px rgba(0, 0, 0, 0.2), 0 12px 24px -4px rgba(0, 0, 0, 0.12);
   --shadow-2xl: 0 32px 64px -12px rgba(0, 0, 0, 0.25), 0 16px 32px -6px rgba(0, 0, 0, 0.15);
   
-  /* Glow shadows - Brand colored */
-  --shadow-glow: 0 0 40px rgba(255, 107, 74, 0.35), 0 0 80px rgba(255, 107, 74, 0.15);
-  --shadow-glow-sm: 0 0 20px rgba(255, 107, 74, 0.3);
-  --shadow-glow-lg: 0 0 60px rgba(255, 107, 74, 0.4), 0 0 120px rgba(255, 107, 74, 0.2);
+  /* Glow shadows - Brand colored (Indigo/Purple) */
+  --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.35), 0 0 80px rgba(139, 92, 246, 0.15);
+  --shadow-glow-sm: 0 0 20px rgba(99, 102, 241, 0.3);
+  --shadow-glow-lg: 0 0 60px rgba(99, 102, 241, 0.4), 0 0 120px rgba(168, 85, 247, 0.2);
   
   /* ===== TRANSITIONS ===== */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -139,7 +139,7 @@
   /* Focus ring */
   --focus-ring-width: 2px;
   --focus-ring-offset: 3px;
-  --focus-ring-color: var(--cinq-coral);
+  --focus-ring-color: var(--cinq-indigo);
   
   /* Line heights */
   --leading-none: 1;
@@ -177,11 +177,11 @@
 [data-theme="dark"] {
   color-scheme: dark;
   
-  /* Backgrounds — Warm darkness */
-  --color-bg-primary: #0e0e12;
-  --color-bg-secondary: #16161c;
-  --color-bg-tertiary: #1e1e26;
-  --color-bg-elevated: #26262f;
+  /* Backgrounds — Dark theme per brand.md */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #1e1b4b;
+  --color-bg-elevated: #334155;
   --color-bg-hover: rgba(255, 255, 255, 0.04);
   --color-bg-active: rgba(255, 255, 255, 0.08);
   
@@ -196,13 +196,13 @@
   --color-text-tertiary: rgba(250, 250, 249, 0.70);
   --color-text-muted: rgba(250, 250, 249, 0.55);
   
-  /* Brand states */
-  --color-brand: var(--cinq-coral);
-  --color-brand-light: var(--cinq-coral-light);
-  --color-brand-dark: var(--cinq-coral-dark);
-  --color-brand-hover: #ff7d5c;
-  --color-brand-muted: rgba(255, 107, 74, 0.12);
-  --color-brand-glow: rgba(255, 107, 74, 0.35);
+  /* Brand states — Indigo to Purple */
+  --color-brand: var(--cinq-indigo);
+  --color-brand-light: var(--cinq-violet);
+  --color-brand-dark: var(--cinq-purple);
+  --color-brand-hover: #7c3aed;
+  --color-brand-muted: rgba(99, 102, 241, 0.12);
+  --color-brand-glow: rgba(99, 102, 241, 0.35);
   
   /* Semantic */
   --color-success: #34d399;
@@ -216,7 +216,7 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-subtle: rgba(255, 255, 255, 0.04);
   --color-border-active: rgba(255, 255, 255, 0.15);
-  --color-border-brand: rgba(255, 107, 74, 0.3);
+  --color-border-brand: rgba(99, 102, 241, 0.3);
   
   /* Gradient orbs opacity */
   --orb-opacity: 0.25;
@@ -232,9 +232,9 @@
   color-scheme: light;
   
   /* Backgrounds — Warm creams and whites */
-  --color-bg-primary: #faf9f7;
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f5f4f2;
+  --color-bg-primary: #fafaf9;
+  --color-bg-secondary: #f5f5f4;
+  --color-bg-tertiary: #e7e5e4;
   --color-bg-elevated: #ffffff;
   --color-bg-hover: rgba(0, 0, 0, 0.03);
   --color-bg-active: rgba(0, 0, 0, 0.06);
@@ -244,19 +244,19 @@
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-highlight: rgba(255, 255, 255, 0.5);
   
-  /* Text — High contrast, warm blacks (WCAG AA compliant) */
-  --color-text-primary: #1a1918;
-  --color-text-secondary: rgba(26, 25, 24, 0.8);   /* ~7:1 contrast ✓ */
-  --color-text-tertiary: rgba(26, 25, 24, 0.65);   /* ~5:1 contrast ✓ */
-  --color-text-muted: rgba(26, 25, 24, 0.58);      /* ~4.5:1 contrast ✓ AA */
+  /* Text — Stone colors per brand.md (WCAG AA compliant) */
+  --color-text-primary: #0c0a09;
+  --color-text-secondary: #44403c;   
+  --color-text-tertiary: #78716c;   
+  --color-text-muted: #a8a29e;
   
-  /* Brand states - slightly darker for contrast */
-  --color-brand: #e85a3a;
-  --color-brand-light: #ff6b4a;
-  --color-brand-dark: #d04a2a;
-  --color-brand-hover: #d04a2a;
-  --color-brand-muted: rgba(232, 90, 58, 0.1);
-  --color-brand-glow: rgba(232, 90, 58, 0.25);
+  /* Brand states - Indigo/Purple for light theme */
+  --color-brand: #6366f1;
+  --color-brand-light: #8b5cf6;
+  --color-brand-dark: #4f46e5;
+  --color-brand-hover: #4f46e5;
+  --color-brand-muted: rgba(99, 102, 241, 0.1);
+  --color-brand-glow: rgba(99, 102, 241, 0.25);
   
   /* Semantic - adjusted for light bg */
   --color-success: #059669;
@@ -270,7 +270,7 @@
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-subtle: rgba(0, 0, 0, 0.04);
   --color-border-active: rgba(0, 0, 0, 0.15);
-  --color-border-brand: rgba(232, 90, 58, 0.25);
+  --color-border-brand: rgba(99, 102, 241, 0.25);
   
   /* Shadows need adjustment for light mode */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -281,7 +281,7 @@
   --shadow-2xl: 0 32px 64px -12px rgba(0, 0, 0, 0.15), 0 16px 32px -6px rgba(0, 0, 0, 0.1);
   
   /* Glow shadows - subtler in light mode */
-  --shadow-glow: 0 0 40px rgba(232, 90, 58, 0.2), 0 0 80px rgba(232, 90, 58, 0.08);
+  --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.2), 0 0 80px rgba(139, 92, 246, 0.08);
   --shadow-glow-sm: 0 0 20px rgba(232, 90, 58, 0.15);
   --shadow-glow-lg: 0 0 60px rgba(232, 90, 58, 0.25), 0 0 120px rgba(232, 90, 58, 0.1);
   
