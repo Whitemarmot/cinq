@@ -2,10 +2,13 @@
  * Contacts API - Manage user's 5 contacts
  * 
  * Endpoints:
- * - GET / - List contacts
+ * - GET / - List contacts (excludes archived by default)
+ * - GET ?archived=true - List archived contacts only
+ * - GET ?include_archived=true - List all contacts
  * - GET ?action=search&search=email - Search user by email
  * - GET ?action=followers - Get followers
  * - POST - Add contact by ID or email
+ * - PATCH ?id=xxx&action=archive - Archive/unarchive contact
  * - DELETE ?id=xxx - Remove contact
  */
 
@@ -18,7 +21,7 @@ import { logActivity } from './activity-log.js';
 const MAX_CONTACTS = 5;
 
 export default async function handler(req, res) {
-    if (handleCors(req, res, ['GET', 'POST', 'DELETE', 'OPTIONS'])) return;
+    if (handleCors(req, res, ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'])) return;
 
     const user = await requireAuth(req, res);
     if (!user) return;
@@ -38,6 +41,11 @@ export default async function handler(req, res) {
         // ============ POST - Add contact ============
         if (req.method === 'POST') {
             return handlePost(req, res, user);
+        }
+
+        // ============ PATCH - Archive/unarchive contact ============
+        if (req.method === 'PATCH') {
+            return handlePatch(req, res, user);
         }
 
         // ============ DELETE ============
@@ -79,7 +87,7 @@ async function handleGet(req, res, user) {
         return listBirthdays(res, user);
     }
 
-    return listContacts(res, user);
+    return listContacts(req, res, user);
 }
 
 async function searchUser(req, res, user, search) {
@@ -174,12 +182,27 @@ async function getFollowers(res, user) {
     return res.json({ followers, count: data.length });
 }
 
-async function listContacts(res, user) {
-    const { data, error } = await supabase
+async function listContacts(req, res, user) {
+    const { archived, include_archived } = req.query;
+    
+    let query = supabase
         .from('contacts')
-        .select('id, contact_user_id, created_at')
-        .eq('user_id', user.id)
+        .select('id, contact_user_id, created_at, is_favorite, archived')
+        .eq('user_id', user.id);
+    
+    // Filter by archived status
+    if (archived === 'true') {
+        query = query.eq('archived', true);
+    } else if (include_archived !== 'true') {
+        // By default, exclude archived contacts
+        query = query.or('archived.is.null,archived.eq.false');
+    }
+    
+    query = query
+        .order('is_favorite', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: true });
+
+    const { data, error } = await query;
 
     if (error) throw error;
     if (!data || data.length === 0) {
@@ -215,6 +238,8 @@ async function listContacts(res, user) {
         
         return {
             ...c,
+            is_favorite: c.is_favorite || false,
+            archived: c.archived || false,
             contact: { 
                 id: c.contact_user_id, 
                 email: profile?.email || null,
@@ -374,6 +399,79 @@ async function resolveEmailToUserId(email, currentUser) {
     }
 
     return { userId: foundUser.id, email: foundUser.email };
+}
+
+// ===== PATCH HANDLER - Toggle Favorite or Archive =====
+
+async function handlePatch(req, res, user) {
+    const contactId = req.query.id;
+    const action = req.query.action; // 'favorite' or 'archive'
+    
+    if (!contactId) {
+        return res.status(400).json({ error: 'id requis' });
+    }
+
+    if (!isValidUUID(contactId)) {
+        return res.status(400).json({ error: 'Format id invalide' });
+    }
+
+    // Get current contact status
+    const { data: contact, error: fetchError } = await supabase
+        .from('contacts')
+        .select('id, is_favorite, archived')
+        .eq('id', contactId)
+        .eq('user_id', user.id)
+        .single();
+
+    if (fetchError || !contact) {
+        return res.status(404).json({ error: 'Contact non trouvé' });
+    }
+
+    // Handle archive action
+    if (action === 'archive') {
+        const newArchivedStatus = !contact.archived;
+        
+        const { data, error } = await supabase
+            .from('contacts')
+            .update({ archived: newArchivedStatus })
+            .eq('id', contactId)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Log activity
+        logActivity(user.id, newArchivedStatus ? 'contact_archived' : 'contact_unarchived', { contact_id: contactId }, req);
+
+        return res.json({ 
+            success: true, 
+            archived: newArchivedStatus,
+            contact: data
+        });
+    }
+
+    // Default: Toggle favorite status
+    const newFavoriteStatus = !contact.is_favorite;
+    
+    const { data, error } = await supabase
+        .from('contacts')
+        .update({ is_favorite: newFavoriteStatus })
+        .eq('id', contactId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+    if (error) throw error;
+
+    // Log activity
+    logActivity(user.id, newFavoriteStatus ? 'contact_favorited' : 'contact_unfavorited', { contact_id: contactId }, req);
+
+    return res.json({ 
+        success: true, 
+        is_favorite: newFavoriteStatus,
+        contact: data
+    });
 }
 
 // ===== DELETE HANDLER =====

@@ -1967,6 +1967,80 @@
             100% { transform: scale(1); }
         }
         
+        /* ===== FAVORITE STAR ===== */
+        .favorite-btn {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+            z-index: 10;
+            padding: 0;
+        }
+        
+        .contact-slot:hover .favorite-btn,
+        .contact-slot:focus .favorite-btn {
+            opacity: 1;
+        }
+        
+        .favorite-btn.is-favorite {
+            opacity: 1;
+            background: rgba(255, 193, 7, 0.2);
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.15);
+            background: rgba(255, 193, 7, 0.3);
+        }
+        
+        .favorite-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .favorite-star {
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .favorite-btn:not(.is-favorite) .favorite-star {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .favorite-btn.is-favorite .favorite-star {
+            color: #ffc107;
+            text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+            animation: star-pop 0.4s var(--ease-spring);
+        }
+        
+        @keyframes star-pop {
+            0% { transform: scale(0.5) rotate(-45deg); }
+            50% { transform: scale(1.3) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+        
+        @media (max-width: 400px) {
+            .favorite-btn {
+                width: 20px;
+                height: 20px;
+                top: 2px;
+                left: 2px;
+            }
+            
+            .favorite-star {
+                font-size: 11px;
+            }
+        }
+        
         /* ===== SUGGESTIONS SECTION ===== */
         .suggestions-section {
             margin-top: var(--space-6);
@@ -4215,9 +4289,200 @@
             border-color: var(--color-brand);
         }
         
+        .message-action-btn.has-reminder {
+            background: var(--color-warning);
+            color: white;
+            border-color: var(--color-warning);
+        }
+        
         .message-action-btn svg {
             width: 14px;
             height: 14px;
+        }
+        
+        /* ===== REMINDER MODAL ===== */
+        .reminder-modal {
+            max-width: 360px;
+        }
+        
+        .reminder-modal .modal-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .reminder-message-preview {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-3);
+            margin-bottom: var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            max-height: 80px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .reminder-message-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(transparent, var(--color-bg-tertiary));
+        }
+        
+        .reminder-quick-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+        }
+        
+        .reminder-quick-btn {
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .reminder-quick-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .reminder-quick-btn.selected {
+            background: var(--color-brand);
+            color: white;
+            border-color: var(--color-brand);
+        }
+        
+        .reminder-custom-time {
+            margin-bottom: var(--space-4);
+        }
+        
+        .reminder-custom-time label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+        
+        .reminder-datetime-input {
+            width: 100%;
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            font-family: inherit;
+            color-scheme: dark;
+        }
+        
+        .reminder-datetime-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .reminder-note-input {
+            width: 100%;
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            font-family: inherit;
+            resize: none;
+            min-height: 60px;
+            margin-bottom: var(--space-4);
+        }
+        
+        .reminder-note-input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px var(--color-brand-muted);
+        }
+        
+        .reminder-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .reminder-actions button {
+            flex: 1;
+            padding: var(--space-3);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reminder-cancel-btn {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+        }
+        
+        .reminder-cancel-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .reminder-save-btn {
+            background: var(--cinq-gradient);
+            border: none;
+            color: white;
+        }
+        
+        .reminder-save-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .reminder-save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Reminder badge on messages */
+        .reminder-badge {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 18px;
+            height: 18px;
+            background: var(--color-warning);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            z-index: 4;
+            animation: reminder-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes reminder-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .chat-message.sent .reminder-badge {
+            left: auto;
+            right: -6px;
         }
         
         /* Empty state for pinned messages */
@@ -7079,9 +7344,28 @@
                     const initial = name.charAt(0).toUpperCase();
                     const avatarUrl = contact.contact?.avatar_url;
                     const unread = unreadCounts[contact.contact_user_id] || 0;
+                    const isFavorite = contact.is_favorite || false;
                     
+                    const favoriteText = isFavorite ? ' (favori)' : '';
                     const unreadText = unread > 0 ? `, ${unread} message${unread > 1 ? 's' : ''} non lu${unread > 1 ? 's' : ''}` : '';
-                    slot.setAttribute('aria-label', `${escapeHtml(name)}${unreadText}. Appuie pour ouvrir la conversation`);
+                    slot.setAttribute('aria-label', `${escapeHtml(name)}${favoriteText}${unreadText}. Appuie pour ouvrir la conversation`);
+                    
+                    // Favorite button
+                    const favoriteBtn = document.createElement('button');
+                    favoriteBtn.className = `favorite-btn${isFavorite ? ' is-favorite' : ''}`;
+                    favoriteBtn.setAttribute('aria-label', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+                    favoriteBtn.setAttribute('title', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+                    favoriteBtn.type = 'button';
+                    const starSpan = document.createElement('span');
+                    starSpan.className = 'favorite-star';
+                    starSpan.textContent = isFavorite ? '★' : '☆';
+                    starSpan.setAttribute('aria-hidden', 'true');
+                    favoriteBtn.appendChild(starSpan);
+                    favoriteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleFavorite(contact.id, isFavorite);
+                    };
+                    slot.appendChild(favoriteBtn);
                     
                     // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
                     const avatarSlot = document.createElement('div');
@@ -7177,6 +7461,54 @@
             
             // Observe lazy images after render
             requestAnimationFrame(() => observeLazyImages());
+        }
+
+        // ===== TOGGLE FAVORITE =====
+        async function toggleFavorite(contactId, currentStatus) {
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}`, {
+                    method: 'PATCH',
+                    headers: authHeaders()
+                });
+                
+                if (res.status === 401) { logout(); return; }
+                
+                const data = await res.json();
+                if (!res.ok) {
+                    showToast({ type: 'error', title: 'Oups', message: data.error || 'Impossible de modifier le favori' });
+                    return;
+                }
+                
+                // Update local contacts array
+                const contactIndex = contacts.findIndex(c => c.id === contactId);
+                if (contactIndex !== -1) {
+                    contacts[contactIndex].is_favorite = data.is_favorite;
+                    
+                    // Re-sort contacts: favorites first, then by created_at
+                    contacts.sort((a, b) => {
+                        if (a.is_favorite && !b.is_favorite) return -1;
+                        if (!a.is_favorite && b.is_favorite) return 1;
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    });
+                }
+                
+                // Re-render contacts
+                renderContacts();
+                
+                // Show feedback
+                const action = data.is_favorite ? 'ajouté aux' : 'retiré des';
+                showToast({ 
+                    type: 'success', 
+                    message: `Contact ${action} favoris ⭐`, 
+                    duration: 2000 
+                });
+                
+                // Haptic feedback
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+            } catch (e) {
+                showToast({ type: 'error', title: 'Oups', message: 'Erreur réseau. Réessaie.' });
+            }
         }
 
         // ===== SUGGESTIONS =====
