@@ -13,6 +13,7 @@ import { supabase, requireAuth, getUserEmail, getUserProfile, handleCors } from 
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, isValidEmail } from './_validation.js';
 import { logError, createErrorResponse } from './_error-logger.js';
+import { logActivity } from './activity-log.js';
 
 const MAX_CONTACTS = 5;
 
@@ -289,6 +290,9 @@ async function handlePost(req, res, user) {
 
     if (error) throw error;
 
+    // Log activity
+    logActivity(user.id, 'contact_added', { contact_email: targetEmail }, req);
+
     return res.status(201).json({ 
         success: true, 
         contact: { ...data, contact: { id: targetUserId, email: targetEmail } }
@@ -340,5 +344,9 @@ async function handleDelete(req, res, user) {
         .eq('user_id', user.id);
 
     if (error) throw error;
+
+    // Log activity
+    logActivity(user.id, 'contact_removed', {}, req);
+
     return res.json({ success: true });
 }

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cinq — Favoris</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Cinq — Tes posts favoris. Retrouve les posts que tu as enregistrés.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/bookmarks">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Favoris — Cinq">
+    <meta property="og:description" content="Tes posts favoris sur Cinq.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/bookmarks">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    
+    <!-- Design System -->
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        /* ===== BOOKMARKS LAYOUT ===== */
+        .bookmarks-container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 1rem));
+        }
+        
+        .bookmarks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+        }
+        
+        .bookmarks-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .bookmarks-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.05);
+        }
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
+        }
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+        /* ===== POSTS ===== */
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .post-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            opacity: 0;
+            animation: post-fade-in 0.4s ease forwards;
+        }
+        
+        @keyframes post-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .post-author {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .post-avatar.own {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .post-author-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        
+        .post-author-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .you-badge {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            font-weight: 400;
+        }
+        
+        .post-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .post-image {
+            margin-top: 0.75rem;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            cursor: zoom-in;
+            transition: transform 0.3s;
+        }
+        
+        .post-image img:hover {
+            transform: scale(1.02);
+        }
+
+        /* ===== BOOKMARK INFO ===== */
+        .bookmark-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .bookmark-info svg {
+            width: 14px;
+            height: 14px;
+            color: var(--color-brand);
+        }
+
+        /* ===== POST ACTIONS ===== */
+        .post-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.65rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .action-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            border-color: var(--color-border-active);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .action-btn.remove:hover {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+        
+        .action-btn.view:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-text {
+            color: var(--color-text-muted);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .empty-state-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .empty-state-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .skeleton-post {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            opacity: 0;
+            animation: skeleton-fade-in 0.3s ease forwards;
+        }
+        
+        .skeleton-post:nth-child(1) { animation-delay: 0s; }
+        .skeleton-post:nth-child(2) { animation-delay: 0.1s; }
+        .skeleton-post:nth-child(3) { animation-delay: 0.2s; }
+        
+        @keyframes skeleton-fade-in {
+            to { opacity: 1; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--color-bg-elevated) 25%, var(--color-bg-tertiary) 50%, var(--color-bg-elevated) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-md);
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .skeleton.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+        .skeleton.skeleton-title { height: 16px; width: 60%; margin-bottom: 0.5rem; }
+        .skeleton.skeleton-text { height: 12px; width: 40%; }
+        .skeleton.skeleton-body { height: 60px; width: 100%; margin-top: 0.75rem; }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .toast {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: toast-in 0.3s ease-out;
+            pointer-events: auto;
+        }
+        
+        .toast.success { border-color: var(--color-success); }
+        .toast.error { border-color: var(--color-error); }
+        
+        @keyframes toast-in {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== IMAGE MODAL ===== */
+        .image-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            cursor: zoom-out;
+        }
+        
+        .image-modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .image-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: var(--radius-lg);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .image-modal.open img {
+            transform: scale(1);
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .image-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== INFINITE SCROLL ===== */
+        .infinite-scroll-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .infinite-scroll-loader .loading-spinner {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .infinite-scroll-end {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .bookmarks-header {
+                padding: 0.75rem 0;
+            }
+            
+            .post-card {
+                padding: 0.75rem;
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .action-btn span {
+                display: none;
+            }
+            
+            .action-btn {
+                padding: 0.5rem;
+            }
+        }
+        
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            .post-card,
+            .skeleton-post,
+            .skeleton,
+            .post-image img,
+            .image-modal img {
+                animation: none;
+                transition: none;
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Links -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        <a href="#bookmarks-list" class="skip-link">Aller aux favoris</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
+    
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal" role="dialog" aria-modal="true" aria-label="Image agrandie" onclick="closeImageModal()">
+        <button class="image-modal-close" onclick="closeImageModal()" aria-label="Fermer">×</button>
+        <img id="modal-image" src="" alt="Image agrandie">
+    </div>
+
+    <main class="bookmarks-container" id="main-content">
+        <header class="bookmarks-header">
+            <a href="/app.html" class="bookmarks-logo" aria-label="Retour à l'accueil">5</a>
+            <span class="bookmarks-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                Favoris
+            </span>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+                    <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <a href="/feed.html" class="back-btn" aria-label="Retour au feed">← Feed</a>
+            </div>
+        </header>
+
+        <!-- Bookmarks List -->
+        <div class="posts-list" id="bookmarks-list" role="feed" aria-label="Liste des favoris">
+            <!-- Loading skeletons -->
+            <div class="skeleton-post" id="skeleton-1" aria-hidden="true">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body"></div>
+            </div>
+            <div class="skeleton-post" id="skeleton-2" aria-hidden="true">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 45%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body" style="height: 40px;"></div>
+            </div>
+            <div class="skeleton-post" id="skeleton-3" aria-hidden="true">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 70%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 25%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body" style="height: 80px;"></div>
+            </div>
+        </div>
+        
+        <!-- Scroll sentinel for infinite scroll -->
+        <div class="scroll-sentinel" id="scroll-sentinel" aria-hidden="true"></div>
+    </main>
+
+    <script>
+        const API_URL = '/api';
+        let session = null;
+        let user = null;
+        let bookmarks = [];
+        
+        // Pagination state
+        let nextCursor = null;
+        let pageSize = 20;
+        let hasMoreBookmarks = true;
+        let isLoadingMore = false;
+        let infiniteScrollObserver = null;
+
+        // ===== INIT =====
+        async function init() {
+            const sessionStr = localStorage.getItem('cinq_session');
+            if (!sessionStr) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                session = JSON.parse(sessionStr);
+                user = session.user;
+                
+                // Setup Infinite Scroll
+                setupInfiniteScroll();
+                
+                // Load bookmarks
+                await loadBookmarks();
+                
+            } catch (e) {
+                console.error('Init error:', e);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // ===== LOAD BOOKMARKS =====
+        async function loadBookmarks() {
+            try {
+                const res = await fetch(`${API_URL}/bookmarks?limit=${pageSize}`, {
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur de chargement');
+                
+                bookmarks = data.bookmarks || [];
+                nextCursor = data.nextCursor || null;
+                hasMoreBookmarks = data.hasMore !== false && nextCursor !== null;
+                
+                renderBookmarks();
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                document.getElementById('bookmarks-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😢</div>
+                        <div class="empty-state-title">Erreur de chargement</div>
+                        <div class="empty-state-text">${escapeHtml(e.message)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // ===== INFINITE SCROLL =====
+        function setupInfiniteScroll() {
+            const sentinel = document.getElementById('scroll-sentinel');
+            if (!sentinel) return;
+            
+            infiniteScrollObserver = new IntersectionObserver(async (entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting && hasMoreBookmarks && !isLoadingMore) {
+                    await loadMoreBookmarks();
+                }
+            }, {
+                rootMargin: '200px'
+            });
+            
+            infiniteScrollObserver.observe(sentinel);
+        }
+        
+        async function loadMoreBookmarks() {
+            if (!nextCursor || isLoadingMore || !hasMoreBookmarks) return;
+            
+            isLoadingMore = true;
+            
+            // Show loading indicator
+            const container = document.getElementById('bookmarks-list');
+            const loader = document.createElement('div');
+            loader.className = 'infinite-scroll-loader';
+            loader.innerHTML = `
+                <div class="loading-spinner"></div>
+                <span>Chargement...</span>
+            `;
+            container.appendChild(loader);
+            
+            try {
+                const res = await fetch(`${API_URL}/bookmarks?limit=${pageSize}&cursor=${encodeURIComponent(nextCursor)}`, {
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur');
+                
+                const newBookmarks = data.bookmarks || [];
+                
+                // Update state
+                bookmarks = [...bookmarks, ...newBookmarks];
+                nextCursor = data.nextCursor || null;
+                hasMoreBookmarks = data.hasMore !== false && nextCursor !== null;
+                
+                // Remove loader
+                loader.remove();
+                
+                // Render new bookmarks
+                const startIndex = bookmarks.length - newBookmarks.length;
+                newBookmarks.forEach((bookmark, i) => {
+                    const postHtml = renderBookmarkPost(bookmark, startIndex + i);
+                    container.insertAdjacentHTML('beforeend', postHtml);
+                });
+                
+                // Show end message if no more
+                if (!hasMoreBookmarks && bookmarks.length > 0) {
+                    const endMsg = document.createElement('div');
+                    endMsg.className = 'infinite-scroll-end';
+                    endMsg.innerHTML = `✨ Tu as tout vu !`;
+                    container.appendChild(endMsg);
+                }
+                
+            } catch (e) {
+                console.error('Load more error:', e);
+                loader.remove();
+                showToast({ type: 'error', message: e.message });
+            } finally {
+                isLoadingMore = false;
+            }
+        }
+
+        // ===== RENDER BOOKMARKS =====
+        function renderBookmarks() {
+            const container = document.getElementById('bookmarks-list');
+            
+            // Remove skeletons
+            document.querySelectorAll('.skeleton-post').forEach(el => el.remove());
+            
+            if (bookmarks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔖</div>
+                        <div class="empty-state-title">Aucun favori</div>
+                        <div class="empty-state-text">
+                            Tu n'as pas encore ajouté de posts en favoris. Parcours le feed et sauvegarde tes posts préférés !
+                        </div>
+                        <a href="/feed.html" class="empty-state-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                            Voir le feed
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = bookmarks.map((bookmark, index) => 
+                renderBookmarkPost(bookmark, index)
+            ).join('');
+            
+            // Show end message if no more
+            if (!hasMoreBookmarks && bookmarks.length > 0) {
+                const endMsg = document.createElement('div');
+                endMsg.className = 'infinite-scroll-end';
+                endMsg.innerHTML = `✨ Tu as tout vu !`;
+                container.appendChild(endMsg);
+            }
+        }
+        
+        function renderBookmarkPost(bookmark, index = 0) {
+            const post = bookmark.post;
+            const author = post.author || {};
+            const isOwn = post.user_id === user.id;
+            const initial = (author.display_name || author.email || '?')[0].toUpperCase();
+            const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
+            const postTime = formatTime(post.created_at);
+            const bookmarkTime = formatTime(bookmark.bookmarked_at);
+            
+            const animDelay = Math.min(index * 0.05, 0.3);
+            
+            const imageHtml = post.image_url ? `
+                <div class="post-image" role="img" aria-label="Image du post">
+                    <img 
+                        src="${escapeHtml(post.image_url)}" 
+                        alt="Image partagée par ${escapeHtml(displayName)}" 
+                        onclick="openImageModal('${escapeHtml(post.image_url)}')"
+                        loading="lazy"
+                    >
+                </div>
+            ` : '';
+            
+            return `
+                <article class="post-card" style="animation-delay: ${animDelay}s;" aria-label="Post de ${escapeHtml(displayName)}">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${initial}</div>
+                            <div class="post-author-info">
+                                <span class="post-author-name">
+                                    ${escapeHtml(displayName)}
+                                    ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
+                                </span>
+                                <time class="post-time" datetime="${post.created_at}">${postTime}</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    ${imageHtml}
+                    <div class="bookmark-info">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        Ajouté aux favoris ${bookmarkTime}
+                    </div>
+                    <div class="post-actions">
+                        <a href="/p/${post.id}" class="action-btn view" aria-label="Voir le post">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            <span>Voir</span>
+                        </a>
+                        <button onclick="removeBookmark('${post.id}')" class="action-btn remove" aria-label="Retirer des favoris">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                            <span>Retirer</span>
+                        </button>
+                    </div>
+                </article>
+            `;
+        }
+
+        // ===== REMOVE BOOKMARK =====
+        async function removeBookmark(postId) {
+            try {
+                const res = await fetch(`${API_URL}/bookmarks?post_id=${postId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Remove from local list
+                bookmarks = bookmarks.filter(b => b.post.id !== postId);
+                renderBookmarks();
+                
+                showToast({ type: 'success', message: '🔖 Retiré des favoris' });
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+
+        // ===== IMAGE MODAL =====
+        function openImageModal(url) {
+            event.stopPropagation();
+            document.getElementById('modal-image').src = url;
+            document.getElementById('image-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>

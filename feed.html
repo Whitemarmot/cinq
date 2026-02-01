@@ -526,6 +526,20 @@
             word-break: break-word;
         }
         
+        .post-content .post-link {
+            color: var(--color-brand);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .post-content .post-link:hover {
+            text-decoration: underline;
+        }
+        
+        .post-previews:empty {
+            display: none;
+        }
+        
         /* ===== LAZY LOADING IMAGES ===== */
         .post-image {
             margin-top: 0.75rem;
@@ -1031,6 +1045,31 @@
         .share-btn.link:hover {
             border-color: var(--color-brand);
             color: var(--color-brand);
+        }
+        
+        .share-btn.bookmark {
+            transition: all 0.2s;
+        }
+        
+        .share-btn.bookmark:hover {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .share-btn.bookmark.active {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .share-btn.bookmark.animating {
+            animation: bookmark-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes bookmark-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         /* ===== RICH MEDIA PREVIEWS ===== */
@@ -1679,6 +1718,9 @@
         // Reactions state
         const REACTION_EMOJIS = ['❤️', '😂', '😮', '😢', '👏'];
         let reactionsCache = {}; // { postId: { counts: {}, userReactions: [] } }
+        
+        // Bookmarks state
+        let bookmarksCache = {}; // { postId: true/false }
         
         // ===== PAGINATION STATE (CURSOR-BASED) =====
         let nextCursor = null;  // ISO date string of last post
@@ -2375,11 +2417,20 @@
                 observeLazyImages();
             });
             
-            // Load reactions for new posts
+            // Load reactions and bookmarks for new posts
             const postIds = newPosts.map(p => p.id);
             if (postIds.length > 0) {
                 loadReactions(postIds);
+                loadBookmarks(postIds);
             }
+            
+            // Process link previews for new posts
+            newPosts.forEach(post => {
+                if (URL_REGEX.test(post.content)) {
+                    URL_REGEX.lastIndex = 0;
+                    queuePreviewProcessing(post.id, post.content);
+                }
+            });
         }
 
         // ===== LAZY LOADING IMAGES =====
@@ -2501,6 +2552,16 @@
             if (postIds.length > 0) {
                 loadReactions(postIds);
             }
+            
+            // Process link previews for posts with URLs
+            requestAnimationFrame(() => {
+                posts.forEach(post => {
+                    if (URL_REGEX.test(post.content)) {
+                        URL_REGEX.lastIndex = 0;
+                        queuePreviewProcessing(post.id, post.content);
+                    }
+                });
+            });
         }
         
         function renderPost(post, isNew = false, index = 0) {
@@ -2582,6 +2643,10 @@
                     <button onclick="copyPostLink('${post.id}')" class="share-btn copy" id="copy-btn-${post.id}" aria-label="Copier le lien">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                         <span id="copy-text-${post.id}">Copier</span>
+                    </button>
+                    <button onclick="toggleBookmark('${post.id}')" class="share-btn bookmark ${bookmarksCache[post.id] ? 'active' : ''}" id="bookmark-btn-${post.id}" aria-label="${bookmarksCache[post.id] ? 'Retirer des favoris' : 'Ajouter aux favoris'}" aria-pressed="${bookmarksCache[post.id] ? 'true' : 'false'}">
+                        <svg viewBox="0 0 24 24" fill="${bookmarksCache[post.id] ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span id="bookmark-text-${post.id}">${bookmarksCache[post.id] ? 'Enregistré' : 'Enregistrer'}</span>
                     </button>
                     <a href="/p/${post.id}" class="share-btn link" aria-label="Voir le post">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -2818,6 +2883,108 @@
             }
         }
 
+        // ===== BOOKMARKS =====
+        async function loadBookmarks(postIds) {
+            if (!postIds || postIds.length === 0) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/bookmarks?post_ids=${postIds.join(',')}`, {
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) return;
+                
+                const data = await res.json();
+                
+                // Update cache
+                if (data.bookmarks) {
+                    Object.assign(bookmarksCache, data.bookmarks);
+                }
+                
+                // Update UI
+                postIds.forEach(postId => {
+                    updateBookmarkUI(postId);
+                });
+                
+            } catch (e) {
+                console.error('Load bookmarks error:', e);
+            }
+        }
+        
+        function updateBookmarkUI(postId) {
+            const isBookmarked = bookmarksCache[postId] || false;
+            const btn = document.getElementById(`bookmark-btn-${postId}`);
+            const text = document.getElementById(`bookmark-text-${postId}`);
+            
+            if (btn) {
+                btn.classList.toggle('active', isBookmarked);
+                btn.setAttribute('aria-pressed', isBookmarked);
+                btn.setAttribute('aria-label', isBookmarked ? 'Retirer des favoris' : 'Ajouter aux favoris');
+                
+                // Update SVG fill
+                const svg = btn.querySelector('svg');
+                if (svg) {
+                    svg.setAttribute('fill', isBookmarked ? 'currentColor' : 'none');
+                }
+            }
+            
+            if (text) {
+                text.textContent = isBookmarked ? 'Enregistré' : 'Enregistrer';
+            }
+        }
+        
+        async function toggleBookmark(postId) {
+            const isBookmarked = bookmarksCache[postId] || false;
+            const btn = document.getElementById(`bookmark-btn-${postId}`);
+            
+            // Optimistic update
+            bookmarksCache[postId] = !isBookmarked;
+            updateBookmarkUI(postId);
+            
+            // Add animation
+            if (btn && !isBookmarked) {
+                btn.classList.add('animating');
+                setTimeout(() => btn.classList.remove('animating'), 300);
+            }
+            
+            // API call
+            try {
+                let res;
+                if (isBookmarked) {
+                    // DELETE
+                    res = await fetch(`${API_URL}/bookmarks?post_id=${postId}`, {
+                        method: 'DELETE',
+                        headers: authHeaders()
+                    });
+                } else {
+                    // POST
+                    res = await fetch(`${API_URL}/bookmarks`, {
+                        method: 'POST',
+                        headers: authHeaders(),
+                        body: JSON.stringify({ post_id: postId })
+                    });
+                }
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur bookmark');
+                }
+                
+                showToast({ 
+                    type: 'success', 
+                    message: isBookmarked ? '🔖 Retiré des favoris' : '🔖 Ajouté aux favoris' 
+                });
+                
+            } catch (e) {
+                console.error('Toggle bookmark error:', e);
+                // Revert optimistic update
+                bookmarksCache[postId] = isBookmarked;
+                updateBookmarkUI(postId);
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+
         // ===== SHARE FUNCTIONS =====
         async function copyPostLink(postId) {
             const url = `${window.location.origin}/p/${postId}`;
@@ -2850,6 +3017,30 @@
             }
         });
 
+        // ===== LINKIFY CONTENT =====
+        /**
+         * Convert URLs in text to clickable links
+         */
+        function linkifyContent(text) {
+            if (!text) return text;
+            // Match URLs but be careful not to double-encode already escaped HTML
+            return text.replace(
+                /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi,
+                (url) => {
+                    // Clean up trailing punctuation that shouldn't be part of URL
+                    let cleanUrl = url;
+                    const trailingPunct = /[.,;:!?)]+$/;
+                    const match = cleanUrl.match(trailingPunct);
+                    let trailing = '';
+                    if (match) {
+                        trailing = match[0];
+                        cleanUrl = cleanUrl.slice(0, -trailing.length);
+                    }
+                    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="post-link">${cleanUrl}</a>${trailing}`;
+                }
+            );
+        }
+        
         // ===== RICH MEDIA PREVIEWS =====
         const previewCache = new Map();
         const PREVIEW_CACHE_TTL = 30 * 60 * 1000; // 30 minutes

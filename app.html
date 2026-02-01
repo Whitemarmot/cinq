@@ -4005,6 +4005,90 @@
             font-size: var(--text-xs);
         }
         
+        /* ===== MENTIONS ===== */
+        .mention {
+            color: var(--color-brand);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--color-brand-muted);
+            padding: 0.1em 0.3em;
+            border-radius: var(--radius-sm);
+        }
+        
+        .mention:hover {
+            color: white;
+            background: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .mention:focus-visible {
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
+        }
+        
+        /* Mention autocomplete dropdown */
+        .mention-autocomplete {
+            position: absolute;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            min-width: 200px;
+        }
+        
+        .mention-autocomplete.visible {
+            display: block;
+            animation: modal-enter 0.2s ease;
+        }
+        
+        .mention-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .mention-item:hover,
+        .mention-item.selected {
+            background: var(--color-bg-hover);
+        }
+        
+        .mention-item-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .mention-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mention-item-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .mention-item-username {
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .app-content {
@@ -5077,7 +5161,7 @@
                             </div>
                             ${menuHtml}
                         </div>
-                        <div class="post-content">${escapeHtml(post.content)}</div>
+                        <div class="post-content">${renderMentions(post.content)}</div>
                         ${imageHtml}
                     </article>
                 `;
@@ -5775,7 +5859,7 @@
                     
                     html += `
                         <div class="chat-message ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} dit">
-                            <div class="chat-message-content">${escapeHtml(msg.content)}</div>
+                            <div class="chat-message-content">${renderMentions(msg.content)}</div>
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
                                 ${receiptHtml}
@@ -5885,7 +5969,7 @@
             const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
             
             msgEl.innerHTML = `
-                <div class="chat-message-content">${escapeHtml(msg.content)}</div>
+                <div class="chat-message-content">${renderMentions(msg.content)}</div>
                 <div class="chat-message-meta">
                     <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
                     <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
