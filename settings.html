@@ -50,6 +50,9 @@
     <!-- Message Templates styles -->
     <link rel="stylesheet" href="/css/message-templates.css">
     
+    <!-- Message Animations styles -->
+    <link rel="stylesheet" href="/css/message-animations.css">
+    
     <!-- Theme initialization -->
     <script>
         (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
@@ -274,6 +277,97 @@
             }
         }
         
+        // Message Animation settings
+        var MSG_ANIM_KEY = 'cinq_msg_animation';
+        var MSG_ANIMATIONS = ['none', 'fade', 'slide', 'bounce'];
+        var MSG_ANIM_NAMES = {
+            'none': 'Aucune animation',
+            'fade': 'Animation fondu',
+            'slide': 'Animation glisser',
+            'bounce': 'Animation rebondir'
+        };
+        
+        function getMsgAnimation() {
+            try {
+                var val = localStorage.getItem(MSG_ANIM_KEY);
+                return MSG_ANIMATIONS.includes(val) ? val : 'fade';
+            } catch (e) {}
+            return 'fade';
+        }
+        
+        function setMsgAnimation(animation) {
+            if (!MSG_ANIMATIONS.includes(animation)) return;
+            
+            // Save to localStorage
+            localStorage.setItem(MSG_ANIM_KEY, animation);
+            
+            // Update data attribute on html element
+            document.documentElement.setAttribute('data-msg-animation', animation);
+            
+            // Update UI
+            updateMsgAnimSelector(animation);
+            updateMsgAnimDescription(animation);
+            
+            // Play preview animation
+            playMsgAnimPreview(animation);
+        }
+        
+        function updateMsgAnimSelector(animation) {
+            document.querySelectorAll('.msg-anim-option').forEach(function(btn) {
+                var a = btn.getAttribute('data-animation');
+                btn.classList.toggle('active', a === animation);
+                btn.setAttribute('aria-pressed', a === animation);
+            });
+        }
+        
+        function updateMsgAnimDescription(animation) {
+            var desc = document.getElementById('msg-anim-description');
+            if (!desc) return;
+            desc.textContent = MSG_ANIM_NAMES[animation] || MSG_ANIM_NAMES['fade'];
+        }
+        
+        function playMsgAnimPreview(animation) {
+            var preview = document.getElementById('msg-anim-preview');
+            if (!preview) return;
+            
+            // Update preview type
+            preview.setAttribute('data-preview', animation);
+            
+            // Reset and replay animation
+            preview.classList.remove('playing');
+            var items = preview.querySelectorAll('.msg-anim-preview-item');
+            items.forEach(function(item) {
+                item.style.animation = 'none';
+                item.offsetHeight; // Trigger reflow
+                item.style.animation = '';
+            });
+            
+            // Only play if not "none"
+            if (animation !== 'none') {
+                preview.classList.add('playing');
+            }
+        }
+        
+        function initMsgAnimSettings() {
+            var animation = getMsgAnimation();
+            
+            // Apply to document
+            document.documentElement.setAttribute('data-msg-animation', animation);
+            
+            // Update UI
+            updateMsgAnimSelector(animation);
+            updateMsgAnimDescription(animation);
+            
+            // Show initial preview
+            var preview = document.getElementById('msg-anim-preview');
+            if (preview) {
+                preview.setAttribute('data-preview', animation);
+                if (animation !== 'none') {
+                    preview.classList.add('playing');
+                }
+            }
+        }
+        
         // Listen for system changes (auto mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', function(e) {
@@ -306,6 +400,9 @@
             
             // Initialize night mode toggle
             initNightModeSettings();
+            
+            // Initialize message animation settings
+            initMsgAnimSettings();
             
             // For sunrise mode, set up periodic check and update
             if (pref === 'sunrise') {
@@ -1377,6 +1474,101 @@
             color: var(--color-text-primary);
         }
         
+        /* ===== MESSAGE ANIMATION SELECTOR ===== */
+        .msg-anim-selector {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+        
+        .msg-anim-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 70px;
+        }
+        
+        .msg-anim-option:hover {
+            border-color: var(--color-border-active);
+            background: var(--color-bg-elevated);
+        }
+        
+        .msg-anim-option:focus-visible {
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
+        }
+        
+        .msg-anim-option.active {
+            border-color: var(--accent-primary, var(--color-brand));
+            background: var(--color-bg-elevated);
+            box-shadow: 0 0 0 1px var(--accent-primary, var(--color-brand));
+        }
+        
+        .msg-anim-icon {
+            font-size: 1.25rem;
+        }
+        
+        .msg-anim-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .msg-anim-option:hover .msg-anim-label,
+        .msg-anim-option.active .msg-anim-label {
+            color: var(--color-text-primary);
+        }
+        
+        /* Animation preview */
+        .msg-anim-preview {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            min-height: 56px;
+            align-items: center;
+        }
+        
+        .msg-anim-preview-item {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-primary, var(--color-brand));
+            border-radius: var(--radius-md);
+            opacity: 0;
+            flex-shrink: 0;
+        }
+        
+        .msg-anim-preview[data-preview="none"] .msg-anim-preview-item {
+            opacity: 1;
+        }
+        
+        @media (max-width: 400px) {
+            .msg-anim-selector {
+                gap: var(--space-1);
+            }
+            
+            .msg-anim-option {
+                padding: var(--space-2);
+                min-width: 60px;
+                flex: 1;
+            }
+            
+            .msg-anim-label {
+                font-size: 0.65rem;
+            }
+        }
+        
         /* Apply accent color to various UI elements */
         .toggle-switch.active {
             background: var(--accent-primary, var(--color-brand)) !important;
@@ -1826,6 +2018,45 @@
                         </div>
                         <button id="btn-night-mode-toggle" class="toggle-switch" onclick="toggleNightModeFromSettings()" aria-label="Activer le mode nuit automatique" aria-pressed="false"></button>
                     </div>
+                    
+                    <!-- Animations des messages -->
+                    <div class="settings-item" style="border-top: 1px solid var(--color-border); margin-top: var(--space-4); padding-top: var(--space-4);">
+                        <div class="settings-item-info" style="flex: 1;">
+                            <p class="settings-item-title">
+                                <span>✨</span>
+                                <span>Animations des messages</span>
+                            </p>
+                            <p class="settings-item-subtitle" id="msg-anim-description">Effet d'entrée pour les nouveaux posts</p>
+                            
+                            <!-- Animation selector -->
+                            <div class="msg-anim-selector" role="radiogroup" aria-label="Choisir l'animation des messages" style="display: flex; gap: var(--space-2); margin-top: var(--space-3); flex-wrap: wrap;">
+                                <button type="button" class="msg-anim-option" data-animation="none" onclick="setMsgAnimation('none')" aria-pressed="false" role="radio" title="Aucune animation">
+                                    <span class="msg-anim-icon">⏸️</span>
+                                    <span class="msg-anim-label">Aucune</span>
+                                </button>
+                                <button type="button" class="msg-anim-option active" data-animation="fade" onclick="setMsgAnimation('fade')" aria-pressed="true" role="radio" title="Fondu">
+                                    <span class="msg-anim-icon">🌫️</span>
+                                    <span class="msg-anim-label">Fondu</span>
+                                </button>
+                                <button type="button" class="msg-anim-option" data-animation="slide" onclick="setMsgAnimation('slide')" aria-pressed="false" role="radio" title="Glisser">
+                                    <span class="msg-anim-icon">➡️</span>
+                                    <span class="msg-anim-label">Glisser</span>
+                                </button>
+                                <button type="button" class="msg-anim-option" data-animation="bounce" onclick="setMsgAnimation('bounce')" aria-pressed="false" role="radio" title="Rebondir">
+                                    <span class="msg-anim-icon">🎾</span>
+                                    <span class="msg-anim-label">Rebondir</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Animation preview -->
+                            <div class="msg-anim-preview" id="msg-anim-preview" data-preview="fade">
+                                <div class="msg-anim-preview-item"></div>
+                                <div class="msg-anim-preview-item"></div>
+                                <div class="msg-anim-preview-item"></div>
+                                <div class="msg-anim-preview-item"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1996,6 +2227,58 @@
                                 🎯 Mode Focus actif
                             </p>
                             <p class="settings-item-subtitle" id="focus-active-hours">Le feed sera masqué de 09:00 à 18:00.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Auto-Reply (Busy Mode) -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v2"/><path d="M12 13h.01"/></svg>
+                    Réponse automatique
+                </h2>
+                
+                <div class="settings-card">
+                    <!-- Toggle auto-reply mode -->
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span id="auto-reply-status-icon">💬</span>
+                                <span id="auto-reply-status-text">Mode occupé</span>
+                            </p>
+                            <p id="auto-reply-status-desc" class="settings-item-subtitle">Répond automatiquement quand tu es occupé(e)</p>
+                        </div>
+                        <button id="btn-auto-reply-toggle" class="toggle-switch" data-pref="autoReply" onclick="toggleAutoReplyMode(this)" aria-label="Activer le mode occupé"></button>
+                    </div>
+                    
+                    <!-- Auto-reply message customization -->
+                    <div id="auto-reply-message-container" class="settings-form" style="border-top: 1px solid var(--color-border); display: none;">
+                        <div class="form-group">
+                            <label for="auto-reply-message" class="form-label">Message automatique</label>
+                            <div class="form-row" style="flex-direction: column; gap: var(--space-2);">
+                                <textarea id="auto-reply-message" class="form-input" placeholder="Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏" maxlength="500" rows="3" style="resize: vertical;"></textarea>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="settings-item-subtitle"><span id="auto-reply-char-count">0</span>/500</span>
+                                    <button id="btn-save-auto-reply-message" class="form-btn form-btn-primary">Enregistrer</button>
+                                </div>
+                            </div>
+                            <p id="auto-reply-message-result" class="form-message hidden"></p>
+                        </div>
+                        <p class="settings-item-subtitle" style="margin-top: var(--space-2);">
+                            💡 Ce message sera envoyé automatiquement (max 1 fois par 30 min par contact). Différent du mode vacances !
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Info box when auto-reply mode is active -->
+                <div id="auto-reply-active-info" class="push-card hidden" style="margin-top: var(--space-3); background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3);">
+                    <div class="push-card-content">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title" style="color: #fbbf24;">
+                                🙏 Mode occupé activé
+                            </p>
+                            <p class="settings-item-subtitle">Tes contacts reçoivent une réponse automatique quand ils t'écrivent.</p>
                         </div>
                     </div>
                 </div>
@@ -3159,6 +3442,108 @@
         $('btn-save-focus-hours').addEventListener('click', saveFocusHours);
         
         // ============================================
+        // Auto-Reply Mode (Busy Mode)
+        // ============================================
+        let autoReplyEnabled = false;
+        
+        function updateAutoReplyUI(isEnabled, message = '') {
+            autoReplyEnabled = isEnabled;
+            const toggle = $('btn-auto-reply-toggle');
+            const icon = $('auto-reply-status-icon');
+            const text = $('auto-reply-status-text');
+            const desc = $('auto-reply-status-desc');
+            const messageContainer = $('auto-reply-message-container');
+            const activeInfo = $('auto-reply-active-info');
+            const messageInput = $('auto-reply-message');
+            
+            if (isEnabled) {
+                toggle.classList.add('active');
+                icon.textContent = '🙏';
+                text.textContent = 'Mode occupé actif';
+                desc.textContent = 'Tes contacts reçoivent une réponse automatique';
+                messageContainer.style.display = 'block';
+                activeInfo.classList.remove('hidden');
+            } else {
+                toggle.classList.remove('active');
+                icon.textContent = '💬';
+                text.textContent = 'Mode occupé';
+                desc.textContent = 'Répond automatiquement quand tu es occupé(e)';
+                messageContainer.style.display = 'none';
+                activeInfo.classList.add('hidden');
+            }
+            
+            if (message) {
+                messageInput.value = message;
+                updateAutoReplyCharCount();
+            }
+        }
+        
+        function updateAutoReplyCharCount() {
+            const messageInput = $('auto-reply-message');
+            const charCount = $('auto-reply-char-count');
+            charCount.textContent = messageInput.value.length;
+        }
+        
+        $('auto-reply-message').addEventListener('input', updateAutoReplyCharCount);
+        
+        async function toggleAutoReplyMode(button) {
+            const willBeActive = !button.classList.contains('active');
+            
+            button.disabled = true;
+            
+            try {
+                await UserProfile.updateProfile({ auto_reply_enabled: willBeActive });
+                updateAutoReplyUI(willBeActive);
+                
+                if (willBeActive) {
+                    showToast('Mode occupé activé 🙏');
+                    logUserActivity('auto_reply_enabled');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Mode occupé activé. Les contacts reçoivent une réponse automatique.';
+                } else {
+                    showToast('Mode occupé désactivé');
+                    logUserActivity('auto_reply_disabled');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Mode occupé désactivé.';
+                }
+            } catch (err) {
+                console.error('Toggle auto-reply mode error:', err);
+                showToast('Erreur', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        async function saveAutoReplyMessage() {
+            const messageInput = $('auto-reply-message');
+            const message = messageInput.value.trim();
+            const btn = $('btn-save-auto-reply-message');
+            
+            if (message.length < 5) {
+                showMessage('auto-reply-message-result', 'Message trop court (min 5 caractères)', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                await UserProfile.updateProfile({ auto_reply_message: message });
+                showMessage('auto-reply-message-result', 'Message enregistré ✓', false);
+                setTimeout(() => hideMessage('auto-reply-message-result'), 3000);
+                showToast('Message de réponse automatique mis à jour ✓');
+            } catch (err) {
+                console.error('Save auto-reply message error:', err);
+                showMessage('auto-reply-message-result', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            }
+        }
+        
+        $('btn-save-auto-reply-message').addEventListener('click', saveAutoReplyMessage);
+        
+        // ============================================
         // Hide Last Seen
         // ============================================
         function updateHideLastSeenUI(isActive) {
@@ -3605,6 +3990,12 @@
                         profile.focus_mode || false,
                         profile.focus_start || '09:00',
                         profile.focus_end || '18:00'
+                    );
+                    
+                    // Load auto-reply (busy mode) state
+                    updateAutoReplyUI(
+                        profile.auto_reply_enabled || false,
+                        profile.auto_reply_message || 'Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏'
                     );
                     
                     // Load hide last seen state

@@ -382,6 +382,9 @@ async function handleSendMessage(req, res, user) {
 
     // Check if receiver is in vacation mode and send auto-reply
     await sendVacationAutoReply(contact_id, user.id);
+    
+    // Check if receiver has auto-reply enabled (busy mode) and send auto-reply
+    await sendBusyAutoReply(contact_id, user.id);
 
     return res.status(201).json({ success: true, message: data });
 }
@@ -441,6 +444,70 @@ async function sendVacationAutoReply(receiverId, senderId) {
     } catch (err) {
         // Log but don't fail the main request
         logError(err, { context: 'vacation_auto_reply', receiverId, senderId });
+    }
+}
+
+/**
+ * Send automatic busy/auto-reply if receiver has auto_reply_enabled
+ * Only sends once per 30 minutes to avoid spam (shorter than vacation mode)
+ * Does not send if vacation mode is already active
+ */
+async function sendBusyAutoReply(receiverId, senderId) {
+    try {
+        // Check if receiver has auto-reply enabled (and not vacation mode)
+        const { data: receiverProfile, error: profileError } = await supabase
+            .from('users')
+            .select('auto_reply_enabled, auto_reply_message, vacation_mode, display_name, email')
+            .eq('id', receiverId)
+            .single();
+
+        if (profileError || !receiverProfile?.auto_reply_enabled) {
+            return; // No auto-reply mode or error
+        }
+
+        // Don't send auto-reply if vacation mode is active (vacation takes priority)
+        if (receiverProfile.vacation_mode) {
+            return;
+        }
+
+        // Check if we already sent an auto-reply recently (within 30 minutes)
+        const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+        const { data: recentAutoReply } = await supabase
+            .from('messages')
+            .select('id')
+            .eq('sender_id', receiverId)
+            .eq('receiver_id', senderId)
+            .eq('is_auto_reply', true)
+            .gte('created_at', thirtyMinutesAgo)
+            .limit(1);
+
+        if (recentAutoReply && recentAutoReply.length > 0) {
+            return; // Already sent an auto-reply recently
+        }
+
+        const autoReplyMessage = receiverProfile.auto_reply_message || 
+            'Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏';
+
+        // Send automatic reply
+        const { error: insertError } = await supabase
+            .from('messages')
+            .insert({
+                sender_id: receiverId,
+                receiver_id: senderId,
+                content: `🙏 ${autoReplyMessage}`,
+                is_ping: false,
+                is_auto_reply: true
+            });
+
+        if (!insertError) {
+            logInfo('Busy auto-reply sent', { 
+                from: receiverId, 
+                to: senderId 
+            });
+        }
+    } catch (err) {
+        // Log but don't fail the main request
+        logError(err, { context: 'busy_auto_reply', receiverId, senderId });
     }
 }
 

@@ -54,6 +54,17 @@ BEGIN
     END IF;
 END $$;
 
+-- Add auto-reply mode columns if not exists (busy mode - different from vacation)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='auto_reply_enabled') THEN
+        ALTER TABLE users ADD COLUMN auto_reply_enabled BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='auto_reply_message') THEN
+        ALTER TABLE users ADD COLUMN auto_reply_message TEXT DEFAULT 'Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏';
+    END IF;
+END $$;
+
 -- Add user status columns (WhatsApp-style status)
 DO $$ 
 BEGIN 
@@ -220,6 +231,14 @@ DO $$
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='is_vacation_reply') THEN
         ALTER TABLE messages ADD COLUMN is_vacation_reply BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+-- Add is_auto_reply column if not exists (for busy/auto-reply mode)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='is_auto_reply') THEN
+        ALTER TABLE messages ADD COLUMN is_auto_reply BOOLEAN DEFAULT FALSE;
     END IF;
 END $$;
 

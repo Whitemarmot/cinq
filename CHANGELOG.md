@@ -7,6 +7,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [2.1.0] - 2025-02-01
+
+### ✨ Added (Nouvelles fonctionnalités)
+
+#### Messagerie
+- **Auto-Reply (Mode Occupé)** - Réponse automatique configurable quand on est occupé (différent du mode vacances). Envoie une réponse automatique aux contacts (max 1x/30min par contact). Message personnalisable dans les paramètres.
+
+---
+
 ## [2.0.0] - 2025-02-01 🌙 Night Sprint Edition
 
 ### ✨ Added (Nouvelles fonctionnalités)

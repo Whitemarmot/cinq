@@ -153,7 +153,7 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio, birthday, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, status_emoji, status_text, hide_last_seen } = req.body;
+    const { display_name, avatar_url, bio, birthday, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, auto_reply_enabled, auto_reply_message, status_emoji, status_text, hide_last_seen } = req.body;
 
     const updates = {};
     
@@ -244,6 +244,21 @@ async function handleUpdateProfile(req, res, user) {
             return res.status(400).json({ error: 'Format d\'heure invalide (HH:MM)', field: 'focus_end' });
         }
         updates.focus_end = focus_end;
+    }
+    
+    // Auto-reply mode (busy mode - different from vacation)
+    if (auto_reply_enabled !== undefined) {
+        updates.auto_reply_enabled = Boolean(auto_reply_enabled);
+        logInfo('Auto-reply mode toggled', { userId: user.id, autoReplyEnabled: updates.auto_reply_enabled });
+    }
+    
+    if (auto_reply_message !== undefined) {
+        // Validate auto-reply message (same as vacation message)
+        const result = validateVacationMessage(auto_reply_message);
+        if (!result.valid) {
+            return res.status(400).json({ error: result.error, field: 'auto_reply_message' });
+        }
+        updates.auto_reply_message = result.message;
     }
     
     // User status (WhatsApp-style)
