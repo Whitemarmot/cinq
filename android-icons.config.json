@@ -1,0 +1,121 @@
+{
+  "androidIcons": {
+    "comment": "Configuration des icônes Android pour Cinq PWA",
+    "baseIcon": "/assets/icons/icon-512x512.png",
+    "maskableIcon": "/assets/icons/icon-512x512.png",
+    "monochromeIcon": "/assets/icons/icon.svg",
+    "backgroundColor": "#0a0a0b",
+    "foregroundColor": "#ffffff",
+    "sizes": {
+      "mdpi": {
+        "size": "48x48",
+        "source": "/assets/icons/icon-96x96.png",
+        "density": "160dpi"
+      },
+      "hdpi": {
+        "size": "72x72", 
+        "source": "/assets/icons/icon-72x72.png",
+        "density": "240dpi"
+      },
+      "xhdpi": {
+        "size": "96x96",
+        "source": "/assets/icons/icon-96x96.png", 
+        "density": "320dpi"
+      },
+      "xxhdpi": {
+        "size": "144x144",
+        "source": "/assets/icons/icon-144x144.png",
+        "density": "480dpi"
+      },
+      "xxxhdpi": {
+        "size": "192x192",
+        "source": "/assets/icons/icon-192x192.png",
+        "density": "640dpi"
+      }
+    },
+    "adaptiveIcon": {
+      "foreground": "/assets/icons/icon-512x512.png",
+      "background": "#0a0a0b",
+      "monochrome": "/assets/icons/icon.svg"
+    },
+    "splashScreen": {
+      "backgroundColor": "#0a0a0b",
+      "icon": "/assets/icons/icon-192x192.png",
+      "branding": {
+        "text": "Cinq",
+        "textColor": "#ffffff",
+        "subtitle": "L'anti-réseau social"
+      }
+    },
+    "shortcuts": [
+      {
+        "id": "ping",
+        "shortLabel": "Ping",
+        "longLabel": "Envoyer un Ping",
+        "icon": "/assets/icons/icon-ping.svg",
+        "url": "/app.html?action=ping"
+      },
+      {
+        "id": "compose",
+        "shortLabel": "Message", 
+        "longLabel": "Écrire un message",
+        "icon": "/assets/icons/icon-96x96.png",
+        "url": "/app.html?action=compose"
+      },
+      {
+        "id": "chat",
+        "shortLabel": "Chat",
+        "longLabel": "Chat avec mes proches", 
+        "icon": "/assets/icons/icon-96x96.png",
+        "url": "/app.html?view=chat"
+      },
+      {
+        "id": "birthdays",
+        "shortLabel": "Anniversaires",
+        "longLabel": "Anniversaires de mes proches",
+        "icon": "/assets/icons/icon-gift.svg", 
+        "url": "/birthdays.html?source=shortcut"
+      }
+    ]
+  },
+  "manifest": {
+    "validationStatus": "✅ Valid",
+    "requiredFields": {
+      "name": "✅ Present",
+      "short_name": "✅ Present", 
+      "start_url": "✅ Present",
+      "display": "✅ standalone",
+      "icons": "✅ Complete set (72px to 512px)",
+      "theme_color": "✅ Present (#0a0a0b)",
+      "background_color": "✅ Present (#0a0a0b)"
+    },
+    "optionalFields": {
+      "description": "✅ Present",
+      "screenshots": "✅ Present (desktop + mobile)",
+      "shortcuts": "✅ Present (5 shortcuts)",
+      "categories": "✅ Present (social, lifestyle)",
+      "share_target": "✅ Configured",
+      "file_handlers": "✅ Configured"
+    }
+  },
+  "buildTargets": {
+    "pwaBuilder": {
+      "url": "https://www.pwabuilder.com/",
+      "inputUrl": "https://cinq.app",
+      "platform": "android",
+      "packageType": "TWA"
+    },
+    "capacitor": {
+      "appId": "app.cinq.mobile",
+      "appName": "Cinq",
+      "platform": "android",
+      "configFile": "capacitor.config.ts"
+    },
+    "androidStudio": {
+      "template": "Trusted Web Activity",
+      "packageName": "app.cinq.twa",
+      "targetSdk": 33,
+      "minSdk": 21
+    }
+  }
+}
