@@ -30,7 +30,8 @@ const JS_FILES = [
   'animations.js',
   'fun.js',
   'analytics.js',
-  'pwa-install.js'
+  'pwa-install.js',
+  'js/confetti.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');

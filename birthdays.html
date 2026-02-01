@@ -553,6 +553,9 @@
             }
         }
     </style>
+    
+    <!-- Confetti celebrations -->
+    <script src="/js/confetti.js"></script>
 </head>
 <body>
     <div class="noise-overlay" aria-hidden="true"></div>
@@ -798,6 +801,22 @@
             if (upcoming.length === 0) {
                 list.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">Aucun anniversaire à venir</p>';
                 return;
+            }
+            
+            // 🎂 Check if anyone has a birthday today and trigger confetti!
+            const todayBirthdays = upcoming.filter(c => c.daysUntil === 0);
+            if (todayBirthdays.length > 0 && window.CinqConfetti) {
+                const birthdayKey = `birthday_${today.toISOString().split('T')[0]}`;
+                if (!CinqConfetti.hasCelebrated(birthdayKey)) {
+                    CinqConfetti.setCelebration(birthdayKey);
+                    // Slight delay for page load
+                    setTimeout(() => {
+                        const names = todayBirthdays.map(c => 
+                            c.contact.display_name || c.contact.email?.split('@')[0] || 'Contact'
+                        ).join(', ');
+                        CinqConfetti.birthday(names);
+                    }, 500);
+                }
             }
             
             list.innerHTML = upcoming.map(c => {

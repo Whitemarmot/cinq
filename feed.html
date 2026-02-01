@@ -1883,6 +1883,188 @@
             animation: spin 0.8s linear infinite;
         }
 
+        /* ===== SEEN BY (Post Views) ===== */
+        .seen-by {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+            border-top: 1px solid var(--color-border);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .seen-by:hover {
+            color: var(--color-text-secondary);
+        }
+        
+        .seen-by-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .seen-by-icon svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .seen-by-avatars {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+        
+        .seen-by-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: white;
+            font-weight: 600;
+            border: 2px solid var(--color-bg-secondary);
+            margin-left: -8px;
+        }
+        
+        .seen-by-avatar:last-child {
+            margin-left: 0;
+        }
+        
+        .seen-by-avatar.more {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-muted);
+            font-size: 0.6rem;
+        }
+        
+        .seen-by-text {
+            flex: 1;
+        }
+        
+        .seen-by-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .seen-by-modal-overlay.open {
+            display: flex;
+            animation: fade-in 0.2s ease;
+        }
+        
+        .seen-by-modal {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            max-width: 320px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .seen-by-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .seen-by-modal-title {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .seen-by-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+        
+        .seen-by-modal-close:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .seen-by-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .seen-by-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .seen-by-item-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .seen-by-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .seen-by-item-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .seen-by-item-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .seen-by-empty {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .seen-by-empty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
         /* ===== MENTIONS ===== */
         .mention {
             color: var(--color-brand);
@@ -2489,6 +2671,9 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
     </style>
+    
+    <!-- Confetti celebrations -->
+    <script src="/js/confetti.js"></script>
 </head>
 <body>
     <!-- Skip Links - WCAG AAA Compliant -->
@@ -2520,6 +2705,25 @@
     <div class="image-modal" id="image-modal" role="dialog" aria-modal="true" aria-label="Image agrandie" onclick="closeImageModal()">
         <button class="image-modal-close" onclick="closeImageModal()" aria-label="Fermer">×</button>
         <img id="modal-image" src="" alt="Image agrandie">
+    </div>
+
+    <!-- Seen By Modal -->
+    <div class="seen-by-modal-overlay" id="seen-by-modal" role="dialog" aria-modal="true" aria-labelledby="seen-by-modal-title" onclick="closeSeenByModal(event)">
+        <div class="seen-by-modal" onclick="event.stopPropagation()">
+            <div class="seen-by-modal-header">
+                <h3 class="seen-by-modal-title" id="seen-by-modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Vu par
+                </h3>
+                <button class="seen-by-modal-close" onclick="closeSeenByModal()" aria-label="Fermer">×</button>
+            </div>
+            <div class="seen-by-list" id="seen-by-list">
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
     </div>
 
     <main class="feed-container" id="main-content">
@@ -2911,6 +3115,9 @@
                 
                 // Setup Lazy Loading
                 setupLazyLoading();
+                
+                // Setup Post Views Tracking (Seen by feature)
+                setupPostViewsTracking();
                 
                 // Load posts
                 await loadPosts();
@@ -3824,7 +4031,17 @@
                 // Clear saved draft after successful post
                 clearDraft();
                 
-                showToast({ type: 'success', message: 'Posté !' });
+                // 🎉 Celebrate first post with confetti!
+                if (window.CinqConfetti) {
+                    const wasFirstPost = await CinqConfetti.triggerFirstPostIfNeeded();
+                    if (wasFirstPost) {
+                        showToast({ type: 'success', message: '🎉 Premier post ! Bienvenue sur Cinq !' });
+                    } else {
+                        showToast({ type: 'success', message: 'Posté !' });
+                    }
+                } else {
+                    showToast({ type: 'success', message: 'Posté !' });
+                }
                 
             } catch (e) {
                 console.error('Submit error:', e);
@@ -4327,8 +4544,46 @@
                 </div>
             `;
             
+            // Seen by section (only for own posts < 24h)
+            let seenByHtml = '';
+            if (isOwn && post.seen_by && post.seen_by.count > 0) {
+                const viewers = post.seen_by.viewers || [];
+                const totalCount = post.seen_by.count;
+                const displayViewers = viewers.slice(0, 3);
+                const remainingCount = totalCount - displayViewers.length;
+                
+                const avatarsHtml = displayViewers.map(v => {
+                    const vInitial = (v.display_name || v.email || '?')[0].toUpperCase();
+                    return `<div class="seen-by-avatar" title="${escapeHtml(v.display_name || v.email?.split('@')[0] || 'Anonyme')}">${vInitial}</div>`;
+                }).join('');
+                
+                const moreAvatarHtml = remainingCount > 0 
+                    ? `<div class="seen-by-avatar more">+${remainingCount}</div>` 
+                    : '';
+                
+                const viewersText = totalCount === 1 
+                    ? `Vu par ${displayViewers[0]?.display_name || displayViewers[0]?.email?.split('@')[0] || '1 personne'}`
+                    : `Vu par ${totalCount} personnes`;
+                
+                seenByHtml = `
+                    <div class="seen-by" onclick="openSeenByModal('${post.id}')" role="button" tabindex="0" aria-label="${viewersText}">
+                        <div class="seen-by-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <div class="seen-by-avatars">
+                            ${moreAvatarHtml}
+                            ${avatarsHtml}
+                        </div>
+                        <span class="seen-by-text">${viewersText}</span>
+                    </div>
+                `;
+            }
+            
             return `
-                <article class="post-card ${newPostClass}" style="animation-delay: ${animDelay}s;" aria-label="Post de ${escapeHtml(displayName)}" data-post-id="${post.id}">
+                <article class="post-card ${newPostClass}" style="animation-delay: ${animDelay}s;" aria-label="Post de ${escapeHtml(displayName)}" data-post-id="${post.id}" data-is-own="${isOwn}">
                     <div class="post-header">
                         <div class="post-author">
                             <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${initial}</div>
@@ -4347,6 +4602,7 @@
                     ${pollHtml}
                     <div class="post-previews" data-post-id-preview="${post.id}"></div>
                     ${reactionsHtml}
+                    ${seenByHtml}
                     ${shareHtml}
                     ${repliesSectionHtml}
                 </article>
@@ -4417,6 +4673,159 @@
             document.getElementById('image-modal').classList.remove('open');
             document.body.style.overflow = '';
         }
+
+        // ===== SEEN BY =====
+        let currentSeenByPostId = null;
+        let postViewsObserver = null;
+        let viewedPostIds = new Set();
+        let pendingViews = [];
+        let viewsDebounceTimeout = null;
+        
+        async function openSeenByModal(postId) {
+            currentSeenByPostId = postId;
+            const modal = document.getElementById('seen-by-modal');
+            const list = document.getElementById('seen-by-list');
+            
+            // Show modal with loading state
+            list.innerHTML = `
+                <div class="seen-by-empty">
+                    <div class="spinner" style="width: 24px; height: 24px; border: 2px solid var(--color-border); border-top-color: var(--color-brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto;"></div>
+                    <div style="margin-top: 0.5rem;">Chargement...</div>
+                </div>
+            `;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            
+            try {
+                const res = await fetch(`${API_URL}/post-views?post_id=${postId}`, {
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Erreur');
+                
+                if (data.expired) {
+                    list.innerHTML = `
+                        <div class="seen-by-empty">
+                            <div class="seen-by-empty-icon">⏰</div>
+                            <div>Les vues ne sont visibles que pour les posts de moins de 24h</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (!data.viewers || data.viewers.length === 0) {
+                    list.innerHTML = `
+                        <div class="seen-by-empty">
+                            <div class="seen-by-empty-icon">👀</div>
+                            <div>Personne n'a encore vu ce post</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render viewers
+                list.innerHTML = data.viewers.map(view => {
+                    const viewer = view.viewer || {};
+                    const initial = (viewer.display_name || viewer.email || '?')[0].toUpperCase();
+                    const name = viewer.display_name || viewer.email?.split('@')[0] || 'Anonyme';
+                    const viewedTime = formatTime(view.viewed_at);
+                    
+                    return `
+                        <div class="seen-by-item">
+                            <div class="seen-by-item-avatar">${initial}</div>
+                            <div class="seen-by-item-info">
+                                <div class="seen-by-item-name">${escapeHtml(name)}</div>
+                                <div class="seen-by-item-time">Vu ${viewedTime}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (e) {
+                console.error('Load seen by error:', e);
+                list.innerHTML = `
+                    <div class="seen-by-empty">
+                        <div class="seen-by-empty-icon">😢</div>
+                        <div>${e.message}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        function closeSeenByModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            
+            const modal = document.getElementById('seen-by-modal');
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+            currentSeenByPostId = null;
+        }
+        
+        // Track post views when they become visible
+        function setupPostViewsTracking() {
+            postViewsObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const postCard = entry.target;
+                            const postId = postCard.dataset.postId;
+                            const isOwn = postCard.dataset.isOwn === 'true';
+                            
+                            // Don't track views for own posts
+                            if (isOwn || !postId || viewedPostIds.has(postId)) return;
+                            
+                            // Check if post is recent (<24h) - we'll let the API handle this
+                            viewedPostIds.add(postId);
+                            pendingViews.push(postId);
+                            
+                            // Debounce API calls
+                            clearTimeout(viewsDebounceTimeout);
+                            viewsDebounceTimeout = setTimeout(sendPendingViews, 2000);
+                        }
+                    });
+                },
+                {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.5 // At least 50% visible
+                }
+            );
+        }
+        
+        function observePostCards() {
+            document.querySelectorAll('.post-card[data-post-id]').forEach(card => {
+                postViewsObserver?.observe(card);
+            });
+        }
+        
+        async function sendPendingViews() {
+            if (pendingViews.length === 0) return;
+            
+            const postIdsToSend = [...pendingViews];
+            pendingViews = [];
+            
+            try {
+                await fetch(`${API_URL}/post-views`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ post_ids: postIdsToSend })
+                });
+            } catch (e) {
+                console.error('Send post views error:', e);
+                // Re-add to pending on error (they'll be retried)
+            }
+        }
+        
+        // Send any pending views when user leaves page
+        window.addEventListener('beforeunload', () => {
+            if (pendingViews.length > 0) {
+                // Use sendBeacon for reliable delivery
+                const data = JSON.stringify({ post_ids: pendingViews });
+                navigator.sendBeacon?.(`${API_URL}/post-views`, new Blob([data], { type: 'application/json' }));
+            }
+        });
 
         // ===== UTILS =====
         // formatTime(), escapeHtml(), and showToast() now provided by /js/shared.js

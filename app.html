@@ -9226,6 +9226,10 @@
             archiveBtn.setAttribute('aria-label', isArchived ? 'Désarchiver cette conversation' : 'Archiver cette conversation');
             archiveBtn.setAttribute('title', isArchived ? 'Désarchiver' : 'Archiver');
             
+            // Update mute button state
+            const isMuted = contact.is_muted || false;
+            updateMuteButton(isMuted);
+            
             // Update private note button state
             updateNoteButtonState();
             
