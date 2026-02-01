@@ -204,7 +204,7 @@ CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
 
 -- ============================================
--- ANALYTICS EVENTS
+-- ANALYTICS EVENTS (server-side)
 -- ============================================
 CREATE TABLE IF NOT EXISTS analytics_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -220,6 +220,39 @@ CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_type_created ON analytics_events(event_type, created_at DESC);
 
 ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
+-- No policies = only service role key works
+
+-- ============================================
+-- CLIENT ANALYTICS (frontend tracking)
+-- ============================================
+CREATE TABLE IF NOT EXISTS client_analytics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_type TEXT NOT NULL,
+    session_id TEXT,
+    visitor_id TEXT,
+    page_url TEXT,
+    page_title TEXT,
+    page_referrer TEXT,
+    viewport TEXT,
+    screen_width INTEGER,
+    screen_height INTEGER,
+    language TEXT,
+    platform TEXT,
+    event_data JSONB DEFAULT '{}',
+    ip_hash TEXT,
+    user_agent TEXT,
+    client_timestamp TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_client_analytics_event_type ON client_analytics(event_type);
+CREATE INDEX IF NOT EXISTS idx_client_analytics_created ON client_analytics(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_client_analytics_session ON client_analytics(session_id);
+CREATE INDEX IF NOT EXISTS idx_client_analytics_visitor ON client_analytics(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_client_analytics_page ON client_analytics(page_url);
+CREATE INDEX IF NOT EXISTS idx_client_analytics_type_time ON client_analytics(event_type, created_at DESC);
+
+ALTER TABLE client_analytics ENABLE ROW LEVEL SECURITY;
 -- No policies = only service role key works
 
 -- ============================================
