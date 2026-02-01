@@ -3577,8 +3577,15 @@
     </style>
 </head>
 <body>
-    <!-- Skip Link for keyboard/screen reader users -->
-    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        <a href="#bottom-nav" class="skip-link">Aller à la navigation</a>
+        <a href="#tab-contacts" class="skip-link">Aller à Tes 5 proches</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
     
     <div class="noise-overlay" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
@@ -3912,7 +3919,7 @@
         </main>
         
         <!-- BOTTOM NAV -->
-        <nav class="bottom-nav" role="tablist" aria-label="Navigation principale">
+        <nav id="bottom-nav" class="bottom-nav" role="tablist" aria-label="Navigation principale">
             <button class="nav-item active" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="true" aria-controls="tab-feed" type="button">
                 <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>

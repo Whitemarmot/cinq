@@ -30,7 +30,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.min.css">
@@ -606,8 +607,17 @@
     </style>
 </head>
 <body>
-    <!-- Skip to content link -->
-    <a href="#login-form" class="skip-link">Aller au formulaire de connexion</a>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#login-form" class="skip-link">Aller au formulaire de connexion</a>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Live region for form validation errors -->
+    <div id="form-errors" class="sr-announce" aria-live="assertive" aria-atomic="true"></div>
     
     <div class="noise-overlay" aria-hidden="true"></div>
     
@@ -927,7 +937,7 @@
     </footer>
     
     <!-- i18n -->
-    <script src="/js/i18n.js"></script>
+    <script defer src="/js/i18n.js"></script>
     <script>
         // Update texts on language change
         window.addEventListener('i18n:loaded', updateTexts);

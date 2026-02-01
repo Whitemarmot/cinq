@@ -30,7 +30,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.min.css">
@@ -811,11 +812,21 @@
     
     <div class="noise-overlay" aria-hidden="true"></div>
     
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
-        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
+    <!-- Language Switcher & Theme Toggle -->
+    <div style="position: fixed; top: var(--space-4); right: var(--space-4); z-index: 100; display: flex; gap: var(--space-2); align-items: center;">
+        <div id="lang-switcher" style="display: flex; gap: 4px;">
+            <button class="lang-btn" data-lang="fr" aria-label="Français" style="padding: 6px 10px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); transition: all 0.2s;">FR</button>
+            <button class="lang-btn" data-lang="en" aria-label="English" style="padding: 6px 10px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); transition: all 0.2s;">EN</button>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+    </div>
+    <style>
+        .lang-btn.active { background: var(--color-brand-muted) !important; border-color: var(--color-brand) !important; color: var(--color-brand) !important; }
+        .lang-btn:hover { background: var(--color-bg-elevated); border-color: var(--color-border-active); }
+    </style>
     
     <div class="pentagon-pattern" aria-hidden="true"></div>
     <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
@@ -962,7 +973,8 @@
 
         async function init() {
             if (!giftCode) {
-                showInvalid('Aucun code fourni. Tu as besoin d\'une invitation pour rejoindre Cinq.');
+                const noCodeMsg = window.i18n ? i18n.t('gift.noCode') : 'Aucun code fourni. Tu as besoin d\'une invitation pour rejoindre Cinq.';
+                showInvalid(noCodeMsg);
                 return;
             }
 
@@ -988,6 +1000,15 @@
         }
 
         function getInvalidReason(reason) {
+            if (window.i18n) {
+                const reasons = {
+                    'not_found': i18n.t('gift.notFound'),
+                    'already_used': i18n.t('gift.alreadyUsed'),
+                    'expired': i18n.t('gift.expired'),
+                    'invalid': i18n.t('gift.invalid')
+                };
+                return reasons[reason] || reason || i18n.t('gift.invalid');
+            }
             const reasons = {
                 'not_found': 'Ce code n\'existe pas. Vérifie que tu l\'as bien copié.',
                 'already_used': 'Ce code a déjà été utilisé.',
@@ -1062,29 +1083,37 @@
             if (/\d/.test(password)) score++;
             if (/[^a-zA-Z0-9]/.test(password)) score++;
             
-            if (score <= 1) return { class: 'weak', text: 'Faible', valid: false };
-            if (score === 2) return { class: 'fair', text: 'Moyen', valid: true };
-            if (score === 3) return { class: 'good', text: 'Bon', valid: true };
-            return { class: 'strong', text: 'Fort', valid: true };
+            const t = window.i18n ? (key) => i18n.t(key) : null;
+            if (score <= 1) return { class: 'weak', text: t ? t('password.strength.weak') : 'Faible', valid: false };
+            if (score === 2) return { class: 'fair', text: t ? t('password.strength.fair') : 'Moyen', valid: true };
+            if (score === 3) return { class: 'good', text: t ? t('password.strength.good') : 'Bon', valid: true };
+            return { class: 'strong', text: t ? t('password.strength.strong') : 'Fort', valid: true };
         }
 
         function validatePassword(password) {
-            if (password.length < 8) return { valid: false, message: 'Minimum 8 caractères requis' };
-            if (!/[a-zA-Z]/.test(password)) return { valid: false, message: 'Au moins une lettre requise' };
-            if (!/\d/.test(password)) return { valid: false, message: 'Au moins un chiffre requis' };
+            const t = window.i18n ? (key) => i18n.t(key) : null;
+            if (password.length < 8) return { valid: false, message: t ? t('validation.passwordMin') : 'Minimum 8 caractères requis' };
+            if (!/[a-zA-Z]/.test(password)) return { valid: false, message: t ? t('validation.passwordLetter') : 'Au moins une lettre requise' };
+            if (!/\d/.test(password)) return { valid: false, message: t ? t('validation.passwordNumber') : 'Au moins un chiffre requis' };
             return { valid: true };
         }
 
         // ===== ENCOURAGEMENT MESSAGES =====
-        const encouragementMessages = {
-            email_valid: { emoji: '✅', text: 'Super, email valide !' },
-            password_start: { emoji: '🔐', text: 'Choisis un mot de passe sécurisé...' },
-            password_weak: { emoji: '💪', text: 'Continue, tu peux faire mieux !' },
-            password_fair: { emoji: '👍', text: 'Pas mal ! Un peu plus de caractères ?' },
-            password_good: { emoji: '🎯', text: 'Excellent choix !' },
-            password_strong: { emoji: '🏆', text: 'Mot de passe ultra sécurisé !' },
-            ready: { emoji: '🚀', text: 'Tu es prêt(e) ! Crée ton compte !' }
-        };
+        function getEncouragementMessages() {
+            const t = window.i18n ? (key) => i18n.t(key) : null;
+            return {
+                email_valid: { emoji: '✅', text: t ? t('encouragement.emailValid') : 'Super, email valide !' },
+                password_start: { emoji: '🔐', text: t ? t('encouragement.passwordStart') : 'Choisis un mot de passe sécurisé...' },
+                password_weak: { emoji: '💪', text: t ? t('encouragement.passwordWeak') : 'Continue, tu peux faire mieux !' },
+                password_fair: { emoji: '👍', text: t ? t('encouragement.passwordFair') : 'Pas mal ! Un peu plus de caractères ?' },
+                password_good: { emoji: '🎯', text: t ? t('encouragement.passwordGood') : 'Excellent choix !' },
+                password_strong: { emoji: '🏆', text: t ? t('encouragement.passwordStrong') : 'Mot de passe ultra sécurisé !' },
+                ready: { emoji: '🚀', text: t ? t('encouragement.ready') : 'Tu es prêt(e) ! Crée ton compte !' }
+            };
+        }
+        let encouragementMessages = getEncouragementMessages();
+        window.addEventListener('i18n:loaded', () => { encouragementMessages = getEncouragementMessages(); });
+        window.addEventListener('i18n:changed', () => { encouragementMessages = getEncouragementMessages(); });
         
         function showEncouragement(key) {
             const el = document.getElementById('encouragement');
@@ -1116,7 +1145,7 @@
         // Real-time validation with encouragement
         document.getElementById('email').addEventListener('blur', function() {
             if (this.value && !validateEmail(this.value)) {
-                showFieldError('email', 'Adresse email invalide');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailInvalid') : 'Adresse email invalide');
                 hideEncouragement();
             } else if (this.value && validateEmail(this.value)) {
                 hideFieldError('email');
@@ -1188,10 +1217,10 @@
             let hasError = false;
 
             if (!email) {
-                showFieldError('email', 'L\'email est requis');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailRequired') : 'L\'email est requis');
                 hasError = true;
             } else if (!validateEmail(email)) {
-                showFieldError('email', 'Adresse email invalide');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailInvalid') : 'Adresse email invalide');
                 hasError = true;
             }
 
@@ -1218,10 +1247,10 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    let errorMessage = data.error || 'Erreur lors de la création du compte';
+                    let errorMessage = data.error || (window.i18n ? i18n.t('errors.registerError') : 'Erreur lors de la création du compte');
                     
                     if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('exist')) {
-                        errorMessage = 'Cette adresse email est déjà utilisée. Essaie de te connecter.';
+                        errorMessage = window.i18n ? i18n.t('errors.emailExists') : 'Cette adresse email est déjà utilisée. Essaie de te connecter.';
                     }
                     
                     throw new Error(errorMessage);
@@ -1237,20 +1266,24 @@
                     // Update progress indicator to step 2
                     document.querySelector('.progress-steps').classList.add('step-2');
                     
-                    showMessage('Bienvenue sur Cinq ! 🎉 Prépare-toi pour la suite...', 'success');
-                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Compte créé !';
+                    const welcomeMsg = window.i18n ? i18n.t('auth.welcomeSuccess') : 'Bienvenue sur Cinq ! 🎉 Prépare-toi pour la suite...';
+                    const accountCreatedMsg = window.i18n ? i18n.t('auth.accountCreated') : 'Compte créé !';
+                    showMessage(welcomeMsg, 'success');
+                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' + accountCreatedMsg;
                     
                     // Show encouragement before redirect
                     const encouragementEl = document.getElementById('encouragement');
                     encouragementEl.querySelector('.emoji').textContent = '🎊';
-                    document.getElementById('encouragement-text').textContent = 'Ton compte est prêt ! On t\'emmène dans ton espace...';
+                    const accountReadyMsg = window.i18n ? i18n.t('auth.accountReady') : 'Ton compte est prêt ! On t\'emmène dans ton espace...';
+                    document.getElementById('encouragement-text').textContent = accountReadyMsg;
                     encouragementEl.classList.add('visible');
                     
                     setTimeout(() => {
                         window.location.href = '/app.html';
                     }, 1500);
                 } else {
-                    showMessage('Compte créé ! Connecte-toi maintenant.', 'success');
+                    const connectMsg = window.i18n ? i18n.t('auth.accountCreated') + ' ' + i18n.t('auth.loginButton') : 'Compte créé ! Connecte-toi maintenant.';
+                    showMessage(connectMsg, 'success');
                     setTimeout(() => {
                         window.location.href = '/login.html?registered=1';
                     }, 1500);
@@ -1280,6 +1313,68 @@
         document.head.appendChild(style);
 
         init();
+    </script>
+
+    <!-- i18n -->
+    <script defer src="/js/i18n.js"></script>
+    <script>
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.i18n) {
+                    i18n.setLanguage(btn.dataset.lang);
+                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            });
+        });
+        
+        // Update texts on language change
+        window.addEventListener('i18n:loaded', updateTexts);
+        window.addEventListener('i18n:changed', updateTexts);
+        window.addEventListener('i18n:loaded', () => {
+            const lang = i18n.getLang();
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
+        });
+        
+        function updateTexts() {
+            document.title = i18n.t('auth.register') + ' — Cinq';
+            document.querySelector('.skip-link').textContent = i18n.t('a11y.skipToRegister');
+            document.querySelector('.register-title').textContent = i18n.t('auth.registerTitle');
+            document.querySelector('.register-subtitle').textContent = i18n.t('auth.registerSubtitle');
+            document.querySelector('label[for="email"]').textContent = i18n.t('auth.email');
+            document.querySelector('label[for="password"]').textContent = i18n.t('auth.password');
+            document.querySelector('#email').placeholder = i18n.t('auth.emailPlaceholder');
+            document.querySelector('#password').placeholder = i18n.t('auth.passwordPlaceholder');
+            document.querySelector('#password-hint').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> ' + i18n.t('validation.passwordHint');
+            document.querySelector('#submit-btn').textContent = i18n.t('auth.registerButton');
+            document.querySelector('.login-link').innerHTML = i18n.t('auth.hasAccount') + ' <a href="/login.html">' + i18n.t('auth.login') + '</a>';
+            document.querySelector('.auth-footer a[href="/privacy.html"]').textContent = i18n.t('footer.privacy');
+            document.querySelector('.auth-footer a[href="/terms.html"]').textContent = i18n.t('footer.terms');
+            document.querySelector('.theme-toggle').setAttribute('aria-label', i18n.t('a11y.toggleTheme'));
+            
+            // Progress steps
+            const stepLabels = document.querySelectorAll('.step-label');
+            if (stepLabels[0]) stepLabels[0].textContent = i18n.t('progress.step1');
+            if (stepLabels[1]) stepLabels[1].textContent = i18n.t('progress.step2');
+            
+            // Loading text
+            const loadingText = document.querySelector('#loading p');
+            if (loadingText) loadingText.textContent = i18n.t('gift.verifying');
+            
+            // Invalid code
+            const invalidH2 = document.querySelector('#invalid-code h2');
+            if (invalidH2) invalidH2.textContent = i18n.t('gift.invalidCode');
+            
+            // Gifter info
+            const gifterText = document.querySelector('.gifter-info .text');
+            if (gifterText) {
+                const name = document.getElementById('gifter-name').textContent;
+                gifterText.innerHTML = i18n.t('gift.giftedBy') + ' <span class="name" id="gifter-name">' + name + '</span>';
+            }
+        }
     </script>
 
     <!-- Footer -->

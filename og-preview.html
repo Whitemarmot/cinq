@@ -6,7 +6,8 @@
     <title>OG Image Preview — Cinq</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -114,7 +115,7 @@
     
     <div class="preview-container">
         <div class="preview-label">Aperçu (50% de la taille réelle)</div>
-        <img src="og-image.svg" alt="Cinq OG Image" class="og-image">
+        <img src="og-image.svg" alt="Cinq OG Image" class="og-image" loading="lazy">
     </div>
     
     <div class="specs">

@@ -905,6 +905,18 @@
     </style>
 </head>
 <body>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        <a href="#settings-profile" class="skip-link">Aller aux paramètres du profil</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Live region for settings changes confirmation -->
+    <div id="settings-status" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    
     <div class="noise-overlay" aria-hidden="true"></div>
     
     <!-- Background orbs -->
