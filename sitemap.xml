@@ -1,27 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
   <url>
     <loc>https://cinq.app/</loc>
-    <lastmod>2025-07-02</lastmod>
+    <lastmod>2025-02-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  
+  <!-- Gift page - High priority, conversion page -->
   <url>
     <loc>https://cinq.app/gift</loc>
-    <lastmod>2025-07-02</lastmod>
+    <lastmod>2025-02-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+  
+  <!-- Redeem page - For gift code activation -->
   <url>
     <loc>https://cinq.app/redeem</loc>
-    <lastmod>2025-07-02</lastmod>
+    <lastmod>2025-02-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
+  
+  <!-- FAQ - Important for SEO and user education -->
+  <url>
+    <loc>https://cinq.app/faq</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Privacy Policy - Required legal page -->
+  <url>
+    <loc>https://cinq.app/privacy</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <!-- Terms of Service - Required legal page -->
+  <url>
+    <loc>https://cinq.app/terms</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  
+  <!-- Login page - noindex but sitemap entry for crawlers -->
   <url>
     <loc>https://cinq.app/login</loc>
-    <lastmod>2025-07-02</lastmod>
+    <lastmod>2025-02-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 </urlset>

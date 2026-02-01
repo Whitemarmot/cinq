@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Connexion — Cinq</title>
+    <title data-i18n-title="auth.login">Connexion — Cinq</title>
     
     <!-- SEO -->
-    <meta name="description" content="Connecte-toi à Cinq et retrouve tes 5 proches.">
+    <meta name="description" content="Connecte-toi à Cinq et retrouve tes 5 proches. L'anti-réseau social sans likes, sans algorithme.">
     <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/login">
     
     <!-- Open Graph -->
     <meta property="og:title" content="Connexion — Cinq">
     <meta property="og:description" content="L'anti-réseau social. 5 proches, pas de likes.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://cinq.app/login.html">
+    <meta property="og:url" content="https://cinq.app/login">
     <meta property="og:image" content="https://cinq.app/og-image.png">
     <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -607,11 +611,39 @@
     
     <div class="noise-overlay" aria-hidden="true"></div>
     
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: var(--space-4); right: var(--space-4); z-index: 100;">
-        <svg class="icon-sun theme-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg class="icon-moon theme-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
+    <!-- Language Switcher & Theme Toggle -->
+    <div style="position: fixed; top: var(--space-4); right: var(--space-4); z-index: 100; display: flex; gap: var(--space-2); align-items: center;">
+        <div id="lang-switcher" style="display: flex; gap: 4px;">
+            <button class="lang-btn" data-lang="fr" aria-label="Français" style="padding: 6px 10px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); transition: all 0.2s;">FR</button>
+            <button class="lang-btn" data-lang="en" aria-label="English" style="padding: 6px 10px; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); transition: all 0.2s;">EN</button>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
+            <svg class="icon-sun theme-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="icon-moon theme-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+    </div>
+    <style>
+        .lang-btn.active { background: var(--color-brand-muted) !important; border-color: var(--color-brand) !important; color: var(--color-brand) !important; }
+        .lang-btn:hover { background: var(--color-bg-elevated); border-color: var(--color-border-active); }
+    </style>
+    <script>
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.i18n) {
+                    i18n.setLanguage(btn.dataset.lang);
+                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            });
+        });
+        // Set initial active state
+        window.addEventListener('i18n:loaded', () => {
+            const lang = i18n.getLang();
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
+        });
+    </script>
     
     <!-- Pentagon pattern -->
     <div class="pentagon-pattern" aria-hidden="true"></div>
@@ -770,7 +802,7 @@
         // Real-time validation
         document.getElementById('email').addEventListener('blur', function() {
             if (this.value && !validateEmail(this.value)) {
-                showFieldError('email', 'Adresse email invalide');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailInvalid') : 'Adresse email invalide');
             } else {
                 hideFieldError('email');
             }
@@ -801,15 +833,15 @@
             let hasError = false;
 
             if (!email) {
-                showFieldError('email', 'L\'email est requis');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailRequired') : 'L\'email est requis');
                 hasError = true;
             } else if (!validateEmail(email)) {
-                showFieldError('email', 'Adresse email invalide');
+                showFieldError('email', window.i18n ? i18n.t('validation.emailInvalid') : 'Adresse email invalide');
                 hasError = true;
             }
 
             if (!password) {
-                showFieldError('password', 'Le mot de passe est requis');
+                showFieldError('password', window.i18n ? i18n.t('validation.passwordRequired') : 'Le mot de passe est requis');
                 hasError = true;
             }
 
@@ -830,15 +862,15 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    // More specific error messages
-                    let errorMessage = data.error || 'Erreur de connexion';
+                    // More specific error messages with i18n
+                    let errorMessage = data.error || (window.i18n ? i18n.t('errors.loginError') : 'Erreur de connexion');
                     
                     if (res.status === 401) {
-                        errorMessage = 'Email ou mot de passe incorrect. Vérifie tes identifiants.';
+                        errorMessage = window.i18n ? i18n.t('errors.unauthorized') : 'Email ou mot de passe incorrect. Vérifie tes identifiants.';
                     } else if (res.status === 429) {
-                        errorMessage = 'Trop de tentatives. Réessaie dans quelques minutes.';
+                        errorMessage = window.i18n ? i18n.t('errors.tooManyAttempts') : 'Trop de tentatives. Réessaie dans quelques minutes.';
                     } else if (res.status >= 500) {
-                        errorMessage = 'Problème de serveur. Réessaie plus tard.';
+                        errorMessage = window.i18n ? i18n.t('errors.server') : 'Problème de serveur. Réessaie plus tard.';
                     }
                     
                     throw new Error(errorMessage);
@@ -849,8 +881,10 @@
                 localStorage.setItem('cinq_user', JSON.stringify(data.user));
 
                 // Success feedback before redirect
-                showMessage('Connexion réussie ! Redirection...', 'success');
-                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Connecté !';
+                const successMsg = window.i18n ? i18n.t('auth.loginSuccess') : 'Connexion réussie ! Redirection...';
+                const connectedMsg = window.i18n ? i18n.t('auth.connected') : 'Connecté !';
+                showMessage(successMsg, 'success');
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' + connectedMsg;
 
                 // Redirect to app
                 setTimeout(() => {
@@ -891,6 +925,39 @@
             <span style="padding: var(--space-2);">© 2025 Cinq</span>
         </nav>
     </footer>
+    
+    <!-- i18n -->
+    <script src="/js/i18n.js"></script>
+    <script>
+        // Update texts on language change
+        window.addEventListener('i18n:loaded', updateTexts);
+        window.addEventListener('i18n:changed', updateTexts);
+        
+        function updateTexts() {
+            document.title = i18n.t('auth.login') + ' — Cinq';
+            document.querySelector('.login-title').textContent = i18n.t('auth.loginTitle');
+            document.querySelector('.login-subtitle').textContent = i18n.t('auth.loginSubtitle');
+            document.querySelector('.skip-link').textContent = i18n.t('a11y.skipToLogin');
+            document.querySelector('label[for="email"]').textContent = i18n.t('auth.email');
+            document.querySelector('label[for="password"]').textContent = i18n.t('auth.password');
+            document.querySelector('#email').placeholder = i18n.t('auth.emailPlaceholder');
+            document.querySelector('#password').placeholder = i18n.t('auth.passwordPlaceholder');
+            document.querySelector('.forgot-link').textContent = i18n.t('auth.forgotPassword');
+            document.querySelector('#submit-btn').textContent = i18n.t('auth.loginButton');
+            document.querySelector('.register-link').innerHTML = 
+                i18n.t('auth.noAccount') + ' <a href="/register.html">' + i18n.t('auth.register') + '</a>';
+            document.querySelector('.home-link a').textContent = '← ' + i18n.t('nav.backToHome');
+            document.querySelector('.auth-footer a[href="/privacy.html"]').textContent = i18n.t('footer.privacy');
+            document.querySelector('.auth-footer a[href="/terms.html"]').textContent = i18n.t('footer.terms');
+            document.querySelector('.theme-toggle').setAttribute('aria-label', i18n.t('a11y.toggleTheme'));
+            
+            const welcomeBanner = document.getElementById('welcome-banner');
+            if (welcomeBanner) {
+                const svg = welcomeBanner.querySelector('svg').outerHTML;
+                welcomeBanner.innerHTML = svg + ' ' + i18n.t('auth.welcomeBanner');
+            }
+        }
+    </script>
     
     <!-- PWA Install Prompt -->
     <script src="/pwa-install.js" defer></script>

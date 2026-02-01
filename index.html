@@ -34,6 +34,68 @@
     <meta name="twitter:title" content="Cinq — L'anti-réseau social">
     <meta name="twitter:description" content="5 proches. Pas de likes. Zéro algorithme.">
     <meta name="twitter:image" content="https://cinq.app/og-image.png">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://cinq.app/#organization",
+                "name": "Cinq",
+                "url": "https://cinq.app",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://cinq.app/assets/icons/icon-512x512.png",
+                    "width": 512,
+                    "height": 512
+                },
+                "description": "L'anti-réseau social. 5 proches, pas de likes, pas d'algorithme.",
+                "sameAs": [
+                    "https://twitter.com/cinqapp"
+                ],
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "customer support",
+                    "email": "support@cinq.app"
+                }
+            },
+            {
+                "@type": "WebApplication",
+                "@id": "https://cinq.app/#webapp",
+                "name": "Cinq",
+                "description": "L'anti-réseau social où tu choisis tes 5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment.",
+                "url": "https://cinq.app",
+                "applicationCategory": "SocialNetworkingApplication",
+                "operatingSystem": "Web, iOS, Android",
+                "browserRequirements": "Requires JavaScript",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "EUR"
+                },
+                "author": {
+                    "@id": "https://cinq.app/#organization"
+                },
+                "inLanguage": "fr-FR",
+                "screenshot": "https://cinq.app/assets/og/og-image.png"
+            },
+            {
+                "@type": "WebSite",
+                "@id": "https://cinq.app/#website",
+                "name": "Cinq",
+                "url": "https://cinq.app",
+                "description": "L'anti-réseau social",
+                "publisher": {
+                    "@id": "https://cinq.app/#organization"
+                },
+                "inLanguage": "fr-FR"
+            }
+        ]
+    }
+    </script>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">

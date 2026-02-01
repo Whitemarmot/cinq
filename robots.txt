@@ -5,6 +5,16 @@ User-agent: *
 Allow: /
 Disallow: /app
 Disallow: /app.html
+Disallow: /feed
+Disallow: /feed.html
+Disallow: /settings
+Disallow: /settings.html
+Disallow: /login
+Disallow: /login.html
+Disallow: /register
+Disallow: /register.html
+Disallow: /forgot-password
+Disallow: /forgot-password.html
 Disallow: /.netlify/
 
 # Pages publiques indexables
@@ -13,6 +23,12 @@ Allow: /gift
 Allow: /gift.html
 Allow: /redeem
 Allow: /redeem.html
+Allow: /faq
+Allow: /FAQ.html
+Allow: /privacy
+Allow: /privacy.html
+Allow: /terms
+Allow: /terms.html
 
 # Sitemap
 Sitemap: https://cinq.app/sitemap.xml

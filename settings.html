@@ -6,8 +6,19 @@
     <title>Paramètres — Cinq</title>
     
     <!-- SEO -->
-    <meta name="description" content="Gérez votre profil et vos paramètres sur Cinq.">
+    <meta name="description" content="Gérez votre profil et vos paramètres sur Cinq. Personnalisez votre expérience sur l'anti-réseau social.">
     <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/settings">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Paramètres — Cinq">
+    <meta property="og:description" content="Personnalisez votre expérience Cinq.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/settings">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -15,10 +26,15 @@
     <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Fonts -->
+    <!-- Preconnect to CDNs for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    
+    <!-- Fonts with font-display: swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
     
     <!-- Design System -->
     <link rel="stylesheet" href="/design/styles.min.css">
@@ -1219,9 +1235,9 @@
     <!-- ============================================ -->
     <!-- SCRIPTS -->
     <!-- ============================================ -->
-    <script src="/fun.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="/js/user-profile.js"></script>
+    <script defer src="/fun.js"></script>
+    <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script defer src="/js/user-profile.js"></script>
     <script>
         // ============================================
         // DOM Elements
