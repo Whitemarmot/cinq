@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
     banned BOOLEAN DEFAULT FALSE,
     vacation_mode BOOLEAN DEFAULT FALSE,
     vacation_message TEXT DEFAULT 'Je suis en vacances ! Je te réponds dès mon retour 🌴',
+    focus_mode BOOLEAN DEFAULT FALSE,
+    focus_start TEXT DEFAULT '09:00',
+    focus_end TEXT DEFAULT '18:00',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -34,6 +37,31 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='vacation_message') THEN
         ALTER TABLE users ADD COLUMN vacation_message TEXT DEFAULT 'Je suis en vacances ! Je te réponds dès mon retour 🌴';
+    END IF;
+END $$;
+
+-- Add focus mode columns if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='focus_mode') THEN
+        ALTER TABLE users ADD COLUMN focus_mode BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='focus_start') THEN
+        ALTER TABLE users ADD COLUMN focus_start TEXT DEFAULT '09:00';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='focus_end') THEN
+        ALTER TABLE users ADD COLUMN focus_end TEXT DEFAULT '18:00';
+    END IF;
+END $$;
+
+-- Add user status columns (WhatsApp-style status)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status_emoji') THEN
+        ALTER TABLE users ADD COLUMN status_emoji TEXT DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status_text') THEN
+        ALTER TABLE users ADD COLUMN status_text TEXT DEFAULT NULL CHECK (char_length(status_text) <= 60);
     END IF;
 END $$;
 
@@ -434,6 +462,146 @@ CREATE POLICY "Users can view own activity log" ON activity_log
 
 -- Only service role can insert (API-only)
 -- No insert policy for regular users = service role only
+
+-- ============================================
+-- POST TAGS (hashtags)
+-- ============================================
+CREATE TABLE IF NOT EXISTS post_tags (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    tag TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(post_id, tag)
+);
+
+CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag);
+CREATE INDEX IF NOT EXISTS idx_post_tags_post_id ON post_tags(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_tags_created ON post_tags(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_tags_tag_created ON post_tags(tag, created_at DESC);
+
+ALTER TABLE post_tags ENABLE ROW LEVEL SECURITY;
+
+-- Post tags: users can view tags on posts they can see
+CREATE POLICY "Users can view tags on visible posts" ON post_tags FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM posts 
+            WHERE posts.id = post_tags.post_id 
+            AND (
+                posts.user_id = auth.uid() 
+                OR posts.user_id IN (
+                    SELECT contact_user_id FROM contacts WHERE user_id = auth.uid()
+                )
+            )
+        )
+    );
+
+-- ============================================
+-- STORIES (ephemeral 24h content)
+-- ============================================
+CREATE TABLE IF NOT EXISTS stories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT CHECK (char_length(content) <= 500),
+    image_url TEXT,
+    background_color TEXT DEFAULT '#1a1a2e',
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_stories_user_id ON stories(user_id);
+CREATE INDEX IF NOT EXISTS idx_stories_expires_at ON stories(expires_at);
+CREATE INDEX IF NOT EXISTS idx_stories_created_at ON stories(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_stories_active ON stories(expires_at) WHERE expires_at > NOW();
+
+ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
+
+-- Stories: users can view their own and contacts' active stories
+CREATE POLICY "Users can view contacts stories" ON stories FOR SELECT
+    USING (
+        expires_at > NOW() AND (
+            user_id = auth.uid() 
+            OR user_id IN (
+                SELECT contact_user_id FROM contacts WHERE user_id = auth.uid()
+            )
+        )
+    );
+CREATE POLICY "Users can create own stories" ON stories FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own stories" ON stories FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- ============================================
+-- STORY VIEWS (track who viewed stories)
+-- ============================================
+CREATE TABLE IF NOT EXISTS story_views (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    story_id UUID NOT NULL REFERENCES stories(id) ON DELETE CASCADE,
+    viewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    viewed_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(story_id, viewer_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_story_views_story_id ON story_views(story_id);
+CREATE INDEX IF NOT EXISTS idx_story_views_viewer_id ON story_views(viewer_id);
+
+ALTER TABLE story_views ENABLE ROW LEVEL SECURITY;
+
+-- Story views: story owner can see who viewed, viewers can create views
+CREATE POLICY "Story owners can view who watched" ON story_views FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM stories 
+            WHERE stories.id = story_views.story_id 
+            AND stories.user_id = auth.uid()
+        )
+    );
+CREATE POLICY "Users can mark stories as viewed" ON story_views FOR INSERT
+    WITH CHECK (auth.uid() = viewer_id);
+
+-- ============================================
+-- POLL VOTES
+-- ============================================
+-- Add poll columns to posts table if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='poll_options') THEN
+        ALTER TABLE posts ADD COLUMN poll_options JSONB DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='poll_votes') THEN
+        ALTER TABLE posts ADD COLUMN poll_votes JSONB DEFAULT NULL;
+    END IF;
+END $$;
+
+-- Poll votes table (tracks who voted for which option)
+CREATE TABLE IF NOT EXISTS poll_votes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    option_index INTEGER NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(post_id, user_id) -- One vote per user per poll
+);
+
+CREATE INDEX IF NOT EXISTS idx_poll_votes_post_id ON poll_votes(post_id);
+CREATE INDEX IF NOT EXISTS idx_poll_votes_user_id ON poll_votes(user_id);
+
+ALTER TABLE poll_votes ENABLE ROW LEVEL SECURITY;
+
+-- Poll votes: users can view votes on posts they can see
+CREATE POLICY "Users can view poll votes on visible posts" ON poll_votes FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM posts 
+            WHERE posts.id = poll_votes.post_id 
+            AND (
+                posts.user_id = auth.uid() 
+                OR posts.user_id IN (
+                    SELECT contact_user_id FROM contacts WHERE user_id = auth.uid()
+                )
+            )
+        )
+    );
 
 -- ============================================
 -- GRANT SERVICE ROLE ACCESS

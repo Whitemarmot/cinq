@@ -153,7 +153,7 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio, vacation_mode, vacation_message } = req.body;
+    const { display_name, avatar_url, bio, vacation_mode, vacation_message, focus_mode, focus_start, focus_end } = req.body;
 
     const updates = {};
     
@@ -193,6 +193,28 @@ async function handleUpdateProfile(req, res, user) {
             return res.status(400).json({ error: result.error, field: 'vacation_message' });
         }
         updates.vacation_message = result.message;
+    }
+    
+    // Focus mode
+    if (focus_mode !== undefined) {
+        updates.focus_mode = Boolean(focus_mode);
+        logInfo('Focus mode toggled', { userId: user.id, focusMode: updates.focus_mode });
+    }
+    
+    if (focus_start !== undefined) {
+        // Validate time format (HH:MM)
+        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(focus_start)) {
+            return res.status(400).json({ error: 'Format d\'heure invalide (HH:MM)', field: 'focus_start' });
+        }
+        updates.focus_start = focus_start;
+    }
+    
+    if (focus_end !== undefined) {
+        // Validate time format (HH:MM)
+        if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(focus_end)) {
+            return res.status(400).json({ error: 'Format d\'heure invalide (HH:MM)', field: 'focus_end' });
+        }
+        updates.focus_end = focus_end;
     }
 
     if (Object.keys(updates).length === 0) {

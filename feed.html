@@ -536,6 +536,99 @@
             text-decoration: underline;
         }
         
+        .post-content .post-hashtag {
+            color: var(--color-brand);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s, background 0.2s;
+            padding: 0 0.15rem;
+            border-radius: var(--radius-sm);
+        }
+        
+        .post-content .post-hashtag:hover {
+            background: var(--color-brand-muted);
+            text-decoration: none;
+        }
+        
+        /* ===== TRENDING TAGS ===== */
+        .trending-tags {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .trending-tags-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .trending-tags-header svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-brand);
+        }
+        
+        .trending-tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .trending-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            color: var(--color-text-primary);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .trending-tag:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+            transform: translateY(-1px);
+        }
+        
+        .trending-tag .tag-name {
+            font-weight: 500;
+        }
+        
+        .trending-tag .tag-count {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            background: var(--color-bg-secondary);
+            padding: 0.125rem 0.375rem;
+            border-radius: var(--radius-full);
+        }
+        
+        .trending-tag:hover .tag-count {
+            background: var(--color-bg-primary);
+        }
+        
+        .trending-tags-empty {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
+        .trending-tags.loading {
+            opacity: 0.6;
+        }
+        
         .post-previews:empty {
             display: none;
         }
@@ -1505,6 +1598,331 @@
             font-size: 0.75rem;
         }
 
+        /* ===== POLLS ===== */
+        .poll-composer {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            display: none;
+        }
+        
+        .poll-composer.visible {
+            display: block;
+            animation: menu-in 0.2s ease;
+        }
+        
+        .poll-composer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .poll-composer-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .poll-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .poll-option-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .poll-option-input input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .poll-option-input input:focus {
+            outline: none;
+            border-color: var(--color-brand);
+        }
+        
+        .poll-option-input input::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .poll-option-number {
+            width: 24px;
+            height: 24px;
+            background: var(--color-brand-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-brand);
+            flex-shrink: 0;
+        }
+        
+        .poll-remove-option {
+            width: 28px;
+            height: 28px;
+            background: none;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .poll-remove-option:hover {
+            background: var(--color-error);
+            border-color: var(--color-error);
+            color: white;
+        }
+        
+        .poll-add-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: none;
+            border: 1px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .poll-add-option:hover {
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+            background: var(--color-brand-muted);
+        }
+        
+        .poll-add-option:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Poll display in posts */
+        .post-poll {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+        }
+        
+        .poll-question {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .poll-option {
+            position: relative;
+            padding: 0.625rem 0.75rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        
+        .poll-option:hover:not(.voted):not(.disabled) {
+            border-color: var(--color-brand);
+            background: var(--color-brand-muted);
+        }
+        
+        .poll-option.selected {
+            border-color: var(--color-brand);
+            background: var(--color-brand-muted);
+        }
+        
+        .poll-option.disabled {
+            cursor: default;
+        }
+        
+        .poll-option-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        
+        .poll-option.selected .poll-option-bar {
+            background: rgba(99, 102, 241, 0.25);
+        }
+        
+        .poll-option-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .poll-option-text {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .poll-option-check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .poll-option.selected .poll-option-check {
+            background: var(--color-brand);
+            border-color: var(--color-brand);
+            color: white;
+        }
+        
+        .poll-option-percent {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+        }
+        
+        .poll-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--color-border);
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .poll-vote-count {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* ===== FOCUS MODE ===== */
+        .focus-mode-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--color-bg-primary);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: focus-fade-in 0.3s ease;
+        }
+        
+        .focus-mode-overlay.hidden {
+            display: none;
+        }
+        
+        @keyframes focus-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .focus-mode-content {
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .focus-mode-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: focus-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes focus-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .focus-mode-title {
+            font-family: var(--font-display, 'Space Grotesk', sans-serif);
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+        }
+        
+        .focus-mode-text {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+        
+        .focus-mode-hours {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+        
+        .focus-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .focus-mode-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            border-color: var(--color-border-active);
+            transform: translateY(-2px);
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .feed-header {
@@ -1605,6 +2023,19 @@
             </div>
         </header>
 
+        <!-- Focus Mode Overlay -->
+        <div id="focus-mode-overlay" class="focus-mode-overlay hidden" role="alert" aria-live="polite">
+            <div class="focus-mode-content">
+                <div class="focus-mode-icon">🎯</div>
+                <h2 class="focus-mode-title">Mode Focus actif</h2>
+                <p class="focus-mode-text">C'est l'heure de te concentrer ! Le feed est masqué pendant tes heures de travail.</p>
+                <p class="focus-mode-hours" id="focus-mode-hours">Retour du feed à 18:00</p>
+                <button class="focus-mode-btn" onclick="bypassFocusMode()">
+                    <span>👀</span> Afficher quand même
+                </button>
+            </div>
+        </div>
+
         <!-- Composer -->
         <div class="composer" id="composer" role="form" aria-label="Créer un nouveau post">
             <div class="composer-header">
@@ -1647,6 +2078,26 @@
                     🤖 Génération IA (5 par heure max)
                 </div>
             </div>
+            <!-- Poll composer -->
+            <div class="poll-composer" id="poll-composer">
+                <div class="poll-composer-header">
+                    <span class="poll-composer-title">📊 Créer un sondage</span>
+                    <button class="poll-remove-option" onclick="togglePollComposer()" aria-label="Fermer">×</button>
+                </div>
+                <div class="poll-options-list" id="poll-options-list">
+                    <div class="poll-option-input" data-index="0">
+                        <span class="poll-option-number">1</span>
+                        <input type="text" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)">
+                    </div>
+                    <div class="poll-option-input" data-index="1">
+                        <span class="poll-option-number">2</span>
+                        <input type="text" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)">
+                    </div>
+                </div>
+                <button class="poll-add-option" id="poll-add-option" onclick="addPollOption()">
+                    + Ajouter une option
+                </button>
+            </div>
             <div class="composer-footer">
                 <div class="composer-actions">
                     <button class="composer-btn" id="upload-image-btn" onclick="triggerFileUpload()" aria-label="Ajouter une photo">
@@ -1661,6 +2112,12 @@
                         </svg>
                         IA
                     </button>
+                    <button class="composer-btn" id="poll-btn" onclick="togglePollComposer()" aria-label="Créer un sondage">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h2v5H7z"/><path d="M11 8h2v9h-2z"/><path d="M15 10h2v7h-2z"/>
+                        </svg>
+                        Sondage
+                    </button>
                 </div>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <span class="char-count" id="char-count" aria-live="polite">0/1000</span>
@@ -1668,6 +2125,21 @@
                         Poster
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Trending Tags -->
+        <div class="trending-tags" id="trending-tags" style="display: none;">
+            <div class="trending-tags-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Tags tendance
+            </div>
+            <div class="trending-tags-list" id="trending-tags-list">
+                <span class="trending-tags-empty">Chargement...</span>
             </div>
         </div>
 
@@ -1743,6 +2215,73 @@
         // ===== AUTH =====
         // getToken() and authHeaders() now provided by /js/shared.js
 
+        // ===== FOCUS MODE =====
+        let focusModeBypass = false;
+        
+        async function checkFocusMode() {
+            try {
+                const token = getToken();
+                if (!token) return { active: false };
+                
+                const res = await fetch(`${API_URL}/user-profile`, {
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) return { active: false };
+                
+                const data = await res.json();
+                const profile = data.profile || {};
+                
+                if (!profile.focus_mode) return { active: false };
+                
+                const focusStart = profile.focus_start || '09:00';
+                const focusEnd = profile.focus_end || '18:00';
+                
+                // Check if current time is within focus hours
+                const now = new Date();
+                const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
+                                   now.getMinutes().toString().padStart(2, '0');
+                
+                const isInFocusHours = currentTime >= focusStart && currentTime < focusEnd;
+                
+                return {
+                    active: isInFocusHours,
+                    focusEnd: focusEnd
+                };
+            } catch (e) {
+                console.error('Focus mode check error:', e);
+                return { active: false };
+            }
+        }
+        
+        function showFocusMode(focusEnd) {
+            const overlay = document.getElementById('focus-mode-overlay');
+            const hoursText = document.getElementById('focus-mode-hours');
+            
+            hoursText.textContent = `Retour du feed à ${focusEnd}`;
+            overlay.classList.remove('hidden');
+            
+            // Hide the composer and posts
+            document.getElementById('composer').style.display = 'none';
+            document.getElementById('posts-list').style.display = 'none';
+        }
+        
+        function hideFocusMode() {
+            const overlay = document.getElementById('focus-mode-overlay');
+            overlay.classList.add('hidden');
+            
+            // Show the composer and posts
+            document.getElementById('composer').style.display = 'block';
+            document.getElementById('posts-list').style.display = 'flex';
+        }
+        
+        function bypassFocusMode() {
+            focusModeBypass = true;
+            hideFocusMode();
+            // Store bypass in session storage (resets on new tab)
+            sessionStorage.setItem('cinq_focus_bypass', 'true');
+        }
+
         // ===== INIT =====
         async function init() {
             const sessionStr = localStorage.getItem('cinq_session');
@@ -1760,6 +2299,16 @@
                 document.getElementById('composer-avatar').textContent = initial;
                 document.getElementById('composer-user').textContent = user.email?.split('@')[0] || 'Toi';
                 
+                // Check Focus Mode (unless bypassed)
+                const bypassStored = sessionStorage.getItem('cinq_focus_bypass') === 'true';
+                if (!bypassStored && !focusModeBypass) {
+                    const focusStatus = await checkFocusMode();
+                    if (focusStatus.active) {
+                        showFocusMode(focusStatus.focusEnd);
+                        return; // Don't load posts when in focus mode
+                    }
+                }
+                
                 // Setup textarea listeners
                 setupComposer();
                 
@@ -1775,9 +2324,50 @@
                 // Load posts
                 await loadPosts();
                 
+                // Load trending tags (non-blocking)
+                loadTrendingTags();
+                
             } catch (e) {
                 console.error('Init error:', e);
                 window.location.href = '/login.html';
+            }
+        }
+
+        // ===== TRENDING TAGS =====
+        async function loadTrendingTags() {
+            const container = document.getElementById('trending-tags');
+            const list = document.getElementById('trending-tags-list');
+            
+            try {
+                const res = await fetch(`${API_URL}/tags?trending`, {
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                const data = await res.json();
+                
+                if (!data.trending || data.trending.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                // Render trending tags
+                list.innerHTML = data.trending.map(item => `
+                    <a href="/tag.html?t=${encodeURIComponent(item.tag)}" class="trending-tag">
+                        <span class="tag-name">#${escapeHtml(item.tag)}</span>
+                        <span class="tag-count">${item.count}</span>
+                    </a>
+                `).join('');
+                
+                container.style.display = 'block';
+                
+            } catch (e) {
+                console.error('Load trending tags error:', e);
+                container.style.display = 'none';
             }
         }
 
@@ -2073,6 +2663,288 @@
             }
         }
         
+        // ===== POLL COMPOSER =====
+        let pollEnabled = false;
+        const MAX_POLL_OPTIONS = 4;
+        const MIN_POLL_OPTIONS = 2;
+        
+        function togglePollComposer() {
+            const composer = document.getElementById('poll-composer');
+            const btn = document.getElementById('poll-btn');
+            
+            pollEnabled = !pollEnabled;
+            composer.classList.toggle('visible', pollEnabled);
+            btn.classList.toggle('active', pollEnabled);
+            
+            if (pollEnabled) {
+                // Focus first option
+                const firstInput = composer.querySelector('input');
+                if (firstInput) firstInput.focus();
+            } else {
+                // Clear poll options
+                resetPollComposer();
+            }
+        }
+        
+        function resetPollComposer() {
+            const list = document.getElementById('poll-options-list');
+            list.innerHTML = `
+                <div class="poll-option-input" data-index="0">
+                    <span class="poll-option-number">1</span>
+                    <input type="text" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)">
+                </div>
+                <div class="poll-option-input" data-index="1">
+                    <span class="poll-option-number">2</span>
+                    <input type="text" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)">
+                </div>
+            `;
+            document.getElementById('poll-add-option').disabled = false;
+        }
+        
+        function addPollOption() {
+            const list = document.getElementById('poll-options-list');
+            const options = list.querySelectorAll('.poll-option-input');
+            
+            if (options.length >= MAX_POLL_OPTIONS) return;
+            
+            const index = options.length;
+            const newOption = document.createElement('div');
+            newOption.className = 'poll-option-input';
+            newOption.dataset.index = index;
+            newOption.innerHTML = `
+                <span class="poll-option-number">${index + 1}</span>
+                <input type="text" placeholder="Option ${index + 1}" maxlength="100" onkeydown="handlePollOptionKeydown(event, ${index})">
+                <button class="poll-remove-option" onclick="removePollOption(${index})" aria-label="Supprimer l'option">×</button>
+            `;
+            list.appendChild(newOption);
+            
+            // Focus new input
+            newOption.querySelector('input').focus();
+            
+            // Disable add button if max reached
+            if (index + 1 >= MAX_POLL_OPTIONS) {
+                document.getElementById('poll-add-option').disabled = true;
+            }
+        }
+        
+        function removePollOption(index) {
+            const list = document.getElementById('poll-options-list');
+            const options = list.querySelectorAll('.poll-option-input');
+            
+            if (options.length <= MIN_POLL_OPTIONS) return;
+            
+            const optionToRemove = list.querySelector(`[data-index="${index}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+                
+                // Re-index remaining options
+                const remaining = list.querySelectorAll('.poll-option-input');
+                remaining.forEach((opt, i) => {
+                    opt.dataset.index = i;
+                    opt.querySelector('.poll-option-number').textContent = i + 1;
+                    opt.querySelector('input').placeholder = `Option ${i + 1}`;
+                    opt.querySelector('input').setAttribute('onkeydown', `handlePollOptionKeydown(event, ${i})`);
+                    const removeBtn = opt.querySelector('.poll-remove-option');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('onclick', `removePollOption(${i})`);
+                    }
+                });
+                
+                // Re-enable add button
+                document.getElementById('poll-add-option').disabled = false;
+            }
+        }
+        
+        function handlePollOptionKeydown(event, index) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const list = document.getElementById('poll-options-list');
+                const options = list.querySelectorAll('.poll-option-input');
+                
+                if (index < options.length - 1) {
+                    // Focus next option
+                    options[index + 1].querySelector('input').focus();
+                } else if (options.length < MAX_POLL_OPTIONS) {
+                    // Add new option
+                    addPollOption();
+                }
+            }
+        }
+        
+        function getPollOptions() {
+            if (!pollEnabled) return null;
+            
+            const list = document.getElementById('poll-options-list');
+            const inputs = list.querySelectorAll('input');
+            const options = [];
+            
+            inputs.forEach(input => {
+                const value = input.value.trim();
+                if (value) options.push(value);
+            });
+            
+            // Need at least 2 options
+            if (options.length < MIN_POLL_OPTIONS) {
+                return null;
+            }
+            
+            return options;
+        }
+        
+        // ===== POLL VOTING =====
+        let pollVotesCache = {}; // { postId: { votes: { optionIndex: count }, userVote: optionIndex|null, totalVotes: n } }
+        
+        async function votePoll(postId, optionIndex) {
+            // Check if already voted
+            const cached = pollVotesCache[postId];
+            if (cached && cached.userVote !== null) {
+                showToast({ type: 'error', message: 'Tu as déjà voté !' });
+                return;
+            }
+            
+            // Optimistic update
+            if (!pollVotesCache[postId]) {
+                pollVotesCache[postId] = { votes: {}, userVote: null, totalVotes: 0 };
+            }
+            pollVotesCache[postId].userVote = optionIndex;
+            pollVotesCache[postId].votes[optionIndex] = (pollVotesCache[postId].votes[optionIndex] || 0) + 1;
+            pollVotesCache[postId].totalVotes++;
+            
+            updatePollUI(postId);
+            
+            try {
+                const res = await fetch(`${API_URL}/posts?action=vote`, {
+                    method: 'PATCH',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ post_id: postId, option_index: optionIndex })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur de vote');
+                }
+                
+                // Update with server data
+                if (data.poll) {
+                    pollVotesCache[postId] = data.poll;
+                    updatePollUI(postId);
+                }
+                
+                showToast({ type: 'success', message: '✓ Vote enregistré !' });
+                
+            } catch (e) {
+                console.error('Vote error:', e);
+                // Revert optimistic update
+                pollVotesCache[postId].userVote = null;
+                pollVotesCache[postId].votes[optionIndex] = Math.max(0, (pollVotesCache[postId].votes[optionIndex] || 1) - 1);
+                pollVotesCache[postId].totalVotes = Math.max(0, pollVotesCache[postId].totalVotes - 1);
+                updatePollUI(postId);
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        function updatePollUI(postId) {
+            const pollEl = document.querySelector(`.post-poll[data-post-id="${postId}"]`);
+            if (!pollEl) return;
+            
+            const cached = pollVotesCache[postId];
+            if (!cached) return;
+            
+            const options = pollEl.querySelectorAll('.poll-option');
+            const totalVotes = cached.totalVotes || 0;
+            const hasVoted = cached.userVote !== null;
+            
+            options.forEach((opt, i) => {
+                const voteCount = cached.votes[i] || 0;
+                const percent = totalVotes > 0 ? Math.round((voteCount / totalVotes) * 100) : 0;
+                const isSelected = cached.userVote === i;
+                
+                // Update classes
+                opt.classList.toggle('selected', isSelected);
+                opt.classList.toggle('disabled', hasVoted);
+                opt.classList.toggle('voted', hasVoted);
+                
+                // Update bar width
+                const bar = opt.querySelector('.poll-option-bar');
+                if (bar) {
+                    bar.style.width = hasVoted ? `${percent}%` : '0%';
+                }
+                
+                // Update percent display
+                const percentEl = opt.querySelector('.poll-option-percent');
+                if (percentEl) {
+                    percentEl.textContent = hasVoted ? `${percent}%` : '';
+                }
+                
+                // Update check
+                const check = opt.querySelector('.poll-option-check');
+                if (check) {
+                    check.innerHTML = isSelected ? '✓' : '';
+                }
+            });
+            
+            // Update vote count
+            const countEl = pollEl.querySelector('.poll-vote-count');
+            if (countEl) {
+                countEl.innerHTML = `<span>👥</span> ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        function renderPollHtml(post) {
+            if (!post.poll_options || !Array.isArray(post.poll_options) || post.poll_options.length < 2) {
+                return '';
+            }
+            
+            // Initialize cache from post data
+            if (!pollVotesCache[post.id]) {
+                pollVotesCache[post.id] = {
+                    votes: post.poll_votes || {},
+                    userVote: post.user_poll_vote !== undefined ? post.user_poll_vote : null,
+                    totalVotes: post.poll_total_votes || 0
+                };
+            }
+            
+            const cached = pollVotesCache[post.id];
+            const hasVoted = cached.userVote !== null;
+            const totalVotes = cached.totalVotes || 0;
+            
+            const optionsHtml = post.poll_options.map((option, index) => {
+                const voteCount = cached.votes[index] || 0;
+                const percent = totalVotes > 0 ? Math.round((voteCount / totalVotes) * 100) : 0;
+                const isSelected = cached.userVote === index;
+                
+                return `
+                    <div class="poll-option ${isSelected ? 'selected' : ''} ${hasVoted ? 'disabled voted' : ''}" 
+                         onclick="${hasVoted ? '' : `votePoll('${post.id}', ${index})`}"
+                         role="button"
+                         aria-pressed="${isSelected}"
+                         tabindex="0">
+                        <div class="poll-option-bar" style="width: ${hasVoted ? percent : 0}%"></div>
+                        <div class="poll-option-content">
+                            <span class="poll-option-text">
+                                <span class="poll-option-check">${isSelected ? '✓' : ''}</span>
+                                ${escapeHtml(option)}
+                            </span>
+                            <span class="poll-option-percent">${hasVoted ? `${percent}%` : ''}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            return `
+                <div class="post-poll" data-post-id="${post.id}">
+                    <div class="poll-question">📊 Sondage</div>
+                    <div class="poll-options">
+                        ${optionsHtml}
+                    </div>
+                    <div class="poll-footer">
+                        <span class="poll-vote-count">👥 ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+            `;
+        }
+
         // ===== AI IMAGE GENERATION =====
         function toggleAIPrompt() {
             const container = document.getElementById('ai-prompt-container');
@@ -2157,6 +3029,13 @@
             
             if (!content) return;
             
+            // Validate poll if enabled
+            const pollOptions = getPollOptions();
+            if (pollEnabled && !pollOptions) {
+                showToast({ type: 'error', message: 'Entre au moins 2 options pour le sondage' });
+                return;
+            }
+            
             const postBtn = document.getElementById('post-btn');
             postBtn.disabled = true;
             postBtn.textContent = '...';
@@ -2165,6 +3044,9 @@
                 const body = { content };
                 if (currentImageUrl) {
                     body.image_url = currentImageUrl;
+                }
+                if (pollOptions) {
+                    body.poll_options = pollOptions;
                 }
                 
                 const res = await fetch(`${API_URL}/posts`, {
@@ -2190,6 +3072,14 @@
                 document.getElementById('ai-image-btn').classList.remove('active');
                 document.getElementById('upload-image-btn').classList.remove('active');
                 hideImagePreview();
+                
+                // Reset poll
+                if (pollEnabled) {
+                    pollEnabled = false;
+                    document.getElementById('poll-composer').classList.remove('visible');
+                    document.getElementById('poll-btn').classList.remove('active');
+                    resetPollComposer();
+                }
                 
                 showToast({ type: 'success', message: 'Posté !' });
                 
@@ -2587,6 +3477,9 @@
                 </div>
             ` : '';
             
+            // Poll
+            const pollHtml = renderPollHtml(post);
+            
             const menuHtml = isOwn ? `
                 <button class="post-menu-btn" onclick="toggleMenu('${post.id}')" aria-label="Menu du post" aria-expanded="false" aria-haspopup="true">⋮</button>
                 <div class="post-menu" id="menu-${post.id}" role="menu">
@@ -2676,6 +3569,7 @@
                     </div>
                     <div class="post-content">${linkifyContent(renderMentions(post.content))}</div>
                     ${imageHtml}
+                    ${pollHtml}
                     <div class="post-previews" data-post-id-preview="${post.id}"></div>
                     ${reactionsHtml}
                     ${shareHtml}
@@ -3023,14 +3917,27 @@
 
         // ===== LINKIFY CONTENT =====
         /**
-         * Convert URLs in text to clickable links
+         * Convert URLs and hashtags in text to clickable links
          */
         function linkifyContent(text) {
             if (!text) return text;
-            // Match URLs but be careful not to double-encode already escaped HTML
-            return text.replace(
+            
+            // First: convert hashtags to links
+            text = text.replace(
+                /#([\w\u00C0-\u017F]{1,50})/g,
+                (match, tag) => {
+                    const normalizedTag = tag.toLowerCase();
+                    return `<a href="/tag.html?t=${encodeURIComponent(normalizedTag)}" class="post-hashtag">#${tag}</a>`;
+                }
+            );
+            
+            // Then: convert URLs to links (but not already-linked content)
+            text = text.replace(
                 /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi,
                 (url) => {
+                    // Skip if already inside an href (from hashtag linking)
+                    if (text.indexOf(`href="${url}"`) !== -1) return url;
+                    
                     // Clean up trailing punctuation that shouldn't be part of URL
                     let cleanUrl = url;
                     const trailingPunct = /[.,;:!?)]+$/;
@@ -3043,6 +3950,8 @@
                     return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="post-link">${cleanUrl}</a>${trailing}`;
                 }
             );
+            
+            return text;
         }
         
         // ===== RICH MEDIA PREVIEWS =====
