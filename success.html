@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Achat réussi — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Achat réussi ! Voici tes codes cadeau Cinq.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+
+    <style>
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: var(--leading-normal);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: var(--font-brand);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            text-decoration: none;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--color-success);
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: var(--font-brand);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            line-height: 1.2;
+            color: var(--color-success);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--color-text-muted);
+            margin: 0 0 3rem 0;
+        }
+
+        .loading {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .codes-section {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+            display: none;
+        }
+
+        .codes-section.show {
+            display: block;
+        }
+
+        .codes-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .codes-header h2 {
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .codes-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .code-item {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .code-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-accent);
+        }
+
+        .copy-btn {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+        }
+
+        .copy-btn.copied {
+            background: var(--color-success);
+        }
+
+        .share-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .share-btn {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .share-btn:hover {
+            background: var(--color-bg-secondary);
+        }
+
+        .instructions {
+            background: var(--color-bg-tertiary);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            margin: 0 0 1rem 0;
+            color: var(--color-accent);
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+
+        .error {
+            background: var(--color-error-bg);
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        .back-link:hover {
+            color: var(--color-text-primary);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .codes-section {
+                padding: 1.5rem;
+            }
+            
+            .code-item {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .share-btn {
+                margin: 0.5rem 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">cinq</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <main class="main-content">
+            <div class="success-icon">✅</div>
+            
+            <div class="hero">
+                <h1>Paiement réussi !</h1>
+                <p>Récupération de tes codes cadeau en cours...</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Génération de tes codes cadeau...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error" class="error">
+                <h3>Erreur</h3>
+                <p id="error-message">Une erreur est survenue lors de la récupération de tes codes.</p>
+            </div>
+
+            <!-- Codes Display -->
+            <div id="codes-section" class="codes-section">
+                <div class="codes-header">
+                    <h2>Tes codes cadeau</h2>
+                    <p>Voici tes 5 codes d'invitation. Partage-les avec tes proches !</p>
+                </div>
+
+                <ul id="codes-list" class="codes-list">
+                    <!-- Codes will be inserted here by JavaScript -->
+                </ul>
+
+                <div class="share-section">
+                    <h3>Partager</h3>
+                    <button class="share-btn" onclick="shareAllCodes()">📋 Copier tous les codes</button>
+                    <button class="share-btn" onclick="shareByEmail()">📧 Partager par email</button>
+                    <button class="share-btn" onclick="shareByWhatsApp()">💬 Partager sur WhatsApp</button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <h3>Comment utiliser tes codes</h3>
+                <ol>
+                    <li>Partage chaque code avec une personne différente</li>
+                    <li>Tes proches peuvent s'inscrire sur <strong>cinq.app</strong></li>
+                    <li>Ils utilisent ton code lors de l'inscription</li>
+                    <li>Vous pouvez maintenant vous connecter sur Cinq !</li>
+                </ol>
+            </div>
+
+            <a href="/gift.html" class="back-link">
+                ← Retour aux cadeaux
+            </a>
+        </main>
+    </div>
+
+    <script>
+        let currentCodes = [];
+
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (!sessionId) {
+            showError('Session non trouvée dans l\'URL');
+        } else {
+            fetchCodes(sessionId);
+        }
+
+        async function fetchCodes(sessionId) {
+            try {
+                const response = await fetch('/api/purchase-codes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ session_id: sessionId }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de la récupération des codes');
+                }
+
+                if (data.codes && data.codes.length > 0) {
+                    displayCodes(data.codes);
+                } else {
+                    throw new Error('Aucun code trouvé pour cette session');
+                }
+
+            } catch (error) {
+                console.error('Error fetching codes:', error);
+                showError(error.message);
+            }
+        }
+
+        function displayCodes(codes) {
+            currentCodes = codes;
+            
+            const loading = document.getElementById('loading');
+            const codesSection = document.getElementById('codes-section');
+            const codesList = document.getElementById('codes-list');
+
+            loading.style.display = 'none';
+            codesSection.classList.add('show');
+
+            // Generate code items
+            codesList.innerHTML = '';
+            codes.forEach((code, index) => {
+                const li = document.createElement('li');
+                li.className = 'code-item';
+                li.innerHTML = `
+                    <div class="code-text">${code}</div>
+                    <button class="copy-btn" onclick="copyCode('${code}', this)">Copier</button>
+                `;
+                codesList.appendChild(li);
+            });
+        }
+
+        function showError(message) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const errorMessage = document.getElementById('error-message');
+
+            loading.style.display = 'none';
+            error.classList.add('show');
+            errorMessage.textContent = message;
+        }
+
+        async function copyCode(code, btn) {
+            try {
+                await navigator.clipboard.writeText(code);
+                const originalText = btn.textContent;
+                btn.textContent = 'Copié !';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Copy failed:', err);
+                // Fallback pour les anciens navigateurs
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                btn.textContent = 'Copié !';
+                setTimeout(() => btn.textContent = 'Copier', 2000);
+            }
+        }
+
+        function shareAllCodes() {
+            const allCodes = currentCodes.join('\n');
+            const text = `🎁 Voici tes codes d'invitation Cinq !\n\n${allCodes}\n\nInscris-toi sur cinq.app avec un de ces codes.`;
+            
+            copyCode(text, event.target);
+        }
+
+        function shareByEmail() {
+            const codes = currentCodes.join('\n');
+            const subject = encodeURIComponent('🎁 Invitation pour Cinq');
+            const body = encodeURIComponent(`Salut !
+
+J'ai quelque chose de spécial à partager avec toi : une invitation pour Cinq, l'anti-réseau social où tu peux rester connecté(e) avec tes 5 personnes les plus importantes.
+
+Voici ton code d'invitation personnel :
+${currentCodes[0]}
+
+Pour t'inscrire :
+1. Va sur cinq.app
+2. Crée ton compte
+3. Utilise ce code lors de l'inscription
+
+Cinq, c'est différent : pas de likes, pas d'algorithme, pas de stress. Juste nous et nos vrais liens.
+
+À bientôt sur Cinq ! 😊`);
+            
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+        }
+
+        function shareByWhatsApp() {
+            const code = currentCodes[0];
+            const text = encodeURIComponent(`🎁 Je t'invite sur Cinq !
+
+L'anti-réseau social où tu choisis tes 5 proches. Pas de likes, pas d'algorithme, juste de vraies connexions.
+
+Ton code d'invitation : ${code}
+
+Inscris-toi sur cinq.app 😊`);
+            
+            window.open(`https://wa.me/?text=${text}`);
+        }
+    </script>
+</body>
+</html>

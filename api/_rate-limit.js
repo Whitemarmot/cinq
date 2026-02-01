@@ -143,4 +143,9 @@ export const RATE_LIMITS = {
     
     // Strict: gift code creation (IP-based)
     GIFT_CREATE: { max: 10, windowMs: 60 * 60 * 1000 }, // 10 per hour
+    
+    // Payment endpoints
+    CHECKOUT: { max: 20, windowMs: 60 * 1000 },     // 20 checkout attempts per minute
+    WEBHOOK: { max: 100, windowMs: 60 * 1000 },     // 100 webhook events per minute
+    PURCHASE_CODES: { max: 10, windowMs: 60 * 1000 }, // 10 code retrievals per minute
 };

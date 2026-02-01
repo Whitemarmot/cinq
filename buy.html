@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Acheter des codes Cinq — L'anti-réseau social</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Achète un pack de 5 codes cadeau Cinq pour seulement 5€. L'anti-réseau social où tu choisis tes 5 proches.">
+    <meta name="keywords" content="cinq, achat, codes cadeau, pack, réseau social, anti-réseau, proches, amis, famille">
+    <meta name="author" content="Cinq">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/buy">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Acheter des codes Cinq — L'anti-réseau social">
+    <meta property="og:description" content="Achète un pack de 5 codes cadeau Cinq pour seulement 5€.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/buy.html">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Theme initialization -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+
+    <style>
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: var(--leading-normal);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .header {
+            background: var(--color-bg-secondary);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: var(--font-brand);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            text-decoration: none;
+        }
+
+        .back-link {
+            color: var(--color-text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: var(--color-text-primary);
+        }
+
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-family: var(--font-brand);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--color-text-muted);
+            margin: 0;
+        }
+
+        .pricing-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pricing-header {
+            margin-bottom: 2rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin: 0.5rem 0;
+        }
+
+        .price-detail {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+        }
+
+        .features {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .features li:last-child {
+            border-bottom: none;
+        }
+
+        .features li::before {
+            content: "✓ ";
+            color: var(--color-success);
+            font-weight: 600;
+        }
+
+        .payment-section {
+            margin-top: 2rem;
+        }
+
+        .btn {
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .crypto-note {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--color-bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .pricing-card {
+                padding: 1.5rem;
+            }
+            
+            .price {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">cinq</a>
+            <a href="/gift.html" class="back-link">
+                ← Retour aux cadeaux
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <main class="main-content">
+            <div class="hero">
+                <h1>Pack de 5 codes cadeau</h1>
+                <p>Offre l'anti-réseau social à tes proches</p>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="price">5€</div>
+                    <div class="price-detail">Pack de 5 codes cadeau</div>
+                </div>
+
+                <ul class="features">
+                    <li>5 codes d'invitation</li>
+                    <li>Valables 30 jours</li>
+                    <li>Accès complet à Cinq</li>
+                    <li>Partage facile par email</li>
+                    <li>Support prioritaire</li>
+                </ul>
+
+                <div class="payment-section">
+                    <button id="stripe-btn" class="btn">
+                        <span class="loading">
+                            <div class="spinner"></div>
+                            Préparation...
+                        </span>
+                        <span class="btn-text">Acheter avec Stripe</span>
+                    </button>
+
+                    <button id="crypto-btn" class="btn btn-secondary" style="display: none;">
+                        Payer en crypto (Bitcoin)
+                    </button>
+
+                    <div class="crypto-note">
+                        💡 <strong>Pourquoi payant ?</strong><br>
+                        Cinq reste gratuit pour tous. Ces codes premium permettent de soutenir le développement et d'inviter tes proches sans limite d'attente.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}'); // À remplacer par la vraie clé
+        const stripeBtn = document.getElementById('stripe-btn');
+        const cryptoBtn = document.getElementById('crypto-btn');
+        const loading = stripeBtn.querySelector('.loading');
+        const btnText = stripeBtn.querySelector('.btn-text');
+
+        // Configuration crypto (BTCPay)
+        const CRYPTO_ENABLED = false; // À activer quand BTCPay est configuré
+
+        if (CRYPTO_ENABLED) {
+            cryptoBtn.style.display = 'block';
+        }
+
+        // Stripe Checkout
+        stripeBtn.addEventListener('click', async () => {
+            // État de chargement
+            loading.classList.add('show');
+            btnText.style.display = 'none';
+            stripeBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        quantity: 1,
+                        pack_type: '5_codes'
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de la création de la session');
+                }
+
+                // Redirection vers Stripe Checkout
+                const { error } = await stripe.redirectToCheckout({
+                    sessionId: data.sessionId
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur: ' + error.message);
+                
+                // Retour état normal
+                loading.classList.remove('show');
+                btnText.style.display = 'block';
+                stripeBtn.disabled = false;
+            }
+        });
+
+        // Crypto payment (BTCPay)
+        cryptoBtn.addEventListener('click', async () => {
+            alert('Paiement crypto bientôt disponible !');
+            // TODO: Implémenter BTCPay Server
+        });
+
+        // Auto-replacement de la clé publique Stripe
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cette clé sera injectée côté serveur ou via une variable d'environnement publique
+            const publicKey = 'pk_test_51234...'; // À configurer
+            if (publicKey && publicKey !== '{{ STRIPE_PUBLISHABLE_KEY }}') {
+                // Réinitialiser Stripe avec la vraie clé
+                window.stripe = Stripe(publicKey);
+            }
+        });
+    </script>
+</body>
+</html>
