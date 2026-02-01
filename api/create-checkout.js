@@ -1,33 +1,36 @@
 /**
- * Stripe Checkout Session Creation
+ * CINQ Premium 5² — Create Stripe Checkout Session (Vercel)
+ * One-time payment of 4.99€ for lifetime access to 25 slots
  * 
- * Creates a Stripe Checkout session for gift code packs
+ * POST /api/create-checkout
+ * Requires: Authorization: Bearer <access_token>
  */
 
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 import { handleCors } from './_supabase.js';
-import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
-import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 
-// Initialize Stripe (lazy loaded to avoid startup cost)
-let stripe = null;
-async function getStripe() {
-    if (!stripe) {
-        const { default: Stripe } = await import('stripe');
-        stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-            apiVersion: '2024-12-18.acacia',
-        });
-    }
-    return stripe;
+const PRODUCT_NAME = '5² Premium';
+const PRODUCT_DESCRIPTION = '25 contacts à vie — L\'upgrade définitif de Cinq';
+const PRICE_CENTS = 499;
+const CURRENCY = 'eur';
+
+function getSupabaseWithToken(token) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    return createClient(url, key, {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+        auth: { autoRefreshToken: false, persistSession: false }
+    });
 }
 
-const PRODUCTS = {
-    '5_codes': {
-        name: 'Pack de 5 codes cadeau Cinq',
-        price: 500, // 5€ en centimes
-        description: '5 codes d\'invitation pour Cinq, l\'anti-réseau social',
-        codes_count: 5
-    }
-};
+function getSupabaseAdmin() {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    return createClient(url, key, {
+        auth: { autoRefreshToken: false, persistSession: false }
+    });
+}
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['POST', 'OPTIONS'])) return;
@@ -36,111 +39,109 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Rate limiting
-    if (!checkRateLimit(req, res, { 
-        ...RATE_LIMITS.CHECKOUT, 
-        keyPrefix: 'checkout:create' 
-    })) {
-        return;
+    if (!process.env.STRIPE_SECRET_KEY) {
+        return res.status(500).json({ error: 'Payment system not configured' });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+    // Auth
+    const authHeader = req.headers['authorization'];
+    if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Authorization required' });
+    }
+    const token = authHeader.slice(7);
+
+    const supabase = getSupabaseWithToken(token);
+    const supabaseAdmin = getSupabaseAdmin();
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    // Check if already premium
+    const { data: userData } = await supabaseAdmin
+        .from('users')
+        .select('is_premium')
+        .eq('id', user.id)
+        .single();
+
+    if (userData?.is_premium) {
+        return res.status(400).json({ error: 'Tu es déjà premium ! 🎉', code: 'ALREADY_PREMIUM' });
+    }
+
+    const body = req.body || {};
+    const origin = req.headers['origin'] || 'https://cinq-three.vercel.app';
+    const successUrl = body.successUrl || `${origin}/settings.html?premium=success`;
+    const cancelUrl = body.cancelUrl || `${origin}/settings.html?premium=cancelled`;
+
+    // Create pending purchase
+    const { data: purchase, error: purchaseError } = await supabaseAdmin
+        .from('purchases')
+        .insert({
+            user_id: user.id,
+            product_id: '5squared',
+            amount_cents: PRICE_CENTS,
+            currency: CURRENCY,
+            provider: 'stripe',
+            status: 'pending',
+            metadata: { email: user.email }
+        })
+        .select()
+        .single();
+
+    if (purchaseError) {
+        console.error('Failed to create purchase:', purchaseError);
+        return res.status(500).json({ error: 'Failed to initiate purchase' });
     }
 
     try {
-        const { pack_type = '5_codes', quantity = 1 } = req.body;
-
-        // Validation
-        if (!PRODUCTS[pack_type]) {
-            return res.status(400).json({ 
-                error: 'Type de pack invalide',
-                available_packs: Object.keys(PRODUCTS)
-            });
-        }
-
-        if (quantity < 1 || quantity > 10) {
-            return res.status(400).json({ 
-                error: 'Quantité invalide (1-10)' 
-            });
-        }
-
-        const product = PRODUCTS[pack_type];
-        const totalAmount = product.price * quantity;
-        const totalCodes = product.codes_count * quantity;
-
-        const stripe = await getStripe();
-
-        // Créer la session Checkout
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'eur',
-                        product_data: {
-                            name: product.name,
-                            description: product.description,
-                            images: ['https://cinq.app/og-image.png'],
-                        },
-                        unit_amount: product.price,
-                    },
-                    quantity: quantity,
-                },
-            ],
             mode: 'payment',
-            success_url: `${process.env.SITE_URL || 'https://cinq.app'}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.SITE_URL || 'https://cinq.app'}/buy.html?cancelled=true`,
+            payment_method_types: ['card'],
+            customer_email: user.email,
+            line_items: [{
+                price_data: {
+                    currency: CURRENCY,
+                    unit_amount: PRICE_CENTS,
+                    product_data: {
+                        name: PRODUCT_NAME,
+                        description: PRODUCT_DESCRIPTION,
+                        images: ['https://cinq-three.vercel.app/assets/icons/icon-512x512.png'],
+                    }
+                },
+                quantity: 1
+            }],
             metadata: {
-                pack_type,
-                quantity: quantity.toString(),
-                codes_count: totalCodes.toString(),
-                source: 'cinq_gift_codes'
+                user_id: user.id,
+                purchase_id: purchase.id,
+                product_id: '5squared'
             },
-            customer_email: req.body.email || undefined,
+            success_url: successUrl + '&session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: cancelUrl,
+            expires_at: Math.floor(Date.now() / 1000) + 1800,
             billing_address_collection: 'auto',
-            shipping_address_collection: null, // Digital product
-            expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30 minutes
+            allow_promotion_codes: true
         });
 
-        logInfo('Checkout session created', {
+        await supabaseAdmin
+            .from('purchases')
+            .update({ provider_payment_id: session.id })
+            .eq('id', purchase.id);
+
+        return res.status(200).json({
+            checkoutUrl: session.url,
             sessionId: session.id,
-            packType: pack_type,
-            quantity,
-            amount: totalAmount,
-            codesCount: totalCodes
+            purchaseId: purchase.id
         });
 
-        return res.json({
-            success: true,
-            sessionId: session.id,
-            url: session.url,
-            purchase: {
-                pack_type,
-                quantity,
-                codes_count: totalCodes,
-                total_amount: totalAmount,
-                currency: 'EUR'
-            }
-        });
-
-    } catch (error) {
-        logError(error, { 
-            endpoint: '/api/create-checkout',
-            method: req.method,
-            body: req.body
-        });
-
-        // Erreurs Stripe spécifiques
-        if (error.type && error.type.startsWith('Stripe')) {
-            return res.status(400).json({
-                error: 'Erreur de paiement',
-                details: error.message,
-                type: error.type
-            });
-        }
-
-        return res.status(500).json(
-            createErrorResponse(error, { 
-                includeDebug: process.env.NODE_ENV === 'development',
-                hint: 'Réessaie dans quelques instants'
-            })
-        );
+    } catch (stripeError) {
+        console.error('Stripe error:', stripeError);
+        await supabaseAdmin
+            .from('purchases')
+            .update({ status: 'failed' })
+            .eq('id', purchase.id);
+        return res.status(500).json({ error: 'Erreur lors de la création du paiement' });
     }
 }

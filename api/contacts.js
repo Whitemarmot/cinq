@@ -19,7 +19,18 @@ import { isValidUUID, isValidEmail } from './_validation.js';
 import { logError, createErrorResponse } from './_error-logger.js';
 import { logActivity } from './activity-log.js';
 
-const MAX_CONTACTS = 5;
+const MAX_CONTACTS_FREE = 5;
+const MAX_CONTACTS_PREMIUM = 25;
+
+// Get user's contact limit based on premium status
+async function getContactLimit(userId) {
+    const { data: user } = await supabase
+        .from('users')
+        .select('is_premium')
+        .eq('id', userId)
+        .single();
+    return user?.is_premium ? MAX_CONTACTS_PREMIUM : MAX_CONTACTS_FREE;
+}
 
 export default async function handler(req, res) {
     if (handleCors(req, res, ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'])) return;
@@ -207,7 +218,8 @@ async function listContacts(req, res, user) {
 
     if (error) throw error;
     if (!data || data.length === 0) {
-        return res.json({ contacts: [], count: 0, max: MAX_CONTACTS });
+        const maxContacts = await getContactLimit(user.id);
+        return res.json({ contacts: [], count: 0, max: maxContacts });
     }
 
     const contactIds = data.map(c => c.contact_user_id);
@@ -268,7 +280,8 @@ async function listContacts(req, res, user) {
         };
     });
 
-    return res.json({ contacts, count: data.length, max: MAX_CONTACTS });
+    const maxContacts = await getContactLimit(user.id);
+    return res.json({ contacts, count: data.length, max: maxContacts });
 }
 
 async function listBirthdays(res, user) {
@@ -349,15 +362,21 @@ async function handlePost(req, res, user) {
         }
     }
 
-    // Check limit
+    // Check limit (premium = 25, free = 5)
+    const maxContacts = await getContactLimit(user.id);
     const { count } = await supabase
         .from('contacts')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id);
 
-    if (count >= MAX_CONTACTS) {
+    if (count >= maxContacts) {
+        const isPremium = maxContacts === MAX_CONTACTS_PREMIUM;
         return res.status(400).json({ 
-            error: `Limite atteinte ! Tu as déjà ${MAX_CONTACTS} contacts.`
+            error: isPremium 
+                ? `Limite atteinte ! Tu as déjà ${maxContacts} contacts.`
+                : `Limite atteinte ! Passe à 5² pour avoir 25 contacts.`,
+            code: isPremium ? 'LIMIT_REACHED' : 'UPGRADE_REQUIRED',
+            maxContacts
         });
     }
 
