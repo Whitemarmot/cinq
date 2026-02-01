@@ -1,24 +1,38 @@
 /**
- * Cinq PWA Service Worker v3
- * Optimized caching strategies with Navigation Preload
+ * ==========================================================================
+ * CINQ PWA Service Worker v4
+ * ==========================================================================
  * 
- * @version 3.0.0
+ * Advanced PWA features:
+ * - Intelligent caching strategies
+ * - Navigation Preload
+ * - Background Sync for offline messages
+ * - IndexedDB integration
+ * - Push notifications
+ * - Periodic sync
+ * 
+ * @version 4.0.0
  * @author Cinq Team
  */
 
-const SW_VERSION = '3.0.0';
+const SW_VERSION = '4.0.0';
 const CACHE_PREFIX = 'cinq';
-const STATIC_CACHE = `${CACHE_PREFIX}-static-v4`;
-const DYNAMIC_CACHE = `${CACHE_PREFIX}-dynamic-v4`;
-const IMAGE_CACHE = `${CACHE_PREFIX}-images-v2`;
-const FONT_CACHE = `${CACHE_PREFIX}-fonts-v2`;
+const STATIC_CACHE = `${CACHE_PREFIX}-static-v5`;
+const DYNAMIC_CACHE = `${CACHE_PREFIX}-dynamic-v5`;
+const IMAGE_CACHE = `${CACHE_PREFIX}-images-v3`;
+const FONT_CACHE = `${CACHE_PREFIX}-fonts-v3`;
+const API_CACHE = `${CACHE_PREFIX}-api-v1`;
 
 // Maximum cache sizes
 const MAX_DYNAMIC_CACHE = 50;
 const MAX_IMAGE_CACHE = 30;
+const MAX_API_CACHE = 20;
+
+// API endpoint patterns
+const API_BASE = '/.netlify/functions';
+const SUPABASE_URL = 'guioxfulihyehrwytxce.supabase.co';
 
 // Critical assets to precache (app shell)
-// These MUST work offline - no external dependencies
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -54,6 +68,7 @@ const PRECACHE_ASSETS = [
   '/analytics.min.js',
   '/js/app.js',
   '/js/common.js',
+  '/js/offline-db.js',
   // Icons
   '/assets/icons/icon-72x72.png',
   '/assets/icons/icon-96x96.png',
@@ -62,13 +77,118 @@ const PRECACHE_ASSETS = [
   '/assets/icons/icon.svg'
 ];
 
-// Assets that are nice to have but not critical
+// Optional assets (nice to have)
 const OPTIONAL_PRECACHE = [
   '/assets/icons/icon-128x128.png',
   '/assets/icons/icon-144x144.png',
   '/assets/icons/icon-152x152.png',
   '/assets/icons/icon-384x384.png'
 ];
+
+// ============================================================================
+// INDEXEDDB FOR SYNC QUEUE
+// ============================================================================
+
+const DB_NAME = 'cinq-offline-db';
+const DB_VERSION = 1;
+
+let db = null;
+
+/**
+ * Open IndexedDB connection
+ */
+async function openDB() {
+  if (db) return db;
+  
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const database = event.target.result;
+      
+      if (!database.objectStoreNames.contains('pending-messages')) {
+        const store = database.createObjectStore('pending-messages', {
+          keyPath: 'id',
+          autoIncrement: true
+        });
+        store.createIndex('status', 'status', { unique: false });
+      }
+      
+      if (!database.objectStoreNames.contains('pending-actions')) {
+        database.createObjectStore('pending-actions', {
+          keyPath: 'id',
+          autoIncrement: true
+        });
+      }
+    };
+  });
+}
+
+/**
+ * Get pending messages from IndexedDB
+ */
+async function getPendingMessages() {
+  const database = await openDB();
+  
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction('pending-messages', 'readonly');
+    const store = tx.objectStore('pending-messages');
+    const index = store.index('status');
+    const request = index.getAll('pending');
+    
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
+ * Update message status in IndexedDB
+ */
+async function updateMessageStatus(id, status, extra = {}) {
+  const database = await openDB();
+  
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction('pending-messages', 'readwrite');
+    const store = tx.objectStore('pending-messages');
+    const getRequest = store.get(id);
+    
+    getRequest.onsuccess = () => {
+      const message = getRequest.result;
+      if (!message) {
+        resolve();
+        return;
+      }
+      
+      const updated = { ...message, ...extra, status };
+      store.put(updated);
+    };
+    
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+/**
+ * Remove message from IndexedDB
+ */
+async function removeMessage(id) {
+  const database = await openDB();
+  
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction('pending-messages', 'readwrite');
+    const store = tx.objectStore('pending-messages');
+    store.delete(id);
+    
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
 
 // ============================================================================
 // INSTALL EVENT
@@ -81,17 +201,16 @@ self.addEventListener('install', (event) => {
     (async () => {
       const cache = await caches.open(STATIC_CACHE);
       
-      // Precache critical assets (fail if any fails)
+      // Precache critical assets
       console.log('[SW] Precaching critical assets...');
       try {
         await cache.addAll(PRECACHE_ASSETS);
         console.log('[SW] Critical assets cached successfully');
       } catch (err) {
         console.error('[SW] Critical precache failed:', err);
-        // Don't throw - let the SW install anyway
       }
       
-      // Try optional assets (don't fail if these fail)
+      // Try optional assets
       console.log('[SW] Precaching optional assets...');
       for (const url of OPTIONAL_PRECACHE) {
         try {
@@ -115,7 +234,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   console.log(`[SW ${SW_VERSION}] Activating...`);
   
-  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE, FONT_CACHE];
+  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, IMAGE_CACHE, FONT_CACHE, API_CACHE];
   
   event.waitUntil(
     (async () => {
@@ -155,13 +274,19 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Handle POST requests for messages (queue if offline)
+  if (request.method === 'POST' && url.pathname.includes('/messages')) {
+    event.respondWith(handleMessagePost(event));
+    return;
+  }
+
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Skip chrome-extension and other non-http(s) schemes
+  // Skip non-http(s) schemes
   if (!url.protocol.startsWith('http')) return;
 
-  // Skip requests to different origins except allowed CDNs
+  // Allowed origins
   const allowedOrigins = [
     self.location.origin,
     'https://fonts.googleapis.com',
@@ -172,18 +297,91 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Route to appropriate strategy
   event.respondWith(handleFetch(event));
 });
 
+/**
+ * Handle message POST requests - queue if offline
+ */
+async function handleMessagePost(event) {
+  const { request } = event;
+  
+  // Try network first
+  try {
+    const response = await fetch(request.clone());
+    return response;
+  } catch (error) {
+    // Network failed - queue for background sync
+    console.log('[SW] Network failed, queuing message for sync...');
+    
+    try {
+      const body = await request.clone().json();
+      
+      // Store in IndexedDB
+      const database = await openDB();
+      const tx = database.transaction('pending-messages', 'readwrite');
+      const store = tx.objectStore('pending-messages');
+      
+      await new Promise((resolve, reject) => {
+        const addRequest = store.add({
+          contact_id: body.contact_id,
+          content: body.content || null,
+          is_ping: body.is_ping || false,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          retries: 0
+        });
+        
+        addRequest.onsuccess = () => resolve(addRequest.result);
+        addRequest.onerror = () => reject(addRequest.error);
+      });
+      
+      // Register for background sync
+      await self.registration.sync.register('sync-messages');
+      
+      // Notify client
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'MESSAGE_QUEUED',
+          status: 'pending'
+        });
+      });
+      
+      // Return a synthetic response
+      return new Response(JSON.stringify({
+        success: true,
+        queued: true,
+        message: 'Message en attente de connexion'
+      }), {
+        status: 202,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+    } catch (queueError) {
+      console.error('[SW] Failed to queue message:', queueError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Impossible d\'envoyer le message hors ligne'
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
+}
+
+/**
+ * Main fetch handler
+ */
 async function handleFetch(event) {
   const { request } = event;
   const url = new URL(request.url);
 
   try {
-    // API calls - Network first with cache fallback (shorter timeout on mobile)
-    if (url.pathname.startsWith('/api/') || url.hostname.includes('supabase')) {
-      return await networkFirst(request, DYNAMIC_CACHE, 5000);
+    // API calls - Network first with cache fallback
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith(API_BASE) || url.hostname.includes(SUPABASE_URL)) {
+      return await networkFirst(request, API_CACHE, 5000);
     }
 
     // Google Fonts CSS - Stale while revalidate
@@ -191,7 +389,7 @@ async function handleFetch(event) {
       return await staleWhileRevalidate(request, FONT_CACHE);
     }
 
-    // Google Fonts files - Cache first (immutable)
+    // Google Fonts files - Cache first
     if (url.hostname === 'fonts.gstatic.com') {
       return await cacheFirst(request, FONT_CACHE);
     }
@@ -201,7 +399,7 @@ async function handleFetch(event) {
       return await cacheFirst(request, IMAGE_CACHE, MAX_IMAGE_CACHE);
     }
 
-    // HTML pages - Network first with Navigation Preload support
+    // HTML pages - Network first with Navigation Preload
     if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
       return await handleNavigationRequest(event);
     }
@@ -216,13 +414,11 @@ async function handleFetch(event) {
       return await cacheFirst(request, DYNAMIC_CACHE, MAX_DYNAMIC_CACHE);
     }
 
-    // Fallback to network
     return await fetch(request);
 
   } catch (error) {
     console.error('[SW] Fetch error:', error);
     
-    // Return offline page for navigation requests
     if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
       const offlinePage = await caches.match('/offline.html');
       if (offlinePage) return offlinePage;
@@ -237,27 +433,23 @@ async function handleFetch(event) {
 // ============================================================================
 
 /**
- * Handle navigation requests with Navigation Preload support
+ * Handle navigation with Navigation Preload
  */
 async function handleNavigationRequest(event) {
   const { request } = event;
   
   try {
-    // Use Navigation Preload response if available
     const preloadResponse = event.preloadResponse ? await event.preloadResponse : null;
     
     if (preloadResponse) {
-      // Cache the preloaded response
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, preloadResponse.clone());
       return preloadResponse;
     }
     
-    // Fall back to network first
     return await networkFirst(request, DYNAMIC_CACHE, 5000);
     
   } catch (error) {
-    // Return cached version or offline page
     const cachedResponse = await caches.match(request);
     if (cachedResponse) return cachedResponse;
     
@@ -269,13 +461,11 @@ async function handleNavigationRequest(event) {
 }
 
 /**
- * Cache-first strategy - Best for immutable assets
+ * Cache-first strategy
  */
 async function cacheFirst(request, cacheName, maxItems = null) {
   const cachedResponse = await caches.match(request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+  if (cachedResponse) return cachedResponse;
   
   try {
     const networkResponse = await fetch(request);
@@ -286,7 +476,6 @@ async function cacheFirst(request, cacheName, maxItems = null) {
     }
     return networkResponse;
   } catch (error) {
-    // Return offline fallback for HTML
     if (request.headers.get('accept')?.includes('text/html')) {
       return caches.match('/offline.html');
     }
@@ -295,8 +484,7 @@ async function cacheFirst(request, cacheName, maxItems = null) {
 }
 
 /**
- * Network-first strategy - Best for dynamic content
- * Uses AbortController for timeout
+ * Network-first strategy with timeout
  */
 async function networkFirst(request, cacheName, timeout = 5000) {
   const controller = new AbortController();
@@ -315,14 +503,12 @@ async function networkFirst(request, cacheName, timeout = 5000) {
   } catch (error) {
     clearTimeout(timeoutId);
     
-    // Try cache on network failure
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       console.log('[SW] Serving from cache:', request.url);
       return cachedResponse;
     }
     
-    // Return offline fallback for HTML
     if (request.headers.get('accept')?.includes('text/html')) {
       return caches.match('/offline.html');
     }
@@ -332,13 +518,12 @@ async function networkFirst(request, cacheName, timeout = 5000) {
 }
 
 /**
- * Stale-while-revalidate - Return cache immediately, update in background
+ * Stale-while-revalidate strategy
  */
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
   
-  // Always fetch in background to update cache
   const fetchPromise = fetch(request)
     .then(response => {
       if (response.ok) {
@@ -348,17 +533,12 @@ async function staleWhileRevalidate(request, cacheName) {
     })
     .catch(() => null);
   
-  // Return cached response immediately if available
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-  
-  // If no cache, wait for network
+  if (cachedResponse) return cachedResponse;
   return fetchPromise;
 }
 
 /**
- * Trim cache to max size (removes oldest entries)
+ * Trim cache to max size
  */
 async function trimCache(cacheName, maxItems) {
   const cache = await caches.open(cacheName);
@@ -380,44 +560,157 @@ async function trimCache(cacheName, maxItems) {
 self.addEventListener('sync', (event) => {
   console.log('[SW] Background sync:', event.tag);
   
-  if (event.tag === 'sync-pings') {
-    event.waitUntil(syncOfflineActions('pings'));
+  if (event.tag === 'sync-messages') {
+    event.waitUntil(syncPendingMessages());
   }
   
-  if (event.tag === 'sync-messages') {
-    event.waitUntil(syncOfflineActions('messages'));
+  if (event.tag === 'sync-pings') {
+    event.waitUntil(syncPendingMessages());
+  }
+  
+  if (event.tag === 'sync-actions') {
+    event.waitUntil(syncPendingActions());
   }
 });
 
-async function syncOfflineActions(type) {
-  console.log(`[SW] Syncing offline ${type}...`);
+/**
+ * Sync pending messages from IndexedDB
+ */
+async function syncPendingMessages() {
+  console.log('[SW] Starting message sync...');
   
-  // Get queued actions from IndexedDB
-  // This would integrate with the app's offline queue
+  const clients = await self.clients.matchAll();
+  const results = { sent: 0, failed: 0 };
+  
+  // Notify clients sync is starting
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SYNC_STATUS',
+      status: 'syncing',
+      queue: 'messages'
+    });
+  });
+  
   try {
-    // Notify clients that sync is starting
-    const clients = await self.clients.matchAll();
-    clients.forEach(client => {
-      client.postMessage({
-        type: 'SYNC_STATUS',
-        status: 'syncing',
-        queue: type
-      });
-    });
+    const messages = await getPendingMessages();
+    console.log(`[SW] Found ${messages.length} pending messages`);
     
-    // TODO: Implement actual sync logic
-    
-    // Notify clients that sync completed
-    clients.forEach(client => {
-      client.postMessage({
-        type: 'SYNC_STATUS',
-        status: 'complete',
-        queue: type
+    if (messages.length === 0) {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SYNC_STATUS',
+          status: 'complete',
+          queue: 'messages',
+          results: { sent: 0, failed: 0 }
+        });
       });
-    });
+      return;
+    }
+    
+    // Get auth token from a client
+    let authToken = null;
+    for (const client of clients) {
+      try {
+        const messageChannel = new MessageChannel();
+        client.postMessage({ type: 'GET_AUTH_TOKEN' }, [messageChannel.port2]);
+        
+        authToken = await new Promise((resolve) => {
+          messageChannel.port1.onmessage = (event) => {
+            resolve(event.data?.token);
+          };
+          setTimeout(() => resolve(null), 2000);
+        });
+        
+        if (authToken) break;
+      } catch (e) {
+        console.warn('[SW] Failed to get auth token from client');
+      }
+    }
+    
+    if (!authToken) {
+      console.warn('[SW] No auth token available, sync postponed');
+      return;
+    }
+    
+    // Send each message
+    for (const msg of messages) {
+      try {
+        await updateMessageStatus(msg.id, 'sending');
+        
+        const response = await fetch(`${API_BASE}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contact_id: msg.contact_id,
+            content: msg.content,
+            is_ping: msg.is_ping
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          await removeMessage(msg.id);
+          results.sent++;
+          
+          // Notify clients of successful send
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'MESSAGE_SENT',
+              localId: msg.id,
+              serverMessage: result.message
+            });
+          });
+        } else {
+          throw new Error(result.error || 'Failed to send');
+        }
+        
+      } catch (err) {
+        console.error('[SW] Failed to send message:', msg.id, err);
+        await updateMessageStatus(msg.id, 'pending', {
+          retries: (msg.retries || 0) + 1,
+          last_error: err.message
+        });
+        results.failed++;
+      }
+    }
+    
   } catch (error) {
     console.error('[SW] Sync failed:', error);
+    results.failed++;
   }
+  
+  // Notify clients sync completed
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SYNC_STATUS',
+      status: 'complete',
+      queue: 'messages',
+      results
+    });
+  });
+  
+  console.log('[SW] Message sync complete:', results);
+}
+
+/**
+ * Sync pending actions
+ */
+async function syncPendingActions() {
+  console.log('[SW] Syncing pending actions...');
+  
+  // Similar logic for generic actions
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'SYNC_STATUS',
+      status: 'complete',
+      queue: 'actions'
+    });
+  });
 }
 
 // ============================================================================
@@ -454,7 +747,7 @@ self.addEventListener('push', (event) => {
     ]
   };
 
-  // Update app badge count
+  // Update app badge
   if ('setAppBadge' in navigator && data.badgeCount) {
     navigator.setAppBadge(data.badgeCount).catch(() => {});
   }
@@ -465,27 +758,22 @@ self.addEventListener('push', (event) => {
 });
 
 // ============================================================================
-// NOTIFICATION CLICK HANDLER
+// NOTIFICATION HANDLERS
 // ============================================================================
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  // Clear badge
   if ('clearAppBadge' in navigator) {
     navigator.clearAppBadge().catch(() => {});
   }
 
-  // Handle dismiss action
-  if (event.action === 'dismiss') {
-    return;
-  }
+  if (event.action === 'dismiss') return;
 
   const targetUrl = event.notification.data?.url || '/app.html';
 
   event.waitUntil(
     (async () => {
-      // Try to find an existing window
       const clientList = await clients.matchAll({ 
         type: 'window', 
         includeUncontrolled: true 
@@ -493,7 +781,6 @@ self.addEventListener('notificationclick', (event) => {
       
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
-          // Post message to existing client
           client.postMessage({
             type: 'NOTIFICATION_CLICKED',
             url: targetUrl,
@@ -503,24 +790,14 @@ self.addEventListener('notificationclick', (event) => {
         }
       }
       
-      // No existing window - open new one
       return clients.openWindow(targetUrl);
     })()
   );
 });
 
-// ============================================================================
-// NOTIFICATION CLOSE HANDLER
-// ============================================================================
-
 self.addEventListener('notificationclose', (event) => {
-  // Track notification dismissal for analytics
   console.log('[SW] Notification dismissed:', event.notification.tag);
 });
-
-// ============================================================================
-// PUSH SUBSCRIPTION CHANGE
-// ============================================================================
 
 self.addEventListener('pushsubscriptionchange', (event) => {
   console.log('[SW] Push subscription changed');
@@ -529,19 +806,13 @@ self.addEventListener('pushsubscriptionchange', (event) => {
     (async () => {
       try {
         const subscription = await self.registration.pushManager.subscribe(
-          event.oldSubscription?.options || {
-            userVisibleOnly: true
-          }
+          event.oldSubscription?.options || { userVisibleOnly: true }
         );
         
-        // Update subscription on server
         await fetch('/api/push-subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            subscription,
-            action: 'update'
-          })
+          body: JSON.stringify({ subscription, action: 'update' })
         });
         
         console.log('[SW] Push subscription updated');
@@ -598,16 +869,35 @@ self.addEventListener('message', (event) => {
         event.ports[0]?.postMessage({ caches: status, version: SW_VERSION });
       })();
       break;
+      
+    case 'SYNC_NOW':
+      // Manual sync trigger
+      (async () => {
+        await syncPendingMessages();
+        event.ports[0]?.postMessage({ success: true });
+      })();
+      break;
+      
+    case 'GET_PENDING_COUNT':
+      (async () => {
+        const messages = await getPendingMessages();
+        event.ports[0]?.postMessage({ count: messages.length });
+      })();
+      break;
   }
 });
 
 // ============================================================================
-// PERIODIC BACKGROUND SYNC (for supported browsers)
+// PERIODIC BACKGROUND SYNC
 // ============================================================================
 
 self.addEventListener('periodicsync', (event) => {
   if (event.tag === 'content-sync') {
     event.waitUntil(periodicContentSync());
+  }
+  
+  if (event.tag === 'message-sync') {
+    event.waitUntil(syncPendingMessages());
   }
 });
 
@@ -615,7 +905,6 @@ async function periodicContentSync() {
   console.log('[SW] Periodic content sync');
   
   try {
-    // Refresh critical cached content
     const cache = await caches.open(DYNAMIC_CACHE);
     const urls = ['/app.html', '/feed.html'];
     
