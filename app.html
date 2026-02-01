@@ -5295,14 +5295,18 @@
         // Show/hide typing indicator from contact
         function showTypingIndicator(show = true, userName = null) {
             const indicator = document.getElementById('typing-indicator');
+            const label = document.getElementById('typing-label');
             const container = document.getElementById('chat-messages');
             
             if (!indicator) return;
             
             if (show) {
                 // Update indicator to show who's typing
-                if (userName) {
+                if (userName && label) {
+                    label.textContent = `${userName} écrit...`;
                     indicator.setAttribute('aria-label', `${userName} est en train d'écrire`);
+                } else if (label) {
+                    label.textContent = 'écrit...';
                 }
                 indicator.classList.add('visible');
                 // Scroll to show typing indicator

@@ -148,7 +148,7 @@ const UserProfile = (function() {
     }
     
     async function updateProfile(updates) {
-        const validFields = ['display_name'];
+        const validFields = ['display_name', 'vacation_mode', 'vacation_message'];
         const filteredUpdates = {};
         
         for (const key of validFields) {
