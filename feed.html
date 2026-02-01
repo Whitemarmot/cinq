@@ -3518,12 +3518,17 @@
             
             const content = textarea.value.trim();
             if (content) {
+                // Save to simple draft (for current session recovery)
                 localStorage.setItem(DRAFT_KEY_FEED, JSON.stringify({
                     content: textarea.value,
                     imageUrl: currentImageUrl || null,
                     pollOptions: pollEnabled ? getPollOptionsRaw() : null,
                     savedAt: Date.now()
                 }));
+                // Also save to multi-draft system for long-term storage
+                if (typeof CinqDrafts !== 'undefined' && CinqDrafts.scheduleAutosave) {
+                    CinqDrafts.scheduleAutosave();
+                }
             } else {
                 localStorage.removeItem(DRAFT_KEY_FEED);
             }
@@ -3600,6 +3605,10 @@
         
         function clearDraft() {
             localStorage.removeItem(DRAFT_KEY_FEED);
+            // Also clear from the new multi-draft system
+            if (typeof CinqDrafts !== 'undefined' && CinqDrafts.clearCurrentDraft) {
+                CinqDrafts.clearCurrentDraft();
+            }
         }
         
         function scheduleDraftSave() {
