@@ -5,3 +5,5 @@ node_modules/
 api-backup/
 tests/results.json
 playwright-report/
+.vercel
+.env*.local

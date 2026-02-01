@@ -923,93 +923,6 @@
             }
         }
 
-        /* ===== TESTIMONIALS SECTION ===== */
-        .testimonials-section {
-            background: var(--color-bg-secondary);
-            border-top: 1px solid var(--color-border-subtle);
-            border-bottom: 1px solid var(--color-border-subtle);
-        }
-        
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--space-6);
-        }
-        
-        .testimonial {
-            padding: var(--space-6);
-            background: var(--color-bg-primary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .testimonial:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-        
-        .testimonial-quote {
-            font-size: var(--text-base);
-            color: var(--color-text-primary);
-            line-height: 1.7;
-            margin-bottom: var(--space-4);
-            font-style: italic;
-        }
-        
-        .testimonial-quote::before {
-            content: '"';
-            display: inline;
-            font-size: var(--text-2xl);
-            color: var(--color-brand);
-            margin-right: 4px;
-        }
-        
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-        }
-        
-        .testimonial-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--cinq-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: var(--text-sm);
-        }
-        
-        .testimonial-info {
-            flex: 1;
-        }
-        
-        .testimonial-name {
-            font-weight: 600;
-            font-size: var(--text-sm);
-        }
-        
-        .testimonial-role {
-            font-size: var(--text-xs);
-            color: var(--color-text-muted);
-        }
-        
-        @media (max-width: 900px) {
-            .testimonials-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .testimonials-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* ===== FAQ SECTION ===== */
         .faq-list {
             max-width: 700px;
@@ -1470,21 +1383,16 @@
                     </p>
                 </div>
                 
-                <!-- Mini social proof -->
-                <div class="hero-social-proof scroll-reveal">
+                <!-- Concept clair -->
+                <div class="hero-social-proof scroll-reveal" style="border-top: none; padding-top: 0; margin-top: var(--space-6);">
                     <div class="hero-stat">
-                        <div class="hero-stat-value" id="counter-hero">—</div>
-                        <div class="hero-stat-label">En attente</div>
+                        <div class="hero-stat-value">5</div>
+                        <div class="hero-stat-label">contacts gratuits</div>
                     </div>
                     <div class="stat-divider"></div>
                     <div class="hero-stat">
-                        <div class="hero-stat-value">4.9★</div>
-                        <div class="hero-stat-label">Satisfaction</div>
-                    </div>
-                    <div class="stat-divider"></div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-value">~12min</div>
-                        <div class="hero-stat-label">/ jour d'usage</div>
+                        <div class="hero-stat-value">25</div>
+                        <div class="hero-stat-label">avec 5²</div>
                     </div>
                 </div>
             </div>
@@ -1524,50 +1432,6 @@
                     </div>
                     <h3 class="step-title">Parle pour de vrai</h3>
                     <p class="step-desc">Messages, audio, moments. Sans métriques, sans spectacle. Juste vous.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== TESTIMONIALS ===== -->
-        <section class="section testimonials-section" id="testimonials">
-            <div class="section-header scroll-reveal">
-                <span class="section-tag">Témoignages</span>
-                <h2 class="section-title">Ce qu'ils en disent</h2>
-                <p class="section-subtitle">De vraies personnes qui ont arrêté de faire semblant.</p>
-            </div>
-            
-            <div class="testimonials-grid stagger-children scroll-reveal">
-                <div class="testimonial">
-                    <p class="testimonial-quote">J'ai supprimé Instagram depuis que j'ai Cinq. Je passais 2h/jour à scroller pour... rien. Maintenant je parle vraiment à mes proches.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">L</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">Léa</div>
-                            <div class="testimonial-role">Graphiste, 28 ans</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial">
-                    <p class="testimonial-quote">Choisir 5 personnes m'a fait réaliser à quel point je collectionnais des "amis" sans vraies connexions. Brutal mais libérateur.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">M</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">Maxime</div>
-                            <div class="testimonial-role">Dev, 32 ans</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial">
-                    <p class="testimonial-quote">Enfin une app qui ne me donne pas envie de checker toutes les 5 minutes. Zéro notifications inutiles, zéro FOMO.</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">S</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">Sofia</div>
-                            <div class="testimonial-role">Prof, 35 ans</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -1636,28 +1500,13 @@
         <!-- ===== FINAL CTA ===== -->
         <section class="final-cta-section" id="join">
             <div class="final-cta-content scroll-reveal">
-                <h2 class="final-cta-title">Prêt·e à retrouver tes vrais proches ?</h2>
-                <p class="final-cta-subtitle">Offre un accès à quelqu'un qui compte. Ou entre dans la file.</p>
+                <h2 class="final-cta-title">Prêt·e ?</h2>
+                <p class="final-cta-subtitle">5 contacts gratuits. 25 avec 5².</p>
                 
                 <a href="gift.html" class="cta-button">
                     <svg class="cta-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/></svg>
-                    <span>Offrir un accès</span>
+                    <span>Commencer</span>
                 </a>
-                
-                <div class="waitlist-section">
-                    <p class="waitlist-label" id="waitlist-label">Pas encore de code ? Rejoins la liste</p>
-                    <form id="waitlist-form" class="waitlist-form" aria-labelledby="waitlist-label">
-                        <label for="email" class="sr-only">Adresse email</label>
-                        <input type="email" id="email" name="email" placeholder="toi@example.com" required autocomplete="email" class="waitlist-input" aria-describedby="form-message">
-                        <button type="submit" class="waitlist-submit" aria-label="Entrer dans la file">Entrer</button>
-                    </form>
-                    <p id="form-message" class="waitlist-message hidden"></p>
-                </div>
-                
-                <div class="counter-section" role="status" aria-live="polite">
-                    <div class="counter-value" id="counter-value">—</div>
-                    <div class="counter-label">personnes veulent aussi des vrais amis</div>
-                </div>
             </div>
         </section>
     </main>
@@ -1770,106 +1619,6 @@
             });
         });
         
-        // ===== WAITLIST FORM =====
-        const API_URL = '/api/waitlist';
-        const form = document.getElementById('waitlist-form');
-        const message = document.getElementById('form-message');
-        const counterValue = document.getElementById('counter-value');
-        const counterHero = document.getElementById('counter-hero');
-        const submitBtn = form?.querySelector('button[type="submit"]');
-        
-        // Animate counter
-        function animateCounter(target, element) {
-            if (!element) return;
-            const duration = 1200;
-            const start = parseInt(element.textContent) || 0;
-            const startTime = performance.now();
-            
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 4);
-                const current = Math.floor(start + (target - start) * eased);
-                element.textContent = current.toLocaleString('fr-FR');
-                
-                if (progress < 1) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
-        }
-        
-        // Load counter
-        async function loadCount() {
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                if (data.count !== undefined) {
-                    animateCounter(data.count, counterValue);
-                    animateCounter(data.count, counterHero);
-                }
-            } catch (e) {
-                if (counterValue) counterValue.textContent = '—';
-                if (counterHero) counterHero.textContent = '—';
-            }
-        }
-        
-        // UTM params
-        function getUtmParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                utm_source: params.get('utm_source'),
-                utm_medium: params.get('utm_medium'),
-                utm_campaign: params.get('utm_campaign'),
-                referrer: document.referrer || null
-            };
-        }
-        
-        if (form) {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('email').value;
-                
-                submitBtn.disabled = true;
-                submitBtn.textContent = '...';
-                
-                try {
-                    const utmData = getUtmParams();
-                    const res = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email.toLowerCase().trim(), ...utmData })
-                    });
-                    
-                    const data = await res.json();
-                    
-                    if (res.status === 409) {
-                        showMessage("T'es déjà dans la liste ! 😏", 'success');
-                    } else if (!res.ok) {
-                        showMessage("Erreur. Réessaie ? 🙏", 'error');
-                    } else {
-                        showMessage("Yes ! Tu fais partie du cercle ✨", 'success');
-                        document.getElementById('email').value = '';
-                        if (data.count) {
-                            animateCounter(data.count, counterValue);
-                            animateCounter(data.count, counterHero);
-                        }
-                    }
-                } catch (error) {
-                    showMessage("Erreur réseau. Réessaie ! 🙏", 'error');
-                }
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Rejoindre';
-            });
-        }
-        
-        function showMessage(text, type) {
-            message.textContent = text;
-            message.className = `waitlist-message ${type}`;
-            message.classList.remove('hidden');
-        }
-        
-        // Init
-        setTimeout(loadCount, 300);
     </script>
     
     <!-- PWA Service Worker -->
