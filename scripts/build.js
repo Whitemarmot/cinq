@@ -23,7 +23,8 @@ const CSS_FILES = [
   'styles.css',
   'css/base.css',
   'css/components.css',
-  'css/utilities.css'
+  'css/utilities.css',
+  'css/qr-code.css'
 ];
 
 const JS_FILES = [
@@ -33,7 +34,8 @@ const JS_FILES = [
   'pwa-install.js',
   'js/confetti.js',
   'js/easter-eggs.js',
-  'js/drafts.js'
+  'js/drafts.js',
+  'js/qr-code.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');

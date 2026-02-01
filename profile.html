@@ -47,6 +47,7 @@
     <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
     <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/qr-code.css">
     
     <!-- Theme initialization -->
     <script src="/js/theme.js"></script>
@@ -361,8 +362,17 @@
             margin-bottom: 1rem;
         }
         
-        /* Share Button */
-        .share-profile-btn {
+        /* Profile Action Buttons */
+        .profile-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-profile-btn,
+        .qr-profile-btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -374,10 +384,10 @@
             font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 1rem;
         }
         
-        .share-profile-btn:hover {
+        .share-profile-btn:hover,
+        .qr-profile-btn:hover {
             background: var(--color-bg-hover);
             border-color: var(--color-brand);
             color: var(--color-brand);
@@ -387,6 +397,18 @@
             background: var(--color-brand-muted);
             border-color: var(--color-brand);
             color: var(--color-brand);
+        }
+        
+        .qr-profile-btn {
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            color: white;
+            border: none;
+        }
+        
+        .qr-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            color: white;
         }
     </style>
     <!-- View Transitions -->
@@ -554,16 +576,30 @@
                     
                     <div class="member-since">Membre depuis ${memberSince}</div>
                     
-                    <button onclick="shareProfile()" class="share-profile-btn" id="share-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="18" cy="5" r="3"></circle>
-                            <circle cx="6" cy="12" r="3"></circle>
-                            <circle cx="18" cy="19" r="3"></circle>
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                        </svg>
-                        <span id="share-text">Partager le profil</span>
-                    </button>
+                    <div class="profile-actions">
+                        <button onclick="showProfileQR('${escapeHtml(profile.id)}', '${escapeHtml(profile.display_name)}', '${escapeHtml(profile.avatar_url || '')}')" class="qr-profile-btn" id="qr-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="3" height="3"/>
+                                <path d="M14 21h3"/>
+                                <path d="M21 14v3"/>
+                            </svg>
+                            <span>QR Code</span>
+                        </button>
+                        
+                        <button onclick="shareProfile()" class="share-profile-btn" id="share-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                            <span id="share-text">Partager</span>
+                        </button>
+                    </div>
                 </article>
                 
                 ${postsHtml}
@@ -639,16 +675,30 @@
                 
                 setTimeout(() => {
                     btn.classList.remove('copied');
-                    text.textContent = 'Partager le profil';
+                    text.textContent = 'Partager';
                 }, 2000);
             } catch (e) {
                 console.error('Failed to copy:', e);
             }
         }
         
+        // Show QR code for this profile
+        function showProfileQR(id, displayName, avatarUrl) {
+            const profile = {
+                id: id,
+                display_name: displayName,
+                avatar_url: avatarUrl || null
+            };
+            window.CinqQR.showProfileQRModal(profile);
+        }
+        
         // Load profile on init
         loadProfile();
     </script>
+    
+    <!-- QR Code functionality -->
+    <script src="/js/qr-code.js"></script>
+    
     <!-- View Transitions -->
     <script defer src="/js/view-transitions.min.js"></script>
 </body>
