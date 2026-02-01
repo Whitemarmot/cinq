@@ -694,7 +694,7 @@ const CinqApp = (function() {
           <div class="inline-block max-w-[80%] px-4 py-2 rounded-2xl ${
             isMine ? 'bg-indigo-500/30 rounded-br-sm' : 'bg-white/10 rounded-bl-sm'
           }">
-            <p class="text-sm">${escapeHtml(msg.content)}</p>
+            <p class="text-sm">${window.parseMarkdown ? window.parseMarkdown(escapeHtml(msg.content)) : escapeHtml(msg.content)}</p>
           </div>
           <p class="text-xs text-white/30 mt-1">${formatRelativeTime(msg.created_at)}</p>
         </div>

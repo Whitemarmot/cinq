@@ -51,6 +51,7 @@
     <!-- Theme initialization -->
     <script src="/js/theme.js"></script>
     <script src="/js/shared.js"></script>
+    <script src="/js/markdown.js"></script>
     
     <style>
         .post-page {
@@ -447,7 +448,7 @@
                         </div>
                     </div>
                     
-                    <div class="post-text">${escapeHtml(post.content)}</div>
+                    <div class="post-text">${parseMarkdown(escapeHtml(post.content))}</div>
                     ${imageHtml}
                     
                     <div class="share-section">
