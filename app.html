@@ -7225,6 +7225,28 @@
                             </div>
                         </div>
                     `;
+                } else if (msg.gif_url) {
+                    // GIF message
+                    let receiptHtml = '';
+                    if (isSent) {
+                        const readStatus = msg.read_at ? 'read' : 'delivered';
+                        const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+                        const doubleCheckIcon = `<svg viewBox="0 0 20 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/><path d="M5 5.5L9 9.5L18.5 1"/></svg>`;
+                        receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
+                    }
+                    
+                    html += `
+                        <div class="chat-message gif ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a envoyé un GIF">
+                            <div class="gif-content giphy-content-gif">
+                                <img src="${escapeHtml(msg.gif_url)}" alt="GIF" loading="lazy">
+                                <span class="giphy-badge">GIF</span>
+                            </div>
+                            <div class="chat-message-meta">
+                                <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
+                                ${receiptHtml}
+                            </div>
+                        </div>
+                    `;
                 } else if (msg.voice_url) {
                     // Voice message
                     const duration = msg.voice_duration || 0;

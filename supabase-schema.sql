@@ -201,6 +201,14 @@ BEGIN
     END IF;
 END $$;
 
+-- Add gif_url column if not exists (GIPHY integration)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='gif_url') THEN
+        ALTER TABLE messages ADD COLUMN gif_url TEXT;
+    END IF;
+END $$;
+
 -- ============================================
 -- READ RECEIPTS (accusés de lecture)
 -- ============================================
@@ -336,6 +344,14 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+
+-- Add is_gif column if not exists (GIPHY integration for posts)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='is_gif') THEN
+        ALTER TABLE posts ADD COLUMN is_gif BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
 
 -- ============================================
 -- ANALYTICS EVENTS (server-side)
