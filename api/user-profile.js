@@ -10,7 +10,7 @@
 
 import { supabase, requireAuth, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
-import { validateDisplayName, validateBio, validateURL } from './_validation.js';
+import { validateDisplayName, validateBio, validateURL, validateVacationMessage } from './_validation.js';
 import { logError, logInfo, logWarn, createErrorResponse } from './_error-logger.js';
 
 export default async function handler(req, res) {
@@ -153,7 +153,7 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio } = req.body;
+    const { display_name, avatar_url, bio, vacation_mode, vacation_message } = req.body;
 
     const updates = {};
     
@@ -179,6 +179,20 @@ async function handleUpdateProfile(req, res, user) {
             return res.status(400).json({ error: result.error, field: 'bio' });
         }
         updates.bio = result.bio;
+    }
+    
+    // Vacation mode
+    if (vacation_mode !== undefined) {
+        updates.vacation_mode = Boolean(vacation_mode);
+        logInfo('Vacation mode toggled', { userId: user.id, vacationMode: updates.vacation_mode });
+    }
+    
+    if (vacation_message !== undefined) {
+        const result = validateVacationMessage(vacation_message);
+        if (!result.valid) {
+            return res.status(400).json({ error: result.error, field: 'vacation_message' });
+        }
+        updates.vacation_message = result.message;
     }
 
     if (Object.keys(updates).length === 0) {

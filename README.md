@@ -2,7 +2,8 @@
 
 > **5 proches. Pas de likes. Pas d'algorithme. Juste les gens qui comptent vraiment.**
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-BADGE/deploy-status)](https://app.netlify.com/sites/cinq-network/deploys)
+[![Tests](https://github.com/Whitemarmot/cinq/actions/workflows/test.yml/badge.svg)](https://github.com/Whitemarmot/cinq/actions/workflows/test.yml)
+[![Deploy](https://github.com/Whitemarmot/cinq/actions/workflows/deploy.yml/badge.svg)](https://github.com/Whitemarmot/cinq/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
 

@@ -16,6 +16,12 @@
   to = "/post.html?id=:id"
   status = 200
 
+# Deep link for profile sharing
+[[redirects]]
+  from = "/u/:id"
+  to = "/profile.html?id=:id"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

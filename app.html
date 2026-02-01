@@ -4258,6 +4258,12 @@
         let searchTimeout = null;
         let currentSearchType = 'all';
         let isSearching = false;
+        
+        // ===== SUPABASE REALTIME FOR TYPING INDICATORS =====
+        const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgyMzI4MTUsImV4cCI6MjA1MzgwODgxNX0.hvHZP-qmz4IZKhJLZqGYaTmaZGFMDShGjW9MYKSbklE';
+        let supabaseClient = null;
+        let typingChannel = null;
 
         // ===== TAB SWITCHING =====
         const tabOrder = ['feed', 'contacts', 'profil'];
@@ -4403,6 +4409,9 @@
                 
                 // Setup search
                 initSearch();
+                
+                // Initialize Supabase client for realtime
+                initSupabaseRealtime();
                 
                 // Load data
                 await Promise.all([loadProfile(), loadContacts(), loadPosts()]);
@@ -5198,19 +5207,89 @@
             });
         }
         
-        // Broadcast typing state (can be connected to real-time later)
+        // ===== SUPABASE REALTIME INITIALIZATION =====
+        function initSupabaseRealtime() {
+            if (typeof supabase === 'undefined' || !supabase.createClient) {
+                console.warn('Supabase client not loaded');
+                return;
+            }
+            
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.debug('Supabase Realtime initialized');
+            } catch (e) {
+                console.warn('Failed to initialize Supabase:', e);
+            }
+        }
+        
+        // Subscribe to typing channel for a specific chat
+        function subscribeToTypingChannel(contactId) {
+            if (!supabaseClient || !user) return;
+            
+            // Unsubscribe from previous channel if exists
+            unsubscribeFromTypingChannel();
+            
+            // Create a unique channel name for this conversation (sorted IDs for consistency)
+            const ids = [user.id, contactId].sort();
+            const channelName = `typing:${ids[0]}:${ids[1]}`;
+            
+            typingChannel = supabaseClient.channel(channelName, {
+                config: { broadcast: { self: false } }
+            });
+            
+            typingChannel
+                .on('broadcast', { event: 'typing' }, (payload) => {
+                    // Only show indicator if it's from the contact (not ourselves)
+                    if (payload.payload.userId !== user.id) {
+                        showTypingIndicator(payload.payload.isTyping, payload.payload.userName);
+                    }
+                })
+                .subscribe((status) => {
+                    console.debug('Typing channel status:', status);
+                });
+        }
+        
+        // Unsubscribe from typing channel
+        function unsubscribeFromTypingChannel() {
+            if (typingChannel) {
+                supabaseClient.removeChannel(typingChannel);
+                typingChannel = null;
+            }
+        }
+        
+        // Broadcast typing state via Supabase Realtime
         function broadcastTypingState(typing) {
-            // For now, this is a placeholder for future WebSocket implementation
-            // When implemented, it would send typing state to the server
-            console.debug('Typing state:', typing);
+            if (!typingChannel || !user || !currentChatContact) {
+                console.debug('Typing state (local only):', typing);
+                return;
+            }
+            
+            const userName = user.email?.split('@')[0] || 'Quelqu\'un';
+            
+            typingChannel.send({
+                type: 'broadcast',
+                event: 'typing',
+                payload: {
+                    userId: user.id,
+                    userName: userName,
+                    isTyping: typing,
+                    timestamp: Date.now()
+                }
+            }).catch(e => console.debug('Typing broadcast error:', e));
         }
         
         // Show/hide typing indicator from contact
-        function showTypingIndicator(show = true) {
+        function showTypingIndicator(show = true, userName = null) {
             const indicator = document.getElementById('typing-indicator');
             const container = document.getElementById('chat-messages');
             
+            if (!indicator) return;
+            
             if (show) {
+                // Update indicator to show who's typing
+                if (userName) {
+                    indicator.setAttribute('aria-label', `${userName} est en train d'écrire`);
+                }
                 indicator.classList.add('visible');
                 // Scroll to show typing indicator
                 container.scrollTo({
@@ -5254,6 +5333,9 @@
             // Setup focus trap
             setupFocusTrap(chatPanel);
             
+            // Subscribe to typing channel for this conversation
+            subscribeToTypingChannel(contact.contact_user_id);
+            
             loadMessages();
             messagePollingInterval = setInterval(loadMessages, 3000);
         }
@@ -5265,6 +5347,15 @@
             chatPanel.classList.remove('open');
             chatPanel.setAttribute('aria-hidden', 'true');
             chatOverlay.classList.remove('open');
+            
+            // Broadcast that we stopped typing before closing
+            if (isTyping) {
+                isTyping = false;
+                broadcastTypingState(false);
+            }
+            
+            // Unsubscribe from typing channel
+            unsubscribeFromTypingChannel();
             
             currentChatContact = null;
             if (messagePollingInterval) {

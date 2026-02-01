@@ -127,3 +127,20 @@ export function validateLocation(location) {
     const sanitized = sanitizeText(location, { maxLength: 200, allowNewlines: false });
     return { valid: true, location: sanitized };
 }
+
+/**
+ * Validate vacation message
+ */
+export function validateVacationMessage(message) {
+    if (!message) {
+        return { valid: true, message: 'Je suis en vacances ! Je te réponds dès mon retour 🌴' };
+    }
+    
+    const sanitized = sanitizeText(message, { maxLength: 500, allowNewlines: false });
+    
+    if (sanitized.length < 5) {
+        return { valid: false, error: 'Message trop court (min 5 caractères)' };
+    }
+    
+    return { valid: true, message: sanitized };
+}

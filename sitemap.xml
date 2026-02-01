@@ -56,4 +56,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
+  
+  <!-- Profile page template - Indexed for user discovery -->
+  <url>
+    <loc>https://cinq.app/profile</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

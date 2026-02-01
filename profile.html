@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Profil — Cinq</title>
+    
+    <!-- SEO (updated dynamically) -->
+    <meta name="description" content="Profil sur Cinq — L'anti-réseau social.">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph (updated dynamically) -->
+    <meta property="og:title" content="Profil — Cinq" id="og-title">
+    <meta property="og:description" content="Découvre ce profil sur Cinq." id="og-description">
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="https://cinq.app/profile" id="og-url">
+    <meta property="og:image" content="https://cinq.app/og-image.png" id="og-image">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Profil — Cinq" id="twitter-title">
+    <meta name="twitter:description" content="Découvre ce profil sur Cinq." id="twitter-description">
+    <meta name="twitter:image" content="https://cinq.app/og-image.png" id="twitter-image">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        .profile-page {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-bg-primary);
+        }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .profile-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .back-btn, .cta-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .back-btn {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .cta-btn {
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            color: white;
+            border: none;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .profile-content {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fade-in 0.5s ease;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--color-text-primary);
+        }
+        
+        .profile-bio {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .member-since {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 1rem;
+        }
+        
+        /* Posts Section */
+        .posts-section {
+            margin-top: 2rem;
+        }
+        
+        .posts-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .posts-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .posts-count {
+            background: var(--color-bg-elevated);
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
+        }
+        
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .post-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .post-card:hover {
+            border-color: var(--color-border-active);
+            transform: translateY(-2px);
+        }
+        
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .post-image {
+            margin-top: 1rem;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+        }
+        
+        .empty-posts {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--color-text-muted);
+        }
+        
+        .empty-posts-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Loading & Error States */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .error-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .error-text {
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* CTA Section */
+        .join-cta {
+            margin-top: 2rem;
+            text-align: center;
+            padding: 2rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+        }
+        
+        .join-cta p {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Share Button */
+        .share-profile-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .share-profile-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .share-profile-btn.copied {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <main class="profile-page">
+        <header class="profile-header">
+            <a href="/" class="profile-logo">5</a>
+            <div class="header-actions">
+                <a href="/" class="back-btn">← Accueil</a>
+                <a href="/register.html" class="cta-btn">Rejoindre</a>
+            </div>
+        </header>
+        
+        <div class="profile-content" id="profile-container">
+            <!-- Loading state -->
+            <div class="loading-state" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Chargement du profil...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = '/api';
+        
+        async function loadProfile() {
+            // Get user ID from URL
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get('id');
+            
+            if (!userId) {
+                showError('Profil non trouvé', 'L\'ID utilisateur est manquant.');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/profile?id=${userId}`);
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Profil non trouvé');
+                }
+                
+                // Update meta tags
+                updateMetaTags(data.profile);
+                
+                // Render profile
+                renderProfile(data.profile, data.posts);
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                showError('Profil non trouvé', e.message);
+            }
+        }
+        
+        function updateMetaTags(profile) {
+            const profileUrl = `${window.location.origin}/profile.html?id=${profile.id}`;
+            const title = `${profile.display_name} — Cinq`;
+            const description = profile.bio 
+                ? profile.bio.substring(0, 160) 
+                : `Profil de ${profile.display_name} sur Cinq — L'anti-réseau social.`;
+            
+            document.title = title;
+            
+            // Canonical URL
+            let canonical = document.querySelector('link[rel="canonical"]');
+            if (!canonical) {
+                canonical = document.createElement('link');
+                canonical.rel = 'canonical';
+                document.head.appendChild(canonical);
+            }
+            canonical.href = profileUrl;
+            
+            // OG tags
+            document.getElementById('og-title').content = title;
+            document.getElementById('og-description').content = description;
+            document.getElementById('og-url').content = profileUrl;
+            if (profile.avatar_url) {
+                document.getElementById('og-image').content = profile.avatar_url;
+            }
+            
+            // Twitter tags
+            document.getElementById('twitter-title').content = title;
+            document.getElementById('twitter-description').content = description;
+            if (profile.avatar_url) {
+                document.getElementById('twitter-image').content = profile.avatar_url;
+            }
+            
+            // Meta description
+            document.querySelector('meta[name="description"]').content = description;
+        }
+        
+        function renderProfile(profile, posts) {
+            const container = document.getElementById('profile-container');
+            const initial = (profile.display_name || '?')[0].toUpperCase();
+            
+            // Avatar
+            const avatarContent = profile.avatar_url 
+                ? `<img src="${escapeHtml(profile.avatar_url)}" alt="${escapeHtml(profile.display_name)}">`
+                : initial;
+            
+            // Bio
+            const bioHtml = profile.bio 
+                ? `<p class="profile-bio">${escapeHtml(profile.bio)}</p>` 
+                : '';
+            
+            // Member since
+            const memberSince = new Date(profile.created_at).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long'
+            });
+            
+            // Posts
+            let postsHtml = '';
+            if (posts && posts.length > 0) {
+                postsHtml = `
+                    <section class="posts-section">
+                        <div class="posts-header">
+                            <h2 class="posts-title">Publications</h2>
+                            <span class="posts-count">${posts.length}</span>
+                        </div>
+                        <div class="posts-list">
+                            ${posts.map(post => renderPostCard(post)).join('')}
+                        </div>
+                    </section>
+                `;
+            } else {
+                postsHtml = `
+                    <section class="posts-section">
+                        <div class="posts-header">
+                            <h2 class="posts-title">Publications</h2>
+                            <span class="posts-count">0</span>
+                        </div>
+                        <div class="empty-posts">
+                            <div class="empty-posts-icon">📝</div>
+                            <p>Aucune publication pour l'instant</p>
+                        </div>
+                    </section>
+                `;
+            }
+            
+            container.innerHTML = `
+                <article class="profile-card">
+                    <div class="profile-avatar">${avatarContent}</div>
+                    <h1 class="profile-name">${escapeHtml(profile.display_name)}</h1>
+                    ${bioHtml}
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${profile.stats.contactCount}</div>
+                            <div class="stat-label">Contacts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${profile.stats.postCount}</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                    </div>
+                    
+                    <div class="member-since">Membre depuis ${memberSince}</div>
+                    
+                    <button onclick="shareProfile()" class="share-profile-btn" id="share-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        <span id="share-text">Partager le profil</span>
+                    </button>
+                </article>
+                
+                ${postsHtml}
+                
+                <div class="join-cta">
+                    <p>✨ Envie de créer ton propre cercle ?</p>
+                    <a href="/register.html" class="cta-btn">Rejoindre Cinq</a>
+                </div>
+            `;
+        }
+        
+        function renderPostCard(post) {
+            const time = formatTime(post.created_at);
+            const imageHtml = post.image_url 
+                ? `<div class="post-image"><img src="${escapeHtml(post.image_url)}" alt="Image" loading="lazy"></div>`
+                : '';
+            
+            // Truncate content for preview
+            const content = post.content.length > 280 
+                ? post.content.substring(0, 280) + '...'
+                : post.content;
+            
+            return `
+                <article class="post-card" onclick="viewPost('${post.id}')">
+                    <div class="post-content">${escapeHtml(content)}</div>
+                    ${imageHtml}
+                    <div class="post-meta">
+                        <time>${time}</time>
+                    </div>
+                </article>
+            `;
+        }
+        
+        function viewPost(postId) {
+            window.location.href = `/post.html?id=${postId}`;
+        }
+        
+        function showError(title, message) {
+            const container = document.getElementById('profile-container');
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">😢</div>
+                    <div class="error-title">${escapeHtml(title)}</div>
+                    <div class="error-text">${escapeHtml(message)}</div>
+                    <a href="/" class="cta-btn">Retour à l'accueil</a>
+                </div>
+            `;
+        }
+        
+        async function shareProfile() {
+            const url = window.location.href;
+            
+            // Try native share first
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: document.title,
+                        url: url
+                    });
+                    return;
+                } catch (e) {
+                    // User cancelled or error, fall through to clipboard
+                }
+            }
+            
+            // Fallback to clipboard
+            try {
+                await navigator.clipboard.writeText(url);
+                const btn = document.getElementById('share-btn');
+                const text = document.getElementById('share-text');
+                btn.classList.add('copied');
+                text.textContent = 'Lien copié !';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    text.textContent = 'Partager le profil';
+                }, 2000);
+            } catch (e) {
+                console.error('Failed to copy:', e);
+            }
+        }
+        
+        // Load profile on init
+        loadProfile();
+    </script>
+</body>
+</html>

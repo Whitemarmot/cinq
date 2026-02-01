@@ -1102,6 +1102,58 @@
                 </div>
             </section>
 
+            <!-- Section: Mode Vacances -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Mode Vacances
+                </h2>
+                
+                <div class="settings-card">
+                    <!-- Toggle vacation mode -->
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span id="vacation-status-icon">🏠</span>
+                                <span id="vacation-status-text">Mode vacances</span>
+                            </p>
+                            <p id="vacation-status-desc" class="settings-item-subtitle">Répond automatiquement à tes contacts</p>
+                        </div>
+                        <button id="btn-vacation-toggle" class="toggle-switch" data-pref="vacation" onclick="toggleVacationMode(this)" aria-label="Activer le mode vacances"></button>
+                    </div>
+                    
+                    <!-- Vacation message customization -->
+                    <div id="vacation-message-container" class="settings-form" style="border-top: 1px solid var(--color-border); display: none;">
+                        <div class="form-group">
+                            <label for="vacation-message" class="form-label">Message automatique</label>
+                            <div class="form-row" style="flex-direction: column; gap: var(--space-2);">
+                                <textarea id="vacation-message" class="form-input" placeholder="Je suis en vacances ! Je te réponds dès mon retour 🌴" maxlength="500" rows="3" style="resize: vertical;"></textarea>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="settings-item-subtitle"><span id="vacation-char-count">0</span>/500</span>
+                                    <button id="btn-save-vacation-message" class="form-btn form-btn-primary">Enregistrer</button>
+                                </div>
+                            </div>
+                            <p id="vacation-message-result" class="form-message hidden"></p>
+                        </div>
+                        <p class="settings-item-subtitle" style="margin-top: var(--space-2);">
+                            💡 Ce message sera envoyé automatiquement quand quelqu'un t'écrit (max 1 fois par heure par contact).
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Info box when vacation mode is active -->
+                <div id="vacation-active-info" class="push-card hidden" style="margin-top: var(--space-3); background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3);">
+                    <div class="push-card-content">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title" style="color: var(--color-success);">
+                                🌴 Mode vacances activé
+                            </p>
+                            <p class="settings-item-subtitle">Les notifications sont désactivées et tes contacts reçoivent un message automatique.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Section: Sécurité -->
             <section class="settings-section">
                 <h2 class="section-header">
@@ -1928,6 +1980,107 @@
         $('btn-export-data').addEventListener('click', exportUserData);
         
         // ============================================
+        // Vacation Mode
+        // ============================================
+        let vacationModeEnabled = false;
+        
+        function updateVacationUI(isEnabled, message = '') {
+            vacationModeEnabled = isEnabled;
+            const toggle = $('btn-vacation-toggle');
+            const icon = $('vacation-status-icon');
+            const text = $('vacation-status-text');
+            const desc = $('vacation-status-desc');
+            const messageContainer = $('vacation-message-container');
+            const activeInfo = $('vacation-active-info');
+            const messageInput = $('vacation-message');
+            
+            if (isEnabled) {
+                toggle.classList.add('active');
+                icon.textContent = '🌴';
+                text.textContent = 'Mode vacances actif';
+                desc.textContent = 'Tes contacts reçoivent un message automatique';
+                messageContainer.style.display = 'block';
+                activeInfo.classList.remove('hidden');
+            } else {
+                toggle.classList.remove('active');
+                icon.textContent = '🏠';
+                text.textContent = 'Mode vacances';
+                desc.textContent = 'Répond automatiquement à tes contacts';
+                messageContainer.style.display = 'none';
+                activeInfo.classList.add('hidden');
+            }
+            
+            if (message) {
+                messageInput.value = message;
+                updateVacationCharCount();
+            }
+        }
+        
+        function updateVacationCharCount() {
+            const messageInput = $('vacation-message');
+            const charCount = $('vacation-char-count');
+            charCount.textContent = messageInput.value.length;
+        }
+        
+        $('vacation-message').addEventListener('input', updateVacationCharCount);
+        
+        async function toggleVacationMode(button) {
+            const willBeActive = !button.classList.contains('active');
+            
+            button.disabled = true;
+            
+            try {
+                await UserProfile.updateProfile({ vacation_mode: willBeActive });
+                updateVacationUI(willBeActive);
+                
+                if (willBeActive) {
+                    showToast('Mode vacances activé 🌴');
+                    // Announce to screen readers
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Mode vacances activé. Les notifications sont désactivées.';
+                } else {
+                    showToast('Mode vacances désactivé');
+                    const announce = $('settings-status');
+                    if (announce) announce.textContent = 'Mode vacances désactivé. Les notifications sont réactivées.';
+                }
+            } catch (err) {
+                console.error('Toggle vacation mode error:', err);
+                showToast('Erreur', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        async function saveVacationMessage() {
+            const messageInput = $('vacation-message');
+            const message = messageInput.value.trim();
+            const btn = $('btn-save-vacation-message');
+            
+            if (message.length < 5) {
+                showMessage('vacation-message-result', 'Message trop court (min 5 caractères)', true);
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            try {
+                await UserProfile.updateProfile({ vacation_message: message });
+                showMessage('vacation-message-result', 'Message enregistré ✓', false);
+                setTimeout(() => hideMessage('vacation-message-result'), 3000);
+                showToast('Message de vacances mis à jour ✓');
+            } catch (err) {
+                console.error('Save vacation message error:', err);
+                showMessage('vacation-message-result', err.message || 'Erreur', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enregistrer';
+            }
+        }
+        
+        $('btn-save-vacation-message').addEventListener('click', saveVacationMessage);
+        
+        // ============================================
         // Initialize
         // ============================================
         async function init() {
@@ -1946,6 +2099,12 @@
                 try {
                     const profile = await UserProfile.loadProfile();
                     $('display-name').value = profile.display_name || UserProfile.getEmailPrefix(user.email);
+                    
+                    // Load vacation mode state
+                    updateVacationUI(
+                        profile.vacation_mode || false, 
+                        profile.vacation_message || 'Je suis en vacances ! Je te réponds dès mon retour 🌴'
+                    );
                 } catch (e) {
                     $('display-name').value = UserProfile.getEmailPrefix(user.email);
                 }

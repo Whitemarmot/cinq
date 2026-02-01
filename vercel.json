@@ -5,6 +5,10 @@
     {
       "source": "/p/:id",
       "destination": "/post.html?id=:id"
+    },
+    {
+      "source": "/u/:id",
+      "destination": "/profile.html?id=:id"
     }
   ],
   "headers": [

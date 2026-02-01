@@ -122,3 +122,65 @@ Le sprint de nuit a été un **succès exceptionnel**:
 | dev-a11y | WCAG AAA compliance |
 | dev-mobile-v2 | Navigation + animations React Native |
 | dev-search | Fonctionnalité recherche |
+
+### Wave 6 - Completed ✅
+| Agent | Status | Résultat |
+|-------|--------|----------|
+| dev-seo | ✅ | JSON-LD, Open Graph, sitemap |
+| dev-e2e-tests | ✅ | 59 tests Playwright |
+| dev-i18n | ✅ | FR/EN 153 clés |
+| dev-performance | ✅ | Lighthouse optimizations |
+| dev-api-docs | ✅ | OpenAPI + Swagger UI |
+| dev-a11y | ✅ | WCAG AAA compliant |
+| dev-mobile-v2 | ✅ | Navigation + animations |
+| dev-search | ✅ | Recherche temps réel |
+
+### Wave 7 - Launched 01:35 UTC
+| Agent | Tâche |
+|-------|-------|
+| dev-analytics | Tracking léger custom |
+| dev-security-headers | CSP, headers sécurité |
+| dev-email-templates | Templates email HTML |
+| dev-admin | Mini dashboard admin |
+| dev-social-sharing | Partage social + deep links |
+| dev-cicd | GitHub Actions CI/CD |
+
+### Wave 7 - Completed ✅
+| Agent | Status | Résultat |
+|-------|--------|----------|
+| dev-security-headers | ✅ | Doc SECURITY-HEADERS.md |
+| dev-cicd | ✅ | GitHub Actions (local, needs push) |
+| dev-email-templates | ✅ | 4 templates responsive |
+| dev-analytics | ✅ | Tracking custom + API |
+| dev-admin | ✅ | Dashboard complet |
+| dev-social-sharing | ✅ | Partage + OG-image + deep links |
+
+### Wave 8 - Launched 01:40 UTC
+| Agent | Tâche |
+|-------|-------|
+| dev-unit-tests | Tests Vitest pour API |
+| dev-pwa-v2 | Install prompt + offline sync |
+| dev-data-export | Export GDPR ZIP |
+| dev-account-deletion | Suppression compte |
+| dev-db-docs | Schéma DB + ERD Mermaid |
+| dev-suggestions | Suggestions amis d'amis |
+
+### Wave 8 - Completed ✅
+| Agent | Status | Résultat |
+|-------|--------|----------|
+| dev-unit-tests | ✅ | Tests Vitest API |
+| dev-pwa-v2 | ✅ | Install prompt + offline sync |
+| dev-data-export | ✅ | Export GDPR ZIP |
+| dev-account-deletion | ✅ | Suppression 7j grace |
+| dev-db-docs | ✅ | DATABASE.md + ERD |
+| dev-suggestions | ✅ | Amis d'amis |
+
+### Wave 9 - Launched 01:52 UTC
+| Agent | Tâche |
+|-------|-------|
+| dev-typing-indicators | "X est en train d'écrire..." |
+| dev-read-receipts | Double check messages |
+| dev-keyboard-shortcuts | Raccourcis clavier |
+| dev-public-profiles | Page profil public |
+| dev-reactions | Réactions emoji posts |
+| dev-vacation-mode | Mode vacances |
