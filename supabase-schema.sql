@@ -133,7 +133,13 @@ CREATE TABLE IF NOT EXISTS contacts (
 
 CREATE INDEX IF NOT EXISTS idx_contacts_user ON contacts(user_id);
 
--- Enforce max 5 contacts
+-- Add is_favorite and archived columns (migrations for existing DBs)
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN DEFAULT FALSE;
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_contacts_archived ON contacts(user_id, archived);
+
+-- Enforce max 5 contacts (only non-archived)
 CREATE OR REPLACE FUNCTION check_contact_limit()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -672,6 +678,37 @@ CREATE POLICY "Users can view own pinned messages" ON pinned_messages FOR SELECT
 CREATE POLICY "Users can pin messages" ON pinned_messages FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can unpin messages" ON pinned_messages FOR DELETE 
+    USING (auth.uid() = user_id);
+
+-- ============================================
+-- REMINDERS
+-- ============================================
+CREATE TABLE IF NOT EXISTS reminders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message_id UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    contact_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    remind_at TIMESTAMPTZ NOT NULL,
+    note TEXT,
+    triggered BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reminders_user ON reminders(user_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_message ON reminders(message_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_remind_at ON reminders(remind_at ASC) WHERE triggered = FALSE;
+CREATE INDEX IF NOT EXISTS idx_reminders_due ON reminders(remind_at) WHERE triggered = FALSE;
+
+ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
+
+-- Users can view and manage their own reminders
+CREATE POLICY "Users can view own reminders" ON reminders FOR SELECT 
+    USING (auth.uid() = user_id);
+CREATE POLICY "Users can create reminders" ON reminders FOR INSERT 
+    WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own reminders" ON reminders FOR UPDATE
+    USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete reminders" ON reminders FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- ============================================

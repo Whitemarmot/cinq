@@ -2041,6 +2041,180 @@
             }
         }
         
+        /* ===== ARCHIVED SECTION ===== */
+        .archived-section {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .archived-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+            cursor: pointer;
+            padding: var(--space-2);
+            border-radius: var(--radius-lg);
+            transition: background 0.2s;
+        }
+        
+        .archived-header:hover {
+            background: var(--color-bg-hover);
+        }
+        
+        .archived-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .archived-title svg {
+            color: var(--color-text-muted);
+        }
+        
+        .archived-count {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            background: var(--color-bg-tertiary);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+        
+        .archived-toggle-icon {
+            color: var(--color-text-muted);
+            transition: transform 0.3s ease;
+        }
+        
+        .archived-header.expanded .archived-toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .archived-list {
+            display: none;
+        }
+        
+        .archived-list.visible {
+            display: block;
+            animation: slide-up-fade 0.3s ease-out;
+        }
+        
+        .archived-empty {
+            text-align: center;
+            padding: var(--space-4);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+        
+        .archived-contact-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-2);
+            transition: all 0.2s ease;
+        }
+        
+        .archived-contact-card:hover {
+            border-color: var(--color-border-active);
+            background: var(--color-bg-elevated);
+        }
+        
+        .archived-contact-avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            background: var(--color-bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            overflow: hidden;
+            opacity: 0.7;
+        }
+        
+        .archived-contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(50%);
+        }
+        
+        .archived-contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .archived-contact-name {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .archived-contact-hint {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+        
+        .unarchive-btn {
+            padding: var(--space-2) var(--space-3);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            font-size: var(--text-xs);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .unarchive-btn:hover {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        /* Chat archive button */
+        .chat-archive-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-archive-btn:hover {
+            background: var(--color-warning-muted, rgba(251, 191, 36, 0.1));
+            border-color: var(--color-warning, #fbbf24);
+            color: var(--color-warning, #fbbf24);
+        }
+        
+        .chat-archive-btn.archived {
+            background: var(--color-warning-muted, rgba(251, 191, 36, 0.1));
+            border-color: var(--color-warning, #fbbf24);
+            color: var(--color-warning, #fbbf24);
+        }
+        
         /* ===== SUGGESTIONS SECTION ===== */
         .suggestions-section {
             margin-top: var(--space-6);
@@ -5845,6 +6019,25 @@
                     </div>
                 </button>
                 
+                <!-- Archived Contacts Section -->
+                <section class="archived-section" id="archived-section" style="display: none;" aria-labelledby="archived-title">
+                    <div class="archived-header" id="archived-header" onclick="toggleArchivedSection()" role="button" aria-expanded="false" tabindex="0">
+                        <h3 class="archived-title" id="archived-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
+                            </svg>
+                            Archivés
+                            <span class="archived-count" id="archived-count">0</span>
+                        </h3>
+                        <svg class="archived-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                    <div class="archived-list" id="archived-list" role="list" aria-label="Contacts archivés">
+                        <!-- Archived contacts will be rendered here -->
+                    </div>
+                </section>
+                
                 <!-- Suggestions Section -->
                 <section class="suggestions-section" id="suggestions-section" aria-labelledby="suggestions-title">
                     <div class="suggestions-header">
@@ -6007,6 +6200,11 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <button class="chat-archive-btn" id="chat-archive-btn" onclick="toggleArchiveContact()" type="button" aria-label="Archiver cette conversation" title="Archiver">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>
+                    </svg>
+                </button>
                 <button class="chat-header-pin-btn" id="chat-pin-btn" onclick="togglePinnedMessagesSection()" type="button" aria-label="Messages épinglés" aria-expanded="false">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
@@ -6237,6 +6435,41 @@
         </div>
     </div>
 
+    <!-- Reminder Modal -->
+    <div class="modal-overlay" id="reminder-modal" role="dialog" aria-modal="true" aria-labelledby="reminder-modal-title" aria-hidden="true">
+        <div class="modal reminder-modal">
+            <h2 class="modal-title" id="reminder-modal-title">
+                <span aria-hidden="true">⏰</span>
+                Programmer un rappel
+            </h2>
+            <div class="reminder-message-preview" id="reminder-message-preview">
+                <!-- Message preview will be inserted here -->
+            </div>
+            <div class="reminder-quick-options">
+                <button class="reminder-quick-btn" data-minutes="30" onclick="selectReminderQuick(30)" type="button">30 min</button>
+                <button class="reminder-quick-btn" data-minutes="60" onclick="selectReminderQuick(60)" type="button">1 heure</button>
+                <button class="reminder-quick-btn" data-minutes="180" onclick="selectReminderQuick(180)" type="button">3 heures</button>
+                <button class="reminder-quick-btn" data-minutes="1440" onclick="selectReminderQuick(1440)" type="button">Demain</button>
+                <button class="reminder-quick-btn" data-minutes="10080" onclick="selectReminderQuick(10080)" type="button">1 semaine</button>
+                <button class="reminder-quick-btn" data-value="custom" onclick="toggleCustomReminder()" type="button">Autre...</button>
+            </div>
+            <div class="reminder-custom-time" id="reminder-custom-time" style="display:none;">
+                <label for="reminder-datetime">Date et heure</label>
+                <input type="datetime-local" id="reminder-datetime" class="reminder-datetime-input">
+            </div>
+            <label for="reminder-note" style="display:block;font-size:var(--text-sm);font-weight:500;color:var(--color-text-muted);margin-bottom:var(--space-2);">Note (optionnel)</label>
+            <textarea id="reminder-note" class="reminder-note-input" placeholder="Ajouter une note..." maxlength="200"></textarea>
+            <div class="reminder-actions">
+                <button class="reminder-cancel-btn" onclick="closeReminderModal()" type="button">Annuler</button>
+                <button class="reminder-save-btn" id="reminder-save-btn" onclick="saveReminder()" type="button" disabled>
+                    <span aria-hidden="true">⏰</span> Créer le rappel
+                </button>
+            </div>
+            <input type="hidden" id="reminder-message-id">
+            <input type="hidden" id="reminder-selected-time">
+        </div>
+    </div>
+
     <!-- GIPHY Integration -->
     <script src="/js/giphy.js"></script>
 
@@ -6245,6 +6478,7 @@
         let session = null;
         let user = null;
         let contacts = [];
+        let archivedContacts = [];
         let posts = [];
         let currentChatContact = null;
         let messagePollingInterval = null;
@@ -7323,8 +7557,172 @@
                 
                 renderContacts();
                 loadSuggestions();
+                loadArchivedContacts();
             } catch (e) {
                 showToast({ type: 'error', title: 'Oups', message: 'Impossible de charger tes contacts. Réseau ?' });
+            }
+        }
+        
+        // ===== ARCHIVED CONTACTS =====
+        async function loadArchivedContacts() {
+            try {
+                const res = await fetch(`${API_URL}/contacts?archived=true`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (res.status === 401) return;
+                
+                archivedContacts = data.contacts || [];
+                renderArchivedContacts();
+            } catch (e) {
+                console.error('Error loading archived contacts:', e);
+            }
+        }
+        
+        function renderArchivedContacts() {
+            const section = document.getElementById('archived-section');
+            const list = document.getElementById('archived-list');
+            const countEl = document.getElementById('archived-count');
+            
+            // Show/hide section based on archived count
+            if (archivedContacts.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            countEl.textContent = archivedContacts.length;
+            
+            list.innerHTML = '';
+            
+            archivedContacts.forEach(contact => {
+                const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+                const initial = name.charAt(0).toUpperCase();
+                const avatarUrl = contact.contact?.avatar_url;
+                
+                const card = document.createElement('div');
+                card.className = 'archived-contact-card';
+                card.setAttribute('role', 'listitem');
+                
+                // Avatar
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'archived-contact-avatar';
+                if (avatarUrl) {
+                    const img = document.createElement('img');
+                    img.src = avatarUrl;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent = initial;
+                }
+                
+                // Info
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'archived-contact-info';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'archived-contact-name';
+                nameDiv.textContent = name;
+                
+                const hintDiv = document.createElement('div');
+                hintDiv.className = 'archived-contact-hint';
+                hintDiv.textContent = 'Conversation archivée';
+                
+                infoDiv.appendChild(nameDiv);
+                infoDiv.appendChild(hintDiv);
+                
+                // Unarchive button
+                const unarchiveBtn = document.createElement('button');
+                unarchiveBtn.className = 'unarchive-btn';
+                unarchiveBtn.type = 'button';
+                unarchiveBtn.setAttribute('aria-label', `Désarchiver ${name}`);
+                unarchiveBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>
+                    </svg>
+                    Restaurer
+                `;
+                unarchiveBtn.onclick = () => unarchiveContact(contact.id, name);
+                
+                card.appendChild(avatarDiv);
+                card.appendChild(infoDiv);
+                card.appendChild(unarchiveBtn);
+                
+                list.appendChild(card);
+            });
+        }
+        
+        function toggleArchivedSection() {
+            const header = document.getElementById('archived-header');
+            const list = document.getElementById('archived-list');
+            
+            const isExpanded = header.classList.toggle('expanded');
+            list.classList.toggle('visible', isExpanded);
+            header.setAttribute('aria-expanded', isExpanded);
+        }
+        
+        async function toggleArchiveContact() {
+            if (!currentChatContact) return;
+            
+            const contactId = currentChatContact.id;
+            const isCurrentlyArchived = currentChatContact.archived || false;
+            const name = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}&action=archive`, {
+                    method: 'PATCH',
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Update UI
+                const archiveBtn = document.getElementById('chat-archive-btn');
+                if (data.archived) {
+                    archiveBtn.classList.add('archived');
+                    archiveBtn.setAttribute('aria-label', 'Désarchiver cette conversation');
+                    archiveBtn.setAttribute('title', 'Désarchiver');
+                    showToast({ type: 'success', message: `${name} archivé` });
+                    closeChat();
+                } else {
+                    archiveBtn.classList.remove('archived');
+                    archiveBtn.setAttribute('aria-label', 'Archiver cette conversation');
+                    archiveBtn.setAttribute('title', 'Archiver');
+                    showToast({ type: 'success', message: `${name} restauré` });
+                }
+                
+                // Refresh contacts lists
+                loadContacts();
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        async function unarchiveContact(contactId, name) {
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}&action=archive`, {
+                    method: 'PATCH',
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                showToast({ type: 'success', message: `${name} restauré !` });
+                
+                // Refresh contacts lists
+                loadContacts();
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
             }
         }
 
@@ -7937,11 +8335,19 @@
             
             loadMessages();
             loadPinnedMessages();
+            loadReminders();
             messagePollingInterval = setInterval(loadMessages, 3000);
             
             // Reset pinned messages section state
             document.getElementById('pinned-messages-section').classList.remove('open');
             document.getElementById('chat-pin-btn').setAttribute('aria-expanded', 'false');
+            
+            // Update archive button state
+            const archiveBtn = document.getElementById('chat-archive-btn');
+            const isArchived = contact.archived || false;
+            archiveBtn.classList.toggle('archived', isArchived);
+            archiveBtn.setAttribute('aria-label', isArchived ? 'Désarchiver cette conversation' : 'Archiver cette conversation');
+            archiveBtn.setAttribute('title', isArchived ? 'Désarchiver' : 'Archiver');
             
             // Show quick replies when chat opens
             showQuickReplies();
@@ -7994,6 +8400,10 @@
             pinnedMessages = [];
             pinnedMessageIds = new Set();
             document.getElementById('pinned-messages-section').classList.remove('open');
+            
+            // Reset reminders
+            reminders = [];
+            reminderMessageIds = new Set();
             
             // Hide quick replies
             hideQuickReplies();
@@ -8579,6 +8989,7 @@
         
         function getPinButtonHtml(messageId) {
             const isPinned = pinnedMessageIds.has(messageId);
+            const hasReminder = reminderMessageIds.has(messageId);
             return `
                 <button class="message-action-btn ${isPinned ? 'pinned' : ''}" 
                         onclick="togglePinMessage('${messageId}')" 
@@ -8589,7 +9000,366 @@
                         <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
                     </svg>
                 </button>
+                <button class="message-action-btn ${hasReminder ? 'has-reminder' : ''}" 
+                        onclick="openReminderModal('${messageId}')" 
+                        data-reminder-msg-id="${messageId}"
+                        type="button" 
+                        aria-label="${hasReminder ? 'Modifier le rappel' : 'Programmer un rappel'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </button>
             `;
+        }
+
+        // ===== REMINDERS =====
+        let reminders = [];
+        let reminderMessageIds = new Set();
+        let currentReminderMessageId = null;
+        let currentReminderMessageContent = null;
+        let selectedReminderTime = null;
+        
+        async function loadReminders() {
+            if (!currentChatContact) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/reminders?contact_id=${currentChatContact.contact_user_id}`, { 
+                    headers: authHeaders() 
+                });
+                
+                if (!res.ok) {
+                    reminders = [];
+                    reminderMessageIds = new Set();
+                    return;
+                }
+                
+                const data = await res.json();
+                reminders = data.reminders || [];
+                reminderMessageIds = new Set(reminders.map(r => r.message_id));
+                
+                // Update UI to show reminder badges
+                updateReminderBadges();
+            } catch (e) {
+                console.error('Failed to load reminders:', e);
+                reminders = [];
+                reminderMessageIds = new Set();
+            }
+        }
+        
+        function updateReminderBadges() {
+            // Update reminder buttons on messages
+            document.querySelectorAll('[data-reminder-msg-id]').forEach(btn => {
+                const msgId = btn.dataset.reminderMsgId;
+                if (reminderMessageIds.has(msgId)) {
+                    btn.classList.add('has-reminder');
+                    btn.setAttribute('aria-label', 'Modifier le rappel');
+                } else {
+                    btn.classList.remove('has-reminder');
+                    btn.setAttribute('aria-label', 'Programmer un rappel');
+                }
+            });
+            
+            // Add reminder badges to messages
+            reminders.forEach(reminder => {
+                const msgEl = document.getElementById(`msg-${reminder.message_id}`);
+                if (msgEl && !msgEl.querySelector('.reminder-badge')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'reminder-badge';
+                    badge.innerHTML = '⏰';
+                    badge.title = formatReminderTime(reminder.remind_at);
+                    msgEl.appendChild(badge);
+                }
+            });
+        }
+        
+        function formatReminderTime(isoDate) {
+            const date = new Date(isoDate);
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const isToday = date.toDateString() === now.toDateString();
+            const isTomorrow = date.toDateString() === tomorrow.toDateString();
+            
+            const timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            
+            if (isToday) return `Aujourd'hui à ${timeStr}`;
+            if (isTomorrow) return `Demain à ${timeStr}`;
+            
+            return date.toLocaleDateString('fr-FR', { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function openReminderModal(messageId) {
+            // Find the message content
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            let messageContent = '';
+            
+            if (msgEl) {
+                const contentEl = msgEl.querySelector('.chat-message-content');
+                if (contentEl) {
+                    messageContent = contentEl.textContent.substring(0, 100);
+                } else if (msgEl.classList.contains('ping')) {
+                    messageContent = '👋 Coucou';
+                } else if (msgEl.classList.contains('sticker')) {
+                    messageContent = '🎨 Sticker';
+                } else if (msgEl.classList.contains('gif')) {
+                    messageContent = '🖼️ GIF';
+                }
+            }
+            
+            currentReminderMessageId = messageId;
+            currentReminderMessageContent = messageContent;
+            selectedReminderTime = null;
+            
+            // Check if there's already a reminder for this message
+            const existingReminder = reminders.find(r => r.message_id === messageId);
+            if (existingReminder) {
+                // Show existing reminder with option to delete
+                showExistingReminderModal(existingReminder);
+                return;
+            }
+            
+            // Setup modal
+            document.getElementById('reminder-message-preview').textContent = messageContent || 'Message';
+            document.getElementById('reminder-message-id').value = messageId;
+            document.getElementById('reminder-note').value = '';
+            document.getElementById('reminder-datetime').value = '';
+            document.getElementById('reminder-custom-time').style.display = 'none';
+            document.getElementById('reminder-save-btn').disabled = true;
+            
+            // Reset quick option selection
+            document.querySelectorAll('.reminder-quick-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Set minimum datetime to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 5);
+            document.getElementById('reminder-datetime').min = now.toISOString().slice(0, 16);
+            
+            // Open modal
+            const modal = document.getElementById('reminder-modal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            triggerHaptic?.('tap');
+        }
+        
+        function showExistingReminderModal(reminder) {
+            const modal = document.getElementById('reminder-modal');
+            const title = document.getElementById('reminder-modal-title');
+            const preview = document.getElementById('reminder-message-preview');
+            
+            preview.innerHTML = `
+                <div style="margin-bottom: var(--space-2);">
+                    <strong>Rappel programmé</strong>
+                </div>
+                <div>📅 ${formatReminderTime(reminder.remind_at)}</div>
+                ${reminder.note ? `<div style="margin-top: var(--space-2); font-style: italic;">📝 ${escapeHtml(reminder.note)}</div>` : ''}
+            `;
+            
+            // Hide quick options and show delete button
+            document.querySelector('.reminder-quick-options').style.display = 'none';
+            document.getElementById('reminder-custom-time').style.display = 'none';
+            document.querySelector('label[for="reminder-note"]').style.display = 'none';
+            document.getElementById('reminder-note').style.display = 'none';
+            
+            const actionsDiv = document.querySelector('.reminder-actions');
+            actionsDiv.innerHTML = `
+                <button class="reminder-cancel-btn" onclick="closeReminderModal()" type="button">Fermer</button>
+                <button class="reminder-save-btn" onclick="deleteReminder('${reminder.id}')" type="button" style="background: var(--color-error);">
+                    🗑️ Supprimer le rappel
+                </button>
+            `;
+            
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+        
+        function closeReminderModal() {
+            const modal = document.getElementById('reminder-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            currentReminderMessageId = null;
+            currentReminderMessageContent = null;
+            selectedReminderTime = null;
+            
+            // Reset modal state for next use
+            document.querySelector('.reminder-quick-options').style.display = 'grid';
+            document.querySelector('label[for="reminder-note"]').style.display = 'block';
+            document.getElementById('reminder-note').style.display = 'block';
+            
+            const actionsDiv = document.querySelector('.reminder-actions');
+            actionsDiv.innerHTML = `
+                <button class="reminder-cancel-btn" onclick="closeReminderModal()" type="button">Annuler</button>
+                <button class="reminder-save-btn" id="reminder-save-btn" onclick="saveReminder()" type="button" disabled>
+                    <span aria-hidden="true">⏰</span> Créer le rappel
+                </button>
+            `;
+        }
+        
+        function selectReminderQuick(minutes) {
+            selectedReminderTime = new Date();
+            selectedReminderTime.setMinutes(selectedReminderTime.getMinutes() + minutes);
+            
+            // Update UI
+            document.querySelectorAll('.reminder-quick-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.minutes === String(minutes));
+            });
+            
+            // Hide custom time input
+            document.getElementById('reminder-custom-time').style.display = 'none';
+            
+            // Enable save button
+            document.getElementById('reminder-save-btn').disabled = false;
+            
+            triggerHaptic?.('tap');
+        }
+        
+        function toggleCustomReminder() {
+            const customTime = document.getElementById('reminder-custom-time');
+            const isVisible = customTime.style.display !== 'none';
+            
+            // Toggle visibility
+            customTime.style.display = isVisible ? 'none' : 'block';
+            
+            // Deselect other options
+            document.querySelectorAll('.reminder-quick-btn').forEach(btn => {
+                if (btn.dataset.value !== 'custom') {
+                    btn.classList.remove('selected');
+                } else {
+                    btn.classList.toggle('selected', !isVisible);
+                }
+            });
+            
+            if (!isVisible) {
+                // Focus the datetime input
+                document.getElementById('reminder-datetime').focus();
+                selectedReminderTime = null;
+                document.getElementById('reminder-save-btn').disabled = true;
+            }
+            
+            triggerHaptic?.('tap');
+        }
+        
+        // Listen for datetime input changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const datetimeInput = document.getElementById('reminder-datetime');
+            if (datetimeInput) {
+                datetimeInput.addEventListener('change', (e) => {
+                    const value = e.target.value;
+                    if (value) {
+                        selectedReminderTime = new Date(value);
+                        document.getElementById('reminder-save-btn').disabled = false;
+                    } else {
+                        selectedReminderTime = null;
+                        document.getElementById('reminder-save-btn').disabled = true;
+                    }
+                });
+            }
+        });
+        
+        async function saveReminder() {
+            if (!currentReminderMessageId || !selectedReminderTime || !currentChatContact) {
+                showToast({ type: 'error', message: 'Sélectionne une heure pour le rappel' });
+                return;
+            }
+            
+            const note = document.getElementById('reminder-note').value.trim();
+            const saveBtn = document.getElementById('reminder-save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Création...';
+            
+            try {
+                const res = await fetch(`${API_URL}/reminders`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        message_id: currentReminderMessageId,
+                        contact_id: currentChatContact.contact_user_id,
+                        remind_at: selectedReminderTime.toISOString(),
+                        note: note || null
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de la création du rappel');
+                }
+                
+                // Update local state
+                reminders.push(data.reminder);
+                reminderMessageIds.add(currentReminderMessageId);
+                
+                // Update UI
+                updateReminderBadges();
+                
+                closeReminderModal();
+                
+                showToast({ 
+                    type: 'success', 
+                    title: '⏰ Rappel créé !',
+                    message: formatReminderTime(selectedReminderTime.toISOString())
+                });
+                triggerHaptic?.('success');
+                
+            } catch (e) {
+                console.error('Failed to create reminder:', e);
+                showToast({ type: 'error', message: e.message || 'Erreur lors de la création du rappel' });
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span aria-hidden="true">⏰</span> Créer le rappel';
+            }
+        }
+        
+        async function deleteReminder(reminderId) {
+            try {
+                const res = await fetch(`${API_URL}/reminders?id=${reminderId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                
+                if (!res.ok) {
+                    throw new Error('Erreur lors de la suppression');
+                }
+                
+                // Update local state
+                const reminder = reminders.find(r => r.id === reminderId);
+                if (reminder) {
+                    reminderMessageIds.delete(reminder.message_id);
+                    reminders = reminders.filter(r => r.id !== reminderId);
+                    
+                    // Remove badge from message
+                    const msgEl = document.getElementById(`msg-${reminder.message_id}`);
+                    if (msgEl) {
+                        const badge = msgEl.querySelector('.reminder-badge');
+                        if (badge) badge.remove();
+                    }
+                    
+                    // Update button
+                    const btn = document.querySelector(`[data-reminder-msg-id="${reminder.message_id}"]`);
+                    if (btn) {
+                        btn.classList.remove('has-reminder');
+                        btn.setAttribute('aria-label', 'Programmer un rappel');
+                    }
+                }
+                
+                closeReminderModal();
+                
+                showToast({ type: 'success', message: 'Rappel supprimé' });
+                triggerHaptic?.('tap');
+                
+            } catch (e) {
+                console.error('Failed to delete reminder:', e);
+                showToast({ type: 'error', message: 'Erreur lors de la suppression' });
+            }
         }
 
         // ===== VOICE MESSAGES =====
