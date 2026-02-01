@@ -2500,10 +2500,10 @@
                         <div class="form-group">
                             <label for="vacation-message" class="form-label">Message automatique</label>
                             <div class="form-row" style="flex-direction: column; gap: var(--space-2);">
-                                <textarea id="vacation-message" class="form-input" placeholder="Je suis en vacances ! Je te réponds dès mon retour 🌴" maxlength="500" rows="3" style="resize: vertical;"></textarea>
+                                <textarea id="vacation-message" class="form-input input-enhanced" placeholder="Je suis en vacances ! Je te réponds dès mon retour 🌴" maxlength="500" rows="3" style="resize: vertical;"></textarea>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span class="settings-item-subtitle"><span id="vacation-char-count">0</span>/500</span>
-                                    <button id="btn-save-vacation-message" class="form-btn form-btn-primary">Enregistrer</button>
+                                    <button id="btn-save-vacation-message" class="form-btn form-btn-primary btn-enhanced">Enregistrer</button>
                                 </div>
                             </div>
                             <p id="vacation-message-result" class="form-message hidden"></p>
@@ -2554,16 +2554,16 @@
                             <div class="form-row" style="gap: var(--space-3); align-items: center;">
                                 <div style="flex: 1;">
                                     <label for="focus-start" class="form-label" style="font-size: var(--text-xs);">Début</label>
-                                    <input type="time" id="focus-start" class="form-input" value="09:00">
+                                    <input type="time" id="focus-start" class="form-input input-enhanced" value="09:00">
                                 </div>
                                 <span style="color: var(--color-text-muted); padding-top: var(--space-4);">→</span>
                                 <div style="flex: 1;">
                                     <label for="focus-end" class="form-label" style="font-size: var(--text-xs);">Fin</label>
-                                    <input type="time" id="focus-end" class="form-input" value="18:00">
+                                    <input type="time" id="focus-end" class="form-input input-enhanced" value="18:00">
                                 </div>
                             </div>
                             <div style="margin-top: var(--space-3); text-align: right;">
-                                <button id="btn-save-focus-hours" class="form-btn form-btn-primary">Enregistrer</button>
+                                <button id="btn-save-focus-hours" class="form-btn form-btn-primary btn-enhanced">Enregistrer</button>
                             </div>
                         </div>
                         <p id="focus-hours-result" class="form-message hidden"></p>
@@ -2593,7 +2593,7 @@
                     Réponse automatique
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <!-- Toggle auto-reply mode -->
                     <div class="settings-item">
                         <div class="settings-item-info">
@@ -2611,10 +2611,10 @@
                         <div class="form-group">
                             <label for="auto-reply-message" class="form-label">Message automatique</label>
                             <div class="form-row" style="flex-direction: column; gap: var(--space-2);">
-                                <textarea id="auto-reply-message" class="form-input" placeholder="Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏" maxlength="500" rows="3" style="resize: vertical;"></textarea>
+                                <textarea id="auto-reply-message" class="form-input input-enhanced" placeholder="Je suis occupé(e) pour le moment. Je te réponds dès que possible ! 🙏" maxlength="500" rows="3" style="resize: vertical;"></textarea>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span class="settings-item-subtitle"><span id="auto-reply-char-count">0</span>/500</span>
-                                    <button id="btn-save-auto-reply-message" class="form-btn form-btn-primary">Enregistrer</button>
+                                    <button id="btn-save-auto-reply-message" class="form-btn form-btn-primary btn-enhanced">Enregistrer</button>
                                 </div>
                             </div>
                             <p id="auto-reply-message-result" class="form-message hidden"></p>
@@ -2645,7 +2645,7 @@
                     Confidentialité
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <!-- Toggle hide last seen -->
                     <div class="settings-item">
                         <div class="settings-item-info">
@@ -2679,7 +2679,7 @@
                     Sécurité
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <button class="settings-item" onclick="showPasswordModal()" style="width: 100%; cursor: pointer; border: none; background: transparent;">
                         <div class="settings-item-info">
                             <p class="settings-item-title">Changer le mot de passe</p>
@@ -2697,7 +2697,7 @@
                     Mes données
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <button id="btn-export-data" class="settings-item" style="width: 100%; cursor: pointer; border: none; background: transparent;">
                         <div class="settings-item-info">
                             <p class="settings-item-title">
@@ -2720,7 +2720,7 @@
                     Ton activité récente
                 </h2>
                 
-                <div id="activity-log-card" class="settings-card">
+                <div id="activity-log-card" class="settings-card card-enhanced">
                     <div id="activity-log-loading" class="settings-item" style="justify-content: center;">
                         <span style="color: var(--color-text-muted); font-size: var(--text-sm);">Chargement...</span>
                     </div>
@@ -2741,7 +2741,7 @@
                     À propos
                 </h2>
                 
-                <div class="settings-card">
+                <div class="settings-card card-enhanced">
                     <a href="/terms.html" class="link-item">
                         <span>Conditions d'utilisation</span>
                         <span class="link-item-arrow">→</span>
@@ -2799,16 +2799,16 @@
             <form id="password-form" class="modal-form">
                 <div class="form-group">
                     <label for="current-password" class="form-label">Mot de passe actuel</label>
-                    <input type="password" id="current-password" class="form-input" required autocomplete="current-password">
+                    <input type="password" id="current-password" class="form-input input-enhanced" required autocomplete="current-password">
                 </div>
                 <div class="form-group">
                     <label for="new-password" class="form-label">Nouveau mot de passe</label>
-                    <input type="password" id="new-password" class="form-input" required minlength="8" autocomplete="new-password">
+                    <input type="password" id="new-password" class="form-input input-enhanced" required minlength="8" autocomplete="new-password">
                     <p class="settings-item-subtitle" style="margin-top: var(--space-1);">Minimum 8 caractères</p>
                 </div>
                 <div class="form-group">
                     <label for="confirm-password" class="form-label">Confirmer</label>
-                    <input type="password" id="confirm-password" class="form-input" required autocomplete="new-password">
+                    <input type="password" id="confirm-password" class="form-input input-enhanced" required autocomplete="new-password">
                 </div>
                 
                 <p id="password-error" class="modal-error hidden"></p>
@@ -2872,7 +2872,7 @@
                     <label for="delete-confirm" class="form-label">
                         Tape <strong style="color: var(--color-error);">SUPPRIMER</strong> pour confirmer
                     </label>
-                    <input type="text" id="delete-confirm" class="form-input delete-input" placeholder="SUPPRIMER" required autocomplete="off">
+                    <input type="text" id="delete-confirm" class="form-input input-enhanced delete-input" placeholder="SUPPRIMER" required autocomplete="off">
                 </div>
                 
                 <p id="delete-error" class="modal-error hidden"></p>
@@ -2927,19 +2927,19 @@
                 
                 <div class="template-form-group">
                     <label for="template-name-input" class="template-form-label">Nom du template</label>
-                    <input type="text" id="template-name-input" class="template-form-input" placeholder="Ex: Anniversaire ami" maxlength="50" required>
+                    <input type="text" id="template-name-input" class="template-form-input input-enhanced" placeholder="Ex: Anniversaire ami" maxlength="50" required>
                 </div>
                 
                 <div class="template-form-group">
                     <label for="template-content-input" class="template-form-label">Message</label>
-                    <textarea id="template-content-input" class="template-form-textarea" placeholder="Écris ton message template..." maxlength="280" required></textarea>
+                    <textarea id="template-content-input" class="template-form-textarea input-enhanced" placeholder="Écris ton message template..." maxlength="280" required></textarea>
                     <span class="template-char-count" id="template-char-count">0/280</span>
                 </div>
                 
                 <div class="template-form-row">
                     <div class="template-form-group">
                         <label for="template-emoji-input" class="template-form-label">Emoji</label>
-                        <input type="text" id="template-emoji-input" class="template-form-input" placeholder="📝" maxlength="4" style="text-align: center;">
+                        <input type="text" id="template-emoji-input" class="template-form-input input-enhanced" placeholder="📝" maxlength="4" style="text-align: center;">
                     </div>
                     
                     <div class="template-form-group">

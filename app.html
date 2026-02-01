@@ -8274,7 +8274,7 @@
         </main>
         
         <!-- BOTTOM NAV -->
-        <nav id="bottom-nav" class="bottom-nav" role="tablist" aria-label="Navigation principale">
+        <nav id="bottom-nav" class="bottom-nav nav-enhanced" role="tablist" aria-label="Navigation principale">
             <button class="nav-item active" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="true" aria-controls="tab-feed" type="button">
                 <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
@@ -8303,7 +8303,7 @@
     <div class="chat-panel" id="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chat-contact-name" aria-hidden="true">
         <div class="chat-header">
             <div class="chat-contact-info">
-                <div class="chat-contact-avatar" id="chat-contact-avatar" aria-hidden="true">?</div>
+                <div class="chat-contact-avatar avatar-enhanced" id="chat-contact-avatar" aria-hidden="true">?</div>
                 <div>
                     <h2 class="chat-contact-name" id="chat-contact-name"></h2>
                     <div class="chat-contact-status" id="chat-contact-status"></div>
@@ -8423,7 +8423,7 @@
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
         <!-- Quick Replies -->
         <div class="quick-replies" id="quick-replies" role="group" aria-label="Réponses rapides">
-            <button class="quick-reply-btn" onclick="sendQuickReply('Oui 👍')" type="button">Oui 👍</button>
+            <button class="quick-reply-btn btn-enhanced" onclick="sendQuickReply('Oui 👍')" type="button">Oui 👍</button>
             <button class="quick-reply-btn" onclick="sendQuickReply('Non 👎')" type="button">Non 👎</button>
             <button class="quick-reply-btn" onclick="sendQuickReply('OK ✓')" type="button">OK ✓</button>
             <button class="quick-reply-btn" onclick="sendQuickReply('Merci ❤️')" type="button">Merci ❤️</button>
@@ -8564,7 +8564,7 @@
                 </div>
             </div>
             <label for="chat-input" class="sr-only">Écrire un message</label>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Écris quelque chose..." maxlength="280" autocomplete="off">
+            <input type="text" class="chat-input input-enhanced" id="chat-input" placeholder="Écris quelque chose..." maxlength="280" autocomplete="off">
             <span class="char-count chat-char-count" id="chat-char-count" aria-live="polite">0/280</span>
             <div class="file-preview" id="file-preview">
                 <div class="file-preview-icon" id="file-preview-icon">📄</div>
@@ -8594,7 +8594,7 @@
                 </svg>
                 <span class="scheduled-count" id="scheduled-count" style="display: none;">0</span>
             </button>
-            <button class="chat-send" onclick="sendMessage()" id="send-btn" disabled type="button" aria-label="Envoyer le message">
+            <button class="chat-send btn-enhanced" onclick="sendMessage()" id="send-btn" disabled type="button" aria-label="Envoyer le message">
                 <span aria-hidden="true">→</span>
             </button>
         </div>
@@ -10097,10 +10097,10 @@
                 })();
                 
                 return `
-                    <article class="post-card" data-post-id="${post.id}" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
+                    <article class="post-card card-enhanced" data-post-id="${post.id}" aria-posinset="${index + 1}" aria-setsize="${posts.length}">
                         <div class="post-header">
                             <div class="post-author">
-                                <div class="post-avatar ${isOwn ? 'own' : ''}" aria-hidden="true">${avatarHtml}</div>
+                                <div class="post-avatar avatar-enhanced ${isOwn ? 'own' : ''}" aria-hidden="true">${avatarHtml}</div>
                                 <div>
                                     <span class="post-author-name">
                                         ${escapeHtml(displayName)}
@@ -11587,7 +11587,7 @@
             for (let i = 0; i < 5; i++) {
                 const contact = contacts[i];
                 const slot = document.createElement('div');
-                slot.className = `contact-slot ${contact ? 'filled' : 'empty'}`;
+                slot.className = `contact-slot card-enhanced ${contact ? 'filled' : 'empty'}`;
                 slot.tabIndex = 0;
                 slot.setAttribute('role', 'listitem');
                 
@@ -11623,7 +11623,7 @@
                     
                     // SECURITY: Use DOM methods instead of innerHTML to prevent XSS
                     const avatarSlot = document.createElement('div');
-                    avatarSlot.className = 'contact-avatar-slot';
+                    avatarSlot.className = 'contact-avatar-slot avatar-enhanced';
                     avatarSlot.setAttribute('aria-hidden', 'true');
                     if (avatarUrl) {
                         const img = document.createElement('img');
@@ -11854,7 +11854,7 @@
         
         function createContactSlot(contact) {
             const slot = document.createElement('div');
-            slot.className = 'contact-slot filled';
+            slot.className = 'contact-slot card-enhanced filled';
             slot.tabIndex = 0;
             slot.setAttribute('role', 'listitem');
             
@@ -11883,7 +11883,7 @@
             
             // Avatar
             const avatarSlot = document.createElement('div');
-            avatarSlot.className = 'contact-avatar-slot';
+            avatarSlot.className = 'contact-avatar-slot avatar-enhanced';
             if (avatarUrl) {
                 const img = document.createElement('img');
                 img.dataset.src = avatarUrl;
