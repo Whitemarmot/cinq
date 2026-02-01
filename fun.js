@@ -575,6 +575,358 @@
     }
     
     // ========================================
+    // 🎉 CELEBRATION MESSAGES
+    // ========================================
+    
+    /**
+     * Celebration Messages - Animations spéciales pour les messages
+     * Détecte les mots-clés et lance des animations festives
+     */
+    const CelebrationMessages = {
+        // Configuration des célébrations
+        triggers: [
+            {
+                keywords: ['joyeux anniversaire', 'bon anniversaire', 'happy birthday', 'bonne fête', 'anniversaire'],
+                animation: 'confetti',
+                message: '🎂 Joyeux anniversaire !',
+                colors: ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#cc5de8', '#f8b500']
+            },
+            {
+                keywords: ['bravo', 'félicitations', 'félicitation', 'congrats', 'congratulations', 'bien joué', 'bien jouée', 'chapeau', 'excellent', 'super', 'génial'],
+                animation: 'applause',
+                message: '👏 Bravo !'
+            },
+            {
+                keywords: ['bonne année', 'happy new year', 'nouvel an', 'meilleurs voeux'],
+                animation: 'fireworks',
+                message: '🎆 Bonne année !'
+            },
+            {
+                keywords: ['je t\'aime', 'i love you', 'love you', 'bisous', '❤️', '💕', '💜', '💙'],
+                animation: 'hearts',
+                message: '💜'
+            },
+            {
+                keywords: ['merci', 'thanks', 'thank you', 'gracias', 'danke'],
+                animation: 'sparkle',
+                message: '✨'
+            }
+        ],
+        
+        // Vérifie si le texte contient un mot-clé de célébration
+        detectCelebration(text) {
+            const normalizedText = text.toLowerCase().trim();
+            
+            for (const trigger of this.triggers) {
+                for (const keyword of trigger.keywords) {
+                    if (normalizedText.includes(keyword.toLowerCase())) {
+                        return trigger;
+                    }
+                }
+            }
+            return null;
+        },
+        
+        // Lance l'animation confetti (anniversaires)
+        launchBirthdayConfetti(colors) {
+            const confettiColors = colors || ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#cc5de8', '#f8b500'];
+            
+            // Plusieurs vagues de confetti pour un effet spectaculaire
+            launchConfetti({ particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.6 }, colors: confettiColors });
+            
+            setTimeout(() => {
+                launchConfetti({ particleCount: 50, spread: 100, origin: { x: 0.2, y: 0.5 }, colors: confettiColors });
+                launchConfetti({ particleCount: 50, spread: 100, origin: { x: 0.8, y: 0.5 }, colors: confettiColors });
+            }, 300);
+            
+            setTimeout(() => {
+                launchConfetti({ particleCount: 75, spread: 120, origin: { x: 0.5, y: 0.4 }, colors: confettiColors });
+            }, 600);
+        },
+        
+        // Lance l'animation applaudissements
+        launchApplause() {
+            // Créer le conteneur d'applaudissements
+            const container = document.createElement('div');
+            container.id = 'applause-container';
+            container.style.cssText = `
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 9998;
+                overflow: hidden;
+            `;
+            document.body.appendChild(container);
+            
+            // Injecter les styles d'animation
+            if (!document.getElementById('applause-styles')) {
+                const style = document.createElement('style');
+                style.id = 'applause-styles';
+                style.textContent = `
+                    @keyframes clap {
+                        0%, 100% { transform: scale(1) rotate(0deg); }
+                        25% { transform: scale(1.3) rotate(-10deg); }
+                        50% { transform: scale(1) rotate(0deg); }
+                        75% { transform: scale(1.3) rotate(10deg); }
+                    }
+                    @keyframes floatUp {
+                        0% { opacity: 1; transform: translateY(0) scale(1); }
+                        100% { opacity: 0; transform: translateY(-200px) scale(0.5); }
+                    }
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Créer les mains qui applaudissent
+            const emojis = ['👏', '🙌', '👐', '✨', '🎉'];
+            const positions = [];
+            
+            for (let i = 0; i < 20; i++) {
+                const emoji = document.createElement('div');
+                const emojiChar = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.textContent = emojiChar;
+                emoji.style.cssText = `
+                    position: absolute;
+                    font-size: ${Math.random() * 30 + 20}px;
+                    left: ${Math.random() * 100}%;
+                    bottom: -50px;
+                    animation: floatUp ${1.5 + Math.random() * 1}s ease-out forwards;
+                    animation-delay: ${Math.random() * 0.5}s;
+                `;
+                container.appendChild(emoji);
+            }
+            
+            // Afficher un gros emoji central qui pulse
+            const centerEmoji = document.createElement('div');
+            centerEmoji.textContent = '👏';
+            centerEmoji.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 100px;
+                animation: clap 0.3s ease-in-out 5;
+                z-index: 9999;
+            `;
+            document.body.appendChild(centerEmoji);
+            
+            // Son d'applaudissements (optionnel - via vibration sur mobile)
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 100, 50, 100]);
+            }
+            
+            // Nettoyer après l'animation
+            setTimeout(() => {
+                container.remove();
+                centerEmoji.remove();
+            }, 3000);
+        },
+        
+        // Lance l'animation feux d'artifice
+        launchFireworks() {
+            const colors = ['#ff0000', '#ffd700', '#00ff00', '#00bfff', '#ff00ff', '#ffffff'];
+            
+            // Plusieurs explosions à différents endroits
+            const positions = [
+                { x: 0.3, y: 0.4 },
+                { x: 0.7, y: 0.3 },
+                { x: 0.5, y: 0.5 },
+                { x: 0.2, y: 0.6 },
+                { x: 0.8, y: 0.5 }
+            ];
+            
+            positions.forEach((pos, i) => {
+                setTimeout(() => {
+                    launchConfetti({
+                        particleCount: 80,
+                        spread: 360,
+                        origin: pos,
+                        colors: colors,
+                        gravity: 0.8,
+                        scalar: 1.2
+                    });
+                }, i * 400);
+            });
+        },
+        
+        // Lance l'animation coeurs
+        launchHearts() {
+            const container = document.createElement('div');
+            container.id = 'hearts-container';
+            container.style.cssText = `
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 9998;
+                overflow: hidden;
+            `;
+            document.body.appendChild(container);
+            
+            // Injecter les styles
+            if (!document.getElementById('hearts-styles')) {
+                const style = document.createElement('style');
+                style.id = 'hearts-styles';
+                style.textContent = `
+                    @keyframes floatHeart {
+                        0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+                        50% { transform: translateY(-150px) scale(1.2) rotate(15deg); }
+                        100% { opacity: 0; transform: translateY(-300px) scale(0.8) rotate(-15deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            const hearts = ['💜', '💕', '❤️', '💙', '💚', '🧡', '💛', '💗', '💖'];
+            
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.cssText = `
+                    position: absolute;
+                    font-size: ${Math.random() * 25 + 15}px;
+                    left: ${Math.random() * 100}%;
+                    bottom: -50px;
+                    animation: floatHeart ${2 + Math.random() * 1.5}s ease-out forwards;
+                    animation-delay: ${Math.random() * 0.8}s;
+                `;
+                container.appendChild(heart);
+            }
+            
+            setTimeout(() => container.remove(), 4000);
+        },
+        
+        // Lance l'animation sparkle/étoiles
+        launchSparkle() {
+            const container = document.createElement('div');
+            container.id = 'sparkle-container';
+            container.style.cssText = `
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 9998;
+            `;
+            document.body.appendChild(container);
+            
+            if (!document.getElementById('sparkle-styles')) {
+                const style = document.createElement('style');
+                style.id = 'sparkle-styles';
+                style.textContent = `
+                    @keyframes sparkle {
+                        0% { opacity: 0; transform: scale(0) rotate(0deg); }
+                        50% { opacity: 1; transform: scale(1) rotate(180deg); }
+                        100% { opacity: 0; transform: scale(0) rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            const sparkles = ['✨', '⭐', '🌟', '💫', '⚡'];
+            
+            for (let i = 0; i < 15; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                sparkle.style.cssText = `
+                    position: absolute;
+                    font-size: ${Math.random() * 20 + 15}px;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: sparkle ${0.8 + Math.random() * 0.5}s ease-in-out forwards;
+                    animation-delay: ${Math.random() * 0.5}s;
+                `;
+                container.appendChild(sparkle);
+            }
+            
+            setTimeout(() => container.remove(), 2000);
+        },
+        
+        // Exécute la célébration appropriée
+        celebrate(trigger) {
+            switch (trigger.animation) {
+                case 'confetti':
+                    this.launchBirthdayConfetti(trigger.colors);
+                    break;
+                case 'applause':
+                    this.launchApplause();
+                    break;
+                case 'fireworks':
+                    this.launchFireworks();
+                    break;
+                case 'hearts':
+                    this.launchHearts();
+                    break;
+                case 'sparkle':
+                    this.launchSparkle();
+                    break;
+                default:
+                    launchConfetti();
+            }
+            
+            // Afficher un toast discret (sauf pour sparkle qui est subtil)
+            if (trigger.message && trigger.animation !== 'sparkle') {
+                setTimeout(() => showToast(trigger.message, 2000), 500);
+            }
+            
+            console.log(`%c🎉 Celebration: ${trigger.animation}`, 'color: #22c55e; font-size: 14px;');
+        },
+        
+        // Initialise les listeners pour détecter les messages
+        init() {
+            // Observer les formulaires de message
+            const observeMessageInputs = () => {
+                // Trouver tous les textareas et inputs de message
+                const inputs = document.querySelectorAll('textarea, input[type="text"]');
+                
+                inputs.forEach(input => {
+                    if (input.dataset.celebrationObserved) return;
+                    input.dataset.celebrationObserved = 'true';
+                    
+                    // Écouter les soumissions de formulaire
+                    const form = input.closest('form');
+                    if (form && !form.dataset.celebrationObserved) {
+                        form.dataset.celebrationObserved = 'true';
+                        form.addEventListener('submit', (e) => {
+                            const text = input.value;
+                            const trigger = this.detectCelebration(text);
+                            if (trigger) {
+                                // Petit délai pour que le message soit envoyé d'abord
+                                setTimeout(() => this.celebrate(trigger), 300);
+                            }
+                        });
+                    }
+                    
+                    // Écouter Entrée pour les inputs sans formulaire
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            const trigger = this.detectCelebration(input.value);
+                            if (trigger) {
+                                setTimeout(() => this.celebrate(trigger), 300);
+                            }
+                        }
+                    });
+                });
+            };
+            
+            // Observer les changements du DOM pour les inputs dynamiques
+            observeMessageInputs();
+            
+            const observer = new MutationObserver(() => {
+                observeMessageInputs();
+            });
+            
+            observer.observe(document.body, { childList: true, subtree: true });
+            
+            console.log('%c🎉 Celebration Messages initialized!', 'color: #6366f1; font-size: 12px;');
+        }
+    };
+    
+    // Exposer pour usage externe
+    window.CelebrationMessages = CelebrationMessages;
+    
+    // ========================================
     // 🥚 HIDDEN EASTER EGGS
     // ========================================
     
@@ -635,10 +987,12 @@
             document.addEventListener('DOMContentLoaded', () => {
                 enhancePingButton();
                 injectRandomCopy();
+                CelebrationMessages.init();
             });
         } else {
             enhancePingButton();
             injectRandomCopy();
+            CelebrationMessages.init();
         }
         
         // Observer pour les changements dynamiques (SPA-like)
@@ -661,7 +1015,14 @@
         confetti: launchConfetti,
         toast: showToast,
         celebrate: celebrateFifthContact,
-        showMessage: showBigMessage
+        showMessage: showBigMessage,
+        // Celebration Messages
+        celebrations: CelebrationMessages,
+        birthdayConfetti: () => CelebrationMessages.launchBirthdayConfetti(),
+        applause: () => CelebrationMessages.launchApplause(),
+        fireworks: () => CelebrationMessages.launchFireworks(),
+        hearts: () => CelebrationMessages.launchHearts(),
+        sparkle: () => CelebrationMessages.launchSparkle()
     };
     
 })();
