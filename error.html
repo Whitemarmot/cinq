@@ -114,8 +114,14 @@
         }
     </style>
     <script defer src="/fun.js"></script>
+    
+    <!-- Accessibility Styles -->
+    <link rel="stylesheet" href="/css/a11y.min.css">
 </head>
 <body class="gradient-bg min-h-screen text-white">
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <!-- Theme Toggle -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" style="position: fixed; top: 1rem; right: 1rem; z-index: 100;">
         <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -129,7 +135,7 @@
         <div class="circle absolute -bottom-20 left-1/3 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl" style="animation-delay: -1s;"></div>
     </div>
 
-    <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center">
+    <main id="main-content" class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center">
         
         <!-- Icône erreur -->
         <div class="mb-8">

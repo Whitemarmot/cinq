@@ -494,8 +494,14 @@
             75% { transform: rotate(-20deg); }
         }
     </style>
+    
+    <!-- Accessibility Styles -->
+    <link rel="stylesheet" href="/css/a11y.min.css">
 </head>
 <body>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    
     <!-- Theme Toggle -->
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -521,7 +527,7 @@
         <div class="circle circle-3"></div>
     </div>
 
-    <main>
+    <main id="main-content">
         <!-- Offline Icon -->
         <div class="offline-icon">
             <div class="offline-icon-inner">
