@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Galerie — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Galerie de médias partagés — Cinq">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#0e0e12" id="theme-color-meta">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    
+    <!-- Design System -->
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    <script src="/js/shared.js"></script>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    <style>
+        /* ===== GALLERY PAGE ===== */
+        .gallery-page {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-bg-primary);
+        }
+        
+        /* ===== HEADER ===== */
+        .gallery-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            transform: scale(1.05);
+        }
+        
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-title h1 {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .contact-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        
+        .contact-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* ===== GALLERY CONTENT ===== */
+        .gallery-content {
+            flex: 1;
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* ===== FILTER TABS ===== */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.25rem;
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-full);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filter-tab {
+            flex: 1;
+            min-width: max-content;
+            padding: 0.625rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-full);
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .filter-tab:hover {
+            color: var(--color-text-secondary);
+        }
+        
+        .filter-tab.active {
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-tab .count {
+            display: inline-block;
+            margin-left: 0.375rem;
+            padding: 0.125rem 0.5rem;
+            background: var(--color-brand-muted);
+            color: var(--color-brand);
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+        }
+        
+        /* ===== DATE GROUP ===== */
+        .date-group {
+            margin-bottom: 2rem;
+        }
+        
+        .date-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .date-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-brand-muted);
+            border-radius: var(--radius-lg);
+            color: var(--color-brand);
+        }
+        
+        .date-label {
+            font-family: var(--font-display);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .date-count {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        /* ===== MEDIA GRID ===== */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.375rem;
+        }
+        
+        @media (min-width: 640px) {
+            .media-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
+        .media-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--color-bg-secondary);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .media-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .media-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .media-item .gif-badge {
+            position: absolute;
+            top: 0.375rem;
+            left: 0.375rem;
+            padding: 0.125rem 0.375rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .media-item .sent-badge {
+            position: absolute;
+            bottom: 0.375rem;
+            right: 0.375rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cinq-gradient);
+            border-radius: 50%;
+            color: white;
+            font-size: 0.625rem;
+        }
+        
+        .media-item .received-badge {
+            position: absolute;
+            bottom: 0.375rem;
+            right: 0.375rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            color: var(--color-text-secondary);
+            font-size: 0.625rem;
+        }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        /* ===== LOADING STATE ===== */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===== LIGHTBOX ===== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .lightbox.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .lightbox-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            padding-top: max(1rem, env(safe-area-inset-top));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+            z-index: 1;
+        }
+        
+        .lightbox-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .lightbox-date {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .lightbox-sender {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .lightbox-close {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: var(--radius-lg);
+            animation: lightbox-zoom 0.3s ease-out;
+        }
+        
+        @keyframes lightbox-zoom {
+            from { 
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .lightbox-nav.prev {
+            left: 1rem;
+        }
+        
+        .lightbox-nav.next {
+            right: 1rem;
+        }
+        
+        .lightbox-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+        }
+        
+        .lightbox-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .lightbox-action:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .lightbox-action svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-xl);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ===== TOAST ===== */
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: toast-in 0.3s ease-out;
+        }
+        
+        .toast.success { border-color: #22c55e; }
+        .toast.error { border-color: #ef4444; }
+        
+        .toast-icon {
+            font-size: 1rem;
+        }
+        
+        .toast.success .toast-icon { color: #22c55e; }
+        .toast.error .toast-icon { color: #ef4444; }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(1rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .toast.toast-out {
+            animation: toast-out 0.3s ease-out forwards;
+        }
+        
+        @keyframes toast-out {
+            to {
+                opacity: 0;
+                transform: translateX(1rem);
+            }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .stats-bar {
+                gap: 1rem;
+                padding: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.25rem;
+            }
+            
+            .lightbox-nav {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .lightbox-action {
+                padding: 0.625rem 1rem;
+            }
+        }
+    </style>
+    <!-- View Transitions -->
+    <link rel="stylesheet" href="/css/view-transitions.min.css">
+</head>
+<body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    
+    <main class="gallery-page">
+        <!-- Header -->
+        <header class="gallery-header">
+            <div class="header-left">
+                <a href="/app.html" class="back-btn" aria-label="Retour">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </a>
+                <div class="header-title">
+                    <h1>Galerie</h1>
+                    <span class="header-subtitle" id="contact-name">Chargement...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="contact-avatar" id="contact-avatar">?</div>
+            </div>
+        </header>
+        
+        <!-- Gallery Content -->
+        <div class="gallery-content" id="gallery-container">
+            <!-- Loading state -->
+            <div class="loading-state" id="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Chargement de la galerie...</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visionneuse de média">
+        <div class="lightbox-header">
+            <div class="lightbox-info">
+                <div class="lightbox-date" id="lightbox-date"></div>
+                <div class="lightbox-sender" id="lightbox-sender"></div>
+            </div>
+            <button class="lightbox-close" onclick="closeLightbox()" aria-label="Fermer">×</button>
+        </div>
+        
+        <button class="lightbox-nav prev" onclick="navigateLightbox(-1)" aria-label="Précédent">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </button>
+        
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="Média">
+        </div>
+        
+        <button class="lightbox-nav next" onclick="navigateLightbox(1)" aria-label="Suivant">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+        </button>
+        
+        <div class="lightbox-footer">
+            <button class="lightbox-action" onclick="downloadMedia()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Télécharger
+            </button>
+            <button class="lightbox-action" onclick="goToMessage()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Voir le message
+            </button>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <script>
+        // ============================================
+        // Configuration
+        // ============================================
+        const SUPABASE_URL = 'https://guioxfulihyehrwytxce.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1aW94ZnVsaWh5ZWhyd3l0eGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MDg5NjUsImV4cCI6MjA4NTM4NDk2NX0.pLvhH3dEYGH7EQCFxUwtvhscLamKVnsWRNrT412YHQ';
+        
+        // ============================================
+        // State
+        // ============================================
+        let db = null;
+        let currentUser = null;
+        let contactId = null;
+        let contactInfo = null;
+        let allMedia = [];
+        let filteredMedia = [];
+        let currentLightboxIndex = 0;
+        let currentFilter = 'all';
+        
+        // ============================================
+        // Initialization
+        // ============================================
+        async function init() {
+            // Get contact ID from URL
+            const params = new URLSearchParams(window.location.search);
+            contactId = params.get('contact');
+            
+            if (!contactId) {
+                showError('Aucun contact spécifié');
+                return;
+            }
+            
+            // Initialize Supabase
+            if (typeof supabase !== 'undefined') {
+                db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                showError('Erreur de connexion');
+                return;
+            }
+            
+            // Check auth
+            const { data: { session } } = await db.auth.getSession();
+            
+            if (!session?.user) {
+                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+            
+            currentUser = session.user;
+            
+            // Load gallery data
+            await loadGallery();
+        }
+        
+        // ============================================
+        // Data Loading
+        // ============================================
+        async function loadGallery() {
+            try {
+                // Load contact info
+                const { data: contact, error: contactError } = await db
+                    .from('users')
+                    .select('id, display_name, avatar_url')
+                    .eq('id', contactId)
+                    .single();
+                
+                if (contactError || !contact) {
+                    showError('Contact non trouvé');
+                    return;
+                }
+                
+                contactInfo = contact;
+                updateHeader();
+                
+                // Load all messages with media (gif_url) between current user and contact
+                const { data: messages, error: msgError } = await db
+                    .from('messages')
+                    .select('id, sender_id, receiver_id, gif_url, content, created_at')
+                    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${currentUser.id})`)
+                    .not('gif_url', 'is', null)
+                    .order('created_at', { ascending: false });
+                
+                if (msgError) {
+                    console.error('Messages error:', msgError);
+                    showError('Erreur de chargement');
+                    return;
+                }
+                
+                // Transform messages to media items
+                allMedia = (messages || []).map(msg => ({
+                    id: msg.id,
+                    url: msg.gif_url,
+                    isGif: msg.gif_url?.includes('giphy') || msg.gif_url?.endsWith('.gif'),
+                    sentByMe: msg.sender_id === currentUser.id,
+                    date: new Date(msg.created_at),
+                    content: msg.content
+                }));
+                
+                renderGallery();
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                showError('Erreur de chargement');
+            }
+        }
+        
+        // ============================================
+        // Header Update
+        // ============================================
+        function updateHeader() {
+            if (!contactInfo) return;
+            
+            // Update contact name
+            document.getElementById('contact-name').textContent = 
+                `avec ${escapeHtml(contactInfo.display_name || 'Contact')}`;
+            
+            // Update avatar
+            const avatarEl = document.getElementById('contact-avatar');
+            if (contactInfo.avatar_url) {
+                avatarEl.innerHTML = `<img src="${escapeHtml(contactInfo.avatar_url)}" alt="${escapeHtml(contactInfo.display_name)}">`;
+            } else {
+                avatarEl.textContent = (contactInfo.display_name || '?')[0].toUpperCase();
+            }
+        }
+        
+        // ============================================
+        // Render Gallery
+        // ============================================
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            
+            // Apply filter
+            filteredMedia = allMedia.filter(m => {
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'sent') return m.sentByMe;
+                if (currentFilter === 'received') return !m.sentByMe;
+                if (currentFilter === 'gifs') return m.isGif;
+                if (currentFilter === 'photos') return !m.isGif;
+                return true;
+            });
+            
+            if (allMedia.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🖼️</div>
+                        <div class="empty-title">Aucun média partagé</div>
+                        <div class="empty-text">Les photos et GIFs que vous échangez avec ${escapeHtml(contactInfo?.display_name || 'ce contact')} apparaîtront ici.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Stats
+            const totalCount = allMedia.length;
+            const sentCount = allMedia.filter(m => m.sentByMe).length;
+            const receivedCount = allMedia.filter(m => !m.sentByMe).length;
+            const gifCount = allMedia.filter(m => m.isGif).length;
+            
+            // Group by date
+            const groupedByDate = groupByDate(filteredMedia);
+            
+            let html = `
+                <!-- Stats -->
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value">${totalCount}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${sentCount}</div>
+                        <div class="stat-label">Envoyés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${receivedCount}</div>
+                        <div class="stat-label">Reçus</div>
+                    </div>
+                </div>
+                
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <button class="filter-tab ${currentFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">
+                        Tout <span class="count">${totalCount}</span>
+                    </button>
+                    <button class="filter-tab ${currentFilter === 'sent' ? 'active' : ''}" onclick="setFilter('sent')">
+                        Envoyés <span class="count">${sentCount}</span>
+                    </button>
+                    <button class="filter-tab ${currentFilter === 'received' ? 'active' : ''}" onclick="setFilter('received')">
+                        Reçus <span class="count">${receivedCount}</span>
+                    </button>
+                    <button class="filter-tab ${currentFilter === 'gifs' ? 'active' : ''}" onclick="setFilter('gifs')">
+                        GIFs <span class="count">${gifCount}</span>
+                    </button>
+                </div>
+            `;
+            
+            if (filteredMedia.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">Aucun résultat</div>
+                        <div class="empty-text">Aucun média ne correspond à ce filtre.</div>
+                    </div>
+                `;
+            } else {
+                // Render each date group
+                for (const [dateKey, media] of Object.entries(groupedByDate)) {
+                    html += renderDateGroup(dateKey, media);
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Group Media by Date
+        // ============================================
+        function groupByDate(mediaList) {
+            const groups = {};
+            
+            for (const media of mediaList) {
+                const dateKey = formatDateKey(media.date);
+                if (!groups[dateKey]) {
+                    groups[dateKey] = [];
+                }
+                groups[dateKey].push(media);
+            }
+            
+            return groups;
+        }
+        
+        function formatDateKey(date) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            if (d.getTime() === today.getTime()) {
+                return "Aujourd'hui";
+            } else if (d.getTime() === yesterday.getTime()) {
+                return "Hier";
+            } else if (d >= weekAgo) {
+                return date.toLocaleDateString('fr-FR', { weekday: 'long' });
+            } else if (d.getFullYear() === now.getFullYear()) {
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+            } else {
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+        }
+        
+        // ============================================
+        // Render Date Group
+        // ============================================
+        function renderDateGroup(dateLabel, mediaList) {
+            const gridItems = mediaList.map((media, idx) => {
+                const globalIndex = filteredMedia.indexOf(media);
+                const badge = media.isGif ? '<span class="gif-badge">GIF</span>' : '';
+                const senderBadge = media.sentByMe 
+                    ? '<span class="sent-badge">↑</span>' 
+                    : '<span class="received-badge">↓</span>';
+                
+                return `
+                    <div class="media-item" onclick="openLightbox(${globalIndex})">
+                        <img src="${escapeHtml(media.url)}" alt="Média" loading="lazy">
+                        ${badge}
+                        ${senderBadge}
+                    </div>
+                `;
+            }).join('');
+            
+            return `
+                <div class="date-group">
+                    <div class="date-header">
+                        <div class="date-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <span class="date-label">${escapeHtml(dateLabel)}</span>
+                        <span class="date-count">${mediaList.length} média${mediaList.length > 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="media-grid">
+                        ${gridItems}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ============================================
+        // Filter
+        // ============================================
+        function setFilter(filter) {
+            currentFilter = filter;
+            renderGallery();
+        }
+        
+        // ============================================
+        // Lightbox
+        // ============================================
+        function openLightbox(index) {
+            currentLightboxIndex = index;
+            const media = filteredMedia[index];
+            
+            if (!media) return;
+            
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-image');
+            const dateEl = document.getElementById('lightbox-date');
+            const senderEl = document.getElementById('lightbox-sender');
+            
+            img.src = media.url;
+            dateEl.textContent = media.date.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            senderEl.textContent = media.sentByMe 
+                ? 'Envoyé par vous' 
+                : `Envoyé par ${contactInfo?.display_name || 'contact'}`;
+            
+            lightbox.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', handleLightboxKeydown);
+        }
+        
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', handleLightboxKeydown);
+        }
+        
+        function navigateLightbox(direction) {
+            const newIndex = currentLightboxIndex + direction;
+            if (newIndex >= 0 && newIndex < filteredMedia.length) {
+                openLightbox(newIndex);
+            }
+        }
+        
+        function handleLightboxKeydown(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            } else if (e.key === 'ArrowLeft') {
+                navigateLightbox(-1);
+            } else if (e.key === 'ArrowRight') {
+                navigateLightbox(1);
+            }
+        }
+        
+        // ============================================
+        // Lightbox Actions
+        // ============================================
+        async function downloadMedia() {
+            const media = filteredMedia[currentLightboxIndex];
+            if (!media) return;
+            
+            try {
+                const response = await fetch(media.url);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cinq-media-${Date.now()}.${media.isGif ? 'gif' : 'jpg'}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast({ type: 'success', message: 'Téléchargement démarré' });
+            } catch (e) {
+                console.error('Download error:', e);
+                showToast({ type: 'error', message: 'Erreur de téléchargement' });
+            }
+        }
+        
+        function goToMessage() {
+            const media = filteredMedia[currentLightboxIndex];
+            if (!media) return;
+            
+            // Navigate to app with message context
+            window.location.href = `/app.html?contact=${contactId}&message=${media.id}`;
+        }
+        
+        // ============================================
+        // Error Display
+        // ============================================
+        function showError(message) {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">😢</div>
+                    <div class="empty-title">Erreur</div>
+                    <div class="empty-text">${escapeHtml(message)}</div>
+                    <a href="/app.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--cinq-gradient); color: white; border-radius: var(--radius-full); text-decoration: none; font-weight: 500;">
+                        Retour à l'app
+                    </a>
+                </div>
+            `;
+        }
+        
+        // ============================================
+        // Click outside lightbox to close
+        // ============================================
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') {
+                closeLightbox();
+            }
+        });
+        
+        // ============================================
+        // Initialize
+        // ============================================
+        init();
+    </script>
+    <!-- View Transitions -->
+    <script defer src="/js/view-transitions.min.js"></script>
+</body>
+</html>
