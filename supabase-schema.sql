@@ -11,9 +11,18 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url TEXT,
     bio TEXT,
     gift_code_used TEXT,
+    banned BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add banned column if not exists (for existing deployments)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='banned') THEN
+        ALTER TABLE users ADD COLUMN banned BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
 
 -- Auto-create user profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()

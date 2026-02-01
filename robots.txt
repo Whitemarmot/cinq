@@ -16,6 +16,8 @@ Disallow: /register.html
 Disallow: /forgot-password
 Disallow: /forgot-password.html
 Disallow: /.netlify/
+Disallow: /admin
+Disallow: /admin/
 
 # Pages publiques indexables
 Allow: /index.html
