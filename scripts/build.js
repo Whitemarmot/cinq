@@ -32,7 +32,8 @@ const JS_FILES = [
   'analytics.js',
   'pwa-install.js',
   'js/confetti.js',
-  'js/easter-eggs.js'
+  'js/easter-eggs.js',
+  'js/drafts.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');
