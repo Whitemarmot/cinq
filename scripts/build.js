@@ -37,7 +37,8 @@ const JS_FILES = [
   'js/easter-eggs.js',
   'js/drafts.js',
   'js/qr-code.js',
-  'js/message-formatting.js'
+  'js/message-formatting.js',
+  'js/voice-transcription.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');

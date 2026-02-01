@@ -11970,6 +11970,11 @@
                         receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
                     }
                     
+                    // Render transcription if available
+                    const transcriptHtml = msg.voice_transcript 
+                        ? renderVoiceTranscript(msg.voice_transcript, msg.id)
+                        : '';
+                    
                     html += `
                         <div class="chat-message ${isSent ? 'sent' : 'received'}" id="msg-${msg.id}" role="article" aria-label="${sender} a envoyé un message vocal de ${durationStr}">
                             <div class="chat-message-actions">
@@ -11985,6 +11990,7 @@
                                     </div>
                                     <span class="voice-duration" id="voice-duration-${msg.id}" data-duration="${duration}">${durationStr}</span>
                                 </div>
+                                ${transcriptHtml}
                             </div>
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
@@ -13573,6 +13579,13 @@
             voiceAudioBlob = null;
             voiceAudioDuration = 0;
             audioAnalyserData = [];
+            voiceTranscript = '';
+            
+            // Abort any ongoing transcription
+            if (window.CinqVoiceTranscription) {
+                CinqVoiceTranscription.abort();
+            }
+            hideVoiceTranscriptionPreview();
             
             inputArea.classList.remove('voice-mode');
             sendBtn.disabled = !chatInput.value.trim();
@@ -13985,6 +13998,58 @@
             }
             
             return bars;
+        }
+        
+        // Render transcript for voice message
+        function renderVoiceTranscript(transcript, msgId) {
+            if (!transcript || !transcript.trim()) return '';
+            
+            // Use the CinqVoiceTranscription helper if available
+            if (window.CinqVoiceTranscription) {
+                return CinqVoiceTranscription.renderTranscriptDisplay(transcript, msgId);
+            }
+            
+            // Fallback inline render
+            return `
+                <div class="voice-transcript" id="voice-transcript-${msgId}">
+                    <button class="voice-transcript-toggle" onclick="toggleVoiceTranscript('${msgId}')" type="button" aria-expanded="false" aria-controls="voice-transcript-text-${msgId}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        </svg>
+                        <span>Transcription</span>
+                        <svg class="voice-transcript-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                    <div class="voice-transcript-content" id="voice-transcript-text-${msgId}">
+                        <p>${escapeHtml(transcript)}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Toggle voice transcript visibility
+        function toggleVoiceTranscript(msgId) {
+            // Use the CinqVoiceTranscription helper if available
+            if (window.CinqVoiceTranscription) {
+                CinqVoiceTranscription.toggleTranscript(msgId);
+                return;
+            }
+            
+            // Fallback toggle
+            const container = document.getElementById(`voice-transcript-${msgId}`);
+            const toggle = container?.querySelector('.voice-transcript-toggle');
+            
+            if (!container || !toggle) return;
+            
+            const isExpanded = container.classList.contains('expanded');
+            container.classList.toggle('expanded', !isExpanded);
+            toggle.setAttribute('aria-expanded', !isExpanded);
+            
+            if (typeof triggerHaptic === 'function') {
+                triggerHaptic('tap');
+            }
         }
 
         async function sendPing() {

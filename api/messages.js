@@ -83,7 +83,7 @@ async function handleGetMessages(req, res, user) {
     // Build query - include read_at for read receipts, file attachment fields, sticker_id, and gif_url
     let query = supabase
         .from('messages')
-        .select('id, sender_id, receiver_id, content, is_ping, sticker_id, gif_url, created_at, read_at, file_url, file_name, file_size, file_type')
+        .select('id, sender_id, receiver_id, content, is_ping, sticker_id, gif_url, created_at, read_at, file_url, file_name, file_size, file_type, voice_url, voice_duration, voice_waveform, voice_transcript')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
         .limit(safeLimit);
@@ -212,7 +212,11 @@ async function handleGetUnreadCount(req, res, user, since, includeLatest) {
 const VALID_STICKERS = ['cinq', 'love', 'hug', 'laugh', 'thinking', 'fire', 'star', 'party', 'cool', 'sleepy', 'coffee', 'sad'];
 
 async function handleSendMessage(req, res, user) {
-    const { contact_id, content, is_ping = false, sticker_id, gif_url, file_url, file_name, file_size, file_type } = req.body;
+    const { 
+        contact_id, content, is_ping = false, sticker_id, gif_url, 
+        file_url, file_name, file_size, file_type,
+        voice_data, voice_duration, voice_waveform, voice_transcript 
+    } = req.body;
 
     if (!contact_id) {
         return res.status(400).json({ error: 'contact_id requis' });
@@ -234,9 +238,12 @@ async function handleSendMessage(req, res, user) {
         return res.status(400).json({ error: 'URL GIF invalide (GIPHY uniquement)' });
     }
 
-    // Validate content (unless it's a ping, sticker, GIF, or file attachment)
+    // Check if this is a voice message
+    const isVoiceMessage = voice_data && typeof voice_data === 'string' && voice_data.startsWith('data:audio');
+
+    // Validate content (unless it's a ping, sticker, GIF, file attachment, or voice message)
     const hasFile = file_url && file_name;
-    if (!is_ping && !isSticker && !isGif && !hasFile) {
+    if (!is_ping && !isSticker && !isGif && !hasFile && !isVoiceMessage) {
         const contentResult = validateMessageContent(content, { 
             maxLength: MAX_MESSAGE_LENGTH, 
             required: true 
@@ -259,6 +266,8 @@ async function handleSendMessage(req, res, user) {
         ? `[sticker:${sticker_id}]`
         : isGif
         ? `[gif]`
+        : isVoiceMessage
+        ? `[voice]`
         : validateMessageContent(content || '', { maxLength: MAX_MESSAGE_LENGTH }).content || '';
 
     // Build message object
@@ -287,6 +296,60 @@ async function handleSendMessage(req, res, user) {
         if (file_type) messageData.file_type = file_type;
     }
 
+    // Handle voice message upload
+    if (isVoiceMessage) {
+        try {
+            // Extract base64 data from data URL
+            const matches = voice_data.match(/^data:([^;]+);base64,(.+)$/);
+            if (!matches) {
+                return res.status(400).json({ error: 'Format audio invalide' });
+            }
+            
+            const mimeType = matches[1];
+            const base64Data = matches[2];
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            // Generate unique filename
+            const ext = mimeType.includes('webm') ? 'webm' : mimeType.includes('mp4') ? 'm4a' : 'ogg';
+            const filename = `voice/${user.id}/${Date.now()}.${ext}`;
+            
+            // Upload to Supabase storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('messages')
+                .upload(filename, buffer, {
+                    contentType: mimeType,
+                    upsert: false
+                });
+            
+            if (uploadError) {
+                logError(uploadError, { context: 'voice_upload', userId: user.id });
+                return res.status(500).json({ error: 'Échec upload vocal' });
+            }
+            
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('messages')
+                .getPublicUrl(filename);
+            
+            messageData.voice_url = urlData.publicUrl;
+            messageData.voice_duration = voice_duration || 0;
+            
+            // Store waveform data (limit to 50 samples)
+            if (voice_waveform && Array.isArray(voice_waveform)) {
+                messageData.voice_waveform = voice_waveform.slice(0, 50);
+            }
+            
+            // Store transcription if available
+            if (voice_transcript && typeof voice_transcript === 'string' && voice_transcript.trim()) {
+                messageData.voice_transcript = voice_transcript.trim().slice(0, 2000);
+            }
+            
+        } catch (uploadErr) {
+            logError(uploadErr, { context: 'voice_message_upload', userId: user.id });
+            return res.status(500).json({ error: 'Erreur lors de l\'envoi du vocal' });
+        }
+    }
+
     // Create message
     const { data, error } = await supabase
         .from('messages')
@@ -303,11 +366,13 @@ async function handleSendMessage(req, res, user) {
         isPing: is_ping,
         isSticker: !!sticker_id,
         isGif: !!gif_url,
-        hasFile: !!file_url
+        hasFile: !!file_url,
+        isVoice: !!data.voice_url,
+        hasTranscript: !!data.voice_transcript
     });
 
     // Send push notification (fire and forget)
-    sendPushToReceiver(contact_id, user, data, is_ping, isSticker ? sticker_id : safeContent, isSticker, isGif);
+    sendPushToReceiver(contact_id, user, data, is_ping, isSticker ? sticker_id : safeContent, isSticker, isGif, !!data.voice_url);
     
     // Process @mentions in message and create notifications (fire and forget)
     if (!is_ping && safeContent) {
@@ -379,7 +444,7 @@ async function sendVacationAutoReply(receiverId, senderId) {
     }
 }
 
-function sendPushToReceiver(receiverId, sender, message, isPing, content, isSticker = false, isGif = false) {
+function sendPushToReceiver(receiverId, sender, message, isPing, content, isSticker = false, isGif = false, isVoice = false) {
     const senderName = sender.email?.split('@')[0] || 'Quelqu\'un';
     
     let title, body;
@@ -392,6 +457,11 @@ function sendPushToReceiver(receiverId, sender, message, isPing, content, isStic
     } else if (isGif) {
         title = `GIF de ${senderName}`;
         body = `${senderName} t'a envoyé un GIF`;
+    } else if (isVoice) {
+        title = `🎤 Message vocal de ${senderName}`;
+        body = message.voice_transcript 
+            ? `"${message.voice_transcript.substring(0, 80)}${message.voice_transcript.length > 80 ? '…' : ''}"`
+            : `${senderName} t'a envoyé un message vocal`;
     } else {
         title = `Message de ${senderName}`;
         body = content.substring(0, 100);
