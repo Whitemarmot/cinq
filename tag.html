@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cinq — #tag</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Cinq — Explore les posts avec ce hashtag.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/tag">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Tag — Cinq">
+    <meta property="og:description" content="Explore les posts avec ce hashtag sur Cinq.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/tag">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-192x192.png">
+    <meta name="theme-color" content="#121218">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cinq">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="/css/critical.min.css">
+    
+    <!-- Design System -->
+    <link rel="preload" href="/design/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/design/styles.min.css"></noscript>
+    <link rel="stylesheet" href="/css/a11y.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/css/theme.css">
+    
+    <!-- Theme initialization -->
+    <script src="/js/theme.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="/js/shared.js"></script>
+    
+    <style>
+        /* ===== TAG PAGE LAYOUT ===== */
+        .tag-container {
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 1rem));
+        }
+        
+        .tag-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            background: var(--color-bg-primary);
+            z-index: 100;
+        }
+        
+        .tag-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+        }
+        
+        .tag-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tag-title-hash {
+            font-size: 1.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .theme-toggle:hover {
+            background: var(--color-bg-hover);
+            transform: scale(1.05);
+        }
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: all 0.3s ease;
+            color: var(--color-text-secondary);
+        }
+        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+
+        /* ===== TAG INFO ===== */
+        .tag-info {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .tag-info-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tag-info-count {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        /* ===== POSTS ===== */
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .post-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            opacity: 0;
+            animation: post-fade-in 0.4s ease forwards;
+            transition: border-color 0.2s;
+        }
+        
+        .post-card:hover {
+            border-color: var(--color-border-active);
+        }
+        
+        @keyframes post-fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .post-author {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .post-avatar.own {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .post-author-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .post-author-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .post-author-name .you-badge {
+            font-size: 0.7rem;
+            color: var(--color-success);
+            margin-left: 0.25rem;
+        }
+        
+        .post-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        
+        .post-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .post-content .post-link {
+            color: var(--color-brand);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .post-content .post-link:hover {
+            text-decoration: underline;
+        }
+        
+        .post-content .post-hashtag {
+            color: var(--color-brand);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s, background 0.2s;
+            padding: 0 0.15rem;
+            border-radius: var(--radius-sm);
+        }
+        
+        .post-content .post-hashtag:hover {
+            background: var(--color-brand-muted);
+        }
+        
+        .post-content .post-hashtag.current-tag {
+            background: var(--color-brand-muted);
+        }
+        
+        .post-image {
+            margin-top: 0.75rem;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .post-image img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .post-image img:hover {
+            transform: scale(1.02);
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .share-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            color: var(--color-text-primary);
+        }
+        
+        .share-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-text {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== LOADING ===== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--color-bg-elevated) 25%, var(--color-bg-secondary) 50%, var(--color-bg-elevated) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-md);
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .skeleton-title { height: 16px; width: 40%; }
+        .skeleton-text { height: 12px; width: 60%; margin-top: 0.5rem; }
+        .skeleton-body { height: 60px; margin-top: 0.75rem; }
+        
+        .skeleton-post {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== LOAD MORE ===== */
+        .load-more {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .load-more-btn {
+            padding: 0.75rem 2rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            color: var(--color-text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .load-more-btn:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-brand);
+        }
+        
+        .load-more-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .all-loaded {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== IMAGE MODAL ===== */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .image-modal.open {
+            display: flex;
+        }
+        
+        .image-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: var(--radius-lg);
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .image-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--color-bg-secondary);
+            border-top: 1px solid var(--color-border);
+            padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--color-brand);
+        }
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tag-container">
+        <!-- Header -->
+        <header class="tag-header">
+            <a href="/feed.html" class="tag-logo">Cinq</a>
+            <div class="tag-title">
+                <span class="tag-title-hash">#</span>
+                <span id="tag-name">tag</span>
+            </div>
+            <div class="header-actions">
+                <a href="/feed.html" class="back-btn">← Feed</a>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème">
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tag Info -->
+        <div class="tag-info">
+            <div class="tag-info-name" id="tag-display">#tag</div>
+            <div class="tag-info-count" id="tag-count">Chargement...</div>
+        </div>
+
+        <!-- Posts List -->
+        <div class="posts-list" id="posts-list">
+            <!-- Loading skeletons -->
+            <div class="skeleton-post" id="skeleton-1">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body"></div>
+            </div>
+            <div class="skeleton-post" id="skeleton-2">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title" style="width: 45%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-body" style="height: 40px;"></div>
+            </div>
+        </div>
+
+        <!-- Load More -->
+        <div class="load-more" id="load-more" style="display: none;">
+            <button class="load-more-btn" id="load-more-btn" onclick="loadMorePosts()">
+                Charger plus
+            </button>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal" onclick="closeImageModal()">
+        <button class="image-modal-close" aria-label="Fermer">×</button>
+        <img id="modal-image" src="" alt="Image agrandie">
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Navigation principale">
+        <a href="/feed.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Feed</span>
+        </a>
+        <a href="/app.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Messages</span>
+        </a>
+        <a href="/bookmarks.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>Favoris</span>
+        </a>
+        <a href="/profile.html" class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const API_URL = '/api';
+        let session = null;
+        let user = null;
+        let posts = [];
+        let currentTag = '';
+        let nextCursor = null;
+        let hasMore = true;
+        let isLoading = false;
+
+        // Get auth headers
+        function authHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
+            };
+        }
+
+        // Init
+        async function init() {
+            const sessionStr = localStorage.getItem('cinq_session');
+            if (!sessionStr) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                session = JSON.parse(sessionStr);
+                user = session.user;
+
+                // Get tag from URL
+                const params = new URLSearchParams(window.location.search);
+                currentTag = params.get('t')?.toLowerCase() || '';
+
+                if (!currentTag) {
+                    window.location.href = '/feed.html';
+                    return;
+                }
+
+                // Update UI with tag name
+                document.getElementById('tag-name').textContent = currentTag;
+                document.getElementById('tag-display').textContent = `#${currentTag}`;
+                document.title = `Cinq — #${currentTag}`;
+
+                // Load posts
+                await loadPosts();
+
+            } catch (e) {
+                console.error('Init error:', e);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Load posts for this tag
+        async function loadPosts() {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                let url = `${API_URL}/tags?t=${encodeURIComponent(currentTag)}&limit=20`;
+                if (nextCursor) {
+                    url += `&cursor=${encodeURIComponent(nextCursor)}`;
+                }
+
+                const res = await fetch(url, { headers: authHeaders() });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+
+                const data = await res.json();
+
+                // Remove skeletons
+                document.querySelectorAll('.skeleton-post').forEach(el => el.remove());
+
+                // Update state
+                posts = [...posts, ...data.posts];
+                nextCursor = data.nextCursor;
+                hasMore = data.hasMore;
+
+                // Update count
+                document.getElementById('tag-count').textContent = 
+                    posts.length === 0 ? 'Aucun post' :
+                    posts.length === 1 ? '1 post' :
+                    `${posts.length}+ posts`;
+
+                // Render posts
+                renderPosts();
+
+                // Show/hide load more
+                const loadMoreSection = document.getElementById('load-more');
+                if (hasMore) {
+                    loadMoreSection.style.display = 'block';
+                    loadMoreSection.innerHTML = `
+                        <button class="load-more-btn" onclick="loadMorePosts()">
+                            Charger plus
+                        </button>
+                    `;
+                } else if (posts.length > 0) {
+                    loadMoreSection.style.display = 'block';
+                    loadMoreSection.innerHTML = `
+                        <span class="all-loaded">✨ Tu as tout vu !</span>
+                    `;
+                } else {
+                    loadMoreSection.style.display = 'none';
+                }
+
+            } catch (e) {
+                console.error('Load error:', e);
+                document.getElementById('posts-list').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">😢</div>
+                        <div class="empty-state-title">Erreur</div>
+                        <div class="empty-state-text">${escapeHtml(e.message)}</div>
+                    </div>
+                `;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Load more posts
+        async function loadMorePosts() {
+            if (!hasMore || isLoading) return;
+
+            const btn = document.getElementById('load-more-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Chargement...';
+            }
+
+            await loadPosts();
+        }
+
+        // Render posts
+        function renderPosts() {
+            const container = document.getElementById('posts-list');
+
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏷️</div>
+                        <div class="empty-state-title">Aucun post avec #${escapeHtml(currentTag)}</div>
+                        <div class="empty-state-text">
+                            Sois le premier à utiliser ce tag dans un post !
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = posts.map((post, index) => renderPost(post, index)).join('');
+        }
+
+        // Render a single post
+        function renderPost(post, index) {
+            const author = post.author || {};
+            const isOwn = post.user_id === user.id;
+            const initial = (author.display_name || author.email || '?')[0].toUpperCase();
+            const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
+            const time = formatTime(post.created_at);
+
+            const imageHtml = post.image_url ? `
+                <div class="post-image">
+                    <img src="${escapeHtml(post.image_url)}" 
+                         alt="Image partagée par ${escapeHtml(displayName)}"
+                         onclick="openImageModal('${escapeHtml(post.image_url)}')"
+                         loading="lazy">
+                </div>
+            ` : '';
+
+            const postUrl = `${window.location.origin}/p/${post.id}`;
+
+            return `
+                <article class="post-card" style="animation-delay: ${index * 0.05}s;" data-post-id="${post.id}">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="post-avatar ${isOwn ? 'own' : ''}">${initial}</div>
+                            <div class="post-author-info">
+                                <span class="post-author-name">
+                                    ${escapeHtml(displayName)}
+                                    ${isOwn ? '<span class="you-badge">(toi)</span>' : ''}
+                                </span>
+                                <time class="post-time" datetime="${post.created_at}">${time}</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${linkifyContent(post.content)}</div>
+                    ${imageHtml}
+                    <div class="post-actions">
+                        <a href="/p/${post.id}" class="share-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Voir
+                        </a>
+                        <button onclick="copyLink('${post.id}')" class="share-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Copier
+                        </button>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Linkify content (URLs + hashtags)
+        function linkifyContent(text) {
+            if (!text) return text;
+
+            // Escape HTML first
+            text = escapeHtml(text);
+
+            // Convert hashtags to links (highlight current tag)
+            text = text.replace(
+                /#([\w\u00C0-\u017F]{1,50})/g,
+                (match, tag) => {
+                    const normalizedTag = tag.toLowerCase();
+                    const isCurrent = normalizedTag === currentTag;
+                    return `<a href="/tag.html?t=${encodeURIComponent(normalizedTag)}" class="post-hashtag ${isCurrent ? 'current-tag' : ''}">#${tag}</a>`;
+                }
+            );
+
+            // Convert URLs to links
+            text = text.replace(
+                /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi,
+                (url) => {
+                    let cleanUrl = url;
+                    const trailingPunct = /[.,;:!?)]+$/;
+                    const match = cleanUrl.match(trailingPunct);
+                    let trailing = '';
+                    if (match) {
+                        trailing = match[0];
+                        cleanUrl = cleanUrl.slice(0, -trailing.length);
+                    }
+                    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="post-link">${cleanUrl}</a>${trailing}`;
+                }
+            );
+
+            return text;
+        }
+
+        // Copy post link
+        async function copyLink(postId) {
+            const url = `${window.location.origin}/p/${postId}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast({ type: 'success', message: '🔗 Lien copié !' });
+            } catch (e) {
+                showToast({ type: 'error', message: 'Impossible de copier' });
+            }
+        }
+
+        // Image modal
+        function openImageModal(url) {
+            event.stopPropagation();
+            document.getElementById('modal-image').src = url;
+            document.getElementById('image-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>

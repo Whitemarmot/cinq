@@ -42,6 +42,7 @@ const PRECACHE_ASSETS = [
   '/gift.html',
   '/redeem.html',
   '/feed.html',
+  '/tag.html',
   '/settings.html',
   '/404.html',
   '/error.html',
