@@ -6983,6 +6983,52 @@
         </div>
     </div>
     
+    <!-- Mute Contact Modal -->
+    <div class="modal-overlay" id="mute-modal" role="dialog" aria-modal="true" aria-labelledby="mute-modal-title" aria-hidden="true">
+        <div class="modal mute-modal">
+            <h2 class="modal-title" id="mute-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+                Notifications en sourdine
+            </h2>
+            <p style="color:var(--color-text-muted);margin-bottom:var(--space-3);font-size:var(--text-sm);">
+                Tu ne recevras plus de notifications pour <strong id="mute-contact-name"></strong>
+            </p>
+            <div class="mute-current-status hidden" id="mute-current-status">
+                <span>🔇</span>
+                <span id="mute-current-text">En sourdine jusqu'à...</span>
+            </div>
+            <div class="mute-options" id="mute-options">
+                <button class="mute-option-btn" onclick="setMuteDuration('1h')" type="button" data-duration="1h">
+                    <span>1 heure</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+                <button class="mute-option-btn" onclick="setMuteDuration('8h')" type="button" data-duration="8h">
+                    <span>8 heures</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+                <button class="mute-option-btn" onclick="setMuteDuration('24h')" type="button" data-duration="24h">
+                    <span>24 heures</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </button>
+                <button class="mute-option-btn" onclick="setMuteDuration('forever')" type="button" data-duration="forever">
+                    <span>Indéfiniment</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                </button>
+            </div>
+            <button id="unmute-btn" class="save-btn" style="width:100%;background:var(--color-success);display:none;" onclick="setMuteDuration('off')" type="button">
+                <span style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    Réactiver les notifications
+                </span>
+            </button>
+            <button style="margin-top:var(--space-3);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeMuteModal()" type="button">Annuler</button>
+        </div>
+    </div>
+    
     <!-- Add Contact Modal -->
     <div class="modal-overlay" id="add-contact-modal" role="dialog" aria-modal="true" aria-labelledby="add-contact-modal-title" aria-hidden="true">
         <div class="modal">
@@ -8347,6 +8393,130 @@
                 
             } catch (e) {
                 showToast({ type: 'error', message: e.message });
+            }
+        }
+
+        // ===== MUTE CONTACT =====
+        function openMuteModal() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('mute-modal');
+            const contactNameEl = document.getElementById('mute-contact-name');
+            const currentStatusEl = document.getElementById('mute-current-status');
+            const currentTextEl = document.getElementById('mute-current-text');
+            const unmuteBtn = document.getElementById('unmute-btn');
+            const optionBtns = document.querySelectorAll('.mute-option-btn');
+            
+            const name = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            contactNameEl.textContent = name;
+            
+            // Reset UI
+            optionBtns.forEach(btn => btn.classList.remove('selected'));
+            
+            // Check if currently muted
+            const isMuted = currentChatContact.is_muted || false;
+            const mutedUntil = currentChatContact.muted_until;
+            
+            if (isMuted && mutedUntil) {
+                currentStatusEl.classList.remove('hidden');
+                unmuteBtn.style.display = 'block';
+                
+                const mutedDate = new Date(mutedUntil);
+                if (mutedDate.getFullYear() >= 9999) {
+                    currentTextEl.textContent = 'En sourdine indéfiniment';
+                } else {
+                    currentTextEl.textContent = `En sourdine jusqu'au ${formatMuteDate(mutedDate)}`;
+                }
+            } else {
+                currentStatusEl.classList.add('hidden');
+                unmuteBtn.style.display = 'none';
+            }
+            
+            openModal('mute-modal');
+        }
+        
+        function closeMuteModal() {
+            closeModal('mute-modal');
+        }
+        
+        function formatMuteDate(date) {
+            const now = new Date();
+            const diff = date - now;
+            
+            // If less than 24h, show time only
+            if (diff < 24 * 60 * 60 * 1000) {
+                return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            // Otherwise show date and time
+            return date.toLocaleDateString('fr-FR', { 
+                day: 'numeric', 
+                month: 'short',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        async function setMuteDuration(duration) {
+            if (!currentChatContact) return;
+            
+            const contactId = currentChatContact.id;
+            const name = currentChatContact.contact?.display_name || currentChatContact.contact?.email?.split('@')[0] || 'Contact';
+            
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}&action=mute&duration=${duration}`, {
+                    method: 'PATCH',
+                    headers: authHeaders()
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Update current contact state
+                currentChatContact.is_muted = data.is_muted;
+                currentChatContact.muted_until = data.muted_until;
+                
+                // Update UI
+                updateMuteButton(data.is_muted);
+                
+                // Show toast
+                if (data.is_muted) {
+                    const durationText = {
+                        '1h': '1 heure',
+                        '8h': '8 heures',
+                        '24h': '24 heures',
+                        'forever': 'indéfiniment'
+                    }[duration] || duration;
+                    showToast({ type: 'success', message: `🔇 ${name} en sourdine pour ${durationText}` });
+                } else {
+                    showToast({ type: 'success', message: `🔔 Notifications réactivées pour ${name}` });
+                }
+                
+                closeMuteModal();
+                
+                // Refresh contacts to update badges
+                loadContacts();
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+            }
+        }
+        
+        function updateMuteButton(isMuted) {
+            const muteBtn = document.getElementById('chat-mute-btn');
+            if (!muteBtn) return;
+            
+            if (isMuted) {
+                muteBtn.classList.add('muted');
+                muteBtn.setAttribute('aria-label', 'Réactiver les notifications');
+                muteBtn.setAttribute('title', 'En sourdine');
+            } else {
+                muteBtn.classList.remove('muted');
+                muteBtn.setAttribute('aria-label', 'Mettre en sourdine');
+                muteBtn.setAttribute('title', 'Sourdine');
             }
         }
 
