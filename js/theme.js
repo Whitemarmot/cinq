@@ -1,20 +1,25 @@
 /**
  * CINQ Theme Manager
- * Handles dark/light/auto theme switching with smooth transitions
+ * Handles dark/light/auto/sunrise theme switching with smooth transitions
  * 
- * @version 1.0
- * @description Complete theme management system with system preference detection
+ * @version 1.1
+ * @description Complete theme management system with system preference detection and sunrise/sunset mode
  */
 
 (function() {
   'use strict';
 
   const STORAGE_KEY = 'cinq_theme';
+  const SUNRISE_CACHE_KEY = 'cinq_sunrise_data';
   const THEME_COLOR_DARK = '#0e0e12';
   const THEME_COLOR_LIGHT = '#faf9f7';
   
-  // Theme values: 'dark', 'light', 'auto'
-  const THEMES = ['dark', 'light', 'auto'];
+  // Default sunrise/sunset times (fallback)
+  const DEFAULT_SUNRISE = 7; // 7:00 AM
+  const DEFAULT_SUNSET = 19; // 7:00 PM
+  
+  // Theme values: 'dark', 'light', 'auto', 'sunrise'
+  const THEMES = ['dark', 'light', 'auto', 'sunrise'];
 
   /**
    * Get the current system color scheme preference
@@ -25,6 +30,159 @@
       return 'light';
     }
     return 'dark';
+  }
+
+  /**
+   * Get cached sunrise/sunset data
+   * @returns {Object|null}
+   */
+  function getCachedSunriseData() {
+    try {
+      const cached = localStorage.getItem(SUNRISE_CACHE_KEY);
+      if (cached) {
+        const data = JSON.parse(cached);
+        // Check if cache is from today
+        const today = new Date().toDateString();
+        if (data.date === today) {
+          return data;
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  /**
+   * Cache sunrise/sunset data
+   * @param {number} sunrise - Hour of sunrise (0-23)
+   * @param {number} sunset - Hour of sunset (0-23)
+   */
+  function cacheSunriseData(sunrise, sunset) {
+    try {
+      localStorage.setItem(SUNRISE_CACHE_KEY, JSON.stringify({
+        date: new Date().toDateString(),
+        sunrise,
+        sunset
+      }));
+    } catch (e) {}
+  }
+
+  /**
+   * Fetch sunrise/sunset times from API
+   * @param {number} lat - Latitude
+   * @param {number} lng - Longitude
+   * @returns {Promise<{sunrise: number, sunset: number}>}
+   */
+  async function fetchSunriseSunset(lat, lng) {
+    try {
+      const response = await fetch(
+        `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`
+      );
+      const data = await response.json();
+      
+      if (data.status === 'OK') {
+        const sunriseDate = new Date(data.results.sunrise);
+        const sunsetDate = new Date(data.results.sunset);
+        
+        return {
+          sunrise: sunriseDate.getHours() + sunriseDate.getMinutes() / 60,
+          sunset: sunsetDate.getHours() + sunsetDate.getMinutes() / 60
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to fetch sunrise/sunset data:', e);
+    }
+    return null;
+  }
+
+  /**
+   * Get sunrise/sunset times (with geolocation and caching)
+   * @returns {Promise<{sunrise: number, sunset: number}>}
+   */
+  async function getSunriseSunset() {
+    // Check cache first
+    const cached = getCachedSunriseData();
+    if (cached) {
+      return { sunrise: cached.sunrise, sunset: cached.sunset };
+    }
+
+    // Try geolocation
+    if ('geolocation' in navigator) {
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            timeout: 5000,
+            maximumAge: 86400000 // 24 hours
+          });
+        });
+        
+        const { latitude, longitude } = position.coords;
+        const times = await fetchSunriseSunset(latitude, longitude);
+        
+        if (times) {
+          cacheSunriseData(times.sunrise, times.sunset);
+          return times;
+        }
+      } catch (e) {
+        // Geolocation failed, use defaults
+      }
+    }
+
+    // Return default values
+    return { sunrise: DEFAULT_SUNRISE, sunset: DEFAULT_SUNSET };
+  }
+
+  /**
+   * Get theme based on current time vs sunrise/sunset
+   * @param {number} sunrise - Hour of sunrise
+   * @param {number} sunset - Hour of sunset
+   * @returns {'dark'|'light'}
+   */
+  function getThemeByTime(sunrise = DEFAULT_SUNRISE, sunset = DEFAULT_SUNSET) {
+    const now = new Date();
+    const currentHour = now.getHours() + now.getMinutes() / 60;
+    
+    // Light theme during daytime (between sunrise and sunset)
+    if (currentHour >= sunrise && currentHour < sunset) {
+      return 'light';
+    }
+    return 'dark';
+  }
+
+  /**
+   * Check and update sunrise theme if needed
+   */
+  async function updateSunriseTheme() {
+    const pref = getSavedTheme();
+    if (pref !== 'sunrise') return;
+
+    const times = await getSunriseSunset();
+    const effective = getThemeByTime(times.sunrise, times.sunset);
+    
+    const html = document.documentElement;
+    const currentEffective = html.getAttribute('data-theme');
+    
+    if (currentEffective !== effective) {
+      applyTheme('sunrise', true);
+    }
+  }
+
+  // Timer for sunrise mode updates
+  let sunriseTimer = null;
+
+  /**
+   * Start/stop sunrise mode timer
+   * @param {boolean} enable
+   */
+  function manageSunriseTimer(enable) {
+    if (sunriseTimer) {
+      clearInterval(sunriseTimer);
+      sunriseTimer = null;
+    }
+    
+    if (enable) {
+      // Check every minute for theme changes
+      sunriseTimer = setInterval(updateSunriseTheme, 60000);
+    }
   }
 
   /**
@@ -56,28 +214,38 @@
   }
 
   /**
-   * Get the effective theme (resolving 'auto' to actual theme)
-   * @param {'dark'|'light'|'auto'} preference
+   * Get the effective theme (resolving 'auto' and 'sunrise' to actual theme)
+   * @param {'dark'|'light'|'auto'|'sunrise'} preference
    * @returns {'dark'|'light'}
    */
   function getEffectiveTheme(preference) {
     if (preference === 'auto') {
       return getSystemPreference();
     }
+    if (preference === 'sunrise') {
+      const cached = getCachedSunriseData();
+      if (cached) {
+        return getThemeByTime(cached.sunrise, cached.sunset);
+      }
+      return getThemeByTime();
+    }
     return preference || 'dark';
   }
 
   /**
    * Apply theme to the document
-   * @param {'dark'|'light'|'auto'} preference - User preference (including auto)
+   * @param {'dark'|'light'|'auto'|'sunrise'} preference - User preference (including auto/sunrise)
    * @param {boolean} [withTransition=true] - Whether to animate the transition
    */
   function applyTheme(preference, withTransition = true) {
     const html = document.documentElement;
     const effectiveTheme = getEffectiveTheme(preference);
     
-    // Store the preference (including auto)
+    // Store the preference (including auto/sunrise)
     html.setAttribute('data-theme-preference', preference);
+    
+    // Manage sunrise timer
+    manageSunriseTimer(preference === 'sunrise');
     
     // Add transition class for smooth switch
     if (withTransition && !html.classList.contains('theme-loading')) {
@@ -94,6 +262,19 @@
     
     // Update theme-color meta tag
     updateThemeColor(effectiveTheme);
+    
+    // If sunrise mode, fetch real sunrise/sunset data asynchronously
+    if (preference === 'sunrise') {
+      getSunriseSunset().then(times => {
+        const newEffective = getThemeByTime(times.sunrise, times.sunset);
+        if (newEffective !== effectiveTheme) {
+          html.classList.add('theme-transitioning');
+          html.setAttribute('data-theme', newEffective);
+          updateThemeColor(newEffective);
+          setTimeout(() => html.classList.remove('theme-transitioning'), 400);
+        }
+      });
+    }
     
     // Dispatch custom event for any listeners
     window.dispatchEvent(new CustomEvent('themechange', {
@@ -237,6 +418,7 @@
     get: getTheme,
     init: initTheme,
     getSystemPreference,
+    getSunriseSunset,
     updateSelector: updateThemeSelector,
     THEMES
   };

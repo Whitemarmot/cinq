@@ -6,7 +6,7 @@
  */
 
 // Minified inline version (copy this into <script> tag in <head>):
-// (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),t=s||'dark';if(t==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',s||'dark');h.classList.add('theme-loading')})();
+// (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),t=s||'dark';if(t==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(t==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,h=new Date().getHours();t=(h>=sr&&h<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',s||'dark');h.classList.add('theme-loading')})();
 
 // Full readable version:
 (function() {
@@ -25,6 +25,20 @@
     effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) 
       ? 'light' 
       : 'dark';
+  }
+  // Resolve 'sunrise' to actual theme based on time
+  else if (preference === 'sunrise') {
+    var sunriseData = null;
+    try {
+      sunriseData = JSON.parse(localStorage.getItem('cinq_sunrise_data'));
+    } catch(e) {}
+    
+    var sunrise = (sunriseData && sunriseData.sunrise) || 7;
+    var sunset = (sunriseData && sunriseData.sunset) || 19;
+    var now = new Date();
+    var currentHour = now.getHours() + now.getMinutes() / 60;
+    
+    effective = (currentHour >= sunrise && currentHour < sunset) ? 'light' : 'dark';
   }
   
   // Apply theme immediately

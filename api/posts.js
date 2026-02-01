@@ -12,6 +12,7 @@ import { supabase, requireAuth, getUserInfo, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, sanitizeText } from './_validation.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
+import { processMentions } from './notifications.js';
 
 const MAX_CONTENT_LENGTH = 1000;
 const MAX_IMAGE_URL_LENGTH = 2000;
@@ -249,6 +250,10 @@ async function handleCreatePost(req, res, user) {
     if (error) throw error;
     
     const authorInfo = await getUserInfo(user.id);
+    
+    // Process @mentions and create notifications (fire and forget)
+    processMentions(sanitizedContent, user.id, 'post_mention', post.id)
+        .catch(e => logError(e, { context: 'processMentions', postId: post.id }));
     
     logInfo('Post created', { postId: post.id, userId: user.id });
     

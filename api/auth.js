@@ -10,6 +10,7 @@
 import { supabase, getUser, handleCors } from './_supabase.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
+import { logActivity } from './activity-log.js';
 
 // Validation patterns
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -259,6 +260,9 @@ async function handleLogin(req, res) {
             hint: 'Vérifie tes identifiants et réessaie'
         });
     }
+
+    // Log successful login
+    logActivity(data.user.id, 'login', {}, req);
 
     return res.json({
         success: true,

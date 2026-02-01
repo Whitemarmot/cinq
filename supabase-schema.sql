@@ -357,6 +357,85 @@ ALTER TABLE account_deletions ENABLE ROW LEVEL SECURITY;
 -- No policies = only service role key works
 
 -- ============================================
+-- NOTIFICATIONS (mentions, etc.)
+-- ============================================
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    actor_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN ('post_mention', 'message_mention', 'new_contact', 'system')),
+    reference_id UUID,
+    content TEXT,
+    read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread ON notifications(user_id, read) WHERE read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own notifications
+CREATE POLICY "Users can view own notifications" ON notifications 
+    FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update own notifications" ON notifications 
+    FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own notifications" ON notifications 
+    FOR DELETE USING (auth.uid() = user_id);
+-- Only service role can insert (API creates notifications)
+
+-- ============================================
+-- BOOKMARKS (favorites)
+-- ============================================
+CREATE TABLE IF NOT EXISTS bookmarks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, post_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_bookmarks_user_id ON bookmarks(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookmarks_post_id ON bookmarks(post_id);
+CREATE INDEX IF NOT EXISTS idx_bookmarks_created_at ON bookmarks(created_at DESC);
+
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
+
+-- Bookmarks: users can manage their own bookmarks
+CREATE POLICY "Users can view own bookmarks" ON bookmarks FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can add bookmarks" ON bookmarks FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own bookmarks" ON bookmarks FOR DELETE USING (auth.uid() = user_id);
+
+-- ============================================
+-- ACTIVITY LOG (user activity history)
+-- ============================================
+CREATE TABLE IF NOT EXISTS activity_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    activity_type TEXT NOT NULL,
+    metadata JSONB DEFAULT '{}',
+    ip_hash TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_log_user_id ON activity_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON activity_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_log_user_created ON activity_log(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_log_type ON activity_log(activity_type);
+
+ALTER TABLE activity_log ENABLE ROW LEVEL SECURITY;
+
+-- Users can only view their own activity log
+CREATE POLICY "Users can view own activity log" ON activity_log 
+    FOR SELECT USING (auth.uid() = user_id);
+
+-- Only service role can insert (API-only)
+-- No insert policy for regular users = service role only
+
+-- ============================================
 -- GRANT SERVICE ROLE ACCESS
 -- ============================================
 -- For API routes using service role key

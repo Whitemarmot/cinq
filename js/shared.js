@@ -233,6 +233,66 @@
   }
 
   // ============================================
+  // Mentions System
+  // ============================================
+
+  /**
+   * Parse and render @mentions in text
+   * Converts @username to clickable blue links
+   * @param {string} text - Text that may contain @mentions
+   * @param {boolean} [escape=true] - Whether to escape HTML first
+   * @returns {string} - HTML with mentions styled as links
+   * @example
+   * renderMentions("Hey @john how are you?")
+   * // Returns: 'Hey <a href="/profile.html?user=john" class="mention">@john</a> how are you?'
+   */
+  function renderMentions(text, escape = true) {
+    if (!text) return '';
+    
+    // First escape HTML if needed
+    const safeText = escape ? escapeHtml(text) : text;
+    
+    // Match @username (alphanumeric, underscores, dots, hyphens, 2-30 chars)
+    const mentionRegex = /@([a-zA-Z0-9_.-]{2,30})\b/g;
+    
+    return safeText.replace(mentionRegex, (match, username) => {
+      return `<a href="/profile.html?user=${encodeURIComponent(username)}" class="mention" data-username="${escapeHtml(username)}">@${escapeHtml(username)}</a>`;
+    });
+  }
+
+  /**
+   * Extract @mentions from text
+   * @param {string} text - Text to parse
+   * @returns {string[]} - Array of usernames (without @)
+   */
+  function extractMentions(text) {
+    if (!text) return [];
+    
+    const mentionRegex = /@([a-zA-Z0-9_.-]{2,30})\b/g;
+    const mentions = [];
+    let match;
+    
+    while ((match = mentionRegex.exec(text)) !== null) {
+      const username = match[1].toLowerCase();
+      if (!mentions.includes(username)) {
+        mentions.push(username);
+      }
+    }
+    
+    return mentions;
+  }
+
+  /**
+   * Check if text contains any @mentions
+   * @param {string} text
+   * @returns {boolean}
+   */
+  function hasMentions(text) {
+    if (!text) return false;
+    return /@[a-zA-Z0-9_.-]{2,30}\b/.test(text);
+  }
+
+  // ============================================
   // Export to Global Scope
   // ============================================
 
@@ -243,6 +303,9 @@
   window.showToast = showToast;
   window.triggerHaptic = triggerHaptic;
   window.formatTime = formatTime;
+  window.renderMentions = renderMentions;
+  window.extractMentions = extractMentions;
+  window.hasMentions = hasMentions;
 
   // Also expose under CinqShared namespace
   window.CinqShared = {
@@ -251,7 +314,10 @@
     getToken,
     showToast,
     triggerHaptic,
-    formatTime
+    formatTime,
+    renderMentions,
+    extractMentions,
+    hasMentions
   };
 
 })(window);

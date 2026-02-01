@@ -184,3 +184,23 @@ Le sprint de nuit a été un **succès exceptionnel**:
 | dev-public-profiles | Page profil public |
 | dev-reactions | Réactions emoji posts |
 | dev-vacation-mode | Mode vacances |
+
+### Wave 9 - Completed ✅
+| Agent | Status | Résultat |
+|-------|--------|----------|
+| dev-typing-indicators | ✅ | "X écrit..." Realtime |
+| dev-read-receipts | ✅ | Double check ✓✓ |
+| dev-keyboard-shortcuts | ✅ | Ctrl+1-5, Ctrl+N/F |
+| dev-public-profiles | ✅ | /u/xxx page profil |
+| dev-reactions | ✅ | ❤️😂😮😢👏 sur posts |
+| dev-vacation-mode | ✅ | Mode vacances 🌴 |
+
+### Wave 10 - Launched 01:52 UTC
+| Agent | Tâche |
+|-------|-------|
+| dev-mentions | @mentions cliquables + notifs |
+| dev-bookmarks | Favoris/bookmarks posts |
+| dev-link-previews | Preview URLs YouTube/Twitter |
+| dev-voice-messages | Messages vocaux 🎤 |
+| dev-auto-dark | Dark mode auto sunrise/sunset |
+| dev-activity-log | Historique activité |

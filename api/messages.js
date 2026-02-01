@@ -11,6 +11,7 @@ import { sendPushNotification } from './_push-helper.js';
 import { checkRateLimit, RATE_LIMITS } from './_rate-limit.js';
 import { isValidUUID, validateMessageContent } from './_validation.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
+import { processMentions } from './notifications.js';
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_FETCH_LIMIT = 100;
@@ -263,6 +264,12 @@ async function handleSendMessage(req, res, user) {
 
     // Send push notification (fire and forget)
     sendPushToReceiver(contact_id, user, data, is_ping, safeContent);
+    
+    // Process @mentions in message and create notifications (fire and forget)
+    if (!is_ping && safeContent) {
+        processMentions(safeContent, user.id, 'message_mention', data.id)
+            .catch(e => logError(e, { context: 'processMentions', messageId: data.id }));
+    }
 
     // Check if receiver is in vacation mode and send auto-reply
     await sendVacationAutoReply(contact_id, user.id);

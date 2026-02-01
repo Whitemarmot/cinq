@@ -46,11 +46,21 @@
     
     <!-- Theme initialization -->
     <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
         
-        const THEMES = ['dark', 'light', 'auto'];
+        const THEMES = ['dark', 'light', 'auto', 'sunrise'];
         function getSystemPref() { return window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark'; }
-        function getEffective(p) { return p === 'auto' ? getSystemPref() : (p || 'dark'); }
+        function getSunrisePref() {
+            var c; try { c = JSON.parse(localStorage.getItem('cinq_sunrise_data')); } catch(e) {}
+            var sr = c && c.sunrise || 7, ss = c && c.sunset || 19;
+            var now = new Date(), ch = now.getHours() + now.getMinutes() / 60;
+            return (ch >= sr && ch < ss) ? 'light' : 'dark';
+        }
+        function getEffective(p) { 
+            if (p === 'auto') return getSystemPref();
+            if (p === 'sunrise') return getSunrisePref();
+            return p || 'dark'; 
+        }
         
         function toggleTheme() {
             var curr = localStorage.getItem('cinq_theme') || 'dark';
@@ -70,6 +80,37 @@
             if(m) m.content = eff === 'light' ? '#faf9f7' : '#0e0e12';
             setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
             updateThemeSelector(theme);
+            updateThemeDescription(theme);
+            
+            // For sunrise mode, try to fetch real sunrise/sunset times
+            if (theme === 'sunrise' && 'geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    fetch('https://api.sunrise-sunset.org/json?lat=' + pos.coords.latitude + '&lng=' + pos.coords.longitude + '&formatted=0')
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.status === 'OK') {
+                                var sr = new Date(data.results.sunrise);
+                                var ss = new Date(data.results.sunset);
+                                var srH = sr.getHours() + sr.getMinutes() / 60;
+                                var ssH = ss.getHours() + ss.getMinutes() / 60;
+                                localStorage.setItem('cinq_sunrise_data', JSON.stringify({
+                                    date: new Date().toDateString(),
+                                    sunrise: srH,
+                                    sunset: ssH
+                                }));
+                                // Update theme if needed
+                                var newEff = getSunrisePref();
+                                if (newEff !== eff) {
+                                    h.classList.add('theme-transitioning');
+                                    h.setAttribute('data-theme', newEff);
+                                    if(m) m.content = newEff === 'light' ? '#faf9f7' : '#0e0e12';
+                                    setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
+                                }
+                                updateThemeDescription('sunrise');
+                            }
+                        });
+                }, null, { timeout: 5000, maximumAge: 86400000 });
+            }
         }
         
         function updateThemeSelector(pref) {
@@ -78,6 +119,36 @@
                 btn.classList.toggle('active', t === pref);
                 btn.setAttribute('aria-pressed', t === pref);
             });
+        }
+        
+        function updateThemeDescription(pref) {
+            var desc = document.getElementById('theme-description');
+            if (!desc) return;
+            
+            var descriptions = {
+                'dark': 'Mode sombre activé.',
+                'light': 'Mode clair activé.',
+                'auto': 'Le mode auto suit les préférences de ton système.',
+                'sunrise': 'Thème clair le jour, sombre la nuit (selon l\'heure locale).'
+            };
+            
+            // For sunrise, try to show actual times
+            if (pref === 'sunrise') {
+                try {
+                    var c = JSON.parse(localStorage.getItem('cinq_sunrise_data'));
+                    if (c && c.sunrise && c.sunset) {
+                        var srH = Math.floor(c.sunrise);
+                        var srM = Math.round((c.sunrise - srH) * 60);
+                        var ssH = Math.floor(c.sunset);
+                        var ssM = Math.round((c.sunset - ssH) * 60);
+                        desc.textContent = '☀️ Lever ' + srH + 'h' + (srM < 10 ? '0' : '') + srM + ' — 🌙 Coucher ' + ssH + 'h' + (ssM < 10 ? '0' : '') + ssM;
+                        return;
+                    }
+                } catch(e) {}
+                desc.textContent = descriptions[pref] || descriptions['dark'];
+            } else {
+                desc.textContent = descriptions[pref] || descriptions['dark'];
+            }
         }
         
         // Listen for system changes (auto mode)
@@ -1020,7 +1091,7 @@
                     </div>
                     
                     <!-- Theme Selector -->
-                    <div class="theme-selector" role="radiogroup" aria-label="Sélection du thème">
+                    <div class="theme-selector theme-selector-4" role="radiogroup" aria-label="Sélection du thème">
                         <button type="button" class="theme-selector-option" data-theme="dark" onclick="setTheme('dark')" aria-pressed="false" role="radio">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                             <span>Sombre</span>
@@ -1032,6 +1103,10 @@
                         <button type="button" class="theme-selector-option" data-theme="auto" onclick="setTheme('auto')" aria-pressed="false" role="radio">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 16.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 1 1 12 7.5"/><path d="M12 7.5V4"/><path d="M12 20v-3.5"/><path d="M16.5 12H20"/><path d="M4 12h3.5"/></svg>
                             <span>Auto</span>
+                        </button>
+                        <button type="button" class="theme-selector-option" data-theme="sunrise" onclick="setTheme('sunrise')" aria-pressed="false" role="radio">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg>
+                            <span>Soleil</span>
                         </button>
                     </div>
                     
@@ -1193,6 +1268,27 @@
                     </button>
                 </div>
                 <p id="export-message" class="form-message hidden" style="margin-top: var(--space-2);"></p>
+            </section>
+
+            <!-- Section: Activité récente -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Ton activité récente
+                </h2>
+                
+                <div id="activity-log-card" class="settings-card">
+                    <div id="activity-log-loading" class="settings-item" style="justify-content: center;">
+                        <span style="color: var(--color-text-muted); font-size: var(--text-sm);">Chargement...</span>
+                    </div>
+                    <div id="activity-log-empty" class="settings-item hidden" style="justify-content: center;">
+                        <span style="color: var(--color-text-muted); font-size: var(--text-sm);">Aucune activité récente</span>
+                    </div>
+                    <div id="activity-log-list"></div>
+                    <button id="activity-log-more" class="settings-item hidden" style="width: 100%; justify-content: center; cursor: pointer; border: none; background: transparent;">
+                        <span style="color: var(--color-brand); font-size: var(--text-sm); font-weight: 500;">Voir plus...</span>
+                    </button>
+                </div>
             </section>
 
             <!-- Section: À propos -->
@@ -1489,6 +1585,7 @@
                 await UserProfile.updatePassword(current, newPass);
                 hidePasswordModal();
                 showToast('Mot de passe modifié ✓');
+                logUserActivity('password_change');
             } catch (err) {
                 showMessage('password-error', err.message, true);
             } finally {
@@ -1710,6 +1807,7 @@
                 showMessage('name-message', 'Nom mis à jour ✓', false);
                 setTimeout(() => hideMessage('name-message'), 3000);
                 showToast('Profil mis à jour ✓');
+                logUserActivity('profile_update', { field: 'display_name' });
             } catch (err) {
                 showMessage('name-message', err.message, true);
             } finally {
@@ -1733,6 +1831,7 @@
                 await UserProfile.updateEmail(email);
                 showMessage('email-message', 'Email de confirmation envoyé ✓', false);
                 setTimeout(() => hideMessage('email-message'), 5000);
+                logUserActivity('email_change', { new_email: email });
             } catch (err) {
                 showMessage('email-message', err.message, true);
             } finally {
@@ -1855,6 +1954,7 @@
                 
                 updatePushUI(true);
                 showToast('Notifications activées ! 🔔');
+                logUserActivity('push_enabled');
                 
             } catch (err) {
                 console.error('Push subscription error:', err);
@@ -1891,6 +1991,7 @@
                 
                 updatePushUI(false);
                 showToast('Notifications désactivées');
+                logUserActivity('push_disabled');
                 
             } catch (err) {
                 console.error('Push unsubscribe error:', err);
@@ -1964,6 +2065,7 @@
                 
                 showMessage('export-message', 'Export téléchargé ✓', false);
                 showToast('Données exportées ! 📦');
+                logUserActivity('data_export');
                 setTimeout(() => hideMessage('export-message'), 5000);
                 
             } catch (err) {
@@ -2035,11 +2137,13 @@
                 
                 if (willBeActive) {
                     showToast('Mode vacances activé 🌴');
+                    logUserActivity('vacation_enabled');
                     // Announce to screen readers
                     const announce = $('settings-status');
                     if (announce) announce.textContent = 'Mode vacances activé. Les notifications sont désactivées.';
                 } else {
                     showToast('Mode vacances désactivé');
+                    logUserActivity('vacation_disabled');
                     const announce = $('settings-status');
                     if (announce) announce.textContent = 'Mode vacances désactivé. Les notifications sont réactivées.';
                 }
@@ -2079,6 +2183,115 @@
         }
         
         $('btn-save-vacation-message').addEventListener('click', saveVacationMessage);
+        
+        // ============================================
+        // Activity Log
+        // ============================================
+        let activityOffset = 0;
+        const ACTIVITY_LIMIT = 5;
+        let activityTotal = 0;
+        
+        async function loadActivityLog(loadMore = false) {
+            const loadingEl = $('activity-log-loading');
+            const emptyEl = $('activity-log-empty');
+            const listEl = $('activity-log-list');
+            const moreBtn = $('activity-log-more');
+            
+            if (!loadMore) {
+                loadingEl.classList.remove('hidden');
+                emptyEl.classList.add('hidden');
+                listEl.innerHTML = '';
+                moreBtn.classList.add('hidden');
+                activityOffset = 0;
+            } else {
+                moreBtn.disabled = true;
+                moreBtn.querySelector('span').textContent = 'Chargement...';
+            }
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) {
+                    loadingEl.classList.add('hidden');
+                    emptyEl.classList.remove('hidden');
+                    return;
+                }
+                
+                const response = await fetch(`/api/activity-log?limit=${ACTIVITY_LIMIT}&offset=${activityOffset}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                loadingEl.classList.add('hidden');
+                activityTotal = data.pagination.total;
+                
+                if (data.activities.length === 0 && activityOffset === 0) {
+                    emptyEl.classList.remove('hidden');
+                    return;
+                }
+                
+                // Render activities
+                data.activities.forEach(activity => {
+                    const item = document.createElement('div');
+                    item.className = 'settings-item';
+                    item.innerHTML = `
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span>${activity.icon}</span>
+                                <span>${activity.label}</span>
+                            </p>
+                            <p class="settings-item-subtitle">${activity.description}</p>
+                        </div>
+                        <span style="color: var(--color-text-muted); font-size: var(--text-xs); white-space: nowrap;">${activity.relative_time}</span>
+                    `;
+                    listEl.appendChild(item);
+                });
+                
+                activityOffset += data.activities.length;
+                
+                // Show "load more" button if there are more
+                if (data.pagination.has_more) {
+                    moreBtn.classList.remove('hidden');
+                    moreBtn.disabled = false;
+                    moreBtn.querySelector('span').textContent = 'Voir plus...';
+                } else {
+                    moreBtn.classList.add('hidden');
+                }
+                
+            } catch (err) {
+                console.error('Error loading activity log:', err);
+                loadingEl.classList.add('hidden');
+                if (activityOffset === 0) {
+                    emptyEl.textContent = 'Erreur de chargement';
+                    emptyEl.classList.remove('hidden');
+                }
+            }
+        }
+        
+        $('activity-log-more').addEventListener('click', () => loadActivityLog(true));
+        
+        // Helper to log activity from settings page
+        async function logUserActivity(activityType, metadata = {}) {
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) return;
+                
+                await fetch('/api/activity-log?action=log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ activity_type: activityType, metadata })
+                });
+            } catch (e) {
+                // Silent fail - don't break main flow
+            }
+        }
         
         // ============================================
         // Initialize
@@ -2129,6 +2342,9 @@
                 
                 // Check if account deletion is pending
                 await checkDeletionStatus();
+                
+                // Load activity log
+                loadActivityLog();
                 
                 showScreen('settings');
                 
