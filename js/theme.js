@@ -697,6 +697,132 @@
     }
   }
 
+  // ===== MESSAGE ANIMATION SETTINGS =====
+
+  const MSG_ANIM_KEY = 'cinq_msg_animation';
+  const MSG_ANIMATIONS = ['none', 'fade', 'slide', 'bounce'];
+  const MSG_ANIM_NAMES = {
+    'none': 'Aucune animation',
+    'fade': 'Animation fondu',
+    'slide': 'Animation glisser',
+    'bounce': 'Animation rebondir'
+  };
+
+  /**
+   * Get the saved message animation from localStorage
+   * @returns {string}
+   */
+  function getMsgAnimation() {
+    try {
+      const val = localStorage.getItem(MSG_ANIM_KEY);
+      return MSG_ANIMATIONS.includes(val) ? val : 'fade';
+    } catch (e) {}
+    return 'fade'; // Default animation
+  }
+
+  /**
+   * Save message animation to localStorage
+   * @param {string} animation
+   */
+  function saveMsgAnimation(animation) {
+    try {
+      localStorage.setItem(MSG_ANIM_KEY, animation);
+    } catch (e) {}
+  }
+
+  /**
+   * Apply message animation to the document
+   * @param {string} animation - Animation name
+   */
+  function applyMsgAnimation(animation) {
+    if (!MSG_ANIMATIONS.includes(animation)) {
+      console.warn('Invalid message animation:', animation);
+      return;
+    }
+
+    document.documentElement.setAttribute('data-msg-animation', animation);
+
+    // Dispatch custom event for any listeners
+    window.dispatchEvent(new CustomEvent('msganimationchange', {
+      detail: { animation }
+    }));
+  }
+
+  /**
+   * Set a specific message animation
+   * @param {string} animation - Animation name
+   */
+  function setMsgAnimation(animation) {
+    if (!MSG_ANIMATIONS.includes(animation)) {
+      console.warn('Invalid message animation:', animation);
+      return;
+    }
+
+    saveMsgAnimation(animation);
+    applyMsgAnimation(animation);
+    updateMsgAnimSelector(animation);
+    updateMsgAnimDescription(animation);
+    playMsgAnimPreview(animation);
+  }
+
+  /**
+   * Update message animation selector UI (for settings page)
+   * @param {string} animation - Current animation
+   */
+  function updateMsgAnimSelector(animation) {
+    const options = document.querySelectorAll('.msg-anim-option');
+    options.forEach(option => {
+      const a = option.getAttribute('data-animation');
+      option.classList.toggle('active', a === animation);
+      option.setAttribute('aria-pressed', a === animation);
+    });
+  }
+
+  /**
+   * Update message animation description (for settings page)
+   * @param {string} animation - Current animation
+   */
+  function updateMsgAnimDescription(animation) {
+    const desc = document.getElementById('msg-anim-description');
+    if (desc) {
+      desc.textContent = MSG_ANIM_NAMES[animation] || MSG_ANIM_NAMES['fade'];
+    }
+  }
+
+  /**
+   * Play animation preview (for settings page)
+   * @param {string} animation - Animation to preview
+   */
+  function playMsgAnimPreview(animation) {
+    const preview = document.getElementById('msg-anim-preview');
+    if (!preview) return;
+
+    // Update preview type
+    preview.setAttribute('data-preview', animation);
+
+    // Reset and replay animation
+    preview.classList.remove('playing');
+    const items = preview.querySelectorAll('.msg-anim-preview-item');
+    items.forEach(item => {
+      item.style.animation = 'none';
+      item.offsetHeight; // Trigger reflow
+      item.style.animation = '';
+    });
+
+    // Only play if not "none"
+    if (animation !== 'none') {
+      preview.classList.add('playing');
+    }
+  }
+
+  /**
+   * Initialize message animation on page load
+   */
+  function initMsgAnimation() {
+    const animation = getMsgAnimation();
+    applyMsgAnimation(animation);
+  }
+
   // Auto-initialize if script is loaded after DOM is ready
   if (document.readyState === 'loading') {
     // DOM not ready, wait for it
@@ -708,6 +834,11 @@
       // Update any accent selectors on the page
       const accent = getAccent();
       updateAccentSelector(accent);
+      
+      // Update any message animation selectors on the page
+      const msgAnim = getMsgAnimation();
+      updateMsgAnimSelector(msgAnim);
+      updateMsgAnimDescription(msgAnim);
     });
   } else {
     // DOM already ready
@@ -716,12 +847,17 @@
     
     const accent = getAccent();
     updateAccentSelector(accent);
+    
+    const msgAnim = getMsgAnimation();
+    updateMsgAnimSelector(msgAnim);
+    updateMsgAnimDescription(msgAnim);
   }
 
-  // Initialize theme, accent, and night mode immediately (runs synchronously)
+  // Initialize theme, accent, night mode, and message animation immediately (runs synchronously)
   initTheme();
   initAccent();
   initNightMode();
+  initMsgAnimation();
 
   // Expose API globally
   window.CinqTheme = {
@@ -746,7 +882,15 @@
     isNightTime,
     updateNightModeToggle,
     NIGHT_MODE_START,
-    NIGHT_MODE_END
+    NIGHT_MODE_END,
+    // Message Animation API
+    setMsgAnimation,
+    getMsgAnimation,
+    updateMsgAnimSelector,
+    updateMsgAnimDescription,
+    playMsgAnimPreview,
+    MSG_ANIMATIONS,
+    MSG_ANIM_NAMES
   };
 
   // Also expose simple toggleTheme function for onclick handlers
@@ -755,5 +899,6 @@
   window.setAccent = setAccent;
   window.setNightMode = setNightMode;
   window.toggleNightMode = toggleNightMode;
+  window.setMsgAnimation = setMsgAnimation;
 
 })();

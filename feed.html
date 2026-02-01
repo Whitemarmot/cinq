@@ -51,11 +51,17 @@
     <!-- Quick Actions (Long Press Context Menu) -->
     <link rel="stylesheet" href="/css/quick-actions.min.css">
     
+    <!-- Quick Profile Edit -->
+    <link rel="stylesheet" href="/css/quick-profile-edit.css">
+    
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.css">
     
     <!-- GIPHY Integration -->
     <link rel="stylesheet" href="/css/giphy.css">
+    
+    <!-- Message Animations -->
+    <link rel="stylesheet" href="/css/message-animations.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
@@ -73,6 +79,14 @@
         (function() {
             var isReading = localStorage.getItem('cinq_reading_mode') === 'true';
             document.documentElement.setAttribute('data-reading-mode', isReading ? 'true' : 'false');
+        })();
+    </script>
+    
+    <!-- Message animation initialization (prevent flash) -->
+    <script>
+        (function() {
+            var msgAnim = localStorage.getItem('cinq_msg_animation') || 'fade';
+            document.documentElement.setAttribute('data-msg-animation', msgAnim);
         })();
     </script>
     
@@ -3694,6 +3708,11 @@
                 Feed
             </span>
             <div class="header-actions">
+                <!-- Quick Profile Edit Avatar -->
+                <button class="header-profile-avatar" id="header-profile-avatar" aria-label="Modifier le profil" title="Modifier le profil">
+                    <span id="header-avatar-emoji">?</span>
+                    <span class="edit-hint">✏️</span>
+                </button>
                 <button class="drafts-btn" id="drafts-btn" onclick="CinqDrafts.openModal()" aria-label="Voir mes brouillons" title="Brouillons">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -7367,6 +7386,9 @@
     
     <!-- Quick Actions (Long Press Context Menu) -->
     <script src="/js/quick-actions.min.js" defer></script>
+    
+    <!-- Quick Profile Edit -->
+    <script src="/js/quick-profile-edit.js" defer></script>
     
     <!-- Easter Eggs 🥚 -->
     <script src="/js/easter-eggs.min.js" defer></script>
