@@ -61,6 +61,9 @@
     <!-- Shared utilities (escapeHtml, authHeaders, showToast, etc.) -->
     <script src="/js/shared.js"></script>
     
+    <!-- Markdown parser for posts and messages -->
+    <script src="/js/markdown.js"></script>
+    
     <!-- Supabase Client for Realtime -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     
@@ -6245,6 +6248,205 @@
         .chat-scheduled-indicator:hover .chat-scheduled-text {
             color: white;
         }
+        
+        /* ===== FORWARD MESSAGE MODAL ===== */
+        .forward-modal {
+            max-width: 400px;
+        }
+        
+        .forward-modal .modal-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .forward-message-preview {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-3);
+            margin-bottom: var(--space-4);
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .forward-message-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(transparent, var(--color-bg-tertiary));
+            pointer-events: none;
+        }
+        
+        .forward-message-preview p {
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            margin: 0;
+            word-break: break-word;
+        }
+        
+        .forward-message-preview .forward-preview-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .forward-contacts-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: var(--space-4);
+        }
+        
+        .forward-contacts-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .forward-contacts-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .forward-contacts-list::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+        
+        .forward-contact-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .forward-contact-item:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-active);
+            transform: translateX(4px);
+        }
+        
+        .forward-contact-item.selected {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+        }
+        
+        .forward-contact-item.selected .forward-contact-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .forward-contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .forward-contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .forward-contact-name {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .forward-contact-email {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .forward-contact-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s var(--ease-spring);
+        }
+        
+        .forward-contact-check svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .forward-empty-contacts {
+            text-align: center;
+            padding: var(--space-6);
+            color: var(--color-text-muted);
+        }
+        
+        .forward-empty-contacts svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--space-3);
+            opacity: 0.5;
+        }
+        
+        .forward-btn {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            background: var(--cinq-gradient);
+            border: none;
+            border-radius: var(--radius-lg);
+            color: white;
+            font-weight: 600;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .forward-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--color-brand-glow);
+        }
+        
+        .forward-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .forward-btn svg {
+            width: 16px;
+            height: 16px;
+        }
     </style>
     
     <!-- Confetti celebrations -->
@@ -7137,6 +7339,45 @@
                     <span aria-hidden="true">💾</span> Enregistrer
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Forward Message Modal -->
+    <div class="modal-overlay" id="forward-modal" role="dialog" aria-modal="true" aria-labelledby="forward-modal-title" aria-hidden="true">
+        <div class="modal forward-modal">
+            <h2 class="modal-title" id="forward-modal-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="15 17 20 12 15 7"/>
+                    <path d="M4 18v-2a4 4 0 0 1 4-4h12"/>
+                </svg>
+                Transférer le message
+            </h2>
+            
+            <div class="forward-message-preview" id="forward-message-preview">
+                <div class="forward-preview-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Message à transférer
+                </div>
+                <p id="forward-message-content"></p>
+            </div>
+            
+            <div class="forward-contacts-list" id="forward-contacts-list" role="listbox" aria-label="Sélectionner un destinataire">
+                <!-- Contacts will be rendered here -->
+            </div>
+            
+            <button class="forward-btn" id="forward-send-btn" onclick="confirmForwardMessage()" type="button" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 17 20 12 15 7"/>
+                    <path d="M4 18v-2a4 4 0 0 1 4-4h12"/>
+                </svg>
+                Transférer
+            </button>
+            
+            <button style="margin-top:var(--space-3);background:none;border:none;color:var(--color-text-muted);cursor:pointer;width:100%;padding:var(--space-2);" onclick="closeForwardModal()" type="button">Annuler</button>
+            
+            <input type="hidden" id="forward-message-id">
         </div>
     </div>
 
@@ -9903,6 +10144,16 @@
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                     </svg>
                 </button>
+                <button class="message-action-btn" 
+                        onclick="openForwardModal('${messageId}')" 
+                        data-forward-msg-id="${messageId}"
+                        type="button" 
+                        aria-label="Transférer ce message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 17 20 12 15 7"/>
+                        <path d="M4 18v-2a4 4 0 0 1 4-4h12"/>
+                    </svg>
+                </button>
             `;
         }
 
@@ -10253,6 +10504,237 @@
             } catch (e) {
                 console.error('Failed to delete reminder:', e);
                 showToast({ type: 'error', message: 'Erreur lors de la suppression' });
+            }
+        }
+
+        // ===== FORWARD MESSAGES =====
+        let currentForwardMessageId = null;
+        let currentForwardMessageContent = null;
+        let selectedForwardContactId = null;
+        
+        function openForwardModal(messageId) {
+            currentForwardMessageId = messageId;
+            selectedForwardContactId = null;
+            
+            // Get message content
+            const msgEl = document.getElementById(`msg-${messageId}`);
+            if (!msgEl) return;
+            
+            const contentEl = msgEl.querySelector('.chat-message-content');
+            const stickerEl = msgEl.querySelector('.sticker-content');
+            const gifEl = msgEl.querySelector('.gif-content');
+            const voiceEl = msgEl.querySelector('.voice-message');
+            const fileEl = msgEl.querySelector('.file-attachment');
+            const locationEl = msgEl.querySelector('.location-content');
+            
+            let previewContent = '';
+            
+            if (contentEl && contentEl.textContent.trim()) {
+                currentForwardMessageContent = contentEl.textContent.trim();
+                previewContent = escapeHtml(currentForwardMessageContent);
+            } else if (stickerEl) {
+                currentForwardMessageContent = '[Sticker]';
+                previewContent = '🎨 Sticker';
+            } else if (gifEl) {
+                currentForwardMessageContent = '[GIF]';
+                previewContent = '🎬 GIF';
+            } else if (voiceEl) {
+                currentForwardMessageContent = '[Message vocal]';
+                previewContent = '🎤 Message vocal';
+            } else if (fileEl) {
+                currentForwardMessageContent = '[Fichier]';
+                previewContent = '📎 Fichier';
+            } else if (locationEl) {
+                currentForwardMessageContent = '[Position]';
+                previewContent = '📍 Position';
+            } else if (msgEl.classList.contains('ping')) {
+                currentForwardMessageContent = '[Coucou]';
+                previewContent = '👋 Coucou';
+            } else {
+                currentForwardMessageContent = '[Message]';
+                previewContent = 'Message';
+            }
+            
+            // Update preview in modal
+            document.getElementById('forward-message-content').innerHTML = previewContent;
+            document.getElementById('forward-message-id').value = messageId;
+            
+            // Render contacts list (excluding current chat contact)
+            renderForwardContactsList();
+            
+            // Reset button state
+            const sendBtn = document.getElementById('forward-send-btn');
+            sendBtn.disabled = true;
+            
+            // Show modal
+            const modal = document.getElementById('forward-modal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            triggerHaptic?.('tap');
+        }
+        
+        function closeForwardModal() {
+            const modal = document.getElementById('forward-modal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            currentForwardMessageId = null;
+            currentForwardMessageContent = null;
+            selectedForwardContactId = null;
+        }
+        
+        function renderForwardContactsList() {
+            const container = document.getElementById('forward-contacts-list');
+            
+            // Filter out current chat contact and archived contacts
+            const availableContacts = contacts.filter(c => 
+                c.contact_user_id !== currentChatContact?.contact_user_id
+            );
+            
+            if (availableContacts.length === 0) {
+                container.innerHTML = `
+                    <div class="forward-empty-contacts">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <p>Aucun autre contact disponible</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = availableContacts.map(contact => {
+                const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || 'Contact';
+                const email = contact.contact?.email || '';
+                const initial = name.charAt(0).toUpperCase();
+                
+                return `
+                    <div class="forward-contact-item" 
+                         data-contact-id="${contact.contact_user_id}"
+                         onclick="selectForwardContact('${contact.contact_user_id}')"
+                         role="option"
+                         aria-selected="false">
+                        <div class="forward-contact-avatar">${escapeHtml(initial)}</div>
+                        <div class="forward-contact-info">
+                            <div class="forward-contact-name">${escapeHtml(name)}</div>
+                            <div class="forward-contact-email">${escapeHtml(email)}</div>
+                        </div>
+                        <div class="forward-contact-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function selectForwardContact(contactId) {
+            selectedForwardContactId = contactId;
+            
+            // Update visual selection
+            document.querySelectorAll('.forward-contact-item').forEach(item => {
+                const isSelected = item.dataset.contactId === contactId;
+                item.classList.toggle('selected', isSelected);
+                item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            });
+            
+            // Enable send button
+            document.getElementById('forward-send-btn').disabled = false;
+            
+            triggerHaptic?.('tap');
+        }
+        
+        async function confirmForwardMessage() {
+            if (!selectedForwardContactId || !currentForwardMessageId) return;
+            
+            const btn = document.getElementById('forward-send-btn');
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"/>
+                </svg>
+                Transfert...
+            `;
+            
+            try {
+                // Get original message data
+                const msgEl = document.getElementById(`msg-${currentForwardMessageId}`);
+                const contentEl = msgEl?.querySelector('.chat-message-content');
+                const stickerEl = msgEl?.querySelector('.sticker-content img');
+                const gifEl = msgEl?.querySelector('.gif-content img');
+                const voiceEl = msgEl?.querySelector('.voice-message');
+                const locationEl = msgEl?.querySelector('.location-content');
+                
+                // Prepare forward message
+                let forwardData = {
+                    contact_id: selectedForwardContactId,
+                    is_forwarded: true
+                };
+                
+                // Determine message type and add appropriate data
+                if (contentEl && contentEl.textContent.trim()) {
+                    forwardData.content = `↪️ ${contentEl.textContent.trim()}`;
+                } else if (stickerEl) {
+                    const stickerId = stickerEl.src.split('/').pop().replace('.svg', '');
+                    forwardData.sticker_id = stickerId;
+                } else if (gifEl) {
+                    forwardData.gif_url = gifEl.src;
+                    forwardData.content = '↪️ [GIF transféré]';
+                } else if (voiceEl) {
+                    // Voice messages can't be easily forwarded, send as text
+                    forwardData.content = '↪️ [Message vocal transféré]';
+                } else if (locationEl) {
+                    forwardData.content = '↪️ [Position transférée]';
+                } else if (msgEl?.classList.contains('ping')) {
+                    forwardData.content = '↪️ [Coucou transféré] 👋';
+                } else {
+                    forwardData.content = '↪️ [Message transféré]';
+                }
+                
+                const res = await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify(forwardData)
+                });
+                
+                if (!res.ok) {
+                    throw new Error('Échec du transfert');
+                }
+                
+                closeForwardModal();
+                
+                // Find contact name for toast
+                const targetContact = contacts.find(c => c.contact_user_id === selectedForwardContactId);
+                const contactName = targetContact?.contact?.display_name || 'Contact';
+                
+                showToast({ 
+                    type: 'success', 
+                    message: `Message transféré à ${contactName} ↪️` 
+                });
+                triggerHaptic?.('success');
+                
+            } catch (e) {
+                console.error('Forward failed:', e);
+                showToast({ 
+                    type: 'error', 
+                    message: 'Échec du transfert. Réessaie ?' 
+                });
+                triggerHaptic?.('error');
+                
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 17 20 12 15 7"/>
+                        <path d="M4 18v-2a4 4 0 0 1 4-4h12"/>
+                    </svg>
+                    Transférer
+                `;
             }
         }
 
@@ -13014,5 +13496,8 @@
             });
         });
     </script>
+    
+    <!-- Easter Eggs 🥚 -->
+    <script src="/js/easter-eggs.min.js" defer></script>
 </body>
 </html>
