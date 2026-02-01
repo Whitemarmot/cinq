@@ -2044,6 +2044,201 @@ if ('setAppBadge' in navigator) {
                 height: 12px;
             }
         }
+        
+        /* Premium 5² Styles */
+        .premium-status-card {
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+        }
+        
+        .premium-status-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        
+        .premium-badge.active {
+            background: linear-gradient(135deg, #FFD700 0%, #8B5CF6 100%);
+            color: #000;
+        }
+        
+        .premium-badge.free {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-secondary);
+        }
+        
+        .premium-contact-bar {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+        
+        .premium-contact-bar-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-2);
+        }
+        
+        .premium-contact-progress {
+            height: 8px;
+            background: var(--color-border);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .premium-contact-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+        }
+        
+        .premium-contact-progress-fill.premium {
+            background: linear-gradient(90deg, #FFD700 0%, #8B5CF6 100%);
+        }
+        
+        .premium-upgrade-cta {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            text-align: center;
+        }
+        
+        .premium-upgrade-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700 0%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-2);
+        }
+        
+        .premium-upgrade-price {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--space-1);
+        }
+        
+        .premium-upgrade-price-sub {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-4);
+        }
+        
+        .premium-features-list {
+            text-align: left;
+            max-width: 280px;
+            margin: 0 auto var(--space-5);
+        }
+        
+        .premium-features-list li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) 0;
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+        }
+        
+        .premium-features-list li::before {
+            content: "✓";
+            color: #8B5CF6;
+            font-weight: 600;
+        }
+        
+        .premium-upgrade-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: var(--text-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 280px;
+        }
+        
+        .premium-upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .premium-upgrade-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .premium-active-card {
+            text-align: center;
+        }
+        
+        .premium-active-icon {
+            font-size: 48px;
+            margin-bottom: var(--space-3);
+        }
+        
+        .premium-active-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-2);
+        }
+        
+        .premium-active-since {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        .premium-features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+        
+        .premium-feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+        }
+        
+        .premium-feature-item span:first-child {
+            font-size: 1.25rem;
+        }
+        
+        @media (max-width: 480px) {
+            .premium-features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <!-- View Transitions -->
     <link rel="stylesheet" href="/css/view-transitions.min.css">
@@ -2180,6 +2375,24 @@ if ('setAppBadge' in navigator) {
                             </div>
                             <p id="email-message" class="form-message hidden"></p>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Premium 5² -->
+            <section class="settings-section" id="premium">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Premium 5²
+                </h2>
+                
+                <!-- Premium Card - Dynamic content loaded by JS -->
+                <div id="premium-card" class="settings-card card-enhanced">
+                    <div class="premium-loading" style="text-align: center; padding: var(--space-6);">
+                        <div class="loader-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <p style="color: var(--color-text-muted); margin-top: var(--space-3);">Chargement...</p>
                     </div>
                 </div>
             </section>
@@ -4635,6 +4848,217 @@ if ('setAppBadge' in navigator) {
         }
         
         // ============================================
+        // Premium 5² Functions
+        // ============================================
+        async function loadPremiumStatus() {
+            const card = $('premium-card');
+            if (!card) return;
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) {
+                    card.innerHTML = renderPremiumError('Connecte-toi pour voir ton statut');
+                    return;
+                }
+                
+                const res = await fetch('/api/premium-status', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur de chargement');
+                }
+                
+                const data = await res.json();
+                card.innerHTML = renderPremiumCard(data);
+                
+                // Check URL params for success/cancel
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('premium') === 'success') {
+                    showToast('🎉 Bienvenue dans 5² Premium !', 'success');
+                    // Clean URL
+                    window.history.replaceState({}, '', '/settings#premium');
+                    // Reload to show updated status
+                    loadPremiumStatus();
+                } else if (params.get('premium') === 'cancelled') {
+                    showToast('Paiement annulé', 'info');
+                    window.history.replaceState({}, '', '/settings#premium');
+                }
+                
+            } catch (err) {
+                console.error('Error loading premium status:', err);
+                card.innerHTML = renderPremiumError(err.message);
+            }
+        }
+        
+        function renderPremiumCard(data) {
+            if (data.isPremium) {
+                return renderPremiumActive(data);
+            } else {
+                return renderPremiumUpgrade(data);
+            }
+        }
+        
+        function renderPremiumActive(data) {
+            const premiumDate = data.premiumSince 
+                ? new Date(data.premiumSince).toLocaleDateString('fr-FR', { 
+                    day: 'numeric', month: 'long', year: 'numeric' 
+                  })
+                : 'Récemment';
+            
+            return `
+                <div class="premium-status-card">
+                    <div class="premium-active-card">
+                        <div class="premium-active-icon">✨</div>
+                        <div class="premium-active-title">5² Premium Actif</div>
+                        <div class="premium-active-since">Membre depuis le ${premiumDate}</div>
+                        
+                        <div class="premium-contact-bar" style="margin-top: var(--space-5);">
+                            <div class="premium-contact-bar-inner">
+                                <span style="font-weight: 600;">${data.contactCount} / ${data.contactLimit} contacts</span>
+                                <span style="color: var(--color-text-muted);">${data.slotsRemaining} disponibles</span>
+                            </div>
+                            <div class="premium-contact-progress">
+                                <div class="premium-contact-progress-fill premium" 
+                                     style="width: ${(data.contactCount / data.contactLimit) * 100}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="premium-features-grid">
+                            <div class="premium-feature-item">
+                                <span>👥</span>
+                                <span>${data.features.contacts} contacts</span>
+                            </div>
+                            <div class="premium-feature-item">
+                                <span>✨</span>
+                                <span>Badge Premium</span>
+                            </div>
+                            <div class="premium-feature-item">
+                                <span>🎨</span>
+                                <span>${data.features.themes} thèmes</span>
+                            </div>
+                            <div class="premium-feature-item">
+                                <span>❤️</span>
+                                <span>Soutien Cinq</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderPremiumUpgrade(data) {
+            const progressPercent = Math.min((data.contactCount / data.contactLimit) * 100, 100);
+            const upgrade = data.upgrade;
+            
+            return `
+                <div class="premium-status-card">
+                    <div class="premium-status-header">
+                        <span class="premium-badge free">Plan Gratuit</span>
+                    </div>
+                    
+                    <div class="premium-contact-bar">
+                        <div class="premium-contact-bar-inner">
+                            <span style="font-weight: 600;">${data.contactCount} / ${data.contactLimit} contacts</span>
+                            <span style="color: var(--color-text-muted);">${data.slotsRemaining} disponibles</span>
+                        </div>
+                        <div class="premium-contact-progress">
+                            <div class="premium-contact-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                    
+                    ${upgrade ? `
+                    <div class="premium-upgrade-cta">
+                        <div class="premium-upgrade-title">✨ Passer à 5² ✨</div>
+                        <div class="premium-upgrade-price">${upgrade.price}</div>
+                        <div class="premium-upgrade-price-sub">${upgrade.priceDescription}</div>
+                        
+                        <ul class="premium-features-list">
+                            ${upgrade.features.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                        
+                        <button class="premium-upgrade-btn" onclick="startPremiumCheckout()" id="btn-upgrade-premium">
+                            <span>Passer à 5²</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        function renderPremiumError(message) {
+            return `
+                <div class="premium-status-card" style="text-align: center; padding: var(--space-6);">
+                    <p style="color: var(--color-text-muted);">
+                        ${message || 'Impossible de charger le statut premium'}
+                    </p>
+                    <button class="form-btn btn-enhanced" onclick="loadPremiumStatus()" style="margin-top: var(--space-3);">
+                        Réessayer
+                    </button>
+                </div>
+            `;
+        }
+        
+        async function startPremiumCheckout() {
+            const btn = $('btn-upgrade-premium');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span>Chargement...</span>';
+            }
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) {
+                    showToast('Connecte-toi d\'abord', 'error');
+                    return;
+                }
+                
+                const res = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        successUrl: window.location.origin + '/settings?premium=success',
+                        cancelUrl: window.location.origin + '/settings?premium=cancelled'
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    if (data.code === 'ALREADY_PREMIUM') {
+                        showToast('Tu es déjà premium ! 🎉', 'success');
+                        loadPremiumStatus();
+                        return;
+                    }
+                    throw new Error(data.error || 'Erreur lors du paiement');
+                }
+                
+                // Redirect to Stripe Checkout
+                if (data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    throw new Error('URL de paiement manquante');
+                }
+                
+            } catch (err) {
+                console.error('Checkout error:', err);
+                showToast(err.message || 'Erreur lors du paiement', 'error');
+                
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Passer à 5²</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+                }
+            }
+        }
+
+        // ============================================
         // Initialize
         // ============================================
         async function init() {
@@ -4715,6 +5139,9 @@ if ('setAppBadge' in navigator) {
                 // Load user stats
                 loadUserStats();
                 
+                // Load premium status
+                loadPremiumStatus();
+                
                 // Initialize compact mode toggle from localStorage
                 initCompactModeToggle();
                 
@@ -4736,6 +5163,9 @@ if ('setAppBadge' in navigator) {
 
     <!-- QR Code functionality -->
     <script src="/js/qr-code.js"></script>
+    
+    <!-- Premium 5² -->
+    <script src="/js/premium.js"></script>
     <script>
         // QR Code handlers for settings page
         async function showMyQRCode() {

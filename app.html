@@ -16050,7 +16050,17 @@
                     body: JSON.stringify({ contactId })
                 });
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Erreur');
+                if (!res.ok) {
+                    // Check if limit reached and not premium - show upgrade modal
+                    if (data.code === 'LIMIT_REACHED' && !data.isPremium) {
+                        closeAddContactModal();
+                        if (typeof CinqPremium !== 'undefined') {
+                            CinqPremium.showUpgradeModal('limit');
+                            return;
+                        }
+                    }
+                    throw new Error(data.error || 'Erreur');
+                }
 
                 closeAddContactModal();
                 
@@ -17681,6 +17691,9 @@
     <script src="/js/message-reactions.js" defer></script>
     <script src="/js/conversation-streaks.js" defer></script>
     <script src="/js/birthday-reminders.js" defer></script>
+    
+    <!-- Premium 5² -->
+    <script src="/js/premium.js" defer></script>
     
     <!-- Design Enhancements -->
     <script defer src="/apply-design-improvements.js"></script>

@@ -92,6 +92,16 @@ exports.handler = async (event, context) => {
     
     if (event.httpMethod === 'GET') {
         try {
+            // Check user's premium status for limit
+            const { data: userData } = await supabaseAdmin
+                .from('users')
+                .select('is_premium')
+                .eq('id', user.id)
+                .single();
+            
+            const isPremium = userData?.is_premium || false;
+            const contactLimit = isPremium ? 25 : 5;
+
             const { data: contacts, error: fetchError } = await supabaseAdmin
                 .from('contacts')
                 .select(`
@@ -112,6 +122,8 @@ exports.handler = async (event, context) => {
                 return error('Failed to fetch contacts', 500);
             }
 
+            const count = contacts?.length || 0;
+            
             return success({
                 contacts: (contacts || []).map(c => ({
                     id: c.id,
@@ -119,9 +131,10 @@ exports.handler = async (event, context) => {
                     email: c.contact?.email || null,
                     added_at: c.created_at
                 })),
-                count: contacts?.length || 0,
-                limit: 5,
-                remaining: 5 - (contacts?.length || 0)
+                count,
+                limit: contactLimit,
+                remaining: contactLimit - count,
+                isPremium
             });
 
         } catch (err) {
@@ -179,18 +192,39 @@ exports.handler = async (event, context) => {
                 return error('Cette personne est déjà dans ton cercle', 409, { code: 'ALREADY_CONTACT' });
             }
 
+            // Check user's contact limit (5 free, 25 premium)
+            const { data: userData } = await supabaseAdmin
+                .from('users')
+                .select('is_premium')
+                .eq('id', user.id)
+                .single();
+            
+            const isPremium = userData?.is_premium || false;
+            const contactLimit = isPremium ? 25 : 5;
+
             // Check: limit reached?
             const { count: currentCount } = await supabaseAdmin
                 .from('contacts')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', user.id);
 
-            if (currentCount >= 5) {
-                return error('5 contacts max. C\'est le concept ! Retire quelqu\'un d\'abord.', 400, {
-                    code: 'LIMIT_REACHED',
-                    current: currentCount,
-                    limit: 5
-                });
+            if (currentCount >= contactLimit) {
+                if (isPremium) {
+                    return error('25 contacts max avec 5². Tu as atteint la limite !', 400, {
+                        code: 'LIMIT_REACHED',
+                        current: currentCount,
+                        limit: 25,
+                        isPremium: true
+                    });
+                } else {
+                    return error('5 contacts max. Passe à 5² pour 25 slots !', 400, {
+                        code: 'LIMIT_REACHED',
+                        current: currentCount,
+                        limit: 5,
+                        isPremium: false,
+                        upgradeUrl: '/settings#premium'
+                    });
+                }
             }
 
             // Add contact
@@ -221,7 +255,9 @@ exports.handler = async (event, context) => {
                     added_at: newContact.created_at
                 },
                 count: currentCount + 1,
-                remaining: 4 - currentCount
+                limit: contactLimit,
+                remaining: contactLimit - currentCount - 1,
+                isPremium
             }, 201);
 
         } catch (err) {
@@ -265,7 +301,16 @@ exports.handler = async (event, context) => {
                 return error('Contact non trouvé ou déjà supprimé', 404);
             }
 
-            // Get updated count
+            // Get user premium status and updated count
+            const { data: userData } = await supabaseAdmin
+                .from('users')
+                .select('is_premium')
+                .eq('id', user.id)
+                .single();
+            
+            const isPremium = userData?.is_premium || false;
+            const contactLimit = isPremium ? 25 : 5;
+
             const { count: newCount } = await supabaseAdmin
                 .from('contacts')
                 .select('*', { count: 'exact', head: true })
@@ -275,7 +320,9 @@ exports.handler = async (event, context) => {
                 message: 'Contact retiré',
                 removed_id: contactId,
                 count: newCount || 0,
-                remaining: 5 - (newCount || 0)
+                limit: contactLimit,
+                remaining: contactLimit - (newCount || 0),
+                isPremium
             });
 
         } catch (err) {
