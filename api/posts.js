@@ -14,6 +14,7 @@ import { isValidUUID, sanitizeText } from './_validation.js';
 import { logError, logInfo, createErrorResponse } from './_error-logger.js';
 import { processMentions } from './notifications.js';
 import { savePostTags } from './tags.js';
+import { getPostViewsForOwner } from './post-views.js';
 
 const MAX_CONTENT_LENGTH = 1000;
 const MAX_IMAGE_URL_LENGTH = 2000;
@@ -235,6 +236,9 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
     // Get reply counts for all posts
     const replyCounts = await getReplyCountsForPosts(postIds);
     
+    // Get post views if viewing own posts
+    const postViews = userId === user.id ? await getPostViewsForOwner(user.id, postIds) : {};
+    
     const enriched = posts.map(post => {
         const enrichedPost = { 
             ...post, 
@@ -246,6 +250,10 @@ async function getSpecificUserPosts(res, user, userId, limit, offset, cursor = n
             enrichedPost.poll_total_votes = post.poll_votes 
                 ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
                 : 0;
+        }
+        // Add seen_by for user's own recent posts
+        if (userId === user.id && postViews[post.id]) {
+            enrichedPost.seen_by = postViews[post.id];
         }
         return enrichedPost;
     });
@@ -304,6 +312,9 @@ async function getFeed(res, user, limit, offset, cursor = null) {
     // Get reply counts for all posts
     const replyCounts = await getReplyCountsForPosts(postIds);
     
+    // Get post views for user's own posts (seen by feature)
+    const postViews = await getPostViewsForOwner(user.id, postIds);
+    
     // Enrich with author info (cached)
     const authorCache = {};
     const enriched = await Promise.all(posts.map(async (post) => {
@@ -320,6 +331,10 @@ async function getFeed(res, user, limit, offset, cursor = null) {
             enrichedPost.poll_total_votes = post.poll_votes 
                 ? Object.values(post.poll_votes).reduce((sum, c) => sum + c, 0) 
                 : 0;
+        }
+        // Add seen_by for user's own recent posts
+        if (post.user_id === user.id && postViews[post.id]) {
+            enrichedPost.seen_by = postViews[post.id];
         }
         return enrichedPost;
     }));

@@ -8716,6 +8716,16 @@
                         slot.appendChild(badge);
                     }
                     
+                    // Add muted badge if contact is muted
+                    if (contact.is_muted) {
+                        const mutedBadge = document.createElement('div');
+                        mutedBadge.className = 'contact-muted-badge';
+                        mutedBadge.setAttribute('aria-hidden', 'true');
+                        mutedBadge.setAttribute('title', 'Notifications en sourdine');
+                        mutedBadge.textContent = '🔇';
+                        slot.appendChild(mutedBadge);
+                    }
+                    
                     slot.onclick = () => openChat(contact);
                     slot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChat(contact); } };
                 } else {

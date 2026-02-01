@@ -4268,6 +4268,8 @@
             // Setup lazy loading for new images
             requestAnimationFrame(() => {
                 observeLazyImages();
+                // Track post views for new posts
+                observePostCards();
             });
             
             // Load reactions and bookmarks for new posts
@@ -4398,6 +4400,8 @@
             // Setup lazy loading for new images
             requestAnimationFrame(() => {
                 observeLazyImages();
+                // Track post views (Seen by feature)
+                observePostCards();
             });
             
             // Load reactions and bookmarks for all posts
