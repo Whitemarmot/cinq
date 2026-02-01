@@ -80,10 +80,10 @@ async function handleGetMessages(req, res, user) {
 
     const safeLimit = Math.min(Math.max(1, parseInt(limit) || 50), MAX_FETCH_LIMIT);
 
-    // Build query - include read_at for read receipts and file attachment fields
+    // Build query - include read_at for read receipts, file attachment fields, and sticker_id
     let query = supabase
         .from('messages')
-        .select('id, sender_id, receiver_id, content, is_ping, created_at, read_at, file_url, file_name, file_size, file_type')
+        .select('id, sender_id, receiver_id, content, is_ping, sticker_id, created_at, read_at, file_url, file_name, file_size, file_type')
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
         .limit(safeLimit);
@@ -208,8 +208,11 @@ async function handleGetUnreadCount(req, res, user, since, includeLatest) {
 
 // ===== POST - Send message =====
 
+// Valid stickers
+const VALID_STICKERS = ['cinq', 'love', 'hug', 'laugh', 'thinking', 'fire', 'star', 'party', 'cool', 'sleepy', 'coffee', 'sad'];
+
 async function handleSendMessage(req, res, user) {
-    const { contact_id, content, is_ping = false, file_url, file_name, file_size, file_type } = req.body;
+    const { contact_id, content, is_ping = false, sticker_id, file_url, file_name, file_size, file_type } = req.body;
 
     if (!contact_id) {
         return res.status(400).json({ error: 'contact_id requis' });
@@ -219,9 +222,15 @@ async function handleSendMessage(req, res, user) {
         return res.status(400).json({ error: 'Format contact_id invalide' });
     }
 
-    // Validate content (unless it's a ping or file attachment)
+    // Validate sticker_id if present
+    const isSticker = sticker_id && VALID_STICKERS.includes(sticker_id);
+    if (sticker_id && !isSticker) {
+        return res.status(400).json({ error: 'Sticker invalide' });
+    }
+
+    // Validate content (unless it's a ping, sticker, or file attachment)
     const hasFile = file_url && file_name;
-    if (!is_ping && !hasFile) {
+    if (!is_ping && !isSticker && !hasFile) {
         const contentResult = validateMessageContent(content, { 
             maxLength: MAX_MESSAGE_LENGTH, 
             required: true 
@@ -240,6 +249,8 @@ async function handleSendMessage(req, res, user) {
     // Sanitize content
     const safeContent = is_ping 
         ? '👋' 
+        : isSticker
+        ? `[sticker:${sticker_id}]`
         : validateMessageContent(content || '', { maxLength: MAX_MESSAGE_LENGTH }).content || '';
 
     // Build message object
@@ -249,6 +260,11 @@ async function handleSendMessage(req, res, user) {
         content: safeContent,
         is_ping
     };
+
+    // Add sticker_id if present
+    if (isSticker) {
+        messageData.sticker_id = sticker_id;
+    }
 
     // Add file attachment fields if present
     if (hasFile) {
@@ -272,11 +288,12 @@ async function handleSendMessage(req, res, user) {
         senderId: user.id, 
         receiverId: contact_id,
         isPing: is_ping,
+        isSticker: !!sticker_id,
         hasFile: !!file_url
     });
 
     // Send push notification (fire and forget)
-    sendPushToReceiver(contact_id, user, data, is_ping, safeContent);
+    sendPushToReceiver(contact_id, user, data, is_ping, isSticker ? sticker_id : safeContent, isSticker);
     
     // Process @mentions in message and create notifications (fire and forget)
     if (!is_ping && safeContent) {
@@ -348,12 +365,24 @@ async function sendVacationAutoReply(receiverId, senderId) {
     }
 }
 
-function sendPushToReceiver(receiverId, sender, message, isPing, content) {
+function sendPushToReceiver(receiverId, sender, message, isPing, content, isSticker = false) {
     const senderName = sender.email?.split('@')[0] || 'Quelqu\'un';
     
+    let title, body;
+    if (isPing) {
+        title = '👋 Ping !';
+        body = `${senderName} te fait coucou`;
+    } else if (isSticker) {
+        title = `Sticker de ${senderName}`;
+        body = `${senderName} t'a envoyé un sticker`;
+    } else {
+        title = `Message de ${senderName}`;
+        body = content.substring(0, 100);
+    }
+    
     sendPushNotification(receiverId, {
-        title: isPing ? '👋 Ping !' : `Message de ${senderName}`,
-        body: isPing ? `${senderName} te fait coucou` : content.substring(0, 100),
+        title,
+        body,
         tag: `msg-${message.id}`,
         data: { messageId: message.id, senderId: sender.id }
     });

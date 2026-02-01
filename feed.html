@@ -3152,6 +3152,47 @@
             document.getElementById('ai-prompt').value = '';
         }
 
+        // ===== GIF FUNCTIONS =====
+        function toggleGifPicker() {
+            if (window.CinqGiphy?.isOpen()) {
+                window.CinqGiphy.closePicker();
+                document.getElementById('gif-btn').classList.remove('active');
+            } else {
+                window.CinqGiphy?.openPicker((gif) => {
+                    selectGif(gif);
+                }, document.getElementById('gif-btn'));
+                document.getElementById('gif-btn').classList.add('active');
+            }
+        }
+        
+        function selectGif(gif) {
+            // Clear any existing image
+            hideImagePreview();
+            document.getElementById('file-input').value = '';
+            
+            // Store selected GIF
+            selectedGif = gif;
+            
+            // Show GIF preview
+            const preview = document.getElementById('gif-preview');
+            const previewImg = document.getElementById('gif-preview-img');
+            previewImg.src = gif.images.standard.url;
+            preview.style.display = 'block';
+            
+            // Hide GIF button active state
+            document.getElementById('gif-btn').classList.remove('active');
+            
+            showToast({ type: 'success', message: 'GIF ajouté !' });
+        }
+        
+        function removeGif() {
+            selectedGif = null;
+            const preview = document.getElementById('gif-preview');
+            const previewImg = document.getElementById('gif-preview-img');
+            preview.style.display = 'none';
+            previewImg.src = '';
+        }
+
         // ===== SUBMIT POST =====
         async function submitPost() {
             const content = document.getElementById('post-content').value.trim();
@@ -3171,7 +3212,11 @@
             
             try {
                 const body = { content };
-                if (currentImageUrl) {
+                if (selectedGif) {
+                    // Use GIF URL as image (GIFs are sent as animated images)
+                    body.image_url = selectedGif.images.original.url || selectedGif.images.standard.url;
+                    body.is_gif = true;
+                } else if (currentImageUrl) {
                     body.image_url = currentImageUrl;
                 }
                 if (pollOptions) {
@@ -3201,6 +3246,7 @@
                 document.getElementById('ai-image-btn').classList.remove('active');
                 document.getElementById('upload-image-btn').classList.remove('active');
                 hideImagePreview();
+                removeGif(); // Reset GIF
                 
                 // Reset poll
                 if (pollEnabled) {
@@ -3597,15 +3643,17 @@
             const displayName = author.display_name || author.email?.split('@')[0] || 'Anonyme';
             const time = formatTime(post.created_at);
             
-            // Lazy load images
+            // Lazy load images - detect if GIF
+            const isGif = post.is_gif || (post.image_url && (post.image_url.includes('giphy.com') || post.image_url.endsWith('.gif')));
             const imageHtml = post.image_url ? `
-                <div class="post-image" role="img" aria-label="Image du post">
+                <div class="post-image ${isGif ? 'giphy-content-gif' : ''}" role="img" aria-label="${isGif ? 'GIF du post' : 'Image du post'}">
                     <img 
                         data-src="${escapeHtml(post.image_url)}" 
-                        alt="Image partagée par ${escapeHtml(displayName)}" 
+                        alt="${isGif ? 'GIF' : 'Image'} partagé par ${escapeHtml(displayName)}" 
                         onclick="openImageModal('${escapeHtml(post.image_url)}')"
                         loading="lazy"
                     >
+                    ${isGif ? '<span class="giphy-badge">GIF</span>' : ''}
                 </div>
             ` : '';
             

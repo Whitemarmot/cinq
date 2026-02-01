@@ -44,6 +44,7 @@ const PRECACHE_ASSETS = [
   '/feed.html',
   '/tag.html',
   '/settings.html',
+  '/birthdays.html',
   '/404.html',
   '/error.html',
   '/offline.html',
@@ -83,7 +84,20 @@ const OPTIONAL_PRECACHE = [
   '/assets/icons/icon-128x128.png',
   '/assets/icons/icon-144x144.png',
   '/assets/icons/icon-152x152.png',
-  '/assets/icons/icon-384x384.png'
+  '/assets/icons/icon-384x384.png',
+  // Stickers
+  '/assets/stickers/cinq.svg',
+  '/assets/stickers/love.svg',
+  '/assets/stickers/hug.svg',
+  '/assets/stickers/laugh.svg',
+  '/assets/stickers/thinking.svg',
+  '/assets/stickers/fire.svg',
+  '/assets/stickers/star.svg',
+  '/assets/stickers/party.svg',
+  '/assets/stickers/cool.svg',
+  '/assets/stickers/sleepy.svg',
+  '/assets/stickers/coffee.svg',
+  '/assets/stickers/sad.svg'
 ];
 
 // ============================================================================

@@ -76,6 +76,14 @@ BEGIN
     END IF;
 END $$;
 
+-- Add birthday column if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='birthday') THEN
+        ALTER TABLE users ADD COLUMN birthday DATE DEFAULT NULL;
+    END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_users_last_seen ON users(last_seen_at DESC);
 
 -- Auto-create user profile on signup
@@ -182,6 +190,14 @@ DO $$
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='is_vacation_reply') THEN
         ALTER TABLE messages ADD COLUMN is_vacation_reply BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+-- Add sticker_id column if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='sticker_id') THEN
+        ALTER TABLE messages ADD COLUMN sticker_id VARCHAR(50);
     END IF;
 END $$;
 

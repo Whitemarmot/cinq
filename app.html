@@ -52,6 +52,9 @@
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.css">
     
+    <!-- GIPHY Integration -->
+    <link rel="stylesheet" href="/css/giphy.css">
+    
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
     
@@ -5129,12 +5132,37 @@
                         <label class="settings-label" for="profile-bio">Bio</label>
                         <textarea id="profile-bio" class="settings-input" placeholder="Ce que tes proches savent déjà sur toi..." maxlength="500" rows="2" style="resize:vertical;min-height:60px;"></textarea>
                     </div>
+                    <div class="settings-field">
+                        <label class="settings-label" for="profile-birthday">🎂 Date de naissance</label>
+                        <input type="date" id="profile-birthday" class="settings-input" style="color-scheme: dark;">
+                        <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem;">Tes proches verront ton anniversaire (pas l'année)</p>
+                    </div>
                     <button onclick="saveProfile()" id="save-profile-btn" class="save-btn btn-ripple glow-hover" type="button">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align: middle; margin-right: 6px;">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
                         </svg>
                         Enregistrer
                     </button>
+                </div>
+                
+                <!-- Birthdays Calendar -->
+                <div class="settings-card" role="region" aria-labelledby="settings-birthdays-title">
+                    <div class="settings-card-header" id="settings-birthdays-title">
+                        <span style="font-size: 1rem;">🎂</span>
+                        <span>Anniversaires</span>
+                    </div>
+                    <a href="/birthdays.html" class="settings-btn" style="text-decoration: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <div class="settings-btn-info">
+                            <span class="settings-btn-title">Calendrier des anniversaires</span>
+                            <span class="settings-btn-subtitle" id="upcoming-birthdays-hint">Ne rate plus aucun anniversaire</span>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto;">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
                 </div>
                 
                 <!-- Data & Actions -->
@@ -5245,6 +5273,9 @@
                     <line x1="9" y1="9" x2="9.01" y2="9"/>
                     <line x1="15" y1="9" x2="15.01" y2="9"/>
                 </svg>
+            </button>
+            <button class="gif-btn giphy-trigger-btn" id="gif-btn" onclick="toggleGifPicker()" type="button" aria-label="Envoyer un GIF">
+                GIF
             </button>
             <!-- Sticker Picker -->
             <div class="sticker-picker" id="sticker-picker" role="dialog" aria-modal="false" aria-labelledby="sticker-picker-title">
@@ -5638,11 +5669,15 @@
                     
                     document.getElementById('profile-display-name').value = data.profile.display_name || '';
                     document.getElementById('profile-bio').value = data.profile.bio || '';
+                    document.getElementById('profile-birthday').value = data.profile.birthday || '';
                     document.getElementById('profile-name').textContent = name;
                     document.getElementById('profile-bio-display').textContent = data.profile.bio || '';
                     
                     // Update all avatars
                     updateAllAvatars(data.profile.avatar_url, initial);
+                    
+                    // Load upcoming birthdays hint
+                    loadUpcomingBirthdaysHint();
                 }
             } catch (e) {
                 console.error('Load profile error:', e);
@@ -5722,6 +5757,7 @@
             const btn = document.getElementById('save-profile-btn');
             const displayName = document.getElementById('profile-display-name').value.trim();
             const bio = document.getElementById('profile-bio').value.trim();
+            const birthday = document.getElementById('profile-birthday').value || null;
             
             btn.disabled = true;
             btn.textContent = 'Enregistrement...';
@@ -5730,7 +5766,7 @@
                 const res = await fetch(`${API_URL}/user-profile`, {
                     method: 'PUT',
                     headers: authHeaders(),
-                    body: JSON.stringify({ display_name: displayName || null, bio: bio || null })
+                    body: JSON.stringify({ display_name: displayName || null, bio: bio || null, birthday })
                 });
                 
                 if (!res.ok) throw new Error((await res.json()).error || 'Erreur');
@@ -5743,6 +5779,57 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💾 Enregistrer';
+            }
+        }
+        
+        // ===== BIRTHDAY HELPERS =====
+        async function loadUpcomingBirthdaysHint() {
+            try {
+                const res = await fetch(`${API_URL}/contacts?action=birthdays`, { headers: authHeaders() });
+                if (!res.ok) return;
+                
+                const data = await res.json();
+                const contacts = data.contacts || [];
+                const birthdays = contacts.filter(c => c.contact?.birthday);
+                
+                if (birthdays.length === 0) {
+                    document.getElementById('upcoming-birthdays-hint').textContent = 'Aucun anniversaire enregistré';
+                    return;
+                }
+                
+                // Find next birthday
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const upcoming = birthdays.map(c => {
+                    const [_, month, day] = c.contact.birthday.split('-').map(Number);
+                    const thisYear = new Date(today.getFullYear(), month - 1, day);
+                    
+                    let nextBirthday = thisYear;
+                    if (thisYear < today) {
+                        nextBirthday = new Date(today.getFullYear() + 1, month - 1, day);
+                    }
+                    
+                    const diffTime = nextBirthday - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    return { ...c, daysUntil: diffDays };
+                }).sort((a, b) => a.daysUntil - b.daysUntil);
+                
+                const next = upcoming[0];
+                const name = next.contact.display_name || next.contact.email?.split('@')[0] || 'Contact';
+                
+                if (next.daysUntil === 0) {
+                    document.getElementById('upcoming-birthdays-hint').textContent = `🎉 ${name} fête son anniversaire aujourd'hui !`;
+                } else if (next.daysUntil === 1) {
+                    document.getElementById('upcoming-birthdays-hint').textContent = `Demain : anniversaire de ${name}`;
+                } else if (next.daysUntil <= 7) {
+                    document.getElementById('upcoming-birthdays-hint').textContent = `Dans ${next.daysUntil} jours : anniversaire de ${name}`;
+                } else {
+                    document.getElementById('upcoming-birthdays-hint').textContent = `${birthdays.length} anniversaire${birthdays.length > 1 ? 's' : ''} enregistré${birthdays.length > 1 ? 's' : ''}`;
+                }
+            } catch (e) {
+                console.error('Load birthdays hint error:', e);
             }
         }
 
@@ -6909,17 +6996,32 @@
             
             document.getElementById('chat-contact-name').textContent = name;
             
-            // Display contact status in chat header
+            // Display contact status and last seen in chat header
             const statusEmoji = contact.contact?.status_emoji;
             const statusText = contact.contact?.status_text;
+            const lastSeenAt = contact.contact?.last_seen_at;
             const chatStatus = document.getElementById('chat-contact-status');
+            
+            // Build status display with last seen
+            let statusHtml = '';
+            
+            // First show user status if available
             if (statusEmoji || statusText) {
-                chatStatus.innerHTML = `${statusEmoji ? `<span>${statusEmoji}</span>` : ''}${statusText ? `<span>${escapeHtml(statusText)}</span>` : ''}`;
-                chatStatus.style.display = 'flex';
-            } else {
-                chatStatus.innerHTML = '';
-                chatStatus.style.display = 'none';
+                statusHtml += `${statusEmoji ? `<span>${statusEmoji}</span>` : ''}${statusText ? `<span>${escapeHtml(statusText)}</span>` : ''}`;
             }
+            
+            // Add last seen info
+            const lastSeenInfo = formatLastSeen(lastSeenAt);
+            if (statusHtml) {
+                statusHtml += `<span style="margin: 0 4px; opacity: 0.5;">•</span>`;
+            }
+            statusHtml += `<span class="chat-last-seen ${lastSeenInfo.isOnline ? 'online' : ''}">`;
+            statusHtml += `<span class="chat-last-seen-dot"></span>`;
+            statusHtml += `<span>${escapeHtml(lastSeenInfo.text)}</span>`;
+            statusHtml += `</span>`;
+            
+            chatStatus.innerHTML = statusHtml;
+            chatStatus.style.display = 'flex';
             
             const chatAvatar = document.getElementById('chat-contact-avatar');
             chatAvatar.innerHTML = avatarUrl 
@@ -7938,6 +8040,113 @@
             }
         }
 
+        // ===== STICKERS =====
+        const STICKER_NAMES = {
+            'cinq': 'Cinq',
+            'love': 'Cœur',
+            'hug': 'Câlin',
+            'laugh': 'Rire',
+            'thinking': 'Pensif',
+            'fire': 'Feu',
+            'star': 'Étoile',
+            'party': 'Fête',
+            'cool': 'Cool',
+            'sleepy': 'Fatigué',
+            'coffee': 'Café',
+            'sad': 'Triste'
+        };
+        
+        function getStickerName(stickerId) {
+            return STICKER_NAMES[stickerId] || stickerId;
+        }
+        
+        function toggleStickerPicker() {
+            const picker = document.getElementById('sticker-picker');
+            const btn = document.getElementById('sticker-btn');
+            const isOpen = picker.classList.contains('open');
+            
+            if (isOpen) {
+                closeStickerPicker();
+            } else {
+                picker.classList.add('open');
+                btn.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+                triggerHaptic('tap');
+            }
+        }
+        
+        function closeStickerPicker() {
+            const picker = document.getElementById('sticker-picker');
+            const btn = document.getElementById('sticker-btn');
+            picker.classList.remove('open');
+            btn.classList.remove('active');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+        
+        async function sendSticker(stickerId) {
+            if (!currentChatContact) return;
+            
+            closeStickerPicker();
+            triggerHaptic('tap');
+            
+            // Optimistic sticker
+            const optimisticSticker = {
+                id: 'temp-sticker-' + Date.now(),
+                sender_id: user.id,
+                sticker_id: stickerId,
+                created_at: new Date().toISOString()
+            };
+            
+            const container = document.getElementById('chat-messages');
+            const stickerEl = document.createElement('div');
+            stickerEl.className = 'chat-message sticker sent';
+            stickerEl.id = `msg-${optimisticSticker.id}`;
+            stickerEl.setAttribute('role', 'article');
+            stickerEl.setAttribute('aria-label', `Tu as envoyé un sticker ${getStickerName(stickerId)}`);
+            
+            const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+            
+            stickerEl.innerHTML = `
+                <div class="sticker-content">
+                    <img src="/assets/stickers/${escapeHtml(stickerId)}.svg" alt="${getStickerName(stickerId)}" loading="lazy">
+                </div>
+                <div class="chat-message-meta">
+                    <span class="chat-message-time">${formatMessageTime(optimisticSticker.created_at)}</span>
+                    <span class="chat-read-receipt sent" aria-label="Envoi en cours">${checkIcon}</span>
+                </div>
+            `;
+            
+            container.appendChild(stickerEl);
+            container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            
+            try {
+                await fetch(`${API_URL}/messages`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ 
+                        contact_id: currentChatContact.contact_user_id, 
+                        sticker_id: stickerId 
+                    })
+                });
+                triggerHaptic('success');
+                // Refresh to sync with server
+                loadMessages();
+            } catch (e) {
+                triggerHaptic('error');
+                showToast({ type: 'error', message: 'Le sticker n\'est pas passé 😕' });
+                removeOptimisticMessage(optimisticSticker.id);
+            }
+        }
+        
+        // Close sticker picker when clicking outside
+        document.addEventListener('click', function(e) {
+            const picker = document.getElementById('sticker-picker');
+            const btn = document.getElementById('sticker-btn');
+            if (picker && btn && !picker.contains(e.target) && !btn.contains(e.target)) {
+                closeStickerPicker();
+            }
+        });
+
         // ===== POLLING =====
         function startPolling() {
             contactPollingInterval = setInterval(checkForNewMessages, 10000);
@@ -8469,6 +8678,7 @@
 
         function logout() {
             stopPolling();
+            stopHeartbeat();
             localStorage.removeItem('cinq_session');
             localStorage.removeItem('cinq_user');
             window.location.href = '/login.html';
@@ -9089,6 +9299,53 @@
         }
         
         initMobileKeyboard();
+        
+        // ===== HEARTBEAT (Last Seen) =====
+        let heartbeatInterval = null;
+        
+        async function sendHeartbeat() {
+            try {
+                const token = getToken();
+                if (!token) return;
+                
+                await fetch(`${API_URL}/heartbeat`, {
+                    method: 'POST',
+                    headers: authHeaders()
+                });
+            } catch (e) {
+                // Silently fail - heartbeat is not critical
+                console.debug('Heartbeat error:', e);
+            }
+        }
+        
+        function startHeartbeat() {
+            // Send initial heartbeat
+            sendHeartbeat();
+            
+            // Send heartbeat every 30 seconds
+            heartbeatInterval = setInterval(sendHeartbeat, 30000);
+            
+            // Also send heartbeat on visibility change (when tab becomes active)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    sendHeartbeat();
+                }
+            });
+        }
+        
+        function stopHeartbeat() {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+        }
+        
+        // Start heartbeat when init completes
+        const originalInit = init;
+        init = async function() {
+            await originalInit();
+            startHeartbeat();
+        };
         
         // ===== INIT =====
         init();
