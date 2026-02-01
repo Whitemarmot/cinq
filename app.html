@@ -49,6 +49,9 @@
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
     <link rel="stylesheet" href="/css/a11y.min.css">
     
+    <!-- Quick Actions (Long Press Context Menu) -->
+    <link rel="stylesheet" href="/css/quick-actions.min.css">
+    
     <!-- Theme CSS for smooth transitions -->
     <link rel="stylesheet" href="/css/theme.css">
     
@@ -6683,6 +6686,210 @@
             width: 16px;
             height: 16px;
         }
+        
+        /* ===== CONTACT GROUPS ===== */
+        .contact-groups-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        .contact-group-section {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            animation: group-appear 0.4s var(--ease-out-expo) backwards;
+        }
+        
+        .contact-group-section:nth-child(1) { animation-delay: 0ms; }
+        .contact-group-section:nth-child(2) { animation-delay: 100ms; }
+        .contact-group-section:nth-child(3) { animation-delay: 200ms; }
+        .contact-group-section:nth-child(4) { animation-delay: 300ms; }
+        
+        @keyframes group-appear {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .contact-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .contact-group-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-family: var(--font-display, 'Space Grotesk', sans-serif);
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .contact-group-icon {
+            font-size: 1.25rem;
+        }
+        
+        .contact-group-count {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            background: var(--color-bg-tertiary);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+        }
+        
+        .contact-group-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: var(--space-3);
+        }
+        
+        .contact-group-empty {
+            text-align: center;
+            padding: var(--space-4);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+        
+        /* Group colors */
+        .contact-group-section[data-group="famille"] {
+            border-left: 3px solid #f87171;
+        }
+        .contact-group-section[data-group="famille"] .contact-group-icon {
+            color: #f87171;
+        }
+        
+        .contact-group-section[data-group="travail"] {
+            border-left: 3px solid #60a5fa;
+        }
+        .contact-group-section[data-group="travail"] .contact-group-icon {
+            color: #60a5fa;
+        }
+        
+        .contact-group-section[data-group="amis"] {
+            border-left: 3px solid #34d399;
+        }
+        .contact-group-section[data-group="amis"] .contact-group-icon {
+            color: #34d399;
+        }
+        
+        .contact-group-section[data-group="autres"] {
+            border-left: 3px solid var(--color-text-muted);
+        }
+        .contact-group-section[data-group="autres"] .contact-group-icon {
+            color: var(--color-text-muted);
+        }
+        
+        /* View toggle */
+        .contacts-view-toggle {
+            display: flex;
+            gap: var(--space-1);
+            background: var(--color-bg-tertiary);
+            padding: var(--space-1);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+        }
+        
+        .contacts-view-btn {
+            flex: 1;
+            padding: var(--space-2) var(--space-3);
+            border: none;
+            background: transparent;
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-1);
+        }
+        
+        .contacts-view-btn:hover {
+            color: var(--color-text-primary);
+        }
+        
+        .contacts-view-btn.active {
+            background: var(--color-bg-primary);
+            color: var(--color-brand);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .contacts-view-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Group selector in chat header */
+        .contact-group-selector {
+            display: flex;
+            gap: var(--space-1);
+            margin-top: var(--space-2);
+        }
+        
+        .group-tag {
+            padding: 2px 8px;
+            font-size: var(--text-xs);
+            border-radius: var(--radius-full);
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .group-tag:hover {
+            border-color: var(--color-brand);
+            color: var(--color-text-primary);
+        }
+        
+        .group-tag.active {
+            background: var(--color-brand-muted);
+            border-color: var(--color-brand);
+            color: var(--color-brand);
+        }
+        
+        .group-tag[data-group="famille"].active {
+            background: rgba(248, 113, 113, 0.15);
+            border-color: #f87171;
+            color: #f87171;
+        }
+        
+        .group-tag[data-group="travail"].active {
+            background: rgba(96, 165, 250, 0.15);
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+        
+        .group-tag[data-group="amis"].active {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: #34d399;
+            color: #34d399;
+        }
+        
+        /* Contact slot group indicator */
+        .contact-group-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: var(--radius-full);
+            background: var(--color-bg-tertiary);
+            z-index: 5;
+        }
+        
+        .contact-group-badge.famille { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+        .contact-group-badge.travail { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+        .contact-group-badge.amis { background: rgba(52, 211, 153, 0.2); color: #34d399; }
     </style>
     
     <!-- Confetti celebrations -->
@@ -6959,7 +7166,28 @@
                     Tes 5
                     <span class="contact-count" id="contact-count" aria-live="polite">0/5</span>
                 </h2>
+                
+                <!-- View Toggle -->
+                <div class="contacts-view-toggle" role="tablist" aria-label="Mode d'affichage des contacts">
+                    <button class="contacts-view-btn active" id="view-grid-btn" onclick="setContactsView('grid')" role="tab" aria-selected="true" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                        </svg>
+                        Grille
+                    </button>
+                    <button class="contacts-view-btn" id="view-groups-btn" onclick="setContactsView('groups')" role="tab" aria-selected="false" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        Groupes
+                    </button>
+                </div>
+                
+                <!-- Grid View (default) -->
                 <div class="contacts-grid" id="contacts-grid" role="list" aria-label="Liste de tes 5 contacts"></div>
+                
+                <!-- Groups View -->
+                <div class="contact-groups-container" id="contacts-groups" style="display: none;" role="list" aria-label="Contacts par groupe"></div>
                 
                 <button class="action-btn btn-ripple reveal" onclick="openGiftModal()" type="button">
                     <svg class="action-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -7149,6 +7377,7 @@
                 <div>
                     <h2 class="chat-contact-name" id="chat-contact-name"></h2>
                     <div class="chat-contact-status" id="chat-contact-status"></div>
+                    <div class="contact-group-selector" id="chat-group-selector" aria-label="Groupe du contact"></div>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: var(--space-2);">
@@ -9605,7 +9834,276 @@
             
             // Observe lazy images after render
             requestAnimationFrame(() => observeLazyImages());
+            
+            // Also render groups view if in groups mode
+            if (currentContactsView === 'groups') {
+                renderContactsGrouped();
+            }
         }
+
+        // ===== CONTACT GROUPS =====
+        let currentContactsView = localStorage.getItem('contactsView') || 'grid';
+        
+        const CONTACT_GROUPS = {
+            famille: { icon: '👨‍👩‍👧‍👦', label: 'Famille' },
+            travail: { icon: '💼', label: 'Travail' },
+            amis: { icon: '🎉', label: 'Amis' },
+            autres: { icon: '📋', label: 'Autres' }
+        };
+        
+        function setContactsView(view) {
+            currentContactsView = view;
+            localStorage.setItem('contactsView', view);
+            
+            const gridBtn = document.getElementById('view-grid-btn');
+            const groupsBtn = document.getElementById('view-groups-btn');
+            const gridContainer = document.getElementById('contacts-grid');
+            const groupsContainer = document.getElementById('contacts-groups');
+            
+            if (view === 'grid') {
+                gridBtn.classList.add('active');
+                gridBtn.setAttribute('aria-selected', 'true');
+                groupsBtn.classList.remove('active');
+                groupsBtn.setAttribute('aria-selected', 'false');
+                gridContainer.style.display = 'grid';
+                groupsContainer.style.display = 'none';
+            } else {
+                gridBtn.classList.remove('active');
+                gridBtn.setAttribute('aria-selected', 'false');
+                groupsBtn.classList.add('active');
+                groupsBtn.setAttribute('aria-selected', 'true');
+                gridContainer.style.display = 'none';
+                groupsContainer.style.display = 'flex';
+                renderContactsGrouped();
+            }
+        }
+        
+        function renderContactsGrouped() {
+            const container = document.getElementById('contacts-groups');
+            container.innerHTML = '';
+            
+            // Group contacts by their contact_group
+            const grouped = {
+                famille: [],
+                travail: [],
+                amis: [],
+                autres: []
+            };
+            
+            contacts.forEach(contact => {
+                const group = contact.contact_group || 'autres';
+                if (grouped[group]) {
+                    grouped[group].push(contact);
+                } else {
+                    grouped.autres.push(contact);
+                }
+            });
+            
+            // Render each group
+            Object.entries(CONTACT_GROUPS).forEach(([groupKey, groupInfo]) => {
+                const groupContacts = grouped[groupKey] || [];
+                
+                const section = document.createElement('section');
+                section.className = 'contact-group-section';
+                section.setAttribute('data-group', groupKey);
+                section.setAttribute('role', 'region');
+                section.setAttribute('aria-labelledby', `group-${groupKey}-title`);
+                
+                // Header
+                const header = document.createElement('div');
+                header.className = 'contact-group-header';
+                
+                const title = document.createElement('h3');
+                title.className = 'contact-group-title';
+                title.id = `group-${groupKey}-title`;
+                title.innerHTML = `<span class="contact-group-icon">${groupInfo.icon}</span> ${groupInfo.label}`;
+                
+                const count = document.createElement('span');
+                count.className = 'contact-group-count';
+                count.textContent = groupContacts.length;
+                
+                header.appendChild(title);
+                header.appendChild(count);
+                section.appendChild(header);
+                
+                // Grid of contacts
+                if (groupContacts.length > 0) {
+                    const grid = document.createElement('div');
+                    grid.className = 'contact-group-grid';
+                    
+                    groupContacts.forEach(contact => {
+                        const slot = createContactSlot(contact);
+                        grid.appendChild(slot);
+                    });
+                    
+                    section.appendChild(grid);
+                } else {
+                    const empty = document.createElement('div');
+                    empty.className = 'contact-group-empty';
+                    empty.textContent = `Aucun contact dans ${groupInfo.label.toLowerCase()}`;
+                    section.appendChild(empty);
+                }
+                
+                container.appendChild(section);
+            });
+            
+            // Observe lazy images
+            requestAnimationFrame(() => observeLazyImages());
+        }
+        
+        function createContactSlot(contact) {
+            const slot = document.createElement('div');
+            slot.className = 'contact-slot filled';
+            slot.tabIndex = 0;
+            slot.setAttribute('role', 'listitem');
+            
+            const name = contact.contact?.display_name || contact.contact?.email?.split('@')[0] || '?';
+            const initial = name.charAt(0).toUpperCase();
+            const avatarUrl = contact.contact?.avatar_url;
+            const unread = unreadCounts[contact.contact_user_id] || 0;
+            const isFavorite = contact.is_favorite || false;
+            
+            slot.setAttribute('aria-label', `${escapeHtml(name)}. Appuie pour ouvrir la conversation`);
+            
+            // Favorite button
+            const favoriteBtn = document.createElement('button');
+            favoriteBtn.className = `favorite-btn${isFavorite ? ' is-favorite' : ''}`;
+            favoriteBtn.setAttribute('aria-label', isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+            favoriteBtn.type = 'button';
+            const starSpan = document.createElement('span');
+            starSpan.className = 'favorite-star';
+            starSpan.textContent = isFavorite ? '★' : '☆';
+            favoriteBtn.appendChild(starSpan);
+            favoriteBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleFavorite(contact.id, isFavorite);
+            };
+            slot.appendChild(favoriteBtn);
+            
+            // Avatar
+            const avatarSlot = document.createElement('div');
+            avatarSlot.className = 'contact-avatar-slot';
+            if (avatarUrl) {
+                const img = document.createElement('img');
+                img.dataset.src = avatarUrl;
+                img.alt = '';
+                img.loading = 'lazy';
+                img.className = 'lazy-image';
+                avatarSlot.appendChild(img);
+            } else {
+                const span = document.createElement('span');
+                span.textContent = initial;
+                avatarSlot.appendChild(span);
+            }
+            slot.appendChild(avatarSlot);
+            
+            // Name
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'contact-name';
+            nameDiv.textContent = name;
+            slot.appendChild(nameDiv);
+            
+            // Unread badge
+            if (unread > 0) {
+                const badge = document.createElement('div');
+                badge.className = 'unread-badge';
+                badge.textContent = unread > 9 ? '9+' : unread;
+                slot.appendChild(badge);
+            }
+            
+            slot.onclick = () => openChat(contact);
+            slot.onkeydown = (e) => { 
+                if (e.key === 'Enter' || e.key === ' ') { 
+                    e.preventDefault(); 
+                    openChat(contact); 
+                } 
+            };
+            
+            return slot;
+        }
+        
+        async function setContactGroup(contactId, group) {
+            try {
+                const res = await fetch(`${API_URL}/contacts?id=${contactId}`, {
+                    method: 'PATCH',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact_group: group })
+                });
+                
+                if (res.status === 401) { logout(); return; }
+                
+                const data = await res.json();
+                if (!res.ok) {
+                    showToast({ type: 'error', title: 'Oups', message: data.error || 'Impossible de modifier le groupe' });
+                    return;
+                }
+                
+                // Update local contacts array
+                const contactIndex = contacts.findIndex(c => c.id === contactId);
+                if (contactIndex !== -1) {
+                    contacts[contactIndex].contact_group = group;
+                }
+                
+                // Re-render contacts
+                renderContacts();
+                
+                // Update group selector in chat if open
+                updateChatGroupSelector();
+                
+                const groupLabel = CONTACT_GROUPS[group]?.label || group;
+                showToast({ 
+                    type: 'success', 
+                    message: `Contact déplacé dans ${groupLabel} ${CONTACT_GROUPS[group]?.icon || ''}`, 
+                    duration: 2000 
+                });
+                
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+            } catch (e) {
+                showToast({ type: 'error', title: 'Oups', message: 'Erreur réseau. Réessaie.' });
+            }
+        }
+        
+        function updateChatGroupSelector() {
+            const selector = document.getElementById('chat-group-selector');
+            if (!selector || !currentChatContact) return;
+            
+            const currentGroup = currentChatContact.contact_group || 'autres';
+            
+            selector.querySelectorAll('.group-tag').forEach(tag => {
+                const tagGroup = tag.dataset.group;
+                if (tagGroup === currentGroup) {
+                    tag.classList.add('active');
+                } else {
+                    tag.classList.remove('active');
+                }
+            });
+        }
+        
+        function renderChatGroupSelector(contact) {
+            const container = document.getElementById('chat-group-selector');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const currentGroup = contact.contact_group || 'autres';
+            
+            Object.entries(CONTACT_GROUPS).forEach(([groupKey, groupInfo]) => {
+                const tag = document.createElement('button');
+                tag.className = `group-tag${groupKey === currentGroup ? ' active' : ''}`;
+                tag.dataset.group = groupKey;
+                tag.type = 'button';
+                tag.textContent = `${groupInfo.icon} ${groupInfo.label}`;
+                tag.onclick = () => setContactGroup(contact.id, groupKey);
+                container.appendChild(tag);
+            });
+        }
+        
+        // Initialize view on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (currentContactsView === 'groups') {
+                setContactsView('groups');
+            }
+        });
 
         // ===== TOGGLE FAVORITE =====
         async function toggleFavorite(contactId, currentStatus) {
@@ -10109,6 +10607,9 @@
             
             // Update private note button state
             updateNoteButtonState();
+            
+            // Render group selector in chat header
+            renderChatGroupSelector(contact);
             
             // Show quick replies when chat opens
             showQuickReplies();
@@ -14439,6 +14940,9 @@
             });
         });
     </script>
+    
+    <!-- Quick Actions (Long Press Context Menu) -->
+    <script src="/js/quick-actions.min.js" defer></script>
     
     <!-- Easter Eggs 🥚 -->
     <script src="/js/easter-eggs.min.js" defer></script>

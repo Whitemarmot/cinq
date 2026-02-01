@@ -144,6 +144,10 @@ ALTER TABLE contacts ADD COLUMN IF NOT EXISTS muted_until TIMESTAMPTZ DEFAULT NU
 -- Add private_note column for private notes about contacts (visible only by the user)
 ALTER TABLE contacts ADD COLUMN IF NOT EXISTS private_note TEXT DEFAULT NULL;
 
+-- Add contact_group column for grouping contacts (famille, travail, amis)
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS contact_group TEXT DEFAULT NULL;
+CREATE INDEX IF NOT EXISTS idx_contacts_group ON contacts(user_id, contact_group);
+
 CREATE INDEX IF NOT EXISTS idx_contacts_archived ON contacts(user_id, archived);
 CREATE INDEX IF NOT EXISTS idx_contacts_muted ON contacts(user_id, muted_until);
 

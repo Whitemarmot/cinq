@@ -188,7 +188,7 @@ async function listContacts(req, res, user) {
     
     let query = supabase
         .from('contacts')
-        .select('id, contact_user_id, created_at, is_favorite, archived, muted_until, private_note')
+        .select('id, contact_user_id, created_at, is_favorite, archived, muted_until, private_note, contact_group')
         .eq('user_id', user.id);
     
     // Filter by archived status
@@ -252,6 +252,7 @@ async function listContacts(req, res, user) {
             archived: c.archived || false,
             muted_until: c.muted_until || null,
             is_muted: isMuted,
+            contact_group: c.contact_group || null,
             contact: { 
                 id: c.contact_user_id, 
                 email: profile?.email || null,
@@ -430,7 +431,7 @@ async function handlePatch(req, res, user) {
     // Get current contact status
     const { data: contact, error: fetchError } = await supabase
         .from('contacts')
-        .select('id, is_favorite, archived, muted_until')
+        .select('id, is_favorite, archived, muted_until, contact_group')
         .eq('id', contactId)
         .eq('user_id', user.id)
         .single();
@@ -538,6 +539,34 @@ async function handlePatch(req, res, user) {
             success: true, 
             muted_until: mutedUntil,
             is_muted: isMuted,
+            contact: data
+        });
+    }
+
+    // Handle contact group update
+    if (action === 'group' || req.body?.contact_group !== undefined) {
+        const contactGroup = req.body?.contact_group || req.query.group;
+        
+        // Validate group value
+        const validGroups = ['famille', 'travail', 'amis', 'autres', null];
+        const groupValue = contactGroup && validGroups.includes(contactGroup) ? contactGroup : null;
+        
+        const { data, error } = await supabase
+            .from('contacts')
+            .update({ contact_group: groupValue })
+            .eq('id', contactId)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Log activity
+        logActivity(user.id, 'contact_group_updated', { contact_id: contactId, group: groupValue }, req);
+
+        return res.json({ 
+            success: true, 
+            contact_group: groupValue,
             contact: data
         });
     }
