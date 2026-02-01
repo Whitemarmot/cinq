@@ -7984,8 +7984,8 @@
         
         <!-- MAIN CONTENT -->
         <main class="app-content" id="main-content">
-            <!-- TAB: FEED (DEFAULT) -->
-            <section class="tab-panel active" id="tab-feed" role="tabpanel" aria-labelledby="nav-feed" tabindex="0">
+            <!-- TAB: FEED -->
+            <section class="tab-panel" id="tab-feed" role="tabpanel" aria-labelledby="nav-feed" tabindex="0" hidden>
                 <!-- Stories Bar -->
                 <div class="stories-bar" id="stories-bar" role="region" aria-label="Stories de tes proches">
                     <!-- Add story button -->
@@ -8048,8 +8048,8 @@
                 </div>
             </section>
             
-            <!-- TAB: TES 5 -->
-            <section class="tab-panel" id="tab-contacts" role="tabpanel" aria-labelledby="nav-contacts" tabindex="0" hidden>
+            <!-- TAB: TES 5 (DEFAULT) -->
+            <section class="tab-panel active" id="tab-contacts" role="tabpanel" aria-labelledby="nav-contacts" tabindex="0">
                 <h2 class="section-title">
                     Tes 5
                     <span class="contact-count" id="contact-count" aria-live="polite">0/5</span>
@@ -8275,13 +8275,13 @@
         
         <!-- BOTTOM NAV -->
         <nav id="bottom-nav" class="bottom-nav nav-enhanced" role="tablist" aria-label="Navigation principale">
-            <button class="nav-item active" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="true" aria-controls="tab-feed" type="button">
+            <button class="nav-item" id="nav-feed" data-tab="feed" onclick="switchTab('feed')" role="tab" aria-selected="false" aria-controls="tab-feed" type="button">
                 <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
                 </svg>
                 <span class="nav-label">Feed</span>
             </button>
-            <button class="nav-item" id="nav-contacts" data-tab="contacts" onclick="switchTab('contacts')" role="tab" aria-selected="false" aria-controls="tab-contacts" type="button">
+            <button class="nav-item active" id="nav-contacts" data-tab="contacts" onclick="switchTab('contacts')" role="tab" aria-selected="true" aria-controls="tab-contacts" type="button">
                 <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 2L22 9L18 21H6L2 9L12 2Z"/>
                 </svg>
@@ -9072,7 +9072,7 @@
 
         // ===== TAB SWITCHING =====
         const tabOrder = ['feed', 'contacts', 'profil'];
-        let currentTab = 'feed';
+        let currentTab = 'contacts';
         
         function switchTab(tabName) {
             const currentIndex = tabOrder.indexOf(currentTab);
@@ -16143,10 +16143,9 @@
             }, 300);
             
             // Guide user to add photo first
-            setTimeout(() => {
-                showTooltipHint('profile-avatar', 'Commence par ajouter ta photo ! 📸', 'bottom');
-                switchTab('profil');
-            }, 800);
+            // FIX: Ne pas forcer l'onglet profil automatiquement
+            // Laisser l'utilisateur voir ses contacts par défaut
+            showToast({ type: 'info', title: '💡 Astuce', message: 'N\'oublie pas d\'ajouter ta photo dans ton profil !' });
         }
         
         function skipOnboarding() {
