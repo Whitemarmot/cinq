@@ -72,6 +72,9 @@
     <!-- Message Search -->
     <link rel="stylesheet" href="/css/message-search.css">
     
+    <!-- Presence Indicators -->
+    <link rel="stylesheet" href="/css/presence.css">
+    
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
     
@@ -83,6 +86,9 @@
     
     <!-- Supabase Client for Realtime -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    <!-- Presence Indicators -->
+    <script src="/js/presence.js"></script>
     
     <style>
         /* ===== ACCESSIBILITY: SKIP LINK ===== */
@@ -2656,6 +2662,245 @@
             background: var(--color-success-muted, rgba(34, 197, 94, 0.1));
             border-color: var(--color-success, #22c55e);
             color: var(--color-success, #22c55e);
+        }
+        
+        /* Chat insights button */
+        .chat-insights-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .chat-insights-btn:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: #a855f7;
+            color: #a855f7;
+        }
+        
+        /* Contact Insights Modal */
+        .insights-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+        
+        .insights-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .insights-modal {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow: hidden;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        .insights-modal-overlay.active .insights-modal {
+            transform: scale(1) translateY(0);
+        }
+        
+        .insights-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+        }
+        
+        .insights-modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .insights-modal-title svg {
+            color: #a855f7;
+        }
+        
+        .insights-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .insights-modal-close:hover {
+            background: var(--color-bg-hover);
+            color: var(--color-text-primary);
+        }
+        
+        .insights-modal-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+        }
+        
+        .insights-contact-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .insights-contact-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-brand) 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .insights-contact-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .insights-contact-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .insights-contact-since {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .insight-card {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-brand);
+        }
+        
+        .insight-card.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .insight-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .insight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            margin-bottom: 0.25rem;
+        }
+        
+        .insight-value.purple {
+            color: #a855f7;
+        }
+        
+        .insight-value.green {
+            color: #22c55e;
+        }
+        
+        .insight-value.orange {
+            color: #f97316;
+        }
+        
+        .insight-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .insights-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .insights-loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-text-muted);
+        }
+        
+        .insights-loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        .insights-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-muted);
+        }
+        
+        .insights-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
         
         /* Chat search button */
@@ -8105,6 +8350,11 @@
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
                 </button>
+                <button class="chat-insights-btn" id="chat-insights-btn" onclick="openContactInsights()" type="button" aria-label="Statistiques de la relation" title="Insights">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+                    </svg>
+                </button>
                 <button class="chat-search-btn" id="chat-search-btn" onclick="CinqMessageSearch.toggle()" type="button" aria-label="Rechercher dans les messages" title="Rechercher">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -8665,6 +8915,31 @@
         </div>
     </div>
 
+    <!-- Contact Insights Modal -->
+    <div class="insights-modal-overlay" id="insights-modal" role="dialog" aria-modal="true" aria-labelledby="insights-modal-title" aria-hidden="true">
+        <div class="insights-modal">
+            <div class="insights-modal-header">
+                <h2 class="insights-modal-title" id="insights-modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+                    </svg>
+                    Contact Insights
+                </h2>
+                <button class="insights-modal-close" onclick="closeContactInsights()" type="button" aria-label="Fermer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="insights-modal-content" id="insights-modal-content">
+                <div class="insights-loading">
+                    <div class="insights-loading-spinner"></div>
+                    <p>Chargement des statistiques...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Wallpaper Modal -->
     <div class="modal-overlay wallpaper-modal" id="wallpaper-modal" role="dialog" aria-modal="true" aria-labelledby="wallpaper-modal-title" aria-hidden="true">
         <div class="modal">
@@ -8949,6 +9224,11 @@
                 await Promise.all([loadProfile(), loadContacts(), loadPosts(), loadStoriesBar()]);
                 startPolling();
                 initPushNotifications();
+                
+                // Initialize presence tracking
+                if (window.CinqPresence) {
+                    await CinqPresence.init({ page: 'app', user });
+                }
                 
                 // Check if new user and show onboarding
                 initOnboarding();
@@ -10475,6 +10755,224 @@
             modal.classList.remove('open');
             modal.setAttribute('aria-hidden', 'true');
         }
+        
+        // ===== CONTACT INSIGHTS =====
+        async function openContactInsights() {
+            if (!currentChatContact) return;
+            
+            const modal = document.getElementById('insights-modal');
+            const content = document.getElementById('insights-modal-content');
+            
+            // Show loading state
+            content.innerHTML = `
+                <div class="insights-loading">
+                    <div class="insights-loading-spinner"></div>
+                    <p>Chargement des statistiques...</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            
+            try {
+                const contactId = currentChatContact.contact_user_id;
+                const res = await fetch(`${API_URL}/contact-insights?contact_id=${contactId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (!res.ok) throw new Error('Failed to load insights');
+                
+                const data = await res.json();
+                renderContactInsights(data.insights, currentChatContact);
+                
+            } catch (e) {
+                console.error('Error loading insights:', e);
+                content.innerHTML = `
+                    <div class="insights-empty">
+                        <div class="insights-empty-icon">😕</div>
+                        <p>Impossible de charger les statistiques</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function closeContactInsights() {
+            const modal = document.getElementById('insights-modal');
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        
+        function renderContactInsights(insights, contact) {
+            const content = document.getElementById('insights-modal-content');
+            const name = contact.nickname || contact.contact?.display_name || 
+                        contact.contact?.email?.split('@')[0] || 'Contact';
+            const avatarUrl = contact.contact?.avatar_url;
+            const initial = name[0]?.toUpperCase() || '?';
+            
+            // Format dates
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '—';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            };
+            
+            const formatRelativeTime = (dateStr) => {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) return "Aujourd'hui";
+                if (diffDays === 1) return 'Hier';
+                if (diffDays < 7) return `Il y a ${diffDays} jours`;
+                if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaine${diffDays >= 14 ? 's' : ''}`;
+                return formatDate(dateStr);
+            };
+            
+            // Contact added date
+            const contactSince = contact.created_at 
+                ? formatDate(contact.created_at) 
+                : '—';
+            
+            // No messages yet
+            if (insights.totalMessages === 0) {
+                content.innerHTML = `
+                    <div class="insights-contact-header">
+                        <div class="insights-contact-avatar">
+                            ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="">` : initial}
+                        </div>
+                        <div>
+                            <div class="insights-contact-name">${escapeHtml(name)}</div>
+                            <div class="insights-contact-since">Contact depuis le ${contactSince}</div>
+                        </div>
+                    </div>
+                    <div class="insights-empty">
+                        <div class="insights-empty-icon">💬</div>
+                        <p>Aucun message échangé pour l'instant</p>
+                        <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-top: 0.5rem;">
+                            Envoie le premier message !
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="insights-contact-header">
+                    <div class="insights-contact-avatar">
+                        ${avatarUrl ? `<img src="${escapeHtml(avatarUrl)}" alt="">` : initial}
+                    </div>
+                    <div>
+                        <div class="insights-contact-name">${escapeHtml(name)}</div>
+                        <div class="insights-contact-since">Contact depuis le ${contactSince}</div>
+                    </div>
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">💬</div>
+                        <div class="insight-value">${insights.totalMessages}</div>
+                        <div class="insight-label">Messages échangés</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">📅</div>
+                        <div class="insight-value purple">${insights.daysSinceFirstContact || 0}</div>
+                        <div class="insight-label">Jours de relation</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">📤</div>
+                        <div class="insight-value green">${insights.messagesSent}</div>
+                        <div class="insight-label">Messages envoyés</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">📥</div>
+                        <div class="insight-value orange">${insights.messagesReceived}</div>
+                        <div class="insight-label">Messages reçus</div>
+                    </div>
+                </div>
+                
+                <div class="insights-section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Historique
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">🌱</div>
+                        <div class="insight-value" style="font-size: 1rem;">${formatRelativeTime(insights.firstContact)}</div>
+                        <div class="insight-label">Premier contact</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">🕐</div>
+                        <div class="insight-value" style="font-size: 1rem;">${formatRelativeTime(insights.lastConversation)}</div>
+                        <div class="insight-label">Dernière conversation</div>
+                    </div>
+                </div>
+                
+                <div class="insights-section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+                    </svg>
+                    Statistiques
+                </div>
+                
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">📊</div>
+                        <div class="insight-value">${insights.averageMessagesPerDay}</div>
+                        <div class="insight-label">Msg / jour (moy.)</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon">🔥</div>
+                        <div class="insight-value purple">${insights.longestStreak}</div>
+                        <div class="insight-label">Record de jours</div>
+                    </div>
+                    
+                    ${insights.currentStreak > 0 ? `
+                    <div class="insight-card">
+                        <div class="insight-icon">⚡</div>
+                        <div class="insight-value green">${insights.currentStreak}</div>
+                        <div class="insight-label">Série actuelle</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${insights.mostActiveDay ? `
+                    <div class="insight-card">
+                        <div class="insight-icon">📆</div>
+                        <div class="insight-value" style="font-size: 1rem;">${insights.mostActiveDay}</div>
+                        <div class="insight-label">Jour le plus actif</div>
+                    </div>
+                    ` : ''}
+                    
+                    ${insights.responseRate !== null ? `
+                    <div class="insight-card full-width">
+                        <div class="insight-icon">⚡</div>
+                        <div class="insight-value orange">${insights.responseRate}%</div>
+                        <div class="insight-label">Taux de réponse (sous 24h)</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Close insights modal on overlay click
+        document.getElementById('insights-modal')?.addEventListener('click', (e) => {
+            if (e.target.classList.contains('insights-modal-overlay')) {
+                closeContactInsights();
+            }
+        });
         
         // ===== WALLPAPER SYSTEM =====
         const WALLPAPER_OPTIONS = {
@@ -16582,5 +17080,8 @@
             }
         }
     </script>
+    
+    <!-- Quick Share: Paste images from clipboard -->
+    <script src="/js/quick-share.js" defer></script>
 </body>
 </html>
