@@ -1,0 +1,512 @@
+/**
+ * CINQ - Premium Micro-Interactions
+ * ==================================
+ * Elite micro-interactions and animations pour une expérience premium
+ * Léger, performant, délicieux
+ */
+
+/* ============================================
+   Variables CSS pour les micro-interactions
+   ============================================ */
+:root {
+  --interaction-fast: 150ms;
+  --interaction-normal: 250ms;
+  --interaction-slow: 400ms;
+  --ease-bounce-soft: cubic-bezier(0.34, 1.25, 0.64, 1);
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic-soft: cubic-bezier(0.68, -0.1, 0.32, 1.1);
+  
+  /* Couleurs des interactions */
+  --interaction-primary: #FF6B5B;
+  --interaction-success: #00D084;
+  --interaction-warning: #FFB800;
+  --interaction-danger: #FF3B30;
+}
+
+/* ============================================
+   🚀 ANIMATIONS ENVOI DE MESSAGE (WHOOSH)
+   ============================================ */
+
+/* Animation d'envoi de message */
+@keyframes messageWhoosh {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(0.95) translateY(-5px);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.02) translateY(-15px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.8) translateY(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes messageSent {
+  0% {
+    transform: scale(1.1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Classes pour l'animation d'envoi */
+.message-sending {
+  animation: messageWhoosh var(--interaction-slow) var(--ease-premium) forwards;
+  pointer-events: none;
+}
+
+.message-sent {
+  animation: messageSent var(--interaction-normal) var(--ease-bounce-soft) forwards;
+}
+
+/* Effet de typing en temps réel */
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--interaction-primary);
+  border-radius: 50%;
+  animation: typingPulse 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingPulse {
+  0%, 60%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  30% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   👥 ANIMATIONS CONTACTS PREMIUM
+   ============================================ */
+
+/* Hover sur contact card */
+.contact-card {
+  transition: all var(--interaction-normal) var(--ease-premium);
+  transform-origin: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left var(--interaction-slow) var(--ease-premium);
+  z-index: 1;
+}
+
+.contact-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(255, 107, 91, 0.1);
+}
+
+.contact-card:hover::before {
+  left: 100%;
+}
+
+/* Animation d'ajout de contact */
+@keyframes contactAdded {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15) rotate(-10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.contact-added {
+  animation: contactAdded 0.6s var(--ease-bounce-soft);
+}
+
+/* Animation de suppression de contact */
+@keyframes contactRemoved {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.contact-removing {
+  animation: contactRemoved 0.4s var(--ease-premium) forwards;
+}
+
+/* Micro-interaction sur avatar */
+.contact-avatar {
+  transition: all var(--interaction-fast) var(--ease-premium);
+  position: relative;
+}
+
+.contact-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--interaction-primary) 90deg,
+    transparent 180deg,
+    var(--interaction-primary) 270deg,
+    transparent 360deg
+  );
+  opacity: 0;
+  transition: opacity var(--interaction-fast) var(--ease-premium);
+  z-index: -1;
+}
+
+.contact-avatar:hover {
+  transform: scale(1.05);
+}
+
+.contact-avatar:hover::after {
+  opacity: 0.6;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   💀 LOADING SKELETONS STYLÉS
+   ============================================ */
+
+/* Skeleton base */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 2s ease-in-out infinite;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  animation: skeletonWave 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes skeletonWave {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Skeleton variants */
+.skeleton-text {
+  height: 1em;
+  margin: 0.5em 0;
+}
+
+.skeleton-text.short { width: 60%; }
+.skeleton-text.medium { width: 80%; }
+.skeleton-text.long { width: 100%; }
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  height: 120px;
+  margin: 12px 0;
+}
+
+.skeleton-message {
+  height: 60px;
+  margin: 8px 0;
+  border-radius: 16px;
+}
+
+/* ============================================
+   📱 HAPTIC FEEDBACK HINTS
+   ============================================ */
+
+/* Simulation visuelle du haptic feedback */
+@keyframes hapticTap {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes hapticPress {
+  0% { transform: scale(1); }
+  100% { transform: scale(0.98); }
+}
+
+@keyframes hapticSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Classes pour déclencher les feedbacks */
+.haptic-light {
+  animation: hapticTap 150ms var(--ease-premium);
+}
+
+.haptic-medium {
+  animation: hapticPress 200ms var(--ease-premium);
+}
+
+.haptic-heavy {
+  animation: hapticSuccess 300ms var(--ease-bounce-soft);
+}
+
+/* Indication visuelle pour les zones interactives */
+.interactive-hint {
+  position: relative;
+}
+
+.interactive-hint::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: linear-gradient(45deg, transparent, rgba(255, 107, 91, 0.1), transparent);
+  background-clip: padding-box;
+  opacity: 0;
+  transition: opacity var(--interaction-fast) var(--ease-premium);
+}
+
+.interactive-hint:focus-visible::before,
+.interactive-hint:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   🎯 MICRO-INTERACTIONS SPÉCIALES
+   ============================================ */
+
+/* Effet de like/coeur */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.heart-animation {
+  animation: heartPop 0.3s var(--ease-bounce-soft);
+  color: var(--interaction-danger);
+}
+
+/* Effet de bookmark */
+@keyframes bookmarkSave {
+  0% { 
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.bookmark-animation {
+  animation: bookmarkSave 0.4s var(--ease-premium);
+  color: var(--interaction-warning);
+}
+
+/* Effet de notification */
+@keyframes notificationBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.notification-bounce {
+  animation: notificationBounce 0.8s var(--ease-bounce-soft);
+}
+
+/* Effet ripple pour les boutons */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  transform: scale(0);
+  transition: transform 0.5s var(--ease-premium);
+  pointer-events: none;
+}
+
+.ripple:active::after {
+  transform: scale(2);
+  transition: transform 0.1s var(--ease-premium);
+}
+
+/* ============================================
+   🎨 STATES & TRANSITIONS
+   ============================================ */
+
+/* États de chargement améliorés */
+.loading-shimmer {
+  background: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  background-size: 400% 400%;
+  animation: shimmerGradient 2s ease infinite;
+}
+
+@keyframes shimmerGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Transitions de focus améliorées */
+:focus-visible {
+  outline: 2px solid var(--interaction-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+  transition: outline-offset var(--interaction-fast) var(--ease-premium);
+}
+
+/* Préférence de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .skeleton::after {
+    display: none;
+  }
+}
+
+/* ============================================
+   📱 MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Réduire les animations sur mobile pour les performances */
+  .contact-card:hover {
+    transform: translateY(-2px) scale(1.01);
+  }
+  
+  /* Touch targets plus grands */
+  .interactive-hint {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Haptic feedback plus prononcé sur mobile */
+  .haptic-light { animation-duration: 100ms; }
+  .haptic-medium { animation-duration: 150ms; }
+  .haptic-heavy { animation-duration: 250ms; }
+}
+
+/* ============================================
+   🌙 DARK MODE ADAPTATIONS
+   ============================================ */
+
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+[data-theme="dark"] .typing-indicator {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .contact-card:hover {
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 107, 91, 0.15);
+}
