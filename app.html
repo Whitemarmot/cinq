@@ -2539,15 +2539,14 @@
         .typing-indicator {
             display: none;
             align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: var(--space-3) var(--space-4);
+            gap: 6px;
+            padding: var(--space-2) var(--space-3);
             background: var(--color-bg-elevated);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             border-bottom-left-radius: 4px;
             width: fit-content;
-            min-width: 60px;
+            max-width: 200px;
             animation: typing-appear 0.3s ease-out;
             position: relative;
             margin-top: var(--space-1);
@@ -2579,9 +2578,24 @@
             border-bottom-right-radius: 4px;
         }
         
+        .typing-indicator-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
         .typing-dot {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             background: var(--color-text-muted);
             border-radius: 50%;
             animation: typing-bounce 1.4s infinite ease-in-out both;
@@ -2597,7 +2611,7 @@
                 opacity: 0.4;
             }
             30% { 
-                transform: translateY(-5px);
+                transform: translateY(-4px);
                 opacity: 1;
             }
         }
@@ -5458,9 +5472,12 @@
             // Add typing indicator at the end
             html += `
                 <div class="typing-indicator${wasTypingVisible ? ' visible' : ''}" id="typing-indicator" aria-live="polite" aria-label="En train d'écrire">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
+                    <span class="typing-indicator-label" id="typing-label">écrit...</span>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
                 </div>
             `;
             
