@@ -3862,12 +3862,12 @@
                 </div>
                 <div class="poll-options-list" id="poll-options-list">
                     <div class="poll-option-input" data-index="0">
-                        <span class="poll-option-number">1</span>
-                        <input type="text" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)">
+                        <label for="poll-option-0" class="poll-option-number">1</label>
+                        <input type="text" id="poll-option-0" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)" aria-label="Première option du sondage">
                     </div>
                     <div class="poll-option-input" data-index="1">
-                        <span class="poll-option-number">2</span>
-                        <input type="text" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)">
+                        <label for="poll-option-1" class="poll-option-number">2</label>
+                        <input type="text" id="poll-option-1" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)" aria-label="Deuxième option du sondage">
                     </div>
                 </div>
                 <button class="poll-add-option" id="poll-add-option" onclick="addPollOption()">
@@ -4549,9 +4549,9 @@
                         optEl.className = 'poll-option-input';
                         optEl.dataset.index = i;
                         optEl.innerHTML = `
-                            <span class="poll-option-number">${i + 1}</span>
-                            <input type="text" placeholder="Option ${i + 1}" maxlength="100" value="${escapeHtml(opt)}" onkeydown="handlePollOptionKeydown(event, ${i})">
-                            ${i >= 2 ? `<button class="poll-remove-option" onclick="removePollOption(${i})" aria-label="Supprimer l'option">×</button>` : ''}
+                            <label for="edit-poll-option-${i}" class="poll-option-number">${i + 1}</label>
+                            <input type="text" id="edit-poll-option-${i}" placeholder="Option ${i + 1}" maxlength="100" value="${escapeHtml(opt)}" onkeydown="handlePollOptionKeydown(event, ${i})" aria-label="Option ${i + 1} du sondage">
+                            ${i >= 2 ? `<button class="poll-remove-option" onclick="removePollOption(${i})" aria-label="Supprimer l'option ${i + 1}">×</button>` : ''}
                         `;
                         list.appendChild(optEl);
                     });
