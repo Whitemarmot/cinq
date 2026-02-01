@@ -7,6 +7,19 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [2.2.0] - 2025-02-01
+
+### ✨ Added (Nouvelles fonctionnalités)
+
+#### Quick Share (Partage rapide d'images)
+- **Ctrl+V / Cmd+V pour coller une image** — Partagez rapidement une image depuis le presse-papier (captures d'écran, images copiées) dans le composer du feed ou le chat
+- Fonctionne avec JPEG, PNG, GIF, WebP (max 5 Mo)
+- Indicateur visuel discret "📋 Ctrl+V pour coller une image" apparaît au focus
+- Dans le chat : l'image est envoyée comme pièce jointe
+- Dans le feed : l'image est uploadée et attachée au post
+
+---
+
 ## [2.1.0] - 2025-02-01
 
 ### ✨ Added (Nouvelles fonctionnalités)

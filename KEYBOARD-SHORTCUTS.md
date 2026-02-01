@@ -22,6 +22,14 @@ Raccourcis clavier globaux disponibles dans l'application Cinq.
 | `Ctrl + F` | Ouvrir la recherche |
 | `Ctrl + K` | Ouvrir/fermer la recherche (alternatif) |
 
+## Quick Share (partage rapide d'images)
+
+| Raccourci | Action |
+|-----------|--------|
+| `Ctrl + V` | Coller une image depuis le presse-papier (dans le composer ou le chat) |
+
+> **Note :** Fonctionne avec les captures d'écran, images copiées, etc. Formats supportés : JPEG, PNG, GIF, WebP. Taille max : 5 Mo.
+
 ## Fermeture des modals
 
 | Raccourci | Action |

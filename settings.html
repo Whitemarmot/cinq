@@ -53,9 +53,12 @@
     <!-- Message Animations styles -->
     <link rel="stylesheet" href="/css/message-animations.css">
     
+    <!-- Chat Themes styles -->
+    <link rel="stylesheet" href="/css/chat-themes.css">
+    
     <!-- Theme initialization -->
     <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a);var ct=localStorage.getItem('cinq_chat_theme');if(ct&&ct!=='default')h.setAttribute('data-chat-theme',ct)})();
         
         const THEMES = ['dark', 'light', 'auto', 'sunrise'];
         function getSystemPref() { return window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark'; }
@@ -368,6 +371,95 @@
             }
         }
         
+        // ===== Chat Themes =====
+        var CHAT_THEME_KEY = 'cinq_chat_theme';
+        var CHAT_THEMES = ['default', 'ocean', 'forest', 'sunset', 'midnight'];
+        var CHAT_THEME_NAMES = {
+            'default': 'Par défaut',
+            'ocean': '🌊 Océan',
+            'forest': '🌲 Forêt',
+            'sunset': '🌅 Coucher de soleil',
+            'midnight': '🌙 Minuit'
+        };
+        var CHAT_THEME_DESCRIPTIONS = {
+            'default': 'Thème par défaut, suit la couleur d\'accent.',
+            'ocean': 'Bleus profonds et teintes aquatiques.',
+            'forest': 'Verts naturels et tons terreux.',
+            'sunset': 'Oranges chauds et roses dorés.',
+            'midnight': 'Violets sombres et nuit étoilée.'
+        };
+        
+        function getChatTheme() {
+            try {
+                var val = localStorage.getItem(CHAT_THEME_KEY);
+                return CHAT_THEMES.includes(val) ? val : 'default';
+            } catch (e) {}
+            return 'default';
+        }
+        
+        function setChatTheme(theme) {
+            if (!CHAT_THEMES.includes(theme)) return;
+            
+            // Save to localStorage
+            localStorage.setItem(CHAT_THEME_KEY, theme);
+            
+            // Apply to document
+            var h = document.documentElement;
+            h.classList.add('chat-theme-transitioning');
+            
+            if (theme === 'default') {
+                h.removeAttribute('data-chat-theme');
+            } else {
+                h.setAttribute('data-chat-theme', theme);
+            }
+            
+            setTimeout(function() { h.classList.remove('chat-theme-transitioning'); }, 400);
+            
+            // Update UI
+            updateChatThemeSelector(theme);
+            updateChatThemeDescription(theme);
+            updateChatThemePreview(theme);
+        }
+        
+        function updateChatThemeSelector(theme) {
+            document.querySelectorAll('.chat-theme-option').forEach(function(btn) {
+                var t = btn.getAttribute('data-chat-theme');
+                btn.classList.toggle('active', t === theme);
+                btn.setAttribute('aria-pressed', t === theme);
+            });
+        }
+        
+        function updateChatThemeDescription(theme) {
+            var desc = document.getElementById('chat-theme-description');
+            if (!desc) return;
+            desc.textContent = CHAT_THEME_DESCRIPTIONS[theme] || CHAT_THEME_DESCRIPTIONS['default'];
+        }
+        
+        function updateChatThemePreview(theme) {
+            var preview = document.getElementById('chat-theme-live-preview');
+            if (!preview) return;
+            
+            if (theme === 'default') {
+                preview.removeAttribute('data-chat-theme');
+            } else {
+                preview.setAttribute('data-chat-theme', theme);
+            }
+        }
+        
+        function initChatThemeSettings() {
+            var theme = getChatTheme();
+            
+            // Apply to document
+            if (theme !== 'default') {
+                document.documentElement.setAttribute('data-chat-theme', theme);
+            }
+            
+            // Update UI
+            updateChatThemeSelector(theme);
+            updateChatThemeDescription(theme);
+            updateChatThemePreview(theme);
+        }
+        
         // Listen for system changes (auto mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', function(e) {
@@ -403,6 +495,9 @@
             
             // Initialize message animation settings
             initMsgAnimSettings();
+            
+            // Initialize chat theme settings
+            initChatThemeSettings();
             
             // For sunrise mode, set up periodic check and update
             if (pref === 'sunrise') {
@@ -1609,6 +1704,168 @@
                 height: 28px;
             }
         }
+        
+        /* ===== CHAT THEME SELECTOR ===== */
+        .chat-theme-selector {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+        
+        .chat-theme-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2);
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 72px;
+        }
+        
+        .chat-theme-option:hover {
+            border-color: var(--color-border-active);
+            transform: translateY(-2px);
+        }
+        
+        .chat-theme-option:focus-visible {
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
+        }
+        
+        .chat-theme-option.active {
+            border-color: var(--accent-primary, var(--color-brand));
+            background: var(--color-bg-elevated);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        .chat-theme-preview {
+            display: flex;
+            gap: 4px;
+            padding: 6px;
+            background: var(--preview-bg, #1a1a2e);
+            border-radius: var(--radius-md);
+        }
+        
+        .chat-theme-preview-bubble {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+        
+        .chat-theme-preview-bubble.sent {
+            background: var(--preview-sent, #6366f1);
+        }
+        
+        .chat-theme-preview-bubble.received {
+            background: var(--preview-received, #2a2a3e);
+        }
+        
+        /* Theme-specific preview colors */
+        .chat-theme-option[data-chat-theme="default"] .chat-theme-preview {
+            --preview-bg: #1a1a2e;
+            --preview-sent: #6366f1;
+            --preview-received: #2a2a3e;
+        }
+        
+        .chat-theme-option[data-chat-theme="ocean"] .chat-theme-preview {
+            --preview-bg: #0a192f;
+            --preview-sent: #0ea5e9;
+            --preview-received: #1e3a5f;
+        }
+        
+        .chat-theme-option[data-chat-theme="forest"] .chat-theme-preview {
+            --preview-bg: #1a2f1a;
+            --preview-sent: #22c55e;
+            --preview-received: #2d4a2d;
+        }
+        
+        .chat-theme-option[data-chat-theme="sunset"] .chat-theme-preview {
+            --preview-bg: #2d1f1a;
+            --preview-sent: #f97316;
+            --preview-received: #4a2d24;
+        }
+        
+        .chat-theme-option[data-chat-theme="midnight"] .chat-theme-preview {
+            --preview-bg: #0f0a1e;
+            --preview-sent: #8b5cf6;
+            --preview-received: #1e1533;
+        }
+        
+        .chat-theme-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            font-weight: 500;
+            transition: color 0.2s;
+            white-space: nowrap;
+        }
+        
+        .chat-theme-option:hover .chat-theme-label,
+        .chat-theme-option.active .chat-theme-label {
+            color: var(--color-text-primary);
+        }
+        
+        /* Chat theme live preview */
+        .chat-theme-live-preview {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: var(--chat-bg, var(--color-bg-tertiary));
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            transition: all 0.35s ease;
+        }
+        
+        .chat-theme-live-preview .preview-message {
+            max-width: 75%;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+        }
+        
+        .chat-theme-live-preview .preview-message.received {
+            align-self: flex-start;
+            background: var(--chat-bubble-received, var(--color-bg-elevated));
+            color: var(--chat-bubble-received-text, var(--color-text-primary));
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-theme-live-preview .preview-message.sent {
+            align-self: flex-end;
+            background: var(--chat-bubble-sent, var(--accent-primary, var(--color-brand)));
+            color: var(--chat-bubble-sent-text, #fff);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-theme-live-preview .preview-timestamp {
+            font-size: var(--text-xs);
+            color: var(--chat-timestamp, var(--color-text-muted));
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            .chat-theme-selector {
+                gap: var(--space-2);
+            }
+            
+            .chat-theme-option {
+                min-width: 64px;
+                padding: var(--space-2);
+            }
+            
+            .chat-theme-label {
+                font-size: 0.65rem;
+            }
+            
+            .chat-theme-preview-bubble {
+                width: 12px;
+                height: 12px;
+            }
+        }
     </style>
     <!-- View Transitions -->
     <link rel="stylesheet" href="/css/view-transitions.min.css">
@@ -2055,6 +2312,67 @@
                                 <div class="msg-anim-preview-item"></div>
                                 <div class="msg-anim-preview-item"></div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Themes -->
+                    <div class="settings-item" style="border-top: 1px solid var(--color-border); margin-top: var(--space-4); padding-top: var(--space-4);">
+                        <div class="settings-item-info" style="flex: 1;">
+                            <p class="settings-item-title">
+                                <span>🎨</span>
+                                <span>Thèmes de chat</span>
+                            </p>
+                            <p class="settings-item-subtitle">Palettes de couleurs pour tes conversations</p>
+                            
+                            <!-- Chat theme selector -->
+                            <div class="chat-theme-selector" role="radiogroup" aria-label="Choisir un thème de chat" style="display: flex; gap: var(--space-3); margin-top: var(--space-3); flex-wrap: wrap;">
+                                <button type="button" class="chat-theme-option active" data-chat-theme="default" onclick="setChatTheme('default')" aria-pressed="true" role="radio" title="Par défaut">
+                                    <div class="chat-theme-preview">
+                                        <span class="chat-theme-preview-bubble received"></span>
+                                        <span class="chat-theme-preview-bubble sent"></span>
+                                    </div>
+                                    <span class="chat-theme-label">Par défaut</span>
+                                </button>
+                                <button type="button" class="chat-theme-option" data-chat-theme="ocean" onclick="setChatTheme('ocean')" aria-pressed="false" role="radio" title="Océan">
+                                    <div class="chat-theme-preview">
+                                        <span class="chat-theme-preview-bubble received"></span>
+                                        <span class="chat-theme-preview-bubble sent"></span>
+                                    </div>
+                                    <span class="chat-theme-label">🌊 Océan</span>
+                                </button>
+                                <button type="button" class="chat-theme-option" data-chat-theme="forest" onclick="setChatTheme('forest')" aria-pressed="false" role="radio" title="Forêt">
+                                    <div class="chat-theme-preview">
+                                        <span class="chat-theme-preview-bubble received"></span>
+                                        <span class="chat-theme-preview-bubble sent"></span>
+                                    </div>
+                                    <span class="chat-theme-label">🌲 Forêt</span>
+                                </button>
+                                <button type="button" class="chat-theme-option" data-chat-theme="sunset" onclick="setChatTheme('sunset')" aria-pressed="false" role="radio" title="Coucher de soleil">
+                                    <div class="chat-theme-preview">
+                                        <span class="chat-theme-preview-bubble received"></span>
+                                        <span class="chat-theme-preview-bubble sent"></span>
+                                    </div>
+                                    <span class="chat-theme-label">🌅 Coucher</span>
+                                </button>
+                                <button type="button" class="chat-theme-option" data-chat-theme="midnight" onclick="setChatTheme('midnight')" aria-pressed="false" role="radio" title="Minuit">
+                                    <div class="chat-theme-preview">
+                                        <span class="chat-theme-preview-bubble received"></span>
+                                        <span class="chat-theme-preview-bubble sent"></span>
+                                    </div>
+                                    <span class="chat-theme-label">🌙 Minuit</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Chat theme live preview -->
+                            <div class="chat-theme-live-preview" id="chat-theme-live-preview" style="margin-top: var(--space-3);">
+                                <div class="preview-message received">Salut ! Comment ça va ? 👋</div>
+                                <div class="preview-timestamp">14:32</div>
+                                <div class="preview-message sent">Super bien, merci ! Et toi ?</div>
+                            </div>
+                            
+                            <p class="text-xs text-white/40 mt-3" id="chat-theme-description">
+                                Thème par défaut, suit la couleur d'accent.
+                            </p>
                         </div>
                     </div>
                 </div>

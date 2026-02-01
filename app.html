@@ -12379,6 +12379,11 @@
         
         // Broadcast typing state via Supabase Realtime
         function broadcastTypingState(typing) {
+            // Also update presence typing state
+            if (window.CinqPresence) {
+                typing ? CinqPresence.startTyping() : CinqPresence.stopTyping();
+            }
+            
             if (!typingChannel || !user || !currentChatContact) {
                 console.debug('Typing state (local only):', typing);
                 return;
