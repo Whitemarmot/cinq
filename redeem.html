@@ -78,7 +78,7 @@
     
     <!-- Theme initialization -->
     <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.getElementById('theme-color-meta');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
         var THEMES=['dark','light','auto'];
         function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
         function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}

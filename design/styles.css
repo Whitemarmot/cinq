@@ -349,6 +349,114 @@
 }
 
 /* ============================================
+   ACCENT COLOR THEMES
+   Custom accent colors for personalization
+   ============================================ */
+
+/* Indigo Accent (Default) */
+[data-accent="indigo"],
+:root:not([data-accent]) {
+  --accent-primary: #6366f1;
+  --accent-light: #818cf8;
+  --accent-dark: #4f46e5;
+  --accent-hover: #7c7ff5;
+  --accent-muted: rgba(99, 102, 241, 0.12);
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a5b4fc 100%);
+}
+
+/* Violet Accent */
+[data-accent="violet"] {
+  --accent-primary: #8b5cf6;
+  --accent-light: #a78bfa;
+  --accent-dark: #7c3aed;
+  --accent-hover: #9d71f8;
+  --accent-muted: rgba(139, 92, 246, 0.12);
+  --accent-glow: rgba(139, 92, 246, 0.35);
+  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+}
+
+/* Rose Accent */
+[data-accent="rose"] {
+  --accent-primary: #ec4899;
+  --accent-light: #f472b6;
+  --accent-dark: #db2777;
+  --accent-hover: #f06bad;
+  --accent-muted: rgba(236, 72, 153, 0.12);
+  --accent-glow: rgba(236, 72, 153, 0.35);
+  --accent-gradient: linear-gradient(135deg, #ec4899 0%, #f472b6 50%, #fbcfe8 100%);
+}
+
+/* Green Accent */
+[data-accent="green"] {
+  --accent-primary: #22c55e;
+  --accent-light: #4ade80;
+  --accent-dark: #16a34a;
+  --accent-hover: #3dd06f;
+  --accent-muted: rgba(34, 197, 94, 0.12);
+  --accent-glow: rgba(34, 197, 94, 0.35);
+  --accent-gradient: linear-gradient(135deg, #22c55e 0%, #4ade80 50%, #86efac 100%);
+}
+
+/* Orange Accent */
+[data-accent="orange"] {
+  --accent-primary: #f97316;
+  --accent-light: #fb923c;
+  --accent-dark: #ea580c;
+  --accent-hover: #fa8a2f;
+  --accent-muted: rgba(249, 115, 22, 0.12);
+  --accent-glow: rgba(249, 115, 22, 0.35);
+  --accent-gradient: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #fdba74 100%);
+}
+
+/* Light theme adjustments for accents */
+[data-theme="light"][data-accent="indigo"],
+[data-theme="light"]:not([data-accent]) {
+  --accent-primary: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-muted: rgba(79, 70, 229, 0.1);
+  --accent-glow: rgba(79, 70, 229, 0.25);
+}
+
+[data-theme="light"][data-accent="violet"] {
+  --accent-primary: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-muted: rgba(124, 58, 237, 0.1);
+  --accent-glow: rgba(124, 58, 237, 0.25);
+}
+
+[data-theme="light"][data-accent="rose"] {
+  --accent-primary: #db2777;
+  --accent-hover: #be185d;
+  --accent-muted: rgba(219, 39, 119, 0.1);
+  --accent-glow: rgba(219, 39, 119, 0.25);
+}
+
+[data-theme="light"][data-accent="green"] {
+  --accent-primary: #16a34a;
+  --accent-hover: #15803d;
+  --accent-muted: rgba(22, 163, 74, 0.1);
+  --accent-glow: rgba(22, 163, 74, 0.25);
+}
+
+[data-theme="light"][data-accent="orange"] {
+  --accent-primary: #ea580c;
+  --accent-hover: #c2410c;
+  --accent-muted: rgba(234, 88, 12, 0.1);
+  --accent-glow: rgba(234, 88, 12, 0.25);
+}
+
+/* Apply accent colors to brand variables */
+:root {
+  --color-accent: var(--accent-primary);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-glow: var(--accent-glow);
+}
+
+/* ============================================
    BASE STYLES
    ============================================ */
 *, *::before, *::after {

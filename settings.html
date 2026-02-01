@@ -46,7 +46,7 @@
     
     <!-- Theme initialization -->
     <script>
-        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12'})();
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}else if(p==='sunrise'){var c;try{c=JSON.parse(localStorage.getItem('cinq_sunrise_data'))}catch(e){}var sr=c&&c.sunrise||7,ss=c&&c.sunset||19,now=new Date(),ch=now.getHours()+now.getMinutes()/60;t=(ch>=sr&&ch<ss)?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
         
         const THEMES = ['dark', 'light', 'auto', 'sunrise'];
         function getSystemPref() { return window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark'; }
@@ -151,6 +151,42 @@
             }
         }
         
+        // Accent color management
+        const ACCENTS = ['indigo', 'violet', 'rose', 'green', 'orange'];
+        const ACCENT_NAMES = {
+            'indigo': 'Indigo',
+            'violet': 'Violet',
+            'rose': 'Rose',
+            'green': 'Vert',
+            'orange': 'Orange'
+        };
+        
+        function setAccent(accent) {
+            if (!ACCENTS.includes(accent)) return;
+            var h = document.documentElement;
+            h.classList.add('theme-transitioning');
+            h.setAttribute('data-accent', accent);
+            localStorage.setItem('cinq_accent', accent);
+            setTimeout(function() { h.classList.remove('theme-transitioning'); }, 400);
+            updateAccentSelector(accent);
+            updateAccentDescription(accent);
+        }
+        
+        function updateAccentSelector(accent) {
+            document.querySelectorAll('.accent-option').forEach(function(btn) {
+                var a = btn.getAttribute('data-accent');
+                btn.classList.toggle('active', a === accent);
+                btn.setAttribute('aria-pressed', a === accent);
+            });
+        }
+        
+        function updateAccentDescription(accent) {
+            var desc = document.getElementById('accent-description');
+            if (!desc) return;
+            var name = ACCENT_NAMES[accent] || 'Indigo';
+            desc.textContent = 'Couleur ' + name + ' appliquée aux boutons et éléments interactifs.';
+        }
+        
         // Listen for system changes (auto mode)
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', function(e) {
@@ -175,6 +211,11 @@
             var pref = localStorage.getItem('cinq_theme') || 'dark';
             updateThemeSelector(pref);
             updateThemeDescription(pref);
+            
+            // Initialize accent color selector
+            var accentPref = localStorage.getItem('cinq_accent') || 'indigo';
+            updateAccentSelector(accentPref);
+            updateAccentDescription(accentPref);
             
             // For sunrise mode, set up periodic check and update
             if (pref === 'sunrise') {
@@ -1180,6 +1221,112 @@
             color: var(--color-text-muted);
             font-size: var(--text-sm);
         }
+        
+        /* ===== ACCENT COLOR SELECTOR ===== */
+        .accent-selector {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+        
+        .accent-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-2);
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+            min-width: 60px;
+        }
+        
+        .accent-option:hover {
+            background: var(--color-bg-hover);
+        }
+        
+        .accent-option:focus-visible {
+            outline: 2px solid var(--accent-primary, var(--color-brand));
+            outline-offset: 2px;
+        }
+        
+        .accent-option.active {
+            background: var(--color-bg-tertiary);
+            border-color: var(--color-border-active);
+        }
+        
+        .accent-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: transform 0.2s var(--ease-spring), box-shadow 0.2s;
+        }
+        
+        .accent-option:hover .accent-swatch {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+        
+        .accent-option.active .accent-swatch {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px var(--color-bg-primary), 0 0 0 5px currentColor, var(--shadow-md);
+        }
+        
+        .accent-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .accent-option:hover .accent-label,
+        .accent-option.active .accent-label {
+            color: var(--color-text-primary);
+        }
+        
+        /* Apply accent color to various UI elements */
+        .toggle-switch.active {
+            background: var(--accent-primary, var(--color-brand)) !important;
+            border-color: var(--accent-primary, var(--color-brand)) !important;
+        }
+        
+        .form-btn-primary {
+            background: var(--accent-primary, var(--color-brand)) !important;
+            border-color: var(--accent-primary, var(--color-brand)) !important;
+        }
+        
+        .form-btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover, var(--color-brand-hover)) !important;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent-primary, var(--color-brand)) !important;
+            box-shadow: 0 0 0 3px var(--accent-muted, var(--color-brand-muted)) !important;
+        }
+        
+        .theme-selector-option.active {
+            box-shadow: 0 0 0 2px var(--accent-primary, var(--color-brand)), var(--shadow-sm) !important;
+        }
+        
+        @media (max-width: 400px) {
+            .accent-selector {
+                justify-content: space-between;
+            }
+            
+            .accent-option {
+                flex: 1 0 18%;
+                min-width: 0;
+                padding: var(--space-1);
+            }
+            
+            .accent-swatch {
+                width: 28px;
+                height: 28px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1447,6 +1594,43 @@
                     <p class="text-xs text-white/40 mt-3" id="theme-description">
                         Le mode auto suit les préférences de ton système.
                     </p>
+                    
+                    <!-- Accent Color Selector -->
+                    <div style="border-top: 1px solid var(--color-border); margin-top: var(--space-4); padding-top: var(--space-4);">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <p class="font-medium text-white">Couleur d'accent</p>
+                                <p class="text-sm text-white/60">Personnalise ton interface</p>
+                            </div>
+                        </div>
+                        
+                        <div class="accent-selector" role="radiogroup" aria-label="Sélection de la couleur d'accent">
+                            <button type="button" class="accent-option" data-accent="indigo" onclick="setAccent('indigo')" aria-pressed="false" role="radio" title="Indigo">
+                                <span class="accent-swatch" style="background: linear-gradient(135deg, #6366f1, #818cf8);"></span>
+                                <span class="accent-label">Indigo</span>
+                            </button>
+                            <button type="button" class="accent-option" data-accent="violet" onclick="setAccent('violet')" aria-pressed="false" role="radio" title="Violet">
+                                <span class="accent-swatch" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);"></span>
+                                <span class="accent-label">Violet</span>
+                            </button>
+                            <button type="button" class="accent-option" data-accent="rose" onclick="setAccent('rose')" aria-pressed="false" role="radio" title="Rose">
+                                <span class="accent-swatch" style="background: linear-gradient(135deg, #ec4899, #f472b6);"></span>
+                                <span class="accent-label">Rose</span>
+                            </button>
+                            <button type="button" class="accent-option" data-accent="green" onclick="setAccent('green')" aria-pressed="false" role="radio" title="Vert">
+                                <span class="accent-swatch" style="background: linear-gradient(135deg, #22c55e, #4ade80);"></span>
+                                <span class="accent-label">Vert</span>
+                            </button>
+                            <button type="button" class="accent-option" data-accent="orange" onclick="setAccent('orange')" aria-pressed="false" role="radio" title="Orange">
+                                <span class="accent-swatch" style="background: linear-gradient(135deg, #f97316, #fb923c);"></span>
+                                <span class="accent-label">Orange</span>
+                            </button>
+                        </div>
+                        
+                        <p class="text-xs text-white/40 mt-3" id="accent-description">
+                            La couleur d'accent s'applique aux boutons et éléments interactifs.
+                        </p>
+                    </div>
                     
                     <!-- Mode compact du feed -->
                     <div class="settings-item" style="border-top: 1px solid var(--color-border); margin-top: var(--space-4); padding-top: var(--space-4);">

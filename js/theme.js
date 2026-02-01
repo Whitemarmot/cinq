@@ -1,8 +1,9 @@
 /**
  * CINQ Theme Manager
  * Handles dark/light/auto/sunrise theme switching with smooth transitions
+ * Also manages accent color customization
  * 
- * @version 1.1
+ * @version 1.2
  * @description Complete theme management system with system preference detection and sunrise/sunset mode
  */
 
@@ -10,9 +11,20 @@
   'use strict';
 
   const STORAGE_KEY = 'cinq_theme';
+  const ACCENT_STORAGE_KEY = 'cinq_accent';
   const SUNRISE_CACHE_KEY = 'cinq_sunrise_data';
   const THEME_COLOR_DARK = '#0e0e12';
   const THEME_COLOR_LIGHT = '#faf9f7';
+  
+  // Available accent colors
+  const ACCENTS = ['indigo', 'violet', 'rose', 'green', 'orange'];
+  const ACCENT_NAMES = {
+    'indigo': 'Indigo',
+    'violet': 'Violet',
+    'rose': 'Rose',
+    'green': 'Vert',
+    'orange': 'Orange'
+  };
   
   // Default sunrise/sunset times (fallback)
   const DEFAULT_SUNRISE = 7; // 7:00 AM
@@ -394,6 +406,109 @@
     });
   }
 
+  // ===== ACCENT COLOR MANAGEMENT =====
+
+  /**
+   * Get the saved accent color from localStorage
+   * @returns {string}
+   */
+  function getSavedAccent() {
+    try {
+      const saved = localStorage.getItem(ACCENT_STORAGE_KEY);
+      if (saved && ACCENTS.includes(saved)) {
+        return saved;
+      }
+    } catch (e) {}
+    return 'indigo'; // Default accent
+  }
+
+  /**
+   * Save accent color to localStorage
+   * @param {string} accent
+   */
+  function saveAccent(accent) {
+    try {
+      localStorage.setItem(ACCENT_STORAGE_KEY, accent);
+    } catch (e) {}
+  }
+
+  /**
+   * Apply accent color to the document
+   * @param {string} accent - Accent color name
+   * @param {boolean} [withTransition=true] - Whether to animate the transition
+   */
+  function applyAccent(accent, withTransition = true) {
+    if (!ACCENTS.includes(accent)) {
+      console.warn('Invalid accent color:', accent);
+      return;
+    }
+
+    const html = document.documentElement;
+
+    if (withTransition && !html.classList.contains('theme-loading')) {
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 400);
+    }
+
+    html.setAttribute('data-accent', accent);
+
+    // Dispatch custom event for any listeners
+    window.dispatchEvent(new CustomEvent('accentchange', {
+      detail: { accent }
+    }));
+  }
+
+  /**
+   * Set a specific accent color
+   * @param {string} accent - Accent color name
+   */
+  function setAccent(accent) {
+    if (!ACCENTS.includes(accent)) {
+      console.warn('Invalid accent color:', accent);
+      return;
+    }
+
+    saveAccent(accent);
+    applyAccent(accent, true);
+    updateAccentSelector(accent);
+  }
+
+  /**
+   * Get current accent color
+   * @returns {string}
+   */
+  function getAccent() {
+    return getSavedAccent();
+  }
+
+  /**
+   * Update accent selector UI (for settings page)
+   * @param {string} accent - Current accent color
+   */
+  function updateAccentSelector(accent) {
+    const options = document.querySelectorAll('.accent-option');
+    options.forEach(option => {
+      const a = option.getAttribute('data-accent');
+      option.classList.toggle('active', a === accent);
+      option.setAttribute('aria-pressed', a === accent);
+    });
+
+    // Update description if present
+    const desc = document.getElementById('accent-description');
+    if (desc) {
+      const name = ACCENT_NAMES[accent] || 'Indigo';
+      desc.textContent = `Couleur ${name} appliquée aux boutons et éléments interactifs.`;
+    }
+  }
+
+  /**
+   * Initialize accent color on page load
+   */
+  function initAccent() {
+    const accent = getSavedAccent();
+    applyAccent(accent, false);
+  }
+
   // Auto-initialize if script is loaded after DOM is ready
   if (document.readyState === 'loading') {
     // DOM not ready, wait for it
@@ -401,15 +516,23 @@
       // Update any theme selectors on the page
       const theme = getTheme();
       updateThemeSelector(theme.preference);
+      
+      // Update any accent selectors on the page
+      const accent = getAccent();
+      updateAccentSelector(accent);
     });
   } else {
     // DOM already ready
     const theme = getTheme();
     updateThemeSelector(theme.preference);
+    
+    const accent = getAccent();
+    updateAccentSelector(accent);
   }
 
-  // Initialize theme immediately (runs synchronously)
+  // Initialize theme and accent immediately (runs synchronously)
   initTheme();
+  initAccent();
 
   // Expose API globally
   window.CinqTheme = {
@@ -420,11 +543,18 @@
     getSystemPreference,
     getSunriseSunset,
     updateSelector: updateThemeSelector,
-    THEMES
+    THEMES,
+    // Accent API
+    setAccent,
+    getAccent,
+    updateAccentSelector,
+    ACCENTS,
+    ACCENT_NAMES
   };
 
   // Also expose simple toggleTheme function for onclick handlers
   window.toggleTheme = toggleTheme;
   window.setTheme = setTheme;
+  window.setAccent = setAccent;
 
 })();
