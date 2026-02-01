@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit Presse — Cinq</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Kit presse Cinq : logos, ressources médias, description, statistiques et citations. Tout ce dont les journalistes ont besoin pour parler de l'anti-réseau social.">
+    <meta name="keywords" content="cinq, kit presse, presse, médias, logo, ressources, journalistes, anti-réseau social">
+    <meta name="author" content="Cinq">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://cinq.app/press">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Kit Presse — Cinq">
+    <meta property="og:description" content="Ressources presse pour Cinq, l'anti-réseau social. Logos, stats et citations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cinq.app/press">
+    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:site_name" content="Cinq">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kit Presse — Cinq">
+    <meta name="twitter:description" content="Ressources presse pour Cinq, l'anti-réseau social.">
+    <meta name="twitter:site" content="@cinqapp">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#0a0a0b">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"></noscript>
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/design/styles.min.css">
+    <link rel="stylesheet" href="/css/mobile-responsive.min.css">
+    
+    <!-- Theme CSS for smooth transitions -->
+    <link rel="stylesheet" href="/css/theme.min.css">
+    
+    <!-- Theme initialization (before body to prevent flash) -->
+    <script>
+        (function(){var h=document.documentElement,s=localStorage.getItem('cinq_theme'),p=s||'dark',t=p;if(p==='auto'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}h.setAttribute('data-theme',t);h.setAttribute('data-theme-preference',p);h.classList.add('theme-loading');var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#faf9f7':'#0e0e12';var a=localStorage.getItem('cinq_accent')||'indigo';h.setAttribute('data-accent',a)})();
+        var THEMES=['dark','light','auto'];
+        function getSystemPref(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}
+        function getEffective(p){return p==='auto'?getSystemPref():(p||'dark')}
+        function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
+        requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
+    </script>
+    
+    <style>
+        .press-container {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .press-header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+        
+        .press-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-brand);
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        
+        .press-logo svg {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .press-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .press-subtitle {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Sections */
+        .press-section {
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-title svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--color-brand);
+        }
+        
+        .section-content {
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+        }
+        
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .section-content strong {
+            color: var(--color-text-primary);
+        }
+        
+        /* Logo Grid */
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .logo-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-card:hover {
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+        }
+        
+        .logo-preview {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+        }
+        
+        .logo-preview.dark-bg {
+            background: #0a0a0b;
+        }
+        
+        .logo-preview.light-bg {
+            background: #faf9f7;
+        }
+        
+        .logo-preview.gradient-bg {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+        }
+        
+        .logo-preview img,
+        .logo-preview svg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .logo-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-formats {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+            margin-bottom: 1rem;
+        }
+        
+        .logo-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--color-brand);
+            color: white;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .logo-download:hover {
+            filter: brightness(1.1);
+        }
+        
+        .logo-download svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* Quotes */
+        .quotes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .quote-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-left: 4px solid var(--color-brand);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+        
+        .quote-icon {
+            position: absolute;
+            top: 1rem;
+            left: 1.5rem;
+            font-size: 3rem;
+            color: var(--color-brand);
+            opacity: 0.2;
+            line-height: 1;
+        }
+        
+        .quote-text {
+            font-size: 1.125rem;
+            font-style: italic;
+            color: var(--color-text-primary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quote-author {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .quote-author strong {
+            color: var(--color-text-primary);
+        }
+        
+        /* Description Box */
+        .description-box {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .description-box h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .description-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            line-height: 1.7;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            color: var(--color-brand);
+            border-color: var(--color-brand);
+        }
+        
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Contact Box */
+        .contact-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .contact-box h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-box p {
+            color: var(--color-text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-brand);
+            color: white;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .contact-email:hover {
+            filter: brightness(1.1);
+        }
+        
+        /* Download All */
+        .download-all {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .download-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            border-radius: var(--radius-xl);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .download-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .download-all-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Footer */
+        .press-footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .press-footer a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .press-footer a:hover {
+            color: var(--color-brand);
+        }
+        
+        /* Brand Colors */
+        .brand-colors {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        
+        .color-swatch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--color-border);
+        }
+        
+        .color-code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+        
+        @media (max-width: 640px) {
+            .press-container {
+                padding: 2rem 1rem;
+            }
+            
+            .press-title {
+                font-size: 2rem;
+            }
+            
+            .logo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="press-container">
+        <!-- Header -->
+        <header class="press-header">
+            <a href="/" class="press-logo">
+                <svg viewBox="0 0 100 100" fill="none">
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1"/>
+                            <stop offset="50%" stop-color="#8b5cf6"/>
+                            <stop offset="100%" stop-color="#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="48" fill="url(#logo-gradient)"/>
+                    <text x="50" y="68" text-anchor="middle" font-family="Inter, sans-serif" font-size="54" font-weight="800" fill="white">5</text>
+                </svg>
+                Cinq
+            </a>
+            <h1 class="press-title">Kit Presse</h1>
+            <p class="press-subtitle">
+                Tout ce dont vous avez besoin pour parler de Cinq. Logos, descriptions, statistiques et citations à votre disposition.
+            </p>
+        </header>
+        
+        <!-- Description Section -->
+        <section class="press-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                À propos de Cinq
+            </h2>
+            
+            <div class="section-content">
+                <p>
+                    <strong>Cinq</strong> est l'anti-réseau social. Contrairement aux plateformes traditionnelles qui encouragent l'accumulation de "followers" et la course aux likes, Cinq limite volontairement chaque utilisateur à <strong>5 proches</strong> — les personnes qui comptent vraiment.
+                </p>
+                <p>
+                    Pas de likes. Pas d'algorithme. Pas de publicité. Juste des moments authentiques partagés avec votre cercle intime. C'est un retour à l'essentiel, une réponse au "doomscrolling" et à l'anxiété générée par les réseaux sociaux traditionnels.
+                </p>
+            </div>
+            
+            <div class="description-box">
+                <h3>Description courte (pour les articles)</h3>
+                <div class="description-text">
+                    <button class="copy-btn" onclick="copyDescription()" title="Copier">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    Cinq est l'anti-réseau social qui limite chaque utilisateur à 5 proches. Sans likes, sans algorithme et sans publicité, l'app redéfinit la connexion sociale en privilégiant la qualité sur la quantité.
+                </div>
+            </div>
+            
+            <div class="description-box">
+                <h3>Description longue</h3>
+                <div class="description-text">
+                    <button class="copy-btn" onclick="copyDescriptionLong()" title="Copier">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    Cinq est un anti-réseau social français qui repense fondamentalement notre rapport aux connexions numériques. En limitant chaque utilisateur à exactement 5 proches, l'application élimine la course aux followers et aux likes qui caractérise les plateformes traditionnelles. Le concept repose sur des études psychologiques démontrant que les humains ne peuvent maintenir qu'un nombre limité de relations profondes. Cinq propose des fonctionnalités uniques : Moments éphémères, Pings spontanés, rappels d'anniversaires, et "Quoi de neuf" pour partager son humeur. Le tout sans algorithme de recommandation, sans publicité, et avec un respect total de la vie privée. Disponible gratuitement sur web, iOS et Android.
+                </div>
+            </div>
+        </section>
+        
+        <!-- Logos Section -->
+        <section class="press-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Logos & Ressources
+            </h2>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <div class="logo-preview dark-bg">
+                        <img src="/assets/logo/logo-full.svg" alt="Logo Cinq complet">
+                    </div>
+                    <div class="logo-name">Logo complet</div>
+                    <div class="logo-formats">SVG • Fond sombre</div>
+                    <a href="/assets/logo/logo-full.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light-bg">
+                        <img src="/assets/logo/logo-full-dark.svg" alt="Logo Cinq complet (fond clair)">
+                    </div>
+                    <div class="logo-name">Logo complet (fond clair)</div>
+                    <div class="logo-formats">SVG • Fond clair</div>
+                    <a href="/assets/logo/logo-full-dark.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview gradient-bg">
+                        <img src="/assets/logo/logo-icon.svg" alt="Icône Cinq">
+                    </div>
+                    <div class="logo-name">Icône</div>
+                    <div class="logo-formats">SVG • Carré</div>
+                    <a href="/assets/logo/logo-icon.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview gradient-bg">
+                        <img src="/assets/logo/logo-icon-rounded.svg" alt="Icône Cinq arrondie">
+                    </div>
+                    <div class="logo-name">Icône arrondie</div>
+                    <div class="logo-formats">SVG • Coins arrondis</div>
+                    <a href="/assets/logo/logo-icon-rounded.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview dark-bg">
+                        <img src="/assets/logo/logo-mono-white.svg" alt="Logo monochrome blanc">
+                    </div>
+                    <div class="logo-name">Monochrome blanc</div>
+                    <div class="logo-formats">SVG • Monochrome</div>
+                    <a href="/assets/logo/logo-mono-white.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+                
+                <div class="logo-card">
+                    <div class="logo-preview light-bg">
+                        <img src="/assets/logo/logo-mono-dark.svg" alt="Logo monochrome noir">
+                    </div>
+                    <div class="logo-name">Monochrome noir</div>
+                    <div class="logo-formats">SVG • Monochrome</div>
+                    <a href="/assets/logo/logo-mono-dark.svg" download class="logo-download">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Télécharger
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Brand Colors -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--color-text-primary);">Couleurs de la marque</h3>
+            <div class="brand-colors">
+                <div class="color-swatch">
+                    <div class="color-circle" style="background: #6366f1;"></div>
+                    <span class="color-code">#6366f1</span>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background: #8b5cf6;"></div>
+                    <span class="color-code">#8b5cf6</span>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background: #a855f7;"></div>
+                    <span class="color-code">#a855f7</span>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background: #0e0e12;"></div>
+                    <span class="color-code">#0e0e12</span>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-circle" style="background: #faf9f7;"></div>
+                    <span class="color-code">#faf9f7</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Stats Section -->
+        <section class="press-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Chiffres clés
+            </h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Proches maximum</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Publicités</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Algorithme</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24h</div>
+                    <div class="stat-label">Durée des Moments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Gratuit</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Vie privée respectée</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Citations Section -->
+        <section class="press-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21c0 1 0 1 1 1z"></path>
+                    <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
+                </svg>
+                Citations
+            </h2>
+            
+            <div class="quotes-list">
+                <div class="quote-card">
+                    <span class="quote-icon">"</span>
+                    <p class="quote-text">
+                        Les réseaux sociaux ont transformé nos amitiés en métriques. Avec Cinq, on revient à l'essentiel : pas de followers, pas de likes, juste les 5 personnes qui comptent vraiment dans votre vie.
+                    </p>
+                    <p class="quote-author">— <strong>L'équipe Cinq</strong>, sur la vision du projet</p>
+                </div>
+                
+                <div class="quote-card">
+                    <span class="quote-icon">"</span>
+                    <p class="quote-text">
+                        Le chiffre 5 n'est pas arbitraire. La recherche en psychologie sociale montre que nous ne pouvons maintenir qu'un nombre limité de relations profondes. Cinq vous force à choisir — et c'est là que réside sa puissance.
+                    </p>
+                    <p class="quote-author">— <strong>L'équipe Cinq</strong>, sur le concept</p>
+                </div>
+                
+                <div class="quote-card">
+                    <span class="quote-icon">"</span>
+                    <p class="quote-text">
+                        Nous ne vendons pas vos données. Nous n'avons pas d'algorithme qui décide ce que vous devez voir. Quand vos proches postent quelque chose, vous le voyez. Point final.
+                    </p>
+                    <p class="quote-author">— <strong>L'équipe Cinq</strong>, sur la vie privée</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="press-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Contact Presse
+            </h2>
+            
+            <div class="contact-box">
+                <h3>Une question ? Un article en préparation ?</h3>
+                <p>Notre équipe est disponible pour répondre à vos questions et organiser des interviews.</p>
+                <a href="mailto:press@cinq.app" class="contact-email">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    press@cinq.app
+                </a>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="press-footer">
+            <p>
+                <a href="/">Accueil</a> · 
+                <a href="/about">À propos</a> · 
+                <a href="/FAQ">FAQ</a> · 
+                <a href="/privacy">Confidentialité</a> · 
+                <a href="/terms">Conditions</a>
+            </p>
+            <p style="margin-top: 1rem; color: var(--color-text-tertiary); font-size: 0.875rem;">
+                © 2025 Cinq. Tous droits réservés.
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        function copyDescription() {
+            const text = "Cinq est l'anti-réseau social qui limite chaque utilisateur à 5 proches. Sans likes, sans algorithme et sans publicité, l'app redéfinit la connexion sociale en privilégiant la qualité sur la quantité.";
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Description copiée !');
+            });
+        }
+        
+        function copyDescriptionLong() {
+            const text = "Cinq est un anti-réseau social français qui repense fondamentalement notre rapport aux connexions numériques. En limitant chaque utilisateur à exactement 5 proches, l'application élimine la course aux followers et aux likes qui caractérise les plateformes traditionnelles. Le concept repose sur des études psychologiques démontrant que les humains ne peuvent maintenir qu'un nombre limité de relations profondes. Cinq propose des fonctionnalités uniques : Moments éphémères, Pings spontanés, rappels d'anniversaires, et \"Quoi de neuf\" pour partager son humeur. Le tout sans algorithme de recommandation, sans publicité, et avec un respect total de la vie privée. Disponible gratuitement sur web, iOS et Android.";
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Description copiée !');
+            });
+        }
+    </script>
+</body>
+</html>
