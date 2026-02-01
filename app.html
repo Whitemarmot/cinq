@@ -286,7 +286,7 @@
             flex-direction: column;
         }
         
-        /* ===== HEADER ===== */
+        /* ===== PROFESSIONAL HEADER ===== */
         .app-header {
             position: sticky;
             top: 0;
@@ -294,29 +294,202 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--space-4) var(--space-5);
+            padding: var(--space-3) var(--space-5);
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--color-border);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--color-border-subtle);
+            transition: all 0.3s var(--ease-out-expo);
         }
         
-        .header-logo {
+        /* Subtle gradient line at bottom */
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--color-brand) 20%, 
+                var(--cinq-coral-light) 50%, 
+                var(--color-brand) 80%, 
+                transparent 100%);
+            opacity: 0.3;
+        }
+        
+        /* Scrolled state */
+        .app-header.scrolled {
+            padding: var(--space-2) var(--space-5);
+            box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12);
+        }
+        
+        .app-header.scrolled::after {
+            opacity: 0.5;
+        }
+        
+        /* ===== HEADER LOGO AREA ===== */
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .header-brand:hover .header-logo-icon {
+            transform: scale(1.05) rotate(5deg);
+        }
+        
+        .header-brand:hover .header-logo-text {
+            letter-spacing: 0.02em;
+        }
+        
+        /* Logo icon container */
+        .header-logo-icon {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s var(--ease-spring);
+        }
+        
+        /* Pentagon background glow */
+        .header-logo-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: var(--cinq-gradient);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            opacity: 0.15;
+            filter: blur(8px);
+            animation: logo-pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes logo-pulse {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.25; transform: scale(1.08); }
+        }
+        
+        /* The "5" number */
+        .header-logo-number {
             font-family: var(--font-display, 'Space Grotesk', sans-serif);
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             background: var(--cinq-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 2px 8px var(--color-brand-glow));
-            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+            line-height: 1;
         }
         
+        /* Logo text */
+        .header-logo-text {
+            font-family: var(--font-display, 'Space Grotesk', sans-serif);
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            letter-spacing: -0.01em;
+            transition: letter-spacing 0.3s var(--ease-out-expo);
+            position: relative;
+        }
+        
+        /* Subtle dot separator */
+        .header-logo-text::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 3px;
+            background: var(--color-brand);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+        
+        /* ===== CENTER NAV (optional, future-ready) ===== */
+        .header-nav {
+            display: none; /* Hidden for now, ready for future expansion */
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        @media (min-width: 768px) {
+            .header-nav {
+                display: flex;
+            }
+        }
+        
+        .header-nav-item {
+            padding: var(--space-2) var(--space-4);
+            font-family: var(--font-display, 'Space Grotesk', sans-serif);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-muted);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            border: none;
+            background: none;
+            position: relative;
+        }
+        
+        .header-nav-item:hover {
+            color: var(--color-text-primary);
+            background: var(--color-bg-hover);
+        }
+        
+        .header-nav-item.active {
+            color: var(--color-brand);
+            background: var(--color-brand-muted);
+        }
+        
+        /* ===== HEADER ACTIONS ===== */
         .header-actions {
             display: flex;
             align-items: center;
-            gap: var(--space-3);
+            gap: var(--space-2);
+        }
+        
+        /* Action button base style */
+        .header-action-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            color: var(--color-text-muted);
+            transition: all 0.2s var(--ease-out-expo);
+        }
+        
+        .header-action-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        
+        .header-action-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        .header-action-btn svg {
+            transition: transform 0.2s var(--ease-spring);
+        }
+        
+        .header-action-btn:hover svg {
+            transform: scale(1.1);
         }
         
         /* Theme toggle button */
@@ -325,33 +498,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-full);
+            border-radius: var(--radius-lg);
             cursor: pointer;
-            transition: 
-                background var(--transition-fast),
-                border-color var(--transition-fast),
-                transform 0.15s var(--ease-spring);
+            transition: all 0.2s var(--ease-out-expo);
             overflow: hidden;
         }
         
         .theme-toggle:hover {
             background: var(--color-bg-elevated);
             border-color: var(--color-border-active);
-            transform: scale(1.05);
+            transform: translateY(-1px);
         }
         
         .theme-toggle:active {
-            transform: scale(0.95);
+            transform: translateY(0) scale(0.95);
         }
         
         .theme-toggle-icon {
             position: absolute;
-            transition: transform 0.4s var(--ease-spring), opacity 0.3s;
-            color: var(--color-text-secondary);
+            transition: transform 0.5s var(--ease-spring), opacity 0.3s;
+            color: var(--color-text-muted);
+        }
+        
+        .theme-toggle:hover .theme-toggle-icon {
+            color: var(--color-text-primary);
         }
         
         .theme-toggle .icon-sun {
@@ -360,12 +534,12 @@
         }
         
         .theme-toggle .icon-moon {
-            transform: rotate(-90deg) scale(0.5);
+            transform: rotate(-90deg) scale(0);
             opacity: 0;
         }
         
         [data-theme="light"] .theme-toggle .icon-sun {
-            transform: rotate(90deg) scale(0.5);
+            transform: rotate(90deg) scale(0);
             opacity: 0;
         }
         
@@ -374,46 +548,113 @@
             opacity: 1;
         }
         
+        /* Notification button */
+        .notification-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-lg);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            color: var(--color-text-muted);
+        }
+        
+        .notification-btn:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-border-active);
+            color: var(--color-text-primary);
+            transform: translateY(-1px);
+        }
+        
+        .notification-btn:hover svg {
+            animation: bell-ring 0.5s ease-in-out;
+        }
+        
+        @keyframes bell-ring {
+            0%, 100% { transform: rotate(0); }
+            20% { transform: rotate(12deg); }
+            40% { transform: rotate(-10deg); }
+            60% { transform: rotate(6deg); }
+            80% { transform: rotate(-4deg); }
+        }
+        
+        .notification-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            background: var(--color-error);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: badge-pop 0.35s var(--ease-spring);
+            box-shadow: 0 2px 8px var(--color-error-muted);
+            border: 2px solid var(--color-bg-primary);
+        }
+        
+        .notification-badge.hidden {
+            display: none;
+        }
+        
+        @keyframes badge-pop {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Header avatar */
         .header-avatar {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            min-height: 36px;
-            max-width: 36px;
-            max-height: 36px;
-            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            min-height: 38px;
+            max-width: 38px;
+            max-height: 38px;
+            border-radius: var(--radius-lg);
             background: var(--cinq-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-display, 'Space Grotesk', sans-serif);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.15s var(--ease-spring), box-shadow 0.2s;
+            transition: all 0.2s var(--ease-out-expo);
             overflow: hidden;
             flex-shrink: 0;
             position: relative;
+            border: 2px solid transparent;
         }
         
         .header-avatar:hover {
-            transform: scale(1.12);
-            box-shadow: var(--shadow-glow-sm);
+            transform: translateY(-1px) scale(1.05);
+            box-shadow: 0 4px 16px var(--color-brand-glow);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .header-avatar:active {
-            transform: scale(0.92);
-            transition-duration: 0.1s;
+            transform: translateY(0) scale(0.95);
         }
         
         .header-avatar:focus-visible {
-            animation: avatar-pulse 0.6s ease-out;
-        }
-        
-        @keyframes avatar-pulse {
-            0%, 100% { box-shadow: var(--shadow-glow-sm); }
-            50% { box-shadow: var(--shadow-glow); }
+            outline: 2px solid var(--color-brand);
+            outline-offset: 2px;
         }
         
         .header-avatar img {
@@ -426,58 +667,64 @@
             inset: 0;
         }
         
-        /* ===== NOTIFICATION BUTTON ===== */
-        .notification-btn {
-            position: relative;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border-subtle);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.15s var(--ease-spring), background 0.2s;
-            color: var(--text-secondary);
-        }
-        
-        .notification-btn:hover {
-            transform: scale(1.08);
-            background: var(--surface-hover);
-            color: var(--text-primary);
-        }
-        
-        .notification-btn:active {
-            transform: scale(0.92);
-        }
-        
-        .notification-badge {
+        /* Status indicator on avatar */
+        .header-avatar::after {
+            content: '';
             position: absolute;
-            top: -4px;
-            right: -4px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            border-radius: 9px;
-            background: var(--error);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: badge-pop 0.35s var(--ease-spring);
+            bottom: -1px;
+            right: -1px;
+            width: 10px;
+            height: 10px;
+            background: var(--color-success);
+            border-radius: 50%;
+            border: 2px solid var(--color-bg-primary);
+            opacity: 0;
+            transition: opacity 0.2s;
         }
         
-        .notification-badge.hidden {
-            display: none;
+        .header-avatar.online::after {
+            opacity: 1;
         }
         
-        @keyframes badge-pop {
-            0% { transform: scale(0); }
-            60% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        /* Divider between action groups */
+        .header-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--color-border);
+            margin: 0 var(--space-1);
+        }
+        
+        /* ===== RESPONSIVE HEADER ===== */
+        @media (max-width: 480px) {
+            .app-header {
+                padding: var(--space-2) var(--space-3);
+            }
+            
+            .header-logo-text {
+                display: none;
+            }
+            
+            .header-logo-text::before {
+                display: none;
+            }
+            
+            .header-actions {
+                gap: var(--space-1);
+            }
+            
+            .header-action-btn,
+            .theme-toggle,
+            .notification-btn,
+            .header-avatar {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+            }
+            
+            .header-divider {
+                display: none;
+            }
         }
         
         /* ===== MAIN CONTENT ===== */
@@ -3129,27 +3376,51 @@
     </div>
     
     <div class="app-shell">
-        <!-- HEADER -->
-        <header class="app-header">
-            <a href="/" class="header-logo-link" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
-                <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 2L29.5 11.5L24.5 27.5H7.5L2.5 11.5L16 2Z" stroke="url(#logo-grad)" stroke-width="2" fill="none"/>
-                    <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-grad)">5</text>
-                    <defs><linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ff6b4a"/><stop offset="100%" style="stop-color:#ff8a6a"/></linearGradient></defs>
-                </svg>
-                <span class="header-logo" aria-hidden="true" style="font-size:1.25rem;">cinq</span>
+        <!-- HEADER — Professional Top Bar -->
+        <header class="app-header" id="app-header">
+            <!-- Brand / Logo -->
+            <a href="/" class="header-brand" aria-label="Cinq — Retour à l'accueil">
+                <div class="header-logo-icon">
+                    <span class="header-logo-number" aria-hidden="true">5</span>
+                </div>
+                <span class="header-logo-text">cinq</span>
             </a>
+            
             <h1 class="sr-only">Cinq — Ton espace intime</h1>
+            
+            <!-- Actions -->
             <div class="header-actions">
+                <!-- Theme Toggle -->
                 <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Basculer entre mode clair/sombre" type="button">
-                    <svg class="theme-toggle-icon icon-sun" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                    <svg class="theme-toggle-icon icon-moon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="theme-toggle-icon icon-sun" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="theme-toggle-icon icon-moon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
                 </button>
+                
+                <!-- Notifications -->
                 <button class="notification-btn" id="notification-btn" onclick="window.CinqNotifications?.toggleNotificationCenter()" aria-label="Voir les notifications" type="button">
-                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
                     <span id="notification-badge" class="notification-badge hidden" aria-live="polite">0</span>
                 </button>
-                <button class="header-avatar" id="header-avatar" onclick="switchTab('profil')" aria-label="Accéder à mon profil" type="button">
+                
+                <div class="header-divider" aria-hidden="true"></div>
+                
+                <!-- User Avatar -->
+                <button class="header-avatar online" id="header-avatar" onclick="switchTab('profil')" aria-label="Accéder à mon profil" type="button">
                     <span id="header-avatar-initial" aria-hidden="true">?</span>
                 </button>
             </div>
@@ -3514,6 +3785,38 @@
                 });
             }
         });
+
+        // ===== HEADER SCROLL EFFECT =====
+        (function() {
+            const header = document.getElementById('app-header');
+            if (!header) return;
+            
+            let lastScrollY = 0;
+            let ticking = false;
+            
+            function updateHeader() {
+                const scrollY = window.scrollY || window.pageYOffset;
+                
+                if (scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+                
+                lastScrollY = scrollY;
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(updateHeader);
+                    ticking = true;
+                }
+            }, { passive: true });
+            
+            // Initial check
+            updateHeader();
+        })();
 
         // ===== TOAST & AUTH =====
         // showToast(), getToken(), and authHeaders() now provided by /js/shared.js
