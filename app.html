@@ -1686,6 +1686,191 @@
             100% { transform: scale(1); }
         }
         
+        /* ===== SUGGESTIONS SECTION ===== */
+        .suggestions-section {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        .suggestions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-4);
+        }
+        
+        .suggestions-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .suggestions-title svg {
+            color: var(--color-brand);
+        }
+        
+        .suggestions-empty {
+            text-align: center;
+            padding: var(--space-6);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+        
+        .suggestion-card {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-3);
+            transition: all 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+            animation: slide-up-fade 0.4s ease-out backwards;
+        }
+        
+        .suggestion-card:hover {
+            border-color: var(--color-border-active);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .suggestion-card:nth-child(1) { animation-delay: 0ms; }
+        .suggestion-card:nth-child(2) { animation-delay: 60ms; }
+        .suggestion-card:nth-child(3) { animation-delay: 120ms; }
+        
+        .suggestion-avatar {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: var(--radius-full);
+            background: var(--color-bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 1.1rem;
+            overflow: hidden;
+        }
+        
+        .suggestion-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .suggestion-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .suggestion-name {
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: var(--text-sm);
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .suggestion-mutual {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+        
+        .suggestion-mutual-avatars {
+            display: flex;
+            margin-right: var(--space-1);
+        }
+        
+        .suggestion-mutual-avatars .mini-avatar {
+            width: 18px;
+            height: 18px;
+            border-radius: var(--radius-full);
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-bg-secondary);
+            margin-left: -6px;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        
+        .suggestion-mutual-avatars .mini-avatar:first-child {
+            margin-left: 0;
+        }
+        
+        .suggestion-mutual-avatars .mini-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .suggestion-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .suggestion-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .suggestion-btn.add {
+            background: var(--cinq-gradient);
+            color: white;
+        }
+        
+        .suggestion-btn.add:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px var(--color-brand-glow);
+        }
+        
+        .suggestion-btn.ignore {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-muted);
+        }
+        
+        .suggestion-btn.ignore:hover {
+            background: var(--color-danger);
+            color: white;
+        }
+        
+        .suggestion-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 400px) {
+            .suggestion-avatar {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+            }
+            
+            .suggestion-btn {
+                width: 32px;
+                height: 32px;
+            }
+        }
+        
         .action-btn {
             display: flex;
             align-items: center;
@@ -3836,6 +4021,24 @@
                         <div class="action-subtitle">Invite quelqu'un qui compte vraiment</div>
                     </div>
                 </button>
+                
+                <!-- Suggestions Section -->
+                <section class="suggestions-section" id="suggestions-section" aria-labelledby="suggestions-title">
+                    <div class="suggestions-header">
+                        <h3 class="suggestions-title" id="suggestions-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Suggestions
+                        </h3>
+                    </div>
+                    <div id="suggestions-list" role="list" aria-label="Suggestions d'amis d'amis">
+                        <div class="suggestions-empty" id="suggestions-loading">
+                            <span class="loading-spinner"></span>
+                            Chargement des suggestions...
+                        </div>
+                    </div>
+                </section>
             </section>
             
             <!-- TAB: PROFIL -->
@@ -4660,6 +4863,7 @@
                 }
                 
                 renderContacts();
+                loadSuggestions();
             } catch (e) {
                 showToast({ type: 'error', title: 'Oups', message: 'Impossible de charger tes contacts. Réseau ?' });
             }
@@ -4739,6 +4943,210 @@
             
             // Observe lazy images after render
             requestAnimationFrame(() => observeLazyImages());
+        }
+
+        // ===== SUGGESTIONS =====
+        let suggestions = [];
+        
+        async function loadSuggestions() {
+            const list = document.getElementById('suggestions-list');
+            const section = document.getElementById('suggestions-section');
+            
+            // Only show suggestions if user has fewer than 5 contacts
+            if (contacts.length >= 5) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            list.innerHTML = '<div class="suggestions-empty" id="suggestions-loading"><span class="loading-spinner"></span> Chargement des suggestions...</div>';
+            
+            try {
+                const res = await fetch(`${API_URL}/suggestions`, { headers: authHeaders() });
+                const data = await res.json();
+                
+                if (res.status === 401) { logout(); return; }
+                
+                suggestions = data.suggestions || [];
+                renderSuggestions(data.message);
+            } catch (e) {
+                list.innerHTML = '<div class="suggestions-empty">Impossible de charger les suggestions</div>';
+            }
+        }
+        
+        function renderSuggestions(emptyMessage) {
+            const list = document.getElementById('suggestions-list');
+            
+            if (!suggestions || suggestions.length === 0) {
+                list.innerHTML = `<div class="suggestions-empty">${escapeHtml(emptyMessage || 'Pas de suggestions pour le moment')}</div>`;
+                return;
+            }
+            
+            list.innerHTML = '';
+            
+            suggestions.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'suggestion-card';
+                card.setAttribute('role', 'listitem');
+                card.dataset.userId = s.user.id;
+                
+                const name = s.user.display_name || s.user.email?.split('@')[0] || 'Utilisateur';
+                const initial = name.charAt(0).toUpperCase();
+                
+                // Avatar
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'suggestion-avatar';
+                if (s.user.avatar_url) {
+                    const img = document.createElement('img');
+                    img.src = s.user.avatar_url;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent = initial;
+                }
+                
+                // Info section
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'suggestion-info';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'suggestion-name';
+                nameDiv.textContent = name;
+                
+                const mutualDiv = document.createElement('div');
+                mutualDiv.className = 'suggestion-mutual';
+                
+                // Mutual contact avatars
+                if (s.mutualContacts && s.mutualContacts.length > 0) {
+                    const avatarsDiv = document.createElement('div');
+                    avatarsDiv.className = 'suggestion-mutual-avatars';
+                    
+                    s.mutualContacts.slice(0, 3).forEach(mc => {
+                        const miniAvatar = document.createElement('div');
+                        miniAvatar.className = 'mini-avatar';
+                        if (mc.avatar_url) {
+                            const img = document.createElement('img');
+                            img.src = mc.avatar_url;
+                            img.alt = '';
+                            miniAvatar.appendChild(img);
+                        } else {
+                            miniAvatar.textContent = (mc.display_name || '?').charAt(0).toUpperCase();
+                        }
+                        avatarsDiv.appendChild(miniAvatar);
+                    });
+                    
+                    mutualDiv.appendChild(avatarsDiv);
+                }
+                
+                const mutualText = document.createElement('span');
+                mutualText.textContent = s.mutualCount === 1 
+                    ? '1 ami en commun' 
+                    : `${s.mutualCount} amis en commun`;
+                mutualDiv.appendChild(mutualText);
+                
+                infoDiv.appendChild(nameDiv);
+                infoDiv.appendChild(mutualDiv);
+                
+                // Actions
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'suggestion-actions';
+                
+                const ignoreBtn = document.createElement('button');
+                ignoreBtn.className = 'suggestion-btn ignore';
+                ignoreBtn.type = 'button';
+                ignoreBtn.setAttribute('aria-label', 'Ignorer cette suggestion');
+                ignoreBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                ignoreBtn.onclick = () => ignoreSuggestion(s.user.id, card);
+                
+                const addBtn = document.createElement('button');
+                addBtn.className = 'suggestion-btn add';
+                addBtn.type = 'button';
+                addBtn.setAttribute('aria-label', 'Ajouter ce contact');
+                addBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+                addBtn.onclick = () => addSuggestionAsContact(s.user.id, s.user.email, card);
+                
+                actionsDiv.appendChild(ignoreBtn);
+                actionsDiv.appendChild(addBtn);
+                
+                card.appendChild(avatarDiv);
+                card.appendChild(infoDiv);
+                card.appendChild(actionsDiv);
+                
+                list.appendChild(card);
+            });
+        }
+        
+        async function addSuggestionAsContact(userId, email, cardElement) {
+            const addBtn = cardElement.querySelector('.suggestion-btn.add');
+            addBtn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_URL}/contacts`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ contactId: userId })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(data.error || 'Erreur lors de l\'ajout');
+                }
+                
+                // Remove card with animation
+                cardElement.style.transform = 'translateX(100%)';
+                cardElement.style.opacity = '0';
+                setTimeout(() => {
+                    cardElement.remove();
+                    suggestions = suggestions.filter(s => s.user.id !== userId);
+                    if (suggestions.length === 0) {
+                        renderSuggestions('Bravo ! Tu as ajouté toutes les suggestions');
+                    }
+                }, 300);
+                
+                showToast({ type: 'success', message: 'Contact ajouté !' });
+                
+                // Refresh contacts
+                loadContacts();
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+                addBtn.disabled = false;
+            }
+        }
+        
+        async function ignoreSuggestion(userId, cardElement) {
+            const ignoreBtn = cardElement.querySelector('.suggestion-btn.ignore');
+            ignoreBtn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_URL}/suggestions`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ userId })
+                });
+                
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Erreur');
+                }
+                
+                // Remove card with animation
+                cardElement.style.transform = 'translateX(-100%)';
+                cardElement.style.opacity = '0';
+                setTimeout(() => {
+                    cardElement.remove();
+                    suggestions = suggestions.filter(s => s.user.id !== userId);
+                    if (suggestions.length === 0) {
+                        renderSuggestions('Plus de suggestions pour le moment');
+                    }
+                }, 300);
+                
+            } catch (e) {
+                showToast({ type: 'error', message: e.message });
+                ignoreBtn.disabled = false;
+            }
         }
 
         // ===== CHAT =====
