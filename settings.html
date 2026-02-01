@@ -1446,17 +1446,129 @@
         });
         
         // ============================================
-        // Delete Modal
+        // Delete Modal - 2-Step GDPR Compliant
         // ============================================
+        let pendingDeletionData = null;
+        
+        // Check deletion status on load
+        async function checkDeletionStatus() {
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) return null;
+                
+                const response = await fetch('/api/delete-account?action=status', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.has_pending_deletion) {
+                    pendingDeletionData = data;
+                    showPendingDeletionBanner(data);
+                }
+                return data;
+            } catch (err) {
+                console.error('Error checking deletion status:', err);
+                return null;
+            }
+        }
+        
+        function showPendingDeletionBanner(data) {
+            // Update the delete button to show pending status
+            const deleteBtn = document.querySelector('.action-btn-danger');
+            if (deleteBtn) {
+                const title = deleteBtn.querySelector('.action-btn-title');
+                const subtitle = deleteBtn.querySelector('.action-btn-subtitle');
+                deleteBtn.querySelector('.action-btn-icon').textContent = '⏳';
+                title.textContent = 'Suppression programmée';
+                title.style.color = 'var(--color-warning, #f59e0b)';
+                subtitle.textContent = `Dans ${data.days_remaining} jour${data.days_remaining > 1 ? 's' : ''} — Cliquer pour annuler`;
+                subtitle.style.color = 'var(--color-warning, #f59e0b)';
+                deleteBtn.style.background = 'rgba(245, 158, 11, 0.1)';
+                deleteBtn.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                deleteBtn.onclick = () => showCancelDeletionModal(data);
+            }
+        }
+        
+        // Step 1: Initial warning
         function showDeleteModal() {
-            $('modal-delete').classList.add('open');
+            // Check if there's already a pending deletion
+            if (pendingDeletionData?.has_pending_deletion) {
+                showCancelDeletionModal(pendingDeletionData);
+                return;
+            }
+            $('modal-delete-step1').classList.add('open');
+        }
+        
+        function hideDeleteStep1() {
+            $('modal-delete-step1').classList.remove('open');
+        }
+        
+        // Step 2: Confirmation
+        function showDeleteStep2() {
+            hideDeleteStep1();
+            $('modal-delete-step2').classList.add('open');
             $('delete-confirm').focus();
         }
         
-        function hideDeleteModal() {
-            $('modal-delete').classList.remove('open');
+        function hideDeleteStep2() {
+            $('modal-delete-step2').classList.remove('open');
             $('delete-form').reset();
             hideMessage('delete-error');
+        }
+        
+        // Cancel deletion modal
+        function showCancelDeletionModal(data) {
+            const scheduledDate = new Date(data.scheduled_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            $('deletion-scheduled-date').textContent = `Suppression prévue le ${scheduledDate}`;
+            $('modal-cancel-deletion').classList.add('open');
+        }
+        
+        function hideCancelDeletionModal() {
+            $('modal-cancel-deletion').classList.remove('open');
+            hideMessage('cancel-deletion-error');
+        }
+        
+        async function cancelAccountDeletion() {
+            const btn = $('modal-cancel-deletion').querySelector('.modal-confirm');
+            btn.disabled = true;
+            btn.textContent = '...';
+            hideMessage('cancel-deletion-error');
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                const response = await fetch('/api/delete-account?action=cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erreur lors de l\'annulation');
+                }
+                
+                pendingDeletionData = null;
+                hideCancelDeletionModal();
+                showToast('Suppression annulée ! Ton compte est en sécurité 🎉');
+                
+                // Reset the delete button to original state
+                setTimeout(() => location.reload(), 1500);
+                
+            } catch (err) {
+                showMessage('cancel-deletion-error', err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Annuler la suppression';
+            }
         }
         
         $('delete-form').addEventListener('submit', async (e) => {
@@ -1475,15 +1587,32 @@
             btn.textContent = '...';
             
             try {
-                await UserProfile.deleteAccount(confirmation);
-                showToast('Compte supprimé. À bientôt peut-être... 💜');
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+                const token = UserProfile.getSession()?.access_token;
+                const response = await fetch('/api/delete-account?action=request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ confirmation: confirmation })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Erreur lors de la demande');
+                }
+                
+                hideDeleteStep2();
+                showToast('Demande de suppression enregistrée. Tu as 7 jours pour changer d\'avis. 💜');
+                
+                // Refresh to show pending deletion state
+                setTimeout(() => location.reload(), 2000);
+                
             } catch (err) {
                 showMessage('delete-error', err.message, true);
                 btn.disabled = false;
-                btn.textContent = 'Supprimer';
+                btn.textContent = 'Confirmer la suppression';
             }
         });
         
@@ -1492,6 +1621,9 @@
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
                     overlay.classList.remove('open');
+                    // Reset forms when closing
+                    const form = overlay.querySelector('form');
+                    if (form) form.reset();
                 }
             });
         });
@@ -1501,6 +1633,8 @@
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-overlay.open').forEach(modal => {
                     modal.classList.remove('open');
+                    const form = modal.querySelector('form');
+                    if (form) form.reset();
                 });
             }
         });
@@ -1833,6 +1967,9 @@
                 }
                 
                 await checkPushSubscription();
+                
+                // Check if account deletion is pending
+                await checkDeletionStatus();
                 
                 showScreen('settings');
                 

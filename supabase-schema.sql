@@ -88,6 +88,24 @@ CREATE TRIGGER enforce_contact_limit
     FOR EACH ROW EXECUTE FUNCTION check_contact_limit();
 
 -- ============================================
+-- IGNORED SUGGESTIONS (friends of friends to hide)
+-- ============================================
+CREATE TABLE IF NOT EXISTS ignored_suggestions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ignored_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, ignored_user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ignored_suggestions_user ON ignored_suggestions(user_id);
+
+ALTER TABLE ignored_suggestions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage ignored suggestions" ON ignored_suggestions 
+    FOR ALL USING (auth.uid() = user_id);
+
+-- ============================================
 -- MESSAGES
 -- ============================================
 CREATE TABLE IF NOT EXISTS messages (
@@ -262,6 +280,30 @@ CREATE INDEX IF NOT EXISTS idx_client_analytics_page ON client_analytics(page_ur
 CREATE INDEX IF NOT EXISTS idx_client_analytics_type_time ON client_analytics(event_type, created_at DESC);
 
 ALTER TABLE client_analytics ENABLE ROW LEVEL SECURITY;
+-- No policies = only service role key works
+
+-- ============================================
+-- ACCOUNT DELETIONS (GDPR Compliance)
+-- ============================================
+CREATE TABLE IF NOT EXISTS account_deletions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'cancelled', 'completed')),
+    scheduled_at TIMESTAMPTZ NOT NULL,
+    requested_at TIMESTAMPTZ DEFAULT NOW(),
+    cancelled_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    ip_address TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_deletions_user ON account_deletions(user_id);
+CREATE INDEX IF NOT EXISTS idx_account_deletions_status ON account_deletions(status);
+CREATE INDEX IF NOT EXISTS idx_account_deletions_scheduled ON account_deletions(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_account_deletions_pending ON account_deletions(status, scheduled_at) WHERE status = 'pending';
+
+ALTER TABLE account_deletions ENABLE ROW LEVEL SECURITY;
 -- No policies = only service role key works
 
 -- ============================================
