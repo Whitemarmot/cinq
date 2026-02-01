@@ -204,9 +204,13 @@ exports.handler = async (event, context) => {
             }
             
             // Build query for messages between user and contact (both directions)
+            // Include reply_to with original message content for replies
             let query = supabaseAdmin
                 .from('messages')
-                .select('id, sender_id, receiver_id, content, is_ping, created_at')
+                .select(`
+                    id, sender_id, receiver_id, content, is_ping, created_at, reply_to_id,
+                    reply_to:reply_to_id(id, content, sender_id, is_ping)
+                `)
                 .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contactId}),and(sender_id.eq.${contactId},receiver_id.eq.${user.id})`)
                 .order('created_at', { ascending: true })
                 .limit(limit);
@@ -234,7 +238,14 @@ exports.handler = async (event, context) => {
                 content: msg.content,
                 is_ping: msg.is_ping || false,
                 is_mine: msg.sender_id === user.id,
-                created_at: msg.created_at
+                created_at: msg.created_at,
+                reply_to_id: msg.reply_to_id || null,
+                reply_to: msg.reply_to ? {
+                    id: msg.reply_to.id,
+                    content: msg.reply_to.content,
+                    is_ping: msg.reply_to.is_ping || false,
+                    is_mine: msg.reply_to.sender_id === user.id
+                } : null
             }));
             
             return success({
@@ -256,11 +267,16 @@ exports.handler = async (event, context) => {
     if (event.httpMethod === 'POST') {
         try {
             const body = JSON.parse(event.body || '{}');
-            const { contact_id, content, is_ping } = body;
+            const { contact_id, content, is_ping, reply_to_id } = body;
             
             // Validate contact_id
             if (!isValidUUID(contact_id)) {
                 return error('Valid contact_id is required', 400);
+            }
+            
+            // Validate reply_to_id if provided
+            if (reply_to_id && !isValidUUID(reply_to_id)) {
+                return error('Invalid reply_to_id', 400);
             }
             
             // Validate content (required unless ping)
@@ -277,16 +293,37 @@ exports.handler = async (event, context) => {
                 return error('Contact not found in your circle', 403);
             }
             
+            // If reply_to_id is provided, verify the original message exists and is part of this conversation
+            let replyToMessage = null;
+            if (reply_to_id) {
+                const { data: originalMsg, error: replyError } = await supabaseAdmin
+                    .from('messages')
+                    .select('id, content, sender_id, is_ping')
+                    .eq('id', reply_to_id)
+                    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${contact_id}),and(sender_id.eq.${contact_id},receiver_id.eq.${user.id})`)
+                    .single();
+                
+                if (replyError || !originalMsg) {
+                    return error('Original message not found', 400);
+                }
+                replyToMessage = originalMsg;
+            }
+            
             // Insert message
+            const insertData = {
+                sender_id: user.id,
+                receiver_id: contact_id,
+                content: messageContent,
+                is_ping: isPingMessage
+            };
+            if (reply_to_id) {
+                insertData.reply_to_id = reply_to_id;
+            }
+            
             const { data: newMessage, error: insertError } = await supabaseAdmin
                 .from('messages')
-                .insert({
-                    sender_id: user.id,
-                    receiver_id: contact_id,
-                    content: messageContent,
-                    is_ping: isPingMessage
-                })
-                .select('id, sender_id, receiver_id, content, is_ping, created_at')
+                .insert(insertData)
+                .select('id, sender_id, receiver_id, content, is_ping, created_at, reply_to_id')
                 .single();
             
             if (insertError) {
@@ -311,7 +348,14 @@ exports.handler = async (event, context) => {
                     content: newMessage.content,
                     is_ping: newMessage.is_ping,
                     is_mine: true,
-                    created_at: newMessage.created_at
+                    created_at: newMessage.created_at,
+                    reply_to_id: newMessage.reply_to_id || null,
+                    reply_to: replyToMessage ? {
+                        id: replyToMessage.id,
+                        content: replyToMessage.content,
+                        is_ping: replyToMessage.is_ping || false,
+                        is_mine: replyToMessage.sender_id === user.id
+                    } : null
                 }
             }, 201);
             

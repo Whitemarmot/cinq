@@ -224,6 +224,16 @@ BEGIN
     END IF;
 END $$;
 
+-- Add reply_to_id column if not exists (reply to message feature)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='reply_to_id') THEN
+        ALTER TABLE messages ADD COLUMN reply_to_id UUID REFERENCES messages(id) ON DELETE SET NULL;
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages(reply_to_id);
+
 -- ============================================
 -- READ RECEIPTS (accusés de lecture)
 -- ============================================

@@ -69,6 +69,9 @@ const CinqApp = (function() {
   /** @type {Array} Messages in current chat */
   let messages = [];
   
+  /** @type {Object|null} Message being replied to */
+  let replyingTo = null;
+  
   /** @type {string|null} Contact ID pending removal */
   let contactToRemove = null;
   
@@ -619,6 +622,7 @@ const CinqApp = (function() {
   function closeChat() {
     selectedContact = null;
     messages = [];
+    setReplyingTo(null);
     $('section-chat').classList.add('hidden');
     $('section-contacts').classList.remove('hidden');
   }
@@ -678,9 +682,24 @@ const CinqApp = (function() {
       const isMine = msg.is_mine || msg.sender_id === currentUser.id;
       const isPing = msg.is_ping;
       
+      // Build reply quote HTML if this message is a reply
+      let replyQuoteHtml = '';
+      if (msg.reply_to && msg.reply_to.id) {
+        const replyContent = msg.reply_to.is_ping 
+          ? '💫 Ping' 
+          : (msg.reply_to.content || '').slice(0, 60) + ((msg.reply_to.content || '').length > 60 ? '…' : '');
+        const replyAuthor = msg.reply_to.is_mine ? 'Toi' : (selectedContact ? getEmailPrefix(selectedContact.contact?.email || 'Contact') : 'Contact');
+        replyQuoteHtml = `
+          <a href="#msg-${msg.reply_to.id}" class="reply-quote block mb-2 p-2 rounded-lg bg-black/20 border-l-2 border-indigo-400/50 text-xs text-white/60 hover:bg-black/30 transition cursor-pointer" data-reply-id="${msg.reply_to.id}">
+            <span class="font-medium text-indigo-300">${escapeHtml(replyAuthor)}</span>
+            <p class="truncate">${escapeHtml(replyContent)}</p>
+          </a>
+        `;
+      }
+      
       if (isPing) {
         return `
-          <div class="message text-center">
+          <div class="message text-center" id="msg-${msg.id}">
             <span class="inline-block px-3 py-1 bg-indigo-500/20 rounded-full text-sm">
               💫 ${isMine ? 'Tu as envoyé un ping' : 'Ping reçu'}
             </span>
@@ -690,18 +709,111 @@ const CinqApp = (function() {
       }
       
       return `
-        <div class="message ${isMine ? 'text-right' : 'text-left'}">
-          <div class="inline-block max-w-[80%] px-4 py-2 rounded-2xl ${
-            isMine ? 'bg-indigo-500/30 rounded-br-sm' : 'bg-white/10 rounded-bl-sm'
-          }">
-            <p class="text-sm">${window.parseMarkdown ? window.parseMarkdown(escapeHtml(msg.content)) : escapeHtml(msg.content)}</p>
+        <div class="message group ${isMine ? 'text-right' : 'text-left'}" id="msg-${msg.id}">
+          <div class="inline-block max-w-[80%] text-left">
+            ${replyQuoteHtml}
+            <div class="relative px-4 py-2 rounded-2xl ${
+              isMine ? 'bg-indigo-500/30 rounded-br-sm' : 'bg-white/10 rounded-bl-sm'
+            }">
+              <p class="text-sm">${window.parseMarkdown ? window.parseMarkdown(escapeHtml(msg.content)) : escapeHtml(msg.content)}</p>
+              <button 
+                class="btn-reply absolute ${isMine ? '-left-8' : '-right-8'} top-1/2 -translate-y-1/2 p-1 text-white/30 hover:text-white/70 opacity-0 group-hover:opacity-100 transition-opacity"
+                data-msg-id="${msg.id}"
+                data-msg-content="${escapeHtml(msg.content)}"
+                data-msg-mine="${isMine}"
+                aria-label="Répondre"
+                title="Répondre"
+              >
+                ↩
+              </button>
+            </div>
           </div>
           <p class="text-xs text-white/30 mt-1">${formatRelativeTime(msg.created_at)}</p>
         </div>
       `;
     }).join('');
     
+    // Bind reply buttons
+    list.querySelectorAll('.btn-reply').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        setReplyingTo({
+          id: btn.dataset.msgId,
+          content: btn.dataset.msgContent,
+          is_mine: btn.dataset.msgMine === 'true'
+        });
+      });
+    });
+    
+    // Bind reply quote clicks for scrolling
+    list.querySelectorAll('.reply-quote').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.dataset.replyId;
+        const targetEl = document.getElementById(`msg-${targetId}`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Flash effect
+          targetEl.classList.add('highlight-flash');
+          setTimeout(() => targetEl.classList.remove('highlight-flash'), 1500);
+        }
+      });
+    });
+    
     scrollToBottom();
+  }
+  
+  /**
+   * Set the message being replied to
+   * @param {Object|null} msg - Message object or null to clear
+   */
+  function setReplyingTo(msg) {
+    replyingTo = msg;
+    renderReplyPreview();
+    if (msg) {
+      $('message-input')?.focus();
+    }
+  }
+  
+  /**
+   * Render the reply preview above the input
+   */
+  function renderReplyPreview() {
+    let preview = $('reply-preview');
+    
+    // Create preview element if it doesn't exist
+    if (!preview) {
+      const form = $('message-form');
+      if (!form) return;
+      
+      preview = document.createElement('div');
+      preview.id = 'reply-preview';
+      preview.className = 'reply-preview hidden';
+      form.insertBefore(preview, form.firstChild);
+    }
+    
+    if (!replyingTo) {
+      preview.classList.add('hidden');
+      preview.innerHTML = '';
+      return;
+    }
+    
+    const authorName = replyingTo.is_mine ? 'Toi' : (selectedContact ? getEmailPrefix(selectedContact.contact?.email || 'Contact') : 'Contact');
+    const content = (replyingTo.content || '').slice(0, 80) + ((replyingTo.content || '').length > 80 ? '…' : '');
+    
+    preview.innerHTML = `
+      <div class="flex items-center justify-between gap-2 px-3 py-2 bg-white/5 border-l-2 border-indigo-400 rounded-r-lg">
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-indigo-300">Répondre à ${escapeHtml(authorName)}</p>
+          <p class="text-xs text-white/50 truncate">${escapeHtml(content)}</p>
+        </div>
+        <button id="btn-cancel-reply" class="p-1 text-white/40 hover:text-white/70 transition" aria-label="Annuler">✕</button>
+      </div>
+    `;
+    preview.classList.remove('hidden');
+    
+    // Bind cancel button
+    $('btn-cancel-reply')?.addEventListener('click', () => setReplyingTo(null));
   }
   
   /**
@@ -738,22 +850,30 @@ const CinqApp = (function() {
         return;
       }
       
+      const messageData = {
+        contact_id: selectedContact.contact_user_id,
+        content: content
+      };
+      
+      // Add reply_to_id if replying to a message
+      if (replyingTo && replyingTo.id) {
+        messageData.reply_to_id = replyingTo.id;
+      }
+      
       const response = await fetch(`${API_BASE}/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          contact_id: selectedContact.contact_user_id,
-          content: content
-        })
+        body: JSON.stringify(messageData)
       });
       
       const result = await response.json();
       
       if (result.success) {
         input.value = '';
+        setReplyingTo(null); // Clear reply state
         messages.push(result.message);
         renderMessages();
       } else {
