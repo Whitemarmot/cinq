@@ -401,7 +401,7 @@ async function getUserPollVotes(userId, postIds) {
 // ===== POST - Create post =====
 
 async function handleCreatePost(req, res, user) {
-    const { content, image_url, is_gif, poll_options, parent_id } = req.body;
+    const { content, image_url, is_gif, poll_options, parent_id, format } = req.body;
     
     // Validate content
     if (!content || typeof content !== 'string') {
@@ -460,13 +460,17 @@ async function handleCreatePost(req, res, user) {
         return res.status(400).json({ error: validatedPollOptions.error });
     }
     
+    // Validate format if provided
+    const validatedFormat = validateFormat(format);
+    
     // Build post data
     const postData = {
         user_id: user.id,
         content: sanitizedContent,
         image_url: validatedImageUrl.url,
         is_gif: !!is_gif && !!validatedImageUrl.url, // Only set is_gif if there's actually an image
-        parent_id: parent_id || null
+        parent_id: parent_id || null,
+        format: validatedFormat
     };
     
     // Add poll options if valid
@@ -590,6 +594,41 @@ function validateImageUrl(imageUrl) {
         return { url: imageUrl };
     } catch {
         return { error: 'Format URL image invalide' };
+    }
+}
+
+/**
+ * Validate post formatting options
+ * @param {string|object} format - JSON string or object with size, color, align
+ * @returns {string|null} - Validated JSON string or null
+ */
+function validateFormat(format) {
+    if (!format) return null;
+    
+    try {
+        const parsed = typeof format === 'string' ? JSON.parse(format) : format;
+        
+        // Valid options
+        const VALID_SIZES = ['small', 'normal', 'large', 'huge'];
+        const VALID_COLORS = ['default', 'brand', 'red', 'orange', 'amber', 'green', 'teal', 'blue', 'indigo', 'purple', 'pink', 'rose'];
+        const VALID_ALIGNS = ['left', 'center', 'right'];
+        
+        // Sanitize and validate each property
+        const sanitized = {
+            size: VALID_SIZES.includes(parsed.size) ? parsed.size : 'normal',
+            color: VALID_COLORS.includes(parsed.color) ? parsed.color : 'default',
+            align: VALID_ALIGNS.includes(parsed.align) ? parsed.align : 'left'
+        };
+        
+        // Only store if not all defaults
+        if (sanitized.size === 'normal' && sanitized.color === 'default' && sanitized.align === 'left') {
+            return null;
+        }
+        
+        return JSON.stringify(sanitized);
+    } catch {
+        // Invalid JSON, ignore
+        return null;
     }
 }
 

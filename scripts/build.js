@@ -24,7 +24,8 @@ const CSS_FILES = [
   'css/base.css',
   'css/components.css',
   'css/utilities.css',
-  'css/qr-code.css'
+  'css/qr-code.css',
+  'css/message-formatting.css'
 ];
 
 const JS_FILES = [
@@ -35,7 +36,8 @@ const JS_FILES = [
   'js/confetti.js',
   'js/easter-eggs.js',
   'js/drafts.js',
-  'js/qr-code.js'
+  'js/qr-code.js',
+  'js/message-formatting.js'
 ];
 
 console.log('🔧 Building Cinq for production...\n');

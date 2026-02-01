@@ -62,7 +62,7 @@
     <link rel="stylesheet" href="/css/message-templates.css">
     
     <!-- Message Formatting (text size, color, alignment) -->
-    <link rel="stylesheet" href="/css/message-formatting.css">
+    <link rel="stylesheet" href="/css/message-formatting.min.css">
     
     <!-- Theme initialization (before body to prevent flash) -->
     <script src="/js/theme.js"></script>
@@ -11578,6 +11578,9 @@
             // Update private note button state
             updateNoteButtonState();
             
+            // Load wallpaper for this conversation
+            initChatWallpaper();
+            
             // Render group selector in chat header
             renderChatGroupSelector(contact);
             
@@ -15929,6 +15932,6 @@
     <script defer src="/js/view-transitions.min.js"></script>
     
     <!-- Message Formatting (text size, color, alignment) -->
-    <script src="/js/message-formatting.js" defer></script>
+    <script src="/js/message-formatting.min.js" defer></script>
 </body>
 </html>

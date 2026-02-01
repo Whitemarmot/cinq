@@ -776,6 +776,17 @@ CREATE POLICY "Users can mark posts as viewed" ON post_views FOR INSERT
     WITH CHECK (auth.uid() = viewer_id);
 
 -- ============================================
+-- POST FORMATTING (text size, color, alignment)
+-- ============================================
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='format') THEN
+        ALTER TABLE posts ADD COLUMN format TEXT DEFAULT NULL;
+        COMMENT ON COLUMN posts.format IS 'JSON string with text formatting: {size, color, align}';
+    END IF;
+END $$;
+
+-- ============================================
 -- GRANT SERVICE ROLE ACCESS
 -- ============================================
 -- For API routes using service role key
