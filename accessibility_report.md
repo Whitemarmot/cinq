@@ -1,109 +1,18 @@
 # 🎯 Accessibility Audit Report - Projet Cinq
 
-**Generated:** 2026-02-01T08:06:42.301Z  
+**Generated:** 2026-02-01T08:08:37.185Z  
 **Total Files Audited:** 44  
 **Files with Issues:** 30  
-**Total Issues Found:** 70
+**Total Issues Found:** 57
 
 ## 📊 Summary by Severity
 
-- 🚨 **Errors:** 26 (Critical - Must Fix)
+- 🚨 **Errors:** 13 (Critical - Must Fix)
 - ⚠️  **Warnings:** 44 (Important - Should Fix)
 
 ✅ **14 files have no accessibility issues detected**
 
-## 🚨 CRITICAL ERRORS (26) - Fix First
-
-### `app.html` - 4 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[6]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="file" class="attach-input" id="attach-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.zip,.rar,.7z,.gz,.tar,.json,.xml" onchange="handleFileSelect(event)">`
-
-2. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[8]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="date" class="schedule-input" id="schedule-date">`
-
-3. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[9]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="time" class="schedule-input" id="schedule-time">`
-
-4. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[15]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input 
-                type="text"
-                id="nickname-input" 
-                class="settings-input" 
-                placeholder="Ex: Maman, Bestie, Chef..."
-                maxlength="50"
-                style="width: 100%; margin-bottom: var(--space-3);"
-            />`
-
-### `birthdays.html` - 3 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[0]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="checkbox" id="notify-same-day" checked onchange="saveNotificationPrefs()">`
-
-2. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[1]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="checkbox" id="notify-1-day" checked onchange="saveNotificationPrefs()">`
-
-3. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[2]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="checkbox" id="notify-1-week" onchange="saveNotificationPrefs()">`
-
-### `feed.html` - 6 error(s)
-
-1. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[2]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)">`
-
-2. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[3]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)">`
-
-3. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[6]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option ${i + 1}" maxlength="100" value="${escapeHtml(opt)}" onkeydown="handlePollOptionKeydown(event, ${i})">`
-
-4. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[7]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option 1" maxlength="100" onkeydown="handlePollOptionKeydown(event, 0)">`
-
-5. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[8]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option 2" maxlength="100" onkeydown="handlePollOptionKeydown(event, 1)">`
-
-6. **WCAG 1.3.1 - Form inputs must have labels**
-   - **Element:** `input[9]`
-   - **Issue:** Form input lacks proper labeling
-   - **Fix:** Add <label for="id"> or aria-label attribute
-   - **Code:** `<input type="text" placeholder="Option ${index + 1}" maxlength="100" onkeydown="handlePollOptionKeydown(event, ${index})">`
+## 🚨 CRITICAL ERRORS (13) - Fix First
 
 ### `invite.html` - 1 error(s)
 
@@ -439,7 +348,7 @@
 
 ## 📋 Issues by Rule Type
 
-- **WCAG 1.3.1:** 38 issue(s)
+- **WCAG 1.3.1:** 25 issue(s)
 - **WCAG 2.4.1:** 24 issue(s)
 - **WCAG 4.1.2:** 6 issue(s)
 - **WCAG 3.1.1:** 1 issue(s)
