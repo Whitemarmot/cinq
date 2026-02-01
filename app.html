@@ -19,7 +19,7 @@
     <meta property="og:description" content="L'anti-réseau social. 5 proches, pas de likes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cinq.app/app">
-    <meta property="og:image" content="https://cinq.app/og-image.png">
+    <meta property="og:image" content="https://cinq.app/og-image.svg">
     <meta property="og:site_name" content="Cinq">
     <meta property="og:locale" content="fr_FR">
     
@@ -6469,6 +6469,283 @@
             color: var(--color-text-primary);
         }
         
+        /* ===== 3-SLIDE ONBOARDING SYSTEM ===== */
+        .onboarding-indicators {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .indicator.active {
+            background: var(--color-brand);
+            transform: scale(1.2);
+        }
+        
+        .onboarding-slide {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(30px);
+            transition: all 0.4s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-8);
+        }
+        
+        .onboarding-slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            position: relative;
+            padding: 0;
+        }
+        
+        .onboarding-slide.prev {
+            transform: translateX(-30px);
+        }
+        
+        .onboarding-emoji.big {
+            font-size: 6rem;
+            margin-bottom: var(--space-6);
+        }
+        
+        .onboarding-feature {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            margin-top: var(--space-4);
+            text-align: left;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            line-height: 1.5;
+        }
+        
+        .slots-visual {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: center;
+            margin: var(--space-6) 0;
+            flex-wrap: wrap;
+        }
+        
+        .slot {
+            width: 48px;
+            height: 48px;
+            background: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            opacity: 0;
+            transform: scale(0);
+            animation: slot-appear 0.5s var(--ease-spring) forwards;
+        }
+        
+        @keyframes slot-appear {
+            0% { opacity: 0; transform: scale(0) rotate(-45deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        
+        .emphasis {
+            font-weight: 600;
+            color: var(--color-brand);
+            margin-top: var(--space-4);
+            font-style: italic;
+        }
+        
+        .onboarding-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--space-6);
+            gap: var(--space-4);
+        }
+        
+        .nav-btn {
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .nav-btn:disabled {
+            pointer-events: none;
+        }
+        
+        .onboarding-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            width: 100%;
+        }
+        
+        /* ===== INTERACTIVE GUIDES ===== */
+        .first-contact-guide,
+        .first-message-guide {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-glow);
+            z-index: calc(var(--z-modal) + 5);
+            width: 90vw;
+            max-width: 420px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -50%) scale(0.9);
+            transition: all 0.3s var(--ease-spring);
+        }
+        
+        .first-contact-guide.visible,
+        .first-message-guide.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .guide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .guide-header h3 {
+            margin: 0;
+            font-size: var(--text-lg);
+            font-weight: 600;
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .guide-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            padding: var(--space-1);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+        
+        .guide-close:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+        
+        .guide-content {
+            padding: var(--space-5);
+        }
+        
+        .guide-content p {
+            margin: 0 0 var(--space-4) 0;
+            color: var(--color-text-muted);
+        }
+        
+        .contact-suggestions,
+        .message-suggestions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        
+        .suggestion {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+        }
+        
+        .suggestion:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .suggestion-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .suggestion-text {
+            flex: 1;
+        }
+        
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: var(--space-1);
+        }
+        
+        .suggestion-subtitle {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+        }
+        
+        .message-suggestion {
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s var(--ease-spring);
+            font-style: italic;
+            line-height: 1.5;
+        }
+        
+        .message-suggestion:hover {
+            background: var(--color-bg-elevated);
+            border-color: var(--color-brand);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow-sm);
+        }
+        
+        .guide-tip {
+            background: var(--color-info-muted);
+            border: 1px solid var(--color-info);
+            border-radius: var(--radius-lg);
+            padding: var(--space-3) var(--space-4);
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
         /* ===== TOOLTIPS/HINTS ===== */
         .tooltip-hint {
             position: absolute;
@@ -7786,37 +8063,85 @@
     <!-- Onboarding Welcome Overlay -->
     <div class="onboarding-overlay" id="onboarding-overlay" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
         <div class="onboarding-card">
-            <div class="onboarding-confetti" aria-hidden="true">🎉</div>
-            <div class="onboarding-emoji" aria-hidden="true">👋</div>
-            <h2 class="onboarding-title" id="onboarding-title">Bienvenue sur Cinq !</h2>
-            <p class="onboarding-subtitle">Ton espace intime avec tes 5 proches est prêt.<br>Voici comment bien démarrer :</p>
+            <!-- Slide indicators -->
+            <div class="onboarding-indicators">
+                <div class="indicator active" data-slide="0"></div>
+                <div class="indicator" data-slide="1"></div>
+                <div class="indicator" data-slide="2"></div>
+            </div>
             
-            <div class="onboarding-steps" role="list">
-                <div class="onboarding-step" role="listitem">
-                    <div class="onboarding-step-icon">📸</div>
-                    <div class="onboarding-step-text">
-                        <div class="onboarding-step-title">Ajoute ta photo</div>
-                        <div class="onboarding-step-subtitle">Pour que tes proches te reconnaissent</div>
-                    </div>
-                </div>
-                <div class="onboarding-step" role="listitem">
-                    <div class="onboarding-step-icon">👥</div>
-                    <div class="onboarding-step-text">
-                        <div class="onboarding-step-title">Invite tes 5 proches</div>
-                        <div class="onboarding-step-subtitle">Les personnes qui comptent vraiment</div>
-                    </div>
-                </div>
-                <div class="onboarding-step" role="listitem">
-                    <div class="onboarding-step-icon">✍️</div>
-                    <div class="onboarding-step-text">
-                        <div class="onboarding-step-title">Partage ton premier moment</div>
-                        <div class="onboarding-step-subtitle">Un message, une photo, un ressenti</div>
+            <!-- Slide 1: Welcome -->
+            <div class="onboarding-slide active" data-slide="0">
+                <div class="onboarding-confetti" aria-hidden="true">🎉</div>
+                <div class="onboarding-emoji" aria-hidden="true">👋</div>
+                <h2 class="onboarding-title" id="onboarding-title">Bienvenue sur Cinq !</h2>
+                <p class="onboarding-subtitle">L'anti-réseau social qui remet l'humain au centre.</p>
+                <div class="onboarding-feature">
+                    <div class="feature-icon">❤️</div>
+                    <div class="feature-text">
+                        <strong>Pas d'algorithme.</strong> Pas de likes.<br>
+                        Juste toi et tes proches.
                     </div>
                 </div>
             </div>
             
-            <button class="onboarding-btn" onclick="startOnboarding()" type="button">C'est parti ! 🚀</button>
-            <button class="onboarding-skip" onclick="skipOnboarding()" type="button">Je connais déjà, passer</button>
+            <!-- Slide 2: The 5 concept -->
+            <div class="onboarding-slide" data-slide="1">
+                <div class="onboarding-emoji big" aria-hidden="true">5️⃣</div>
+                <h2 class="onboarding-title">Tu as 5 slots. Choisis bien.</h2>
+                <p class="onboarding-subtitle">Selon Dunbar, on ne peut maintenir que 5 relations vraiment proches.</p>
+                <div class="slots-visual">
+                    <div class="slot" style="animation-delay: 0.1s">👤</div>
+                    <div class="slot" style="animation-delay: 0.2s">👤</div>
+                    <div class="slot" style="animation-delay: 0.3s">👤</div>
+                    <div class="slot" style="animation-delay: 0.4s">👤</div>
+                    <div class="slot" style="animation-delay: 0.5s">👤</div>
+                </div>
+                <p class="emphasis">Famille, amis, partenaire... Les personnes qui comptent vraiment.</p>
+            </div>
+            
+            <!-- Slide 3: How to start -->
+            <div class="onboarding-slide" data-slide="2">
+                <div class="onboarding-emoji" aria-hidden="true">🚀</div>
+                <h2 class="onboarding-title">Comment bien démarrer</h2>
+                <div class="onboarding-steps" role="list">
+                    <div class="onboarding-step" role="listitem">
+                        <div class="onboarding-step-icon">📸</div>
+                        <div class="onboarding-step-text">
+                            <div class="onboarding-step-title">Ajoute ta photo</div>
+                            <div class="onboarding-step-subtitle">Pour que tes proches te reconnaissent</div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step" role="listitem">
+                        <div class="onboarding-step-icon">👥</div>
+                        <div class="onboarding-step-text">
+                            <div class="onboarding-step-title">Invite tes 5 proches</div>
+                            <div class="onboarding-step-subtitle">Choisis-les avec soin</div>
+                        </div>
+                    </div>
+                    <div class="onboarding-step" role="listitem">
+                        <div class="onboarding-step-icon">✍️</div>
+                        <div class="onboarding-step-text">
+                            <div class="onboarding-step-title">Partage ton premier moment</div>
+                            <div class="onboarding-step-subtitle">Un message, une photo, un ressenti</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="onboarding-navigation">
+                <button class="btn btn-text nav-btn" id="prev-btn" onclick="previousOnboardingSlide()" style="opacity: 0.3;" disabled type="button">
+                    ← Précédent
+                </button>
+                <button class="btn btn-primary nav-btn" id="next-btn" onclick="nextOnboardingSlide()" type="button">
+                    Suivant →
+                </button>
+                <div class="onboarding-actions" id="final-actions" style="display: none;">
+                    <button class="onboarding-btn" onclick="startOnboarding()" type="button">C'est parti ! 🚀</button>
+                    <button class="onboarding-skip" onclick="skipOnboarding()" type="button">Je connais déjà, passer</button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -15748,8 +16073,13 @@
                 
                 // Onboarding: check progress after adding contact
                 setTimeout(() => {
+                    const wasFirstContact = !onboardingState.hasContact;
                     checkOnboardingProgress();
-                    if (!onboardingState.hasPost && localStorage.getItem('cinq_onboarding_completed') !== 'true') {
+                    
+                    if (wasFirstContact && onboardingState.hasContact) {
+                        // First contact celebration
+                        showFirstContactCelebration();
+                    } else if (!onboardingState.hasPost && localStorage.getItem('cinq_onboarding_completed') !== 'true') {
                         showToast({ type: 'info', title: '🎯 Bien joué !', message: 'Plus qu\'à poster ton premier message !' });
                     }
                 }, 500);
@@ -16164,6 +16494,86 @@
             showToast({ type: 'info', title: '👍 Pas de souci !', message: 'Tu peux explorer librement.' });
         }
         
+        // ===== SLIDE NAVIGATION FUNCTIONS =====
+        let currentSlide = 0;
+        const totalSlides = 3;
+        
+        function nextOnboardingSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+        
+        function previousOnboardingSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+        
+        function goToSlide(slideIndex) {
+            if (slideIndex >= 0 && slideIndex < totalSlides) {
+                currentSlide = slideIndex;
+                updateSlide();
+            }
+        }
+        
+        function updateSlide() {
+            // Update slides
+            document.querySelectorAll('.onboarding-slide').forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+            
+            // Update indicators
+            document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finalActions = document.getElementById('final-actions');
+            
+            prevBtn.disabled = currentSlide === 0;
+            prevBtn.style.opacity = currentSlide === 0 ? '0.3' : '1';
+            
+            if (currentSlide === totalSlides - 1) {
+                // Last slide
+                nextBtn.style.display = 'none';
+                finalActions.style.display = 'flex';
+            } else {
+                nextBtn.style.display = 'block';
+                finalActions.style.display = 'none';
+            }
+        }
+        
+        // Initialize slide system
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click handlers to indicators
+            document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                indicator.addEventListener('click', () => goToSlide(index));
+            });
+            
+            // Keyboard navigation for slides
+            document.addEventListener('keydown', (e) => {
+                if (!document.getElementById('onboarding-overlay').classList.contains('open')) return;
+                
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    previousOnboardingSlide();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextOnboardingSlide();
+                }
+            });
+        });
+        
         function showOnboardingChecklist() {
             const checklist = document.getElementById('onboarding-checklist');
             if (localStorage.getItem('cinq_onboarding_completed') !== 'true') {
@@ -16256,8 +16666,174 @@
                     emptySlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     emptySlot.classList.add('pulse-indicator');
                     setTimeout(() => emptySlot.classList.remove('pulse-indicator'), 3000);
+                    
+                    // Show interactive guide for adding first contact
+                    showFirstContactGuide();
                 }
             }, 300);
+        }
+        
+        function showFirstContactGuide() {
+            const guide = document.createElement('div');
+            guide.className = 'first-contact-guide';
+            guide.innerHTML = `
+                <div class="guide-header">
+                    <h3>👥 Ajoute ton premier contact</h3>
+                    <button class="guide-close" onclick="hideFirstContactGuide()">&times;</button>
+                </div>
+                <div class="guide-content">
+                    <p>Choisis une personne qui compte vraiment pour toi :</p>
+                    <div class="contact-suggestions">
+                        <div class="suggestion" onclick="suggestContactType('family')">
+                            <span class="suggestion-icon">👨‍👩‍👧‍👦</span>
+                            <div class="suggestion-text">
+                                <div class="suggestion-title">Famille</div>
+                                <div class="suggestion-subtitle">Parent, frère/sœur, conjoint(e)</div>
+                            </div>
+                        </div>
+                        <div class="suggestion" onclick="suggestContactType('friend')">
+                            <span class="suggestion-icon">👫</span>
+                            <div class="suggestion-text">
+                                <div class="suggestion-title">Meilleur(e) ami(e)</div>
+                                <div class="suggestion-subtitle">Cette personne qui te connaît vraiment</div>
+                            </div>
+                        </div>
+                        <div class="suggestion" onclick="suggestContactType('import')">
+                            <span class="suggestion-icon">📱</span>
+                            <div class="suggestion-text">
+                                <div class="suggestion-title">Importer depuis contacts</div>
+                                <div class="suggestion-subtitle">Parcourir ton carnet d'adresses</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-tip">
+                        💡 <strong>Astuce :</strong> Commence par la personne la plus proche. Tu pourras ajouter les 4 autres plus tard.
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(guide);
+            setTimeout(() => guide.classList.add('visible'), 100);
+        }
+        
+        function hideFirstContactGuide() {
+            const guide = document.querySelector('.first-contact-guide');
+            if (guide) {
+                guide.classList.remove('visible');
+                setTimeout(() => guide.remove(), 300);
+            }
+        }
+        
+        function suggestContactType(type) {
+            hideFirstContactGuide();
+            
+            const suggestions = {
+                family: {
+                    message: 'Parfait ! La famille, c\'est la base. 👨‍👩‍👧‍👦',
+                    placeholder: 'Ex: Maman, Papa, Alex (frère)...'
+                },
+                friend: {
+                    message: 'Excellent choix ! Les vrais amis sont rares. 👫',
+                    placeholder: 'Ex: Sarah, Thomas, Marie...'
+                },
+                import: {
+                    message: 'Bonne idée ! Regarde dans tes contacts 📱',
+                    placeholder: 'Cherche dans tes contacts...'
+                }
+            };
+            
+            const suggestion = suggestions[type];
+            if (suggestion) {
+                showToast({ 
+                    type: 'info', 
+                    title: suggestion.message, 
+                    message: 'Clique sur un slot vide pour commencer',
+                    duration: 4000
+                });
+                
+                // Highlight empty slots
+                document.querySelectorAll('.contact-slot.empty').forEach(slot => {
+                    slot.classList.add('pulse-indicator');
+                    setTimeout(() => slot.classList.remove('pulse-indicator'), 4000);
+                });
+            }
+        }
+        
+        // Enhanced post guidance with message suggestions
+        function goToFeedForPost() {
+            switchTab('feed');
+            setTimeout(() => {
+                const composer = document.querySelector('.composer-textarea');
+                if (composer) {
+                    composer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    composer.focus();
+                    composer.parentElement.classList.add('pulse-indicator');
+                    setTimeout(() => composer.parentElement.classList.remove('pulse-indicator'), 3000);
+                    
+                    // Show first message suggestions
+                    showFirstMessageGuide();
+                }
+            }, 300);
+        }
+        
+        function showFirstMessageGuide() {
+            const guide = document.createElement('div');
+            guide.className = 'first-message-guide';
+            guide.innerHTML = `
+                <div class="guide-header">
+                    <h3>✍️ Ton premier message</h3>
+                    <button class="guide-close" onclick="hideFirstMessageGuide()">&times;</button>
+                </div>
+                <div class="guide-content">
+                    <p>Quelques idées pour commencer :</p>
+                    <div class="message-suggestions">
+                        <div class="message-suggestion" onclick="useMessageSuggestion('hello')">
+                            "Salut ! Je viens de m'inscrire sur Cinq. C'est notre espace privé pour rester vraiment proches 😊"
+                        </div>
+                        <div class="message-suggestion" onclick="useMessageSuggestion('sharing')">
+                            "Hey ! Je découvre Cinq, une app juste pour nous 5. Fini les algorithmes, juste nos vrais moments ❤️"
+                        </div>
+                        <div class="message-suggestion" onclick="useMessageSuggestion('moment')">
+                            "Premier post sur notre espace Cinq ! [Raconte quelque chose de ta journée, partage une photo...] 🌟"
+                        </div>
+                    </div>
+                    <div class="guide-tip">
+                        💡 Ou écris quelque chose de personnel. L'authenticité, c'est ce qui compte !
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(guide);
+            setTimeout(() => guide.classList.add('visible'), 100);
+        }
+        
+        function hideFirstMessageGuide() {
+            const guide = document.querySelector('.first-message-guide');
+            if (guide) {
+                guide.classList.remove('visible');
+                setTimeout(() => guide.remove(), 300);
+            }
+        }
+        
+        function useMessageSuggestion(type) {
+            const composer = document.querySelector('.composer-textarea');
+            const suggestions = {
+                hello: "Salut ! Je viens de m'inscrire sur Cinq. C'est notre espace privé pour rester vraiment proches 😊",
+                sharing: "Hey ! Je découvre Cinq, une app juste pour nous 5. Fini les algorithmes, juste nos vrais moments ❤️",
+                moment: "Premier post sur notre espace Cinq ! "
+            };
+            
+            if (composer && suggestions[type]) {
+                composer.value = suggestions[type];
+                composer.dispatchEvent(new Event('input'));
+                hideFirstMessageGuide();
+                showToast({ 
+                    type: 'success', 
+                    title: '👍 Parfait !', 
+                    message: 'Tu peux modifier le message comme tu veux',
+                    duration: 3000
+                });
+            }
         }
         
         function goToFeedForPost() {
