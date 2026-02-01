@@ -228,6 +228,175 @@
             right: 0;
         }
         
+        /* ===== STORY VIEWER FOOTER (Replies, Reactions, Views) ===== */
+        .story-viewer-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            padding: var(--space-3) var(--space-4);
+            padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .story-views-counter {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: rgba(255,255,255,0.8);
+            font-size: var(--text-sm);
+        }
+        
+        .story-views-counter svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .story-reactions-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .story-reaction-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .story-reaction-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.15);
+        }
+        
+        .story-reaction-btn.active {
+            background: rgba(255,255,255,0.35);
+            transform: scale(1.1);
+            animation: reaction-pop 0.3s ease-out;
+        }
+        
+        @keyframes reaction-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1.1); }
+        }
+        
+        .story-reply-container {
+            display: flex;
+            gap: var(--space-2);
+        }
+        
+        .story-reply-input {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: var(--radius-full);
+            color: white;
+            font-size: var(--text-sm);
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .story-reply-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .story-reply-input:focus {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+        
+        .story-reply-send {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--cinq-gradient);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .story-reply-send.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .story-reply-send:hover {
+            transform: scale(1.1);
+        }
+        
+        .story-reactions-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-1);
+            margin-top: var(--space-2);
+        }
+        
+        .reaction-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            color: white;
+        }
+        
+        .reaction-badge .emoji {
+            font-size: 0.875rem;
+        }
+        
+        /* Reply sent toast animation */
+        .story-reply-toast {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-xl);
+            font-size: var(--text-sm);
+            display: none;
+            animation: toast-fade 2s ease-out forwards;
+        }
+        
+        .story-reply-toast.show {
+            display: block;
+        }
+        
+        @keyframes toast-fade {
+            0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+        
         /* ===== STORY CREATION ===== */
         .create-story-modal {
             position: fixed;
@@ -751,6 +920,53 @@
             <div class="story-content-inner" id="story-content-inner"></div>
             <div class="story-nav next" onclick="nextStory()"></div>
         </div>
+        
+        <!-- Story Footer: Views, Reactions, Reply -->
+        <footer class="story-viewer-footer">
+            <!-- Views Counter -->
+            <div class="story-views-counter" id="story-views-counter">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span id="views-count">0 vue</span>
+            </div>
+            
+            <!-- Reactions Display -->
+            <div class="story-reactions-display" id="story-reactions-display"></div>
+            
+            <!-- Quick Reactions -->
+            <div class="story-reactions-row">
+                <button class="story-reaction-btn" onclick="sendReaction('❤️')" aria-label="J'aime">❤️</button>
+                <button class="story-reaction-btn" onclick="sendReaction('🔥')" aria-label="Feu">🔥</button>
+                <button class="story-reaction-btn" onclick="sendReaction('😂')" aria-label="Rire">😂</button>
+                <button class="story-reaction-btn" onclick="sendReaction('😮')" aria-label="Wow">😮</button>
+                <button class="story-reaction-btn" onclick="sendReaction('😢')" aria-label="Triste">😢</button>
+                <button class="story-reaction-btn" onclick="sendReaction('👏')" aria-label="Applaudir">👏</button>
+            </div>
+            
+            <!-- Reply Input -->
+            <div class="story-reply-container">
+                <input 
+                    type="text" 
+                    class="story-reply-input" 
+                    id="story-reply-input" 
+                    placeholder="Répondre à la story..."
+                    maxlength="500"
+                    oninput="updateReplySendBtn()"
+                    onkeypress="handleReplyKeypress(event)"
+                >
+                <button class="story-reply-send" id="story-reply-send" onclick="sendReply()" aria-label="Envoyer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </div>
+        </footer>
+        
+        <!-- Reply Sent Toast -->
+        <div class="story-reply-toast" id="story-reply-toast">✓ Réponse envoyée</div>
     </div>
     
     <!-- Create Story Modal -->
@@ -993,9 +1209,166 @@
                 document.getElementById('story-content').style = bgStyle;
             }
             
+            // Update views counter
+            updateViewsCounter(story);
+            
+            // Update reactions display
+            updateReactionsDisplay(story);
+            
+            // Reset reply input
+            document.getElementById('story-reply-input').value = '';
+            updateReplySendBtn();
+            
+            // Register view (async, non-blocking)
+            registerStoryView(story.id);
+            
             // Auto-advance after 5 seconds
             if (storyTimer) clearTimeout(storyTimer);
             storyTimer = setTimeout(() => nextStory(), 5000);
+        }
+        
+        // ===== VIEWS COUNTER =====
+        function updateViewsCounter(story) {
+            const viewsCount = story.views_count || 0;
+            const viewsText = viewsCount === 0 ? 'Aucune vue' : 
+                              viewsCount === 1 ? '1 vue' : 
+                              `${viewsCount} vues`;
+            document.getElementById('views-count').textContent = viewsText;
+        }
+        
+        async function registerStoryView(storyId) {
+            if (!storyId) return;
+            try {
+                await fetch(`/api/stories/${storyId}/view`, {
+                    method: 'POST',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' }
+                });
+            } catch (e) {
+                console.error('Error registering view:', e);
+            }
+        }
+        
+        // ===== REACTIONS =====
+        function updateReactionsDisplay(story) {
+            const container = document.getElementById('story-reactions-display');
+            const reactions = story.reactions || {};
+            
+            // Group reactions by emoji with counts
+            const reactionCounts = {};
+            if (Array.isArray(reactions)) {
+                reactions.forEach(r => {
+                    if (!reactionCounts[r.emoji]) reactionCounts[r.emoji] = 0;
+                    reactionCounts[r.emoji]++;
+                });
+            } else if (typeof reactions === 'object') {
+                Object.assign(reactionCounts, reactions);
+            }
+            
+            const entries = Object.entries(reactionCounts).filter(([_, count]) => count > 0);
+            
+            if (entries.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = entries.map(([emoji, count]) => 
+                `<span class="reaction-badge"><span class="emoji">${emoji}</span>${count}</span>`
+            ).join('');
+        }
+        
+        async function sendReaction(emoji) {
+            const group = groupedStories[currentGroupIndex];
+            const story = group?.stories[currentStoryIndex];
+            if (!story) return;
+            
+            // Pause timer while reacting
+            if (storyTimer) {
+                clearTimeout(storyTimer);
+            }
+            
+            // Visual feedback
+            const btn = event.target.closest('.story-reaction-btn');
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 300);
+            
+            try {
+                const res = await fetch(`/api/stories/${story.id}/react`, {
+                    method: 'POST',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emoji })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    // Update local story reactions
+                    story.reactions = data.reactions || story.reactions;
+                    updateReactionsDisplay(story);
+                }
+            } catch (e) {
+                console.error('Error sending reaction:', e);
+            }
+            
+            // Resume timer
+            storyTimer = setTimeout(() => nextStory(), 3000);
+        }
+        
+        // ===== REPLIES =====
+        function updateReplySendBtn() {
+            const input = document.getElementById('story-reply-input');
+            const btn = document.getElementById('story-reply-send');
+            btn.classList.toggle('active', input.value.trim().length > 0);
+        }
+        
+        function handleReplyKeypress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendReply();
+            }
+        }
+        
+        async function sendReply() {
+            const input = document.getElementById('story-reply-input');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const group = groupedStories[currentGroupIndex];
+            const story = group?.stories[currentStoryIndex];
+            if (!story) return;
+            
+            // Pause timer
+            if (storyTimer) clearTimeout(storyTimer);
+            
+            try {
+                const res = await fetch(`/api/stories/${story.id}/reply`, {
+                    method: 'POST',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                if (res.ok) {
+                    // Clear input and show toast
+                    input.value = '';
+                    updateReplySendBtn();
+                    showReplyToast();
+                } else {
+                    throw new Error('Reply failed');
+                }
+            } catch (e) {
+                console.error('Error sending reply:', e);
+                showToast({ type: 'error', title: 'Erreur', message: "Impossible d'envoyer la réponse" });
+            }
+            
+            // Resume timer
+            storyTimer = setTimeout(() => nextStory(), 3000);
+        }
+        
+        function showReplyToast() {
+            const toast = document.getElementById('story-reply-toast');
+            toast.classList.remove('show');
+            // Force reflow
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
         }
         
         function nextStory() {
@@ -1199,9 +1572,34 @@
             const viewer = document.getElementById('story-viewer');
             if (!viewer.classList.contains('active')) return;
             
+            // Don't handle shortcuts when typing in reply input
+            const replyInput = document.getElementById('story-reply-input');
+            if (document.activeElement === replyInput) {
+                if (e.key === 'Escape') {
+                    replyInput.blur();
+                    e.preventDefault();
+                }
+                return;
+            }
+            
             if (e.key === 'Escape') closeStoryViewer();
             if (e.key === 'ArrowRight' || e.key === ' ') nextStory();
             if (e.key === 'ArrowLeft') prevStory();
+        });
+        
+        // Pause story timer when interacting with footer
+        document.querySelector('.story-viewer-footer')?.addEventListener('mouseenter', () => {
+            if (storyTimer) {
+                clearTimeout(storyTimer);
+                storyTimer = null;
+            }
+        });
+        
+        document.querySelector('.story-viewer-footer')?.addEventListener('mouseleave', () => {
+            const viewer = document.getElementById('story-viewer');
+            if (viewer.classList.contains('active') && !storyTimer) {
+                storyTimer = setTimeout(() => nextStory(), 3000);
+            }
         });
         
         // Init
