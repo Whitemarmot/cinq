@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     bio TEXT,
     gift_code_used TEXT,
     banned BOOLEAN DEFAULT FALSE,
+    vacation_mode BOOLEAN DEFAULT FALSE,
+    vacation_message TEXT DEFAULT 'Je suis en vacances ! Je te réponds dès mon retour 🌴',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -21,6 +23,17 @@ DO $$
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='banned') THEN
         ALTER TABLE users ADD COLUMN banned BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+-- Add vacation mode columns if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='vacation_mode') THEN
+        ALTER TABLE users ADD COLUMN vacation_mode BOOLEAN DEFAULT FALSE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='vacation_message') THEN
+        ALTER TABLE users ADD COLUMN vacation_message TEXT DEFAULT 'Je suis en vacances ! Je te réponds dès mon retour 🌴';
     END IF;
 END $$;
 
@@ -114,6 +127,7 @@ CREATE TABLE IF NOT EXISTS messages (
     receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     is_ping BOOLEAN DEFAULT FALSE,
+    is_vacation_reply BOOLEAN DEFAULT FALSE,
     read_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -121,6 +135,29 @@ CREATE TABLE IF NOT EXISTS messages (
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
 CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at DESC);
+
+-- Add is_vacation_reply column if not exists
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='is_vacation_reply') THEN
+        ALTER TABLE messages ADD COLUMN is_vacation_reply BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+-- ============================================
+-- READ RECEIPTS (accusés de lecture)
+-- ============================================
+CREATE TABLE IF NOT EXISTS read_receipts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    message_id UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    reader_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    read_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(message_id, reader_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_read_receipts_message ON read_receipts(message_id);
+CREATE INDEX IF NOT EXISTS idx_read_receipts_reader ON read_receipts(reader_id);
+CREATE INDEX IF NOT EXISTS idx_read_receipts_read_at ON read_receipts(read_at DESC);
 
 -- ============================================
 -- PROPOSALS (meetup suggestions)
@@ -169,6 +206,7 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gift_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE read_receipts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE proposals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
@@ -192,6 +230,18 @@ CREATE POLICY "Users can view their messages" ON messages FOR SELECT
 CREATE POLICY "Users can send messages" ON messages FOR INSERT WITH CHECK (auth.uid() = sender_id);
 CREATE POLICY "Users can mark messages read" ON messages FOR UPDATE 
     USING (auth.uid() = receiver_id);
+
+-- Read receipts: reader can create, sender can view
+CREATE POLICY "Users can view read receipts for their messages" ON read_receipts FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM messages 
+            WHERE messages.id = read_receipts.message_id 
+            AND (messages.sender_id = auth.uid() OR messages.receiver_id = auth.uid())
+        )
+    );
+CREATE POLICY "Users can create read receipts" ON read_receipts FOR INSERT 
+    WITH CHECK (auth.uid() = reader_id);
 
 -- Proposals: sender and receiver can view
 CREATE POLICY "Users can view their proposals" ON proposals FOR SELECT 
