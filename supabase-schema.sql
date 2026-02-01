@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     display_name TEXT,
     avatar_url TEXT,
+    avatar_emoji TEXT,
     bio TEXT,
     gift_code_used TEXT,
     banned BOOLEAN DEFAULT FALSE,
@@ -73,6 +74,14 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='status_text') THEN
         ALTER TABLE users ADD COLUMN status_text TEXT DEFAULT NULL CHECK (char_length(status_text) <= 60);
+    END IF;
+END $$;
+
+-- Add avatar emoji column (quick profile edit)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='avatar_emoji') THEN
+        ALTER TABLE users ADD COLUMN avatar_emoji TEXT DEFAULT NULL;
     END IF;
 END $$;
 

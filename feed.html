@@ -4367,10 +4367,25 @@
                 // Load Read Later cache from localStorage
                 loadReadLaterCache();
                 
-                // Update composer
-                const initial = (user.email || '?')[0].toUpperCase();
+                // Load user profile and update UI
+                let userProfile = {};
+                try {
+                    if (typeof UserProfile !== 'undefined') {
+                        UserProfile.init();
+                        userProfile = await UserProfile.loadProfile() || {};
+                    }
+                } catch (e) {
+                    console.warn('Could not load profile:', e);
+                }
+                
+                // Update avatars with profile data
+                const avatarEmoji = userProfile.avatar_emoji;
+                const displayName = userProfile.display_name || user.email?.split('@')[0] || 'Toi';
+                const initial = avatarEmoji || displayName[0].toUpperCase();
+                
                 document.getElementById('composer-avatar').textContent = initial;
-                document.getElementById('composer-user').textContent = user.email?.split('@')[0] || 'Toi';
+                document.getElementById('composer-user').textContent = displayName;
+                document.getElementById('header-avatar-emoji').textContent = initial;
                 
                 // Check Focus Mode (unless bypassed)
                 const bypassStored = sessionStorage.getItem('cinq_focus_bypass') === 'true';
@@ -7386,6 +7401,9 @@
     
     <!-- Quick Actions (Long Press Context Menu) -->
     <script src="/js/quick-actions.min.js" defer></script>
+    
+    <!-- User Profile Module -->
+    <script src="/js/user-profile.js"></script>
     
     <!-- Quick Profile Edit -->
     <script src="/js/quick-profile-edit.js" defer></script>

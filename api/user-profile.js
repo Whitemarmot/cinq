@@ -153,7 +153,7 @@ async function handleGdprExport(res, user) {
 // ===== UPDATE PROFILE =====
 
 async function handleUpdateProfile(req, res, user) {
-    const { display_name, avatar_url, bio, birthday, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, auto_reply_enabled, auto_reply_message, status_emoji, status_text, hide_last_seen } = req.body;
+    const { display_name, avatar_url, avatar_emoji, bio, birthday, vacation_mode, vacation_message, focus_mode, focus_start, focus_end, auto_reply_enabled, auto_reply_message, status_emoji, status_text, hide_last_seen } = req.body;
 
     const updates = {};
     
@@ -200,6 +200,17 @@ async function handleUpdateProfile(req, res, user) {
             return res.status(400).json({ error: result.error, field: 'avatar_url' });
         }
         updates.avatar_url = result.url;
+    }
+    
+    // Avatar emoji (alternative to avatar_url)
+    if (avatar_emoji !== undefined) {
+        if (avatar_emoji === null || avatar_emoji === '') {
+            updates.avatar_emoji = null;
+        } else if (typeof avatar_emoji === 'string' && avatar_emoji.length <= 10) {
+            updates.avatar_emoji = avatar_emoji;
+        } else {
+            return res.status(400).json({ error: 'Emoji d\'avatar invalide', field: 'avatar_emoji' });
+        }
     }
     
     if (bio !== undefined) {
