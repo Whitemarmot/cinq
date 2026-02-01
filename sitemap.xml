@@ -80,4 +80,12 @@
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Badges - Achievements and gamification -->
+  <url>
+    <loc>https://cinq.app/badges</loc>
+    <lastmod>2025-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
