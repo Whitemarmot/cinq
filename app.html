@@ -5741,9 +5741,36 @@
                     <div class="chat-contact-status" id="chat-contact-status"></div>
                 </div>
             </div>
-            <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
-                <span aria-hidden="true">×</span>
-            </button>
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <button class="chat-header-pin-btn" id="chat-pin-btn" onclick="togglePinnedMessagesSection()" type="button" aria-label="Messages épinglés" aria-expanded="false">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
+                    </svg>
+                    <span class="pin-count" id="pin-count" style="display: none;">0</span>
+                </button>
+                <button class="chat-close" onclick="closeChat()" type="button" aria-label="Fermer la conversation">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        </div>
+        <!-- Pinned Messages Section -->
+        <div class="pinned-messages-section" id="pinned-messages-section" aria-label="Messages épinglés">
+            <div class="pinned-messages-header">
+                <div class="pinned-messages-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
+                    </svg>
+                    Messages épinglés
+                </div>
+                <button class="pinned-messages-toggle" onclick="togglePinnedMessagesSection()" type="button" aria-label="Fermer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="pinned-messages-list" id="pinned-messages-list">
+                <!-- Pinned messages will be rendered here -->
+            </div>
         </div>
         <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Messages de la conversation"></div>
         <!-- Quick Replies -->
@@ -7794,6 +7821,25 @@
                             <div class="chat-message-content">
                                 ${renderFileAttachment(msg.file_url, msg.file_name, msg.file_size, msg.file_type)}
                             </div>
+                            <div class="chat-message-meta">
+                                <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
+                                ${receiptHtml}
+                            </div>
+                        </div>
+                    `;
+                } else if (msg.location_lat && msg.location_lng) {
+                    // Location message
+                    let receiptHtml = '';
+                    if (isSent) {
+                        const readStatus = msg.read_at ? 'read' : 'delivered';
+                        const checkIcon = `<svg viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/></svg>`;
+                        const doubleCheckIcon = `<svg viewBox="0 0 20 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 5.5L5 9.5L14.5 1"/><path d="M5 5.5L9 9.5L18.5 1"/></svg>`;
+                        receiptHtml = `<span class="chat-read-receipt ${readStatus}" aria-label="${msg.read_at ? 'Lu' : 'Envoyé'}">${msg.read_at ? doubleCheckIcon : checkIcon}</span>`;
+                    }
+                    
+                    html += `
+                        <div class="chat-message location ${isSent ? 'sent' : 'received'}" role="article" aria-label="${sender} a partagé sa position">
+                            ${renderLocationMessage(msg, isSent)}
                             <div class="chat-message-meta">
                                 <span class="chat-message-time">${formatMessageTime(msg.created_at)}</span>
                                 ${receiptHtml}
