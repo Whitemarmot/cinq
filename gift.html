@@ -1,182 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- PWA Meta Tags Optimisées -->
-<!-- À injecter dans la section <head> de vos pages HTML -->
-
-<!-- iOS Safari PWA -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cinq">
-<meta name="apple-touch-fullscreen" content="yes">
-
-<!-- iOS Splash Screens -->
-<link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-430x932.png">
-<link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-393x852.png">
-<link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-428x926.png">
-<link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-390x844.png">
-<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-375x812.png">
-<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/assets/splash/splash-414x896.png">
-
-<!-- iOS Icons -->
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/icon-180x180.png">
-<link rel="apple-touch-icon" sizes="167x167" href="/assets/icons/icon-167x167.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/icon-152x152.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/icon-120x120.png">
-
-<!-- Windows Metro -->
-<meta name="msapplication-TileColor" content="#0a0a0b">
-<meta name="msapplication-TileImage" content="/assets/icons/icon-144x144.png">
-<meta name="msapplication-navbutton-color" content="#0a0a0b">
-
-<!-- Performance hints -->
-<link rel="preload" href="/css/critical.min.css" as="style">
-<link rel="preload" href="/js/app.min.js" as="script">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<!-- PWA Install prompts -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Cinq">
-
-<!-- Chrome Android -->
-<meta name="theme-color" content="#0a0a0b">
-<meta name="color-scheme" content="dark light">
-
-<!-- Edge Pinned Sites -->
-<meta name="msapplication-config" content="/browserconfig.xml">
-
-<!-- Focus ring for accessibility -->
-<style>
-:focus-visible {
-  outline: 2px solid #6366f1;
-  outline-offset: 2px;
-}
-
-/* PWA splash screen styles */
-.pwa-splash {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #0a0a0b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.pwa-splash.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.pwa-splash-logo {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 24px;
-}
-
-.pwa-splash-text {
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.pwa-splash-subtitle {
-  color: #9ca3af;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 16px;
-  text-align: center;
-  max-width: 280px;
-}
-
-/* Loading animation */
-.pwa-loading {
-  margin-top: 32px;
-  width: 40px;
-  height: 40px;
-  border: 3px solid #374151;
-  border-top: 3px solid #6366f1;
-  border-radius: 50%;
-  animation: pwa-spin 1s linear infinite;
-}
-
-@keyframes pwa-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
-
-<script>
-// PWA Splash Screen Management
-window.addEventListener('DOMContentLoaded', () => {
-  // Create splash screen if not exists
-  if (!document.querySelector('.pwa-splash')) {
-    const splash = document.createElement('div');
-    splash.className = 'pwa-splash';
-    splash.innerHTML = `
-      <img src="/assets/icons/icon-192x192.png" alt="Cinq" class="pwa-splash-logo">
-      <div class="pwa-splash-text">Cinq</div>
-      <div class="pwa-splash-subtitle">L'anti-réseau social</div>
-      <div class="pwa-loading"></div>
-    `;
-    document.body.appendChild(splash);
-    
-    // Hide splash when app is ready
-    setTimeout(() => {
-      splash.classList.add('hidden');
-      setTimeout(() => splash.remove(), 300);
-    }, 1500);
-  }
-});
-
-// PWA Install Banner
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Show install button/banner
-  const installBtn = document.querySelector('#pwa-install-btn');
-  if (installBtn) {
-    installBtn.style.display = 'block';
-  }
-});
-
-// Badge API Support
-if ('setAppBadge' in navigator) {
-  // Function to update badge from app
-  window.updateAppBadge = (count) => {
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      const channel = new MessageChannel();
-      navigator.serviceWorker.controller.postMessage({
-        type: 'UPDATE_BADGE',
-        data: { count }
-      }, [channel.port2]);
-    }
-  };
-  
-  // Clear badge on focus
-  window.addEventListener('focus', () => {
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      const channel = new MessageChannel();
-      navigator.serviceWorker.controller.postMessage({
-        type: 'UPDATE_BADGE',
-        data: { count: 0 }
-      }, [channel.port2]);
-    }
-  });
-}
-</script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Offrir Cinq — L'anti-réseau social</title>
@@ -245,9 +69,8 @@ if ('setAppBadge' in navigator) {
     <link rel="stylesheet" href="/design/styles.min.css">
     <link rel="stylesheet" href="/css/a11y.min.css">
     <link rel="stylesheet" href="/css/mobile-responsive.min.css">
-    <link rel="stylesheet" href="/css/iphone14-responsive-fixes.min.css">
     
-    <!-- Theme CSS for smooth transitions -->
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="/css/theme.min.css">
     
     <!-- Theme initialization -->
@@ -259,62 +82,121 @@ if ('setAppBadge' in navigator) {
         function toggleTheme(){var h=document.documentElement,c=localStorage.getItem('cinq_theme')||'dark',n=THEMES[(THEMES.indexOf(c)+1)%3],e=getEffective(n);h.classList.add('theme-transitioning');h.setAttribute('data-theme',e);h.setAttribute('data-theme-preference',n);localStorage.setItem('cinq_theme',n);var m=document.getElementById('theme-color-meta');if(m)m.content=e==='light'?'#faf9f7':'#0e0e12';setTimeout(function(){h.classList.remove('theme-transitioning')},400)}
         requestAnimationFrame(function(){requestAnimationFrame(function(){document.documentElement.classList.remove('theme-loading')})});
     </script>
+
     <style>
         /* ===== LAYOUT ===== */
-        .gift-container {
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: var(--leading-normal);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: var(--space-5);
             padding-top: calc(var(--space-5) + 80px);
-            text-align: center;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        @media (max-width: 380px) {
-            .gift-container {
+        /* Mobile-first responsive */
+        @media (max-width: 390px) {
+            .main-container {
                 padding: var(--space-4);
+                padding-top: calc(var(--space-4) + 70px);
             }
         }
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            text-align: center;
+            max-width: 580px;
+            width: 100%;
+            margin-bottom: var(--space-10);
+            position: relative;
+        }
         
-        /* ===== CARD ===== */
-        .gift-card {
+        .hero-logo {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 10vw, 6rem);
+            font-weight: 700;
+            margin-bottom: var(--space-5);
+            background: var(--cinq-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 20px var(--color-brand-glow));
+            position: relative;
+            display: inline-block;
+            animation: hero-float 4s ease-in-out infinite;
+        }
+        
+        @keyframes hero-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(var(--text-2xl), 6vw, var(--text-4xl));
+            font-weight: 600;
+            line-height: var(--leading-tight);
+            letter-spacing: var(--tracking-tight);
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, var(--color-text-primary), var(--color-text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: var(--text-lg);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2);
+            line-height: var(--leading-relaxed);
+        }
+        
+        .hero-price {
+            font-size: var(--text-base);
+            color: var(--color-brand);
+            font-weight: 600;
+            background: var(--color-brand-muted);
+            border: 1px solid rgba(255, 107, 74, 0.2);
+            border-radius: var(--radius-full);
+            padding: var(--space-2) var(--space-4);
+            display: inline-block;
+            animation: price-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes price-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 74, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 107, 74, 0); }
+        }
+
+        /* ===== HOW IT WORKS SECTION ===== */
+        .how-it-works {
+            width: 100%;
+            max-width: 580px;
+            margin-bottom: var(--space-10);
             background: var(--color-bg-secondary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-2xl);
             padding: var(--space-8);
-            width: 100%;
-            max-width: 580px;
             position: relative;
-            box-shadow: var(--shadow-xl);
-            animation: card-enter 0.4s var(--ease-out-expo);
+            backdrop-filter: blur(20px);
         }
         
-        @keyframes card-enter {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .gift-card::before {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            border-radius: inherit;
-            background: var(--cinq-gradient);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity 0.3s;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            padding: 1px;
-        }
-        
-        .gift-card:hover::before {
-            opacity: 0.4;
-        }
-        
-        .gift-card::after {
+        .how-it-works::before {
             content: '';
             position: absolute;
             top: 0;
@@ -322,155 +204,190 @@ if ('setAppBadge' in navigator) {
             right: var(--space-6);
             height: 1px;
             background: var(--glass-highlight);
-            pointer-events: none;
+            opacity: 0.6;
         }
         
-        /* ===== LOGO ===== */
-        .gift-logo { 
+        .section-title {
             font-family: var(--font-display);
-            font-size: 4.5rem;
-            font-weight: 700;
-            margin-bottom: var(--space-5);
-            background: var(--cinq-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 4px 12px var(--color-brand-glow));
-            position: relative;
-            display: inline-block;
-            transition: transform 0.3s var(--ease-spring);
-        }
-        
-        .gift-logo:hover {
-            transform: scale(1.05) rotate(-3deg);
-        }
-        
-        .gift-logo::before {
-            content: '';
-            position: absolute;
-            inset: -25px;
-            background: conic-gradient(
-                from 0deg,
-                rgba(255, 107, 74, 0.3) 0deg,
-                rgba(255, 138, 106, 0.2) 72deg,
-                rgba(251, 191, 36, 0.15) 144deg,
-                rgba(167, 139, 250, 0.2) 216deg,
-                rgba(255, 107, 74, 0.3) 288deg
-            );
-            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-            opacity: 0.4;
-            z-index: -1;
-            filter: blur(18px);
-            animation: pentagon-pulse 4s ease-in-out infinite;
-        }
-        
-        @keyframes pentagon-pulse {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.05); }
-        }
-        
-        /* ===== TITLES ===== */
-        .gift-title { 
-            font-family: var(--font-display);
-            font-size: var(--text-2xl); 
-            font-weight: 600; 
-            margin-bottom: var(--space-2);
-            letter-spacing: -0.02em;
-        }
-        
-        .gift-subtitle { 
-            color: var(--color-text-muted); 
-            margin-bottom: var(--space-8);
-            font-size: var(--text-sm);
-        }
-        
-        /* ===== INSTRUCTIONS ===== */
-        .instructions-section {
-            margin-bottom: var(--space-8);
-            padding: var(--space-6);
-            background: var(--color-bg-tertiary);
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--color-border);
-        }
-        
-        .instructions-title {
-            font-family: var(--font-display);
-            font-size: var(--text-lg);
+            font-size: var(--text-xl);
             font-weight: 600;
             text-align: center;
-            margin-bottom: var(--space-5);
+            margin-bottom: var(--space-6);
             color: var(--color-text-primary);
         }
         
-        .instruction-steps {
+        .steps-container {
             display: flex;
             flex-direction: column;
-            gap: var(--space-4);
-            margin-bottom: var(--space-5);
+            gap: var(--space-5);
         }
         
-        .instruction-step {
+        .step {
             display: flex;
             align-items: flex-start;
-            gap: var(--space-3);
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--color-border);
+            transition: all var(--transition-base) var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--cinq-gradient);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        
+        .step:hover::before {
+            opacity: 1;
+        }
+        
+        .step:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-border-active);
+            box-shadow: var(--shadow-lg);
         }
         
         .step-number {
-            width: 28px;
-            height: 28px;
+            width: 40px;
+            height: 40px;
             background: var(--cinq-gradient);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--text-sm);
+            font-size: var(--text-base);
             font-weight: 700;
             flex-shrink: 0;
+            box-shadow: var(--shadow-glow-sm);
         }
         
         .step-content h3 {
-            font-size: var(--text-sm);
+            font-family: var(--font-display);
+            font-size: var(--text-base);
             font-weight: 600;
-            margin-bottom: var(--space-1);
+            margin-bottom: var(--space-2);
             color: var(--color-text-primary);
         }
         
         .step-content p {
-            font-size: var(--text-xs);
-            color: var(--color-text-muted);
-            line-height: 1.5;
-        }
-        
-        .gift-note {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--space-3);
-            padding: var(--space-4);
-            background: var(--color-brand-muted);
-            border: 1px solid var(--color-brand);
-            border-radius: var(--radius-lg);
-        }
-        
-        .gift-note svg {
-            color: var(--color-brand);
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-        
-        .gift-note p {
-            font-size: var(--text-xs);
+            font-size: var(--text-sm);
             color: var(--color-text-secondary);
-            line-height: 1.6;
+            line-height: var(--leading-relaxed);
             margin: 0;
         }
+
+        /* ===== GIFT FORM SECTION ===== */
+        .gift-form-section {
+            width: 100%;
+            max-width: 580px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            position: relative;
+            backdrop-filter: blur(20px);
+            animation: card-enter 0.6s var(--ease-out-expo) 0.2s both;
+        }
         
-        .gift-note strong {
+        @keyframes card-enter {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .gift-form-section::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: var(--cinq-gradient);
+            opacity: 0.1;
+            z-index: -1;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            padding: 1px;
+            transition: opacity var(--transition-base);
+        }
+        
+        .gift-form-section:hover::before {
+            opacity: 0.2;
+        }
+        
+        .gift-form-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: var(--space-6);
+            right: var(--space-6);
+            height: 1px;
+            background: var(--glass-highlight);
+            opacity: 0.8;
+        }
+        
+        .form-title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: var(--space-6);
             color: var(--color-text-primary);
         }
         
-        /* ===== GENERATE BUTTON ===== */
-        .generate-btn {
+        .input-group {
+            margin-bottom: var(--space-6);
+        }
+        
+        .input-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-base);
+            color: var(--color-text-primary);
+            transition: all var(--transition-base);
+            min-height: 44px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.1);
+            background: var(--color-bg-secondary);
+        }
+        
+        .input-field::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .optional-badge {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            padding: 2px var(--space-2);
+            margin-left: var(--space-2);
+        }
+        
+        .generate-button {
             width: 100%;
             padding: var(--space-4);
             background: var(--cinq-gradient);
@@ -481,10 +398,7 @@ if ('setAppBadge' in navigator) {
             font-size: var(--text-base);
             font-weight: 600;
             cursor: pointer;
-            transition: 
-                transform 0.15s var(--ease-spring),
-                box-shadow 0.2s,
-                opacity 0.15s;
+            transition: all var(--transition-base) var(--ease-spring);
             box-shadow: var(--shadow-glow-sm);
             position: relative;
             overflow: hidden;
@@ -492,9 +406,10 @@ if ('setAppBadge' in navigator) {
             align-items: center;
             justify-content: center;
             gap: var(--space-2);
+            min-height: 48px;
         }
         
-        .generate-btn::before {
+        .generate-button::before {
             content: '';
             position: absolute;
             top: 0;
@@ -502,30 +417,29 @@ if ('setAppBadge' in navigator) {
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+            transition: left 0.6s;
         }
         
-        .generate-btn:hover:not(:disabled)::before { 
-            left: 100%; 
-        }
-        
-        .generate-btn:hover:not(:disabled) { 
-            transform: translateY(-2px) scale(1.01);
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
             box-shadow: var(--shadow-glow);
         }
         
-        .generate-btn:active:not(:disabled) {
+        .generate-button:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        
+        .generate-button:active:not(:disabled) {
             transform: translateY(0) scale(0.98);
         }
         
-        .generate-btn:disabled { 
-            opacity: 0.5; 
-            cursor: not-allowed; 
-            transform: none !important; 
+        .generate-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
         }
         
-        /* Loading state */
-        .generate-btn .loading-spinner {
+        .loading-spinner {
             width: 18px;
             height: 18px;
             border: 2px solid rgba(255,255,255,0.3);
@@ -537,90 +451,100 @@ if ('setAppBadge' in navigator) {
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        /* ===== RESULT ===== */
-        .result { 
-            margin-top: var(--space-6); 
+
+        /* ===== RESULT SECTION ===== */
+        .result-section {
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--color-border);
             display: none;
-            animation: result-enter 0.4s var(--ease-out-expo);
+            animation: result-enter 0.5s var(--ease-out-expo);
         }
         
         @keyframes result-enter {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .result.show { 
-            display: block; 
+        .result-section.show {
+            display: block;
         }
         
-        .code-box {
+        .code-container {
             background: var(--color-bg-elevated);
-            border: 2px dashed var(--color-brand);
+            border: 2px solid var(--color-brand);
             border-radius: var(--radius-xl);
             padding: var(--space-5);
             margin: var(--space-4) 0;
             position: relative;
             overflow: hidden;
+            text-align: center;
         }
         
-        .code-box::before {
+        .code-container::before {
             content: '';
             position: absolute;
             inset: 0;
             background: var(--cinq-gradient);
             opacity: 0.05;
+            border-radius: inherit;
         }
         
         .code-label {
             font-size: var(--text-xs);
             color: var(--color-text-muted);
-            margin-bottom: var(--space-2);
+            margin-bottom: var(--space-3);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: var(--tracking-wider);
+            font-weight: 500;
         }
         
-        .code {
-            font-size: var(--text-xl);
+        .gift-code {
+            font-size: var(--text-2xl);
             font-weight: 700;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
             color: var(--color-brand);
             letter-spacing: 0.1em;
             word-break: break-all;
-            position: relative;
+            margin-bottom: var(--space-4);
         }
         
-        .share-section {
-            margin-top: var(--space-4);
-            padding-top: var(--space-4);
-            border-top: 1px solid var(--color-border);
+        .share-url-container {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin: var(--space-4) 0;
         }
         
         .share-label {
             font-size: var(--text-xs);
             color: var(--color-text-muted);
             margin-bottom: var(--space-2);
+            font-weight: 500;
         }
         
-        .share-link {
+        .share-url {
             font-size: var(--text-sm);
             color: var(--color-text-secondary);
             word-break: break-all;
-            padding: var(--space-3);
-            background: var(--color-bg-tertiary);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--color-border);
+            line-height: var(--leading-relaxed);
         }
         
-        /* ===== ACTION BUTTONS ===== */
         .action-buttons {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: var(--space-3);
-            margin-top: var(--space-4);
+            margin-top: var(--space-5);
         }
         
-        .copy-btn, .share-btn {
-            flex: 1;
+        @media (max-width: 390px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .action-button {
             padding: var(--space-3) var(--space-4);
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
@@ -628,49 +552,53 @@ if ('setAppBadge' in navigator) {
             color: var(--color-text-primary);
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s var(--ease-spring);
+            transition: all var(--transition-base) var(--ease-spring);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: var(--space-2);
+            min-height: 44px;
+            text-decoration: none;
         }
         
-        .copy-btn:hover, .share-btn:hover {
+        .action-button:hover {
             background: var(--color-bg-elevated);
             border-color: var(--color-border-active);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
         
-        .copy-btn:active, .share-btn:active {
+        .action-button:active {
             transform: translateY(0) scale(0.98);
         }
         
-        .copy-btn.copied {
-            background: var(--color-success-muted);
-            border-color: var(--color-success);
-            color: var(--color-success);
-        }
-        
-        .share-btn {
+        .action-button.primary {
             background: var(--cinq-gradient);
             border-color: transparent;
             color: white;
         }
         
-        .share-btn:hover {
+        .action-button.primary:hover {
             box-shadow: var(--shadow-glow-sm);
+            transform: translateY(-2px);
         }
         
-        /* ===== ERROR ===== */
-        .error-message { 
-            color: var(--color-error); 
+        .action-button.success {
+            background: var(--color-success-muted);
+            border-color: var(--color-success);
+            color: var(--color-success);
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
             margin-top: var(--space-4);
-            padding: var(--space-3) var(--space-4);
+            padding: var(--space-4);
             background: var(--color-error-muted);
             border: 1px solid rgba(239, 68, 68, 0.3);
             border-radius: var(--radius-lg);
+            color: var(--color-error);
             font-size: var(--text-sm);
-            display: flex;
+            display: none;
             align-items: center;
             gap: var(--space-2);
             animation: error-enter 0.3s var(--ease-out-expo);
@@ -681,56 +609,37 @@ if ('setAppBadge' in navigator) {
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .error-message.hidden {
-            display: none;
+        .error-message.show {
+            display: flex;
         }
-        
-        /* ===== LINKS ===== */
-        .back-link {
-            margin-top: var(--space-6);
-            font-size: var(--text-sm);
-            color: var(--color-text-muted);
-        }
-        
-        .back-link a {
-            color: var(--color-brand);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        
-        .back-link a:hover {
-            color: var(--color-brand-hover);
-            text-decoration: underline;
-        }
-        
+
         /* ===== HEADER ===== */
         .site-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
+            z-index: var(--z-sticky);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1.5rem;
-            background: rgba(12, 12, 15, 0.9);
+            padding: var(--space-3) var(--space-5);
+            background: rgba(14, 14, 18, 0.8);
             backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--color-border-subtle);
-            transition: background 0.3s ease, backdrop-filter 0.3s ease;
+            transition: background var(--transition-theme);
         }
         
         [data-theme="light"] .site-header {
-            background: rgba(250, 249, 247, 0.9);
+            background: rgba(250, 249, 247, 0.8);
         }
         
         .header-logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: var(--space-2);
             text-decoration: none;
-            transition: transform 0.2s ease;
+            transition: transform var(--transition-base);
         }
         
         .header-logo:hover {
@@ -742,30 +651,31 @@ if ('setAppBadge' in navigator) {
             height: 32px;
         }
         
-        .header-logo-icon svg {
-            width: 100%;
-            height: 100%;
+        .header-logo-text {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: var(--text-lg);
         }
         
         .header-nav {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: var(--space-3);
         }
         
         .theme-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             width: 40px;
             height: 40px;
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
         }
         
         .theme-toggle:hover {
@@ -773,60 +683,75 @@ if ('setAppBadge' in navigator) {
             transform: scale(1.05);
         }
         
-        .theme-toggle .icon-sun,
-        .theme-toggle .icon-moon {
-            position: absolute;
-            transition: all 0.3s ease;
-            color: var(--color-text-secondary);
-        }
-        
-        .theme-toggle .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-        .theme-toggle .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-        
-        [data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
-        [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
-
-        .header-login-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
+        .header-login {
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-full);
             color: var(--color-text-primary);
-            font-size: 0.875rem;
+            font-size: var(--text-sm);
             font-weight: 500;
             text-decoration: none;
-            transition: all 0.2s var(--ease-out-expo);
+            transition: all var(--transition-base);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
         }
         
-        .header-login-btn:hover {
+        .header-login:hover {
             background: var(--color-brand);
             border-color: var(--color-brand);
             color: white;
-            box-shadow: var(--shadow-glow-sm);
+        }
+
+        /* ===== BACK LINK ===== */
+        .back-link {
+            text-align: center;
+            margin-top: var(--space-8);
+            padding-top: var(--space-6);
         }
         
-        /* ===== BACKGROUND ===== */
-        .pentagon-pattern {
+        .back-link a {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            text-decoration: none;
+            transition: color var(--transition-base);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .back-link a:hover {
+            color: var(--color-brand);
+            background: var(--color-bg-tertiary);
+        }
+
+        /* ===== BACKGROUND EFFECTS ===== */
+        .noise-overlay {
             position: fixed;
             inset: 0;
+            opacity: 0.015;
             pointer-events: none;
-            z-index: -2;
-            opacity: 0.02;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='30,5 55,22 47,52 13,52 5,22' fill='none' stroke='%23ff6b4a' stroke-width='0.5'/%3E%3C/svg%3E");
-            background-size: 60px 60px;
+            z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
         
         .gradient-orb {
             position: fixed;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.15;
+            opacity: 0.1;
             pointer-events: none;
             z-index: -1;
+            animation: orb-float 8s ease-in-out infinite;
+        }
+        
+        @keyframes orb-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 20px) scale(0.9); }
         }
         
         .gradient-orb-1 {
@@ -835,6 +760,7 @@ if ('setAppBadge' in navigator) {
             background: var(--color-brand);
             top: -100px;
             right: -100px;
+            animation-delay: 0s;
         }
         
         .gradient-orb-2 {
@@ -843,81 +769,65 @@ if ('setAppBadge' in navigator) {
             background: #a78bfa;
             bottom: -50px;
             left: -50px;
+            animation-delay: -4s;
         }
         
-        /* ===== FOOTER ===== */
-        .auth-footer {
-            padding: var(--space-5);
-            padding-bottom: max(var(--space-5), calc(env(safe-area-inset-bottom, 0px) + var(--space-4)));
-            text-align: center;
-            font-size: var(--text-xs);
-            color: var(--color-text-muted);
-            margin-top: auto;
+        /* ===== SKIP LINKS ===== */
+        .skip-links {
+            position: absolute;
+            top: -100px;
+            left: var(--space-4);
+            z-index: var(--z-max);
         }
         
-        .auth-footer nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: var(--space-2);
-        }
-        
-        .auth-footer a {
-            color: var(--color-text-muted);
-            padding: var(--space-2) var(--space-3);
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
+        .skip-link {
+            background: var(--color-brand);
+            color: white;
+            padding: var(--space-2) var(--space-4);
             border-radius: var(--radius-md);
-            transition: color 0.2s, background 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+            transition: top var(--transition-base);
         }
         
-        .auth-footer a:hover {
-            color: var(--color-text-secondary);
-            background: var(--color-bg-tertiary);
+        .skip-link:focus {
+            top: var(--space-4);
         }
-        
-        /* ===== SUCCESS ANIMATION ===== */
-        @keyframes success-pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .success-icon {
-            animation: success-pop 0.4s var(--ease-spring);
-        }
-        
+
         /* ===== REDUCED MOTION ===== */
         @media (prefers-reduced-motion: reduce) {
-            .gift-card,
-            .result,
-            .error-message,
-            .gift-logo::before,
-            .success-icon {
+            .hero-logo,
+            .hero-price,
+            .card-enter,
+            .result-enter,
+            .error-enter,
+            .gradient-orb {
                 animation: none !important;
             }
             
-            .generate-btn::before {
+            .generate-button::before {
                 display: none;
+            }
+            
+            * {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
     </style>
-    <!-- View Transitions -->
-    <link rel="stylesheet" href="/css/view-transitions.min.css">
 </head>
-<body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
-    <!-- Skip Links - WCAG AAA Compliant -->
-    <nav class="skip-links" aria-label="Liens d'évitement">
+<body>
+    <!-- Skip Links -->
+    <nav class="skip-links">
         <a href="#main-content" class="skip-link">Aller au contenu principal</a>
-        <a href="#gift-form" class="skip-link">Aller au formulaire de cadeau</a>
+        <a href="#gift-form" class="skip-link">Aller au formulaire</a>
     </nav>
     
-    <!-- Live region for dynamic announcements -->
-    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
-    
+    <!-- Background Effects -->
     <div class="noise-overlay" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
+    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
     
     <!-- Header -->
     <header class="site-header" role="banner">
@@ -928,269 +838,325 @@ if ('setAppBadge' in navigator) {
                     <text x="16" y="20" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700" fill="url(#logo-gradient)">5</text>
                     <defs>
                         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#6366f1"/>
-                            <stop offset="50%" style="stop-color:#8b5cf6"/>
-                            <stop offset="100%" style="stop-color:#a855f7"/>
+                            <stop offset="0%" style="stop-color:#ff6b4a"/>
+                            <stop offset="50%" style="stop-color:#ff8a6a"/>
+                            <stop offset="100%" style="stop-color:#fbbf24"/>
                         </linearGradient>
                     </defs>
                 </svg>
             </span>
-            <span style="font-family: var(--font-display); font-weight: 600; color: var(--color-text-primary); font-size: 1.1rem;">cinq</span>
+            <span class="header-logo-text">cinq</span>
         </a>
         <nav class="header-nav" aria-label="Navigation principale">
-            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Basculer mode clair/sombre" type="button">
-                <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Changer de thème" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
             </button>
-            <a href="/login.html" class="header-login-btn">Se connecter</a>
+            <a href="/login.html" class="header-login">Se connecter</a>
         </nav>
     </header>
     
-    <div class="pentagon-pattern" aria-hidden="true"></div>
-    <div class="gradient-orb gradient-orb-1" aria-hidden="true"></div>
-    <div class="gradient-orb gradient-orb-2" aria-hidden="true"></div>
-    
-    <main id="main-content" style="flex: 1; display: flex;">
-        <div class="gift-container">
-            <div class="gift-card">
-                <div class="gift-logo" aria-hidden="true">5</div>
-                <h1 class="gift-title">Offrir un accès</h1>
-                <p class="gift-subtitle">Invite quelqu'un qui compte vraiment dans ton cercle de 5</p>
-                
-                <!-- Instructions section -->
-                <div class="instructions-section">
-                    <h2 class="instructions-title">Comment ça marche ?</h2>
-                    <div class="instruction-steps">
-                        <div class="instruction-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h3>Génère un code</h3>
-                                <p>Crée un code d'invitation unique pour la personne de ton choix</p>
-                            </div>
-                        </div>
-                        <div class="instruction-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h3>Partage avec style</h3>
-                                <p>Envoie le lien ou le code directement à ton proche</p>
-                            </div>
-                        </div>
-                        <div class="instruction-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h3>Vous vous retrouvez</h3>
-                                <p>Il s'inscrit et vous voilà connectés. Simple comme bonjour.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="gift-note">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 12l2 2 4-4"/>
-                            <circle cx="12" cy="12" r="10"/>
-                        </svg>
-                        <p><strong>Pourquoi par invitation ?</strong> Parce qu'on entre pas comme ça chez les gens. Chaque membre choisit ses 5, créant un cercle qui a du sens.</p>
+    <!-- Main Content -->
+    <main id="main-content" class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-logo" aria-hidden="true">5</div>
+            <h1 class="hero-title">Offre Cinq à quelqu'un qui compte</h1>
+            <p class="hero-subtitle">L'anti-réseau social où les liens vrais passent avant les likes.</p>
+            <div class="hero-price">✨ Gratuit pendant la bêta</div>
+        </section>
+        
+        <!-- How It Works -->
+        <section class="how-it-works">
+            <h2 class="section-title">Comment ça marche ?</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Génère ton code</h3>
+                        <p>Crée un code d'invitation unique en quelques secondes</p>
                     </div>
                 </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Partage avec style</h3>
+                        <p>Envoie le lien directement à la personne de ton choix</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Connectez-vous</h3>
+                        <p>Il s'inscrit avec ton code et vous voilà dans le même cercle</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Gift Form -->
+        <section class="gift-form-section" id="gift-form">
+            <h2 class="form-title">Créer ton invitation</h2>
+            
+            <form id="gift-form-element" onsubmit="return false;">
+                <div class="input-group">
+                    <label for="recipient-name" class="input-label">
+                        Pour qui ? 
+                        <span class="optional-badge">optionnel</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="recipient-name" 
+                        class="input-field"
+                        placeholder="Le prénom de la personne"
+                        autocomplete="given-name"
+                    >
+                </div>
                 
-                <button class="generate-btn" id="generate-btn" onclick="generateGift()" aria-label="Générer un nouveau code cadeau d'invitation">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                <button 
+                    type="button" 
+                    class="generate-button" 
+                    id="generate-button"
+                    onclick="generateGiftCode()"
+                    aria-describedby="button-help"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/>
+                        <path d="M12 8v13"/>
+                        <path d="M3 12h18"/>
                     </svg>
-                    <span id="btn-text">Générer un code cadeau</span>
+                    <span id="button-text">Générer le code cadeau</span>
                 </button>
                 
-                <div class="error-message hidden" id="error" role="alert" aria-live="polite">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div class="error-message" id="error-message" role="alert">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
                     <span id="error-text"></span>
                 </div>
-                
-                <div class="result" id="result" role="region" aria-label="Code cadeau généré">
-                    <div class="code-box">
-                        <p class="code-label">Code cadeau</p>
-                        <p class="code" id="gift-code" aria-label="Code cadeau"></p>
-                    </div>
-                    
-                    <div class="share-section">
-                        <p class="share-label">Lien de partage</p>
-                        <p class="share-link" id="share-link" aria-label="Lien de partage"></p>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="copy-btn" id="copy-btn" onclick="copyLink()" aria-label="Copier le lien de partage">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="copy-icon">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                            </svg>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="check-icon" style="display: none;">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            <span id="copy-text">Chopper le lien</span>
-                        </button>
-                        
-                        <button class="share-btn" id="share-native-btn" onclick="shareNative()" aria-label="Partager via le système" style="display: none;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                            </svg>
-                            <span>Partager</span>
-                        </button>
-                    </div>
+            </form>
+            
+            <!-- Result Section -->
+            <div class="result-section" id="result-section" role="region" aria-label="Code généré">
+                <div class="code-container">
+                    <div class="code-label">Ton code cadeau</div>
+                    <div class="gift-code" id="gift-code" aria-label="Code cadeau généré"></div>
                 </div>
                 
-                <p class="back-link">
-                    <a href="/" aria-label="Retour à la page d'accueil">← Retour à l'accueil</a>
-                </p>
+                <div class="share-url-container">
+                    <div class="share-label">Lien à partager</div>
+                    <div class="share-url" id="share-url"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-button" id="copy-button" onclick="copyToClipboard()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="copy-icon">
+                            <rect x="9" y="9" width="13" height="13" rx="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="check-icon" style="display: none;">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span id="copy-text">Copier le lien</span>
+                    </button>
+                    
+                    <button class="action-button primary" id="share-button" onclick="shareNative()" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="18" cy="5" r="3"/>
+                            <circle cx="6" cy="12" r="3"/>
+                            <circle cx="18" cy="19" r="3"/>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                        </svg>
+                        <span>Partager</span>
+                    </button>
+                </div>
             </div>
-        </div>
+            
+            <div class="back-link">
+                <a href="/" aria-label="Retour à l'accueil">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    Retour à l'accueil
+                </a>
+            </div>
+        </section>
     </main>
 
     <script>
-        let shareUrl = '';
-        let generatedCode = '';
+        let currentShareUrl = '';
+        let currentGiftCode = '';
         
-        // Check if Web Share API is available
-        if (navigator.share) {
-            document.getElementById('share-native-btn').style.display = 'flex';
+        // Check for Web Share API support
+        if ('share' in navigator) {
+            document.getElementById('share-button').style.display = 'flex';
         }
         
-        async function generateGift() {
-            const btn = document.getElementById('generate-btn');
-            const btnText = document.getElementById('btn-text');
-            const error = document.getElementById('error');
+        async function generateGiftCode() {
+            const button = document.getElementById('generate-button');
+            const buttonText = document.getElementById('button-text');
+            const errorMessage = document.getElementById('error-message');
             const errorText = document.getElementById('error-text');
-            const result = document.getElementById('result');
+            const resultSection = document.getElementById('result-section');
+            const recipientName = document.getElementById('recipient-name').value.trim();
             
-            btn.disabled = true;
-            btnText.innerHTML = '<span class="loading-spinner"></span>Génération...';
-            error.classList.add('hidden');
+            // Show loading state
+            button.disabled = true;
+            buttonText.innerHTML = '<span class="loading-spinner"></span> Génération...';
+            errorMessage.classList.remove('show');
             
             try {
-                const res = await fetch('/api/gift?action=create', {
+                const response = await fetch('/api/gift?action=create', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recipientName: recipientName || null
+                    })
                 });
                 
-                const data = await res.json();
+                const data = await response.json();
                 
-                if (!res.ok) {
-                    throw new Error(data.error || 'Erreur lors de la génération');
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de la génération du code');
                 }
                 
                 if (data.code) {
-                    generatedCode = data.code;
-                    document.getElementById('gift-code').textContent = data.code;
-                    shareUrl = data.gift?.shareUrl || `${window.location.origin}/register.html?code=${data.code}`;
-                    document.getElementById('share-link').textContent = shareUrl;
-                    result.classList.add('show');
+                    // Success - update UI
+                    currentGiftCode = data.code;
+                    currentShareUrl = data.gift?.shareUrl || `${window.location.origin}/register.html?code=${data.code}`;
+                    
+                    document.getElementById('gift-code').textContent = currentGiftCode;
+                    document.getElementById('share-url').textContent = currentShareUrl;
+                    
+                    // Show result section
+                    resultSection.classList.add('show');
                     
                     // Reset copy button
                     resetCopyButton();
                     
-                    // Update button text
-                    btnText.innerHTML = `
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                    // Update button for next generation
+                    buttonText.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="8" width="18" height="13" rx="2"/>
+                            <path d="M12 8v13"/>
+                            <path d="M3 12h18"/>
                         </svg>
                         Générer un autre code
                     `;
                 } else {
-                    throw new Error(data.error || 'Réponse invalide du serveur');
+                    throw new Error('Réponse invalide du serveur');
                 }
-            } catch (e) {
-                errorText.textContent = e.message;
-                error.classList.remove('hidden');
+            } catch (error) {
+                // Error handling
+                errorText.textContent = error.message;
+                errorMessage.classList.add('show');
                 
-                btnText.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13"/><path d="M3 12h18"/><path d="M12 8c-2.5-3-6-2-6 0s3.5 2 6 0"/><path d="M12 8c2.5-3 6-2 6 0s-3.5 2-6 0"/>
+                buttonText.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"/>
+                        <path d="M12 8v13"/>
+                        <path d="M3 12h18"/>
                     </svg>
                     Réessayer
                 `;
             }
             
-            btn.disabled = false;
+            button.disabled = false;
         }
         
         function resetCopyButton() {
-            const btn = document.getElementById('copy-btn');
+            const button = document.getElementById('copy-button');
             const copyIcon = document.getElementById('copy-icon');
             const checkIcon = document.getElementById('check-icon');
             const copyText = document.getElementById('copy-text');
             
-            btn.classList.remove('copied');
+            button.classList.remove('success');
             copyIcon.style.display = 'block';
             checkIcon.style.display = 'none';
             copyText.textContent = 'Copier le lien';
         }
         
-        async function copyLink() {
-            const btn = document.getElementById('copy-btn');
+        async function copyToClipboard() {
+            if (!currentShareUrl) return;
+            
+            const button = document.getElementById('copy-button');
             const copyIcon = document.getElementById('copy-icon');
             const checkIcon = document.getElementById('check-icon');
             const copyText = document.getElementById('copy-text');
             
             try {
-                await navigator.clipboard.writeText(shareUrl);
+                await navigator.clipboard.writeText(currentShareUrl);
                 
-                // Success state
-                btn.classList.add('copied');
+                // Success feedback
+                button.classList.add('success');
                 copyIcon.style.display = 'none';
                 checkIcon.style.display = 'block';
                 copyText.textContent = 'Copié !';
                 
                 // Reset after 2 seconds
                 setTimeout(resetCopyButton, 2000);
-            } catch (err) {
+            } catch (error) {
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
-                textArea.value = shareUrl;
+                textArea.value = currentShareUrl;
                 textArea.style.position = 'fixed';
                 textArea.style.left = '-9999px';
+                textArea.style.top = '-9999px';
                 document.body.appendChild(textArea);
+                textArea.focus();
                 textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
                 
-                btn.classList.add('copied');
-                copyIcon.style.display = 'none';
-                checkIcon.style.display = 'block';
-                copyText.textContent = 'Copié !';
-                
-                setTimeout(resetCopyButton, 2000);
+                try {
+                    document.execCommand('copy');
+                    
+                    // Success feedback
+                    button.classList.add('success');
+                    copyIcon.style.display = 'none';
+                    checkIcon.style.display = 'block';
+                    copyText.textContent = 'Copié !';
+                    
+                    setTimeout(resetCopyButton, 2000);
+                } catch (err) {
+                    console.error('Erreur lors de la copie:', err);
+                } finally {
+                    document.body.removeChild(textArea);
+                }
             }
         }
         
         async function shareNative() {
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Rejoins-moi sur Cinq',
-                        text: `Tu as reçu une invitation pour Cinq, l'anti-réseau social ! Code: ${generatedCode}`,
-                        url: shareUrl
-                    });
-                } catch (err) {
-                    // User cancelled or error
-                    if (err.name !== 'AbortError') {
-                        console.error('Share failed:', err);
-                    }
+            if (!('share' in navigator) || !currentShareUrl) return;
+            
+            const recipientName = document.getElementById('recipient-name').value.trim();
+            const shareText = recipientName 
+                ? `${recipientName}, tu as reçu une invitation pour Cinq ! Code: ${currentGiftCode}`
+                : `Tu as reçu une invitation pour Cinq ! Code: ${currentGiftCode}`;
+            
+            try {
+                await navigator.share({
+                    title: 'Invitation Cinq',
+                    text: shareText,
+                    url: currentShareUrl
+                });
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Erreur de partage:', error);
                 }
             }
         }
+        
+        // Enter key support on input
+        document.getElementById('recipient-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateGiftCode();
+            }
+        });
     </script>
-
-    <!-- Footer -->
-    <footer class="auth-footer" role="contentinfo">
-        <nav aria-label="Liens légaux">
-            <a href="/privacy.html">Confidentialité</a>
-            <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <a href="/terms.html">CGU</a>
-            <span aria-hidden="true" style="opacity: 0.3;">·</span>
-            <span style="padding: 0 var(--space-2);">© 2025 Cinq</span>
-        </nav>
-    </footer>
-    <!-- Easter Eggs 🥚 -->
-    <script src="/js/easter-eggs.min.js" defer></script>
-    <!-- View Transitions -->
-    <script defer src="/js/view-transitions.min.js"></script>
 </body>
 </html>
