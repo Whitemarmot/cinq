@@ -1,0 +1,461 @@
+/* ============================================
+   CINQ DESIGN IMPROVEMENTS
+   Beautiful, modern enhancements per brand.md
+   ============================================ */
+
+/* Enhanced Glassmorphism Effects */
+.glass-enhanced {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        0 8px 32px rgba(99, 102, 241, 0.15);
+}
+
+/* Enhanced Hero Section */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='pentagon' x='0' y='0' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Cpolygon points='10,2 18,7 15,16 5,16 2,7' fill='none' stroke='%236366f1' stroke-width='0.5' opacity='0.3'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23pentagon)'/%3E%3C/svg%3E") center/400px;
+    opacity: 0.1;
+    animation: pentagon-drift 60s linear infinite;
+}
+
+@keyframes pentagon-drift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-400px, -400px); }
+}
+
+/* Enhanced Five Logo */
+.five {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.five::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        var(--cinq-indigo) 60deg,
+        var(--cinq-violet) 120deg,
+        var(--cinq-purple) 180deg,
+        var(--cinq-indigo) 240deg,
+        transparent 300deg
+    );
+    border-radius: 50%;
+    opacity: 0.6;
+    filter: blur(20px);
+    animation: logo-rotate 8s linear infinite;
+}
+
+.five-number {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--cinq-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.5));
+    z-index: 1;
+    position: relative;
+}
+
+@keyframes logo-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Enhanced Cards */
+.card-enhanced {
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.card-enhanced::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--cinq-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    padding: 1px;
+}
+
+.card-enhanced:hover::before {
+    opacity: 0.3;
+}
+
+.card-enhanced:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(99, 102, 241, 0.2),
+        0 0 60px rgba(139, 92, 246, 0.15);
+}
+
+/* Enhanced Buttons */
+.btn-enhanced {
+    position: relative;
+    background: var(--cinq-gradient);
+    border: none;
+    border-radius: 16px;
+    padding: 16px 32px;
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 8px 24px rgba(99, 102, 241, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.btn-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    transition: left 0.6s ease;
+}
+
+.btn-enhanced:hover::before {
+    left: 100%;
+}
+
+.btn-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 32px rgba(99, 102, 241, 0.4),
+        0 0 40px rgba(139, 92, 246, 0.3);
+}
+
+.btn-enhanced:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Enhanced Input Fields */
+.input-enhanced {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 20px;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.input-enhanced::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.input-enhanced:focus {
+    outline: none;
+    border-color: var(--cinq-indigo);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 0 0 3px rgba(99, 102, 241, 0.15),
+        0 8px 24px rgba(99, 102, 241, 0.2);
+}
+
+/* Enhanced Avatar Ring */
+.avatar-enhanced {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.avatar-enhanced::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: var(--cinq-gradient);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: avatar-pulse 2s ease-in-out infinite;
+}
+
+.avatar-enhanced:hover::before {
+    opacity: 0.8;
+}
+
+@keyframes avatar-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Enhanced Message Bubbles */
+.message-enhanced {
+    position: relative;
+    padding: 16px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    max-width: 70%;
+    margin: 8px 0;
+    animation: message-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.message-enhanced.sent {
+    background: var(--cinq-gradient);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.message-enhanced.received {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-primary);
+    border-bottom-left-radius: 8px;
+}
+
+@keyframes message-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Enhanced Navigation */
+.nav-enhanced {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 8px;
+    display: flex;
+    gap: 4px;
+}
+
+.nav-item-enhanced {
+    padding: 12px 24px;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-item-enhanced.active,
+.nav-item-enhanced:hover {
+    background: var(--cinq-gradient);
+    color: white;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+/* Enhanced Tooltips */
+.tooltip-enhanced {
+    position: relative;
+}
+
+.tooltip-enhanced::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(12px);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.tooltip-enhanced:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+/* Enhanced Floating Action Button */
+.fab-enhanced {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 64px;
+    height: 64px;
+    background: var(--cinq-gradient);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 12px 32px rgba(99, 102, 241, 0.4),
+        0 0 40px rgba(139, 92, 246, 0.3);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.fab-enhanced:hover {
+    transform: scale(1.1);
+    box-shadow: 
+        0 16px 40px rgba(99, 102, 241, 0.5),
+        0 0 60px rgba(139, 92, 246, 0.4);
+}
+
+.fab-enhanced:active {
+    transform: scale(0.95);
+}
+
+/* Enhanced Loading States */
+.loading-enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-enhanced::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.2) 50%,
+        transparent 100%
+    );
+    animation: loading-shine 2s ease-in-out infinite;
+}
+
+@keyframes loading-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Enhanced Dark Mode Transitions */
+.theme-transition {
+    transition: 
+        background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced Scroll Animations */
+.scroll-reveal-enhanced {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal-enhanced.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger Animation for Lists */
+.stagger-enhanced > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stagger-enhanced.revealed > *:nth-child(1) { transition-delay: 0ms; }
+.stagger-enhanced.revealed > *:nth-child(2) { transition-delay: 100ms; }
+.stagger-enhanced.revealed > *:nth-child(3) { transition-delay: 200ms; }
+.stagger-enhanced.revealed > *:nth-child(4) { transition-delay: 300ms; }
+.stagger-enhanced.revealed > *:nth-child(5) { transition-delay: 400ms; }
+
+.stagger-enhanced.revealed > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+    .card-enhanced {
+        padding: 1.5rem;
+        border-radius: 20px;
+    }
+    
+    .btn-enhanced {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+    
+    .fab-enhanced {
+        width: 56px;
+        height: 56px;
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+    
+    .five {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .five-number {
+        font-size: 3rem;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .avatar-enhanced::before,
+    .loading-enhanced::after,
+    .hero::before {
+        animation: none !important;
+    }
+    
+    .card-enhanced:hover,
+    .btn-enhanced:hover,
+    .fab-enhanced:hover {
+        transform: none !important;
+    }
+}
