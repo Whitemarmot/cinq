@@ -267,7 +267,7 @@ async function getUserPollVotes(userId, postIds) {
 // ===== POST - Create post =====
 
 async function handleCreatePost(req, res, user) {
-    const { content, image_url, poll_options } = req.body;
+    const { content, image_url, is_gif, poll_options } = req.body;
     
     // Validate content
     if (!content || typeof content !== 'string') {
@@ -300,7 +300,8 @@ async function handleCreatePost(req, res, user) {
     const postData = {
         user_id: user.id,
         content: sanitizedContent,
-        image_url: validatedImageUrl.url
+        image_url: validatedImageUrl.url,
+        is_gif: !!is_gif && !!validatedImageUrl.url // Only set is_gif if there's actually an image
     };
     
     // Add poll options if valid
