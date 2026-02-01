@@ -1120,6 +1120,29 @@
                 </div>
             </section>
 
+            <!-- Section: Mes données (GDPR) -->
+            <section class="settings-section">
+                <h2 class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Mes données
+                </h2>
+                
+                <div class="settings-card">
+                    <button id="btn-export-data" class="settings-item" style="width: 100%; cursor: pointer; border: none; background: transparent;">
+                        <div class="settings-item-info">
+                            <p class="settings-item-title">
+                                <span>📦</span>
+                                Exporter mes données
+                            </p>
+                            <p class="settings-item-subtitle">Télécharge un ZIP avec tes contacts, messages et posts (RGPD)</p>
+                        </div>
+                        <span class="link-item-arrow" id="export-arrow">→</span>
+                        <span id="export-spinner" class="hidden" style="color: var(--color-brand);">⏳</span>
+                    </button>
+                </div>
+                <p id="export-message" class="form-message hidden" style="margin-top: var(--space-2);"></p>
+            </section>
+
             <!-- Section: À propos -->
             <section class="settings-section">
                 <h2 class="section-header">
@@ -1208,16 +1231,48 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- Modal: Supprimer compte -->
+    <!-- Modal: Supprimer compte - Étape 1 -->
     <!-- ============================================ -->
-    <div id="modal-delete" class="modal-overlay" role="dialog" aria-labelledby="delete-modal-title" aria-modal="true">
+    <div id="modal-delete-step1" class="modal-overlay" role="dialog" aria-labelledby="delete-modal-title-1" aria-modal="true">
+        <div class="modal">
+            <div class="delete-modal-content">
+                <span class="delete-modal-icon">⚠️</span>
+                <h3 id="delete-modal-title-1" class="delete-modal-title">Supprimer ton compte ?</h3>
+                <p class="delete-modal-text">
+                    Tu es sur le point de demander la suppression de ton compte.
+                </p>
+            </div>
+            
+            <div class="gdpr-info-box" style="background: var(--color-bg-tertiary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-4);">
+                <p style="font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: var(--space-2);">
+                    <strong>🛡️ Protection RGPD</strong>
+                </p>
+                <ul style="font-size: var(--text-xs); color: var(--color-text-muted); list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: var(--space-1);">✓ Délai de grâce de <strong>7 jours</strong> pour changer d'avis</li>
+                    <li style="margin-bottom: var(--space-1);">✓ Email de confirmation envoyé immédiatement</li>
+                    <li style="margin-bottom: var(--space-1);">✓ Toutes tes données seront définitivement effacées</li>
+                    <li>✓ Tu peux annuler à tout moment pendant le délai</li>
+                </ul>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="modal-cancel" onclick="hideDeleteStep1()">Annuler</button>
+                <button type="button" class="modal-confirm modal-confirm-danger" onclick="showDeleteStep2()">Je comprends, continuer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Modal: Supprimer compte - Étape 2 -->
+    <!-- ============================================ -->
+    <div id="modal-delete-step2" class="modal-overlay" role="dialog" aria-labelledby="delete-modal-title-2" aria-modal="true">
         <div class="modal">
             <div class="delete-modal-content">
                 <span class="delete-modal-icon">💔</span>
-                <h3 id="delete-modal-title" class="delete-modal-title">Supprimer ton compte ?</h3>
+                <h3 id="delete-modal-title-2" class="delete-modal-title">Dernière étape</h3>
                 <p class="delete-modal-text">
-                    Cette action est <strong>irréversible</strong>.<br>
-                    Toutes tes données seront supprimées.
+                    Ton compte sera supprimé dans <strong>7 jours</strong>.<br>
+                    Tu recevras un email de confirmation.
                 </p>
             </div>
             
@@ -1232,10 +1287,33 @@
                 <p id="delete-error" class="modal-error hidden"></p>
                 
                 <div class="modal-actions">
-                    <button type="button" class="modal-cancel" onclick="hideDeleteModal()">Annuler</button>
-                    <button type="submit" class="modal-confirm modal-confirm-danger">Supprimer</button>
+                    <button type="button" class="modal-cancel" onclick="hideDeleteStep2()">Annuler</button>
+                    <button type="submit" class="modal-confirm modal-confirm-danger">Confirmer la suppression</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Modal: Annuler la suppression -->
+    <!-- ============================================ -->
+    <div id="modal-cancel-deletion" class="modal-overlay" role="dialog" aria-labelledby="cancel-deletion-title" aria-modal="true">
+        <div class="modal">
+            <div class="delete-modal-content">
+                <span class="delete-modal-icon">🎉</span>
+                <h3 id="cancel-deletion-title" class="delete-modal-title" style="color: var(--color-success);">Garder ton compte ?</h3>
+                <p class="delete-modal-text">
+                    Tu as une demande de suppression en cours.<br>
+                    <span id="deletion-scheduled-date" style="color: var(--color-text-primary); font-weight: 500;"></span>
+                </p>
+            </div>
+            
+            <p id="cancel-deletion-error" class="modal-error hidden"></p>
+            
+            <div class="modal-actions">
+                <button type="button" class="modal-cancel" onclick="hideCancelDeletionModal()">Fermer</button>
+                <button type="button" class="modal-confirm" style="background: var(--color-success);" onclick="cancelAccountDeletion()">Annuler la suppression</button>
+            </div>
         </div>
     </div>
 
@@ -1646,6 +1724,74 @@
         }
         
         $('btn-push-toggle').addEventListener('click', togglePushNotifications);
+        
+        // ============================================
+        // GDPR Data Export
+        // ============================================
+        async function exportUserData() {
+            const btn = $('btn-export-data');
+            const arrow = $('export-arrow');
+            const spinner = $('export-spinner');
+            
+            btn.disabled = true;
+            arrow.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            hideMessage('export-message');
+            
+            try {
+                const token = UserProfile.getSession()?.access_token;
+                if (!token) {
+                    throw new Error('Non authentifié');
+                }
+                
+                const response = await fetch('/api/export', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Erreur ${response.status}`);
+                }
+                
+                // Get the blob and trigger download
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Extract filename from Content-Disposition header or use default
+                const disposition = response.headers.get('Content-Disposition');
+                let filename = 'cinq-data-export.zip';
+                if (disposition) {
+                    const match = disposition.match(/filename="(.+)"/);
+                    if (match) filename = match[1];
+                }
+                
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showMessage('export-message', 'Export téléchargé ✓', false);
+                showToast('Données exportées ! 📦');
+                setTimeout(() => hideMessage('export-message'), 5000);
+                
+            } catch (err) {
+                console.error('Export error:', err);
+                showMessage('export-message', err.message || 'Erreur lors de l\'export', true);
+                showToast('Erreur d\'export', 'error');
+            } finally {
+                btn.disabled = false;
+                arrow.classList.remove('hidden');
+                spinner.classList.add('hidden');
+            }
+        }
+        
+        $('btn-export-data').addEventListener('click', exportUserData);
         
         // ============================================
         // Initialize
