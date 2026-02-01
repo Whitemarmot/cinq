@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug App - Cinq</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #0e0e12; color: white; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; }
+        .debug-title { color: #4ade80; margin-bottom: 10px; font-weight: bold; }
+        .debug-info { margin: 5px 0; }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+        .warning { color: #f59e0b; }
+        pre { background: #1a1a1a; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { background: #4ade80; color: black; border: none; padding: 8px 16px; border-radius: 4px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Cinq App</h1>
+    
+    <div class="debug-section">
+        <div class="debug-title">1. Authentification</div>
+        <div class="debug-info" id="auth-status">Vérification...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">2. Variables globales</div>
+        <div class="debug-info" id="global-vars">Vérification...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">3. Onglets visibles</div>
+        <div class="debug-info" id="tabs-status">Vérification...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">4. Contacts chargés</div>
+        <div class="debug-info" id="contacts-status">Vérification...</div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">5. Actions de test</div>
+        <button onclick="testSwitchToContacts()">Aller aux contacts</button>
+        <button onclick="testSwitchToFeed()">Aller au feed</button>
+        <button onclick="testSwitchToProfil()">Aller au profil</button>
+        <button onclick="refreshDebug()">Actualiser debug</button>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-title">6. Console logs</div>
+        <pre id="console-logs"></pre>
+    </div>
+
+    <script>
+        // Configuration de l'API
+        const API_URL = 'https://supabase-api-cinq.vercel.app';
+        
+        // Variables pour capturer les logs
+        let debugLogs = [];
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn
+        };
+        
+        // Override console pour capturer les logs
+        console.log = (...args) => {
+            debugLogs.push({ type: 'log', args, timestamp: new Date() });
+            originalConsole.log(...args);
+            updateConsoleLogs();
+        };
+        
+        console.error = (...args) => {
+            debugLogs.push({ type: 'error', args, timestamp: new Date() });
+            originalConsole.error(...args);
+            updateConsoleLogs();
+        };
+        
+        console.warn = (...args) => {
+            debugLogs.push({ type: 'warn', args, timestamp: new Date() });
+            originalConsole.warn(...args);
+            updateConsoleLogs();
+        };
+        
+        function updateConsoleLogs() {
+            const logsEl = document.getElementById('console-logs');
+            logsEl.textContent = debugLogs.slice(-10).map(log => 
+                `[${log.timestamp.toLocaleTimeString()}] ${log.type.toUpperCase()}: ${log.args.join(' ')}`
+            ).join('\n');
+        }
+        
+        function checkAuth() {
+            const session = localStorage.getItem('cinq_session');
+            const user = localStorage.getItem('cinq_user');
+            const authEl = document.getElementById('auth-status');
+            
+            if (!session || !user) {
+                authEl.innerHTML = '<span class="error">❌ Pas de session authentifiée</span>';
+                authEl.innerHTML += '<div>Redirection vers /login.html...</div>';
+                setTimeout(() => window.location.href = '/login.html', 2000);
+                return false;
+            }
+            
+            try {
+                const sessionData = JSON.parse(session);
+                const userData = JSON.parse(user);
+                authEl.innerHTML = `
+                    <span class="success">✅ Authentifié</span>
+                    <div>User: ${userData.email || 'N/A'}</div>
+                    <div>Session: ${sessionData.access_token ? 'Token OK' : 'Pas de token'}</div>
+                `;
+                return { session: sessionData, user: userData };
+            } catch (e) {
+                authEl.innerHTML = '<span class="error">❌ Erreur parsing session</span>';
+                return false;
+            }
+        }
+        
+        function checkGlobalVars() {
+            const varsEl = document.getElementById('global-vars');
+            let html = '';
+            
+            // Variables définies dans app.html
+            const globalVars = ['contacts', 'posts', 'user', 'session', 'currentTab'];
+            
+            globalVars.forEach(varName => {
+                const exists = typeof window[varName] !== 'undefined';
+                const value = window[varName];
+                html += `<div>${varName}: ${exists ? `✅ (${typeof value}, length: ${value?.length || 'N/A'})` : '❌ Non définie'}</div>`;
+            });
+            
+            varsEl.innerHTML = html;
+        }
+        
+        function checkTabsStatus() {
+            const tabsEl = document.getElementById('tabs-status');
+            const tabs = ['tab-feed', 'tab-contacts', 'tab-profil'];
+            let html = '';
+            
+            tabs.forEach(tabId => {
+                const tab = document.getElementById(tabId);
+                if (tab) {
+                    const isActive = tab.classList.contains('active');
+                    const isHidden = tab.hasAttribute('hidden');
+                    const display = window.getComputedStyle(tab).display;
+                    html += `<div>${tabId}: ${isActive ? '🟢 Active' : '⚪ Inactive'}, ${isHidden ? '🔒 Hidden' : '👁️ Visible'}, display: ${display}</div>`;
+                } else {
+                    html += `<div>${tabId}: ❌ Élément non trouvé</div>`;
+                }
+            });
+            
+            tabsEl.innerHTML = html;
+        }
+        
+        function checkContactsStatus() {
+            const contactsEl = document.getElementById('contacts-status');
+            
+            if (typeof window.contacts === 'undefined') {
+                contactsEl.innerHTML = '<span class="error">❌ Variable contacts non définie</span>';
+                return;
+            }
+            
+            const contacts = window.contacts;
+            let html = `<div>Contacts array: ${Array.isArray(contacts) ? '✅ Array' : '❌ Pas un array'}</div>`;
+            html += `<div>Nombre de contacts: ${contacts?.length || 0}</div>`;
+            
+            if (contacts?.length > 0) {
+                html += `<div>Premier contact: ${JSON.stringify(contacts[0], null, 2)}</div>`;
+            }
+            
+            // Vérifier la grille des contacts
+            const grid = document.getElementById('contacts-grid');
+            if (grid) {
+                html += `<div>Grille contacts: ${grid.children.length} éléments</div>`;
+            } else {
+                html += `<div>❌ Grille contacts-grid non trouvée</div>`;
+            }
+            
+            contactsEl.innerHTML = html;
+        }
+        
+        function testSwitchToContacts() {
+            console.log('Test switch to contacts');
+            if (typeof window.switchTab === 'function') {
+                window.switchTab('contacts');
+                setTimeout(refreshDebug, 500);
+            } else {
+                console.error('switchTab function not found');
+            }
+        }
+        
+        function testSwitchToFeed() {
+            console.log('Test switch to feed');
+            if (typeof window.switchTab === 'function') {
+                window.switchTab('feed');
+                setTimeout(refreshDebug, 500);
+            } else {
+                console.error('switchTab function not found');
+            }
+        }
+        
+        function testSwitchToProfil() {
+            console.log('Test switch to profil');
+            if (typeof window.switchTab === 'function') {
+                window.switchTab('profil');
+                setTimeout(refreshDebug, 500);
+            } else {
+                console.error('switchTab function not found');
+            }
+        }
+        
+        function refreshDebug() {
+            console.log('Refreshing debug info...');
+            checkAuth();
+            checkGlobalVars();
+            checkTabsStatus();
+            checkContactsStatus();
+        }
+        
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Debug page loaded');
+            
+            // Check if we're in an iframe or if app.html is loaded
+            const isInApp = document.getElementById('app-header') !== null;
+            
+            if (!isInApp) {
+                // Load app.html content to test
+                console.log('Loading app.html for testing...');
+                setTimeout(() => {
+                    window.location.href = '/app.html';
+                }, 3000);
+                return;
+            }
+            
+            refreshDebug();
+        });
+    </script>
+</body>
+</html>
