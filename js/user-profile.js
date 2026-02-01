@@ -113,6 +113,24 @@ const UserProfile = (function() {
         return null;
     }
     
+    function getSession() {
+        const db = initSupabase();
+        if (!db) return null;
+        
+        // Get cached session synchronously from localStorage
+        const storageKey = `sb-guioxfulihyehrwytxce-auth-token`;
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                return parsed;
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    }
+    
     async function logout() {
         const db = initSupabase();
         if (!db) throw new Error('Supabase non initialisé');
@@ -130,7 +148,7 @@ const UserProfile = (function() {
     
     async function loadProfile() {
         try {
-            const data = await apiCall('profile');
+            const data = await apiCall('user-profile');
             _profile = data.profile || {};
             return _profile;
         } catch (err) {
@@ -161,7 +179,7 @@ const UserProfile = (function() {
             throw new Error('Aucune modification');
         }
         
-        const data = await apiCall('profile', 'PATCH', filteredUpdates);
+        const data = await apiCall('user-profile', 'PATCH', filteredUpdates);
         _profile = { ..._profile, ...filteredUpdates };
         return data;
     }
@@ -303,6 +321,7 @@ const UserProfile = (function() {
         // Auth
         checkAuth,
         getCurrentUser,
+        getSession,
         logout,
         
         // Profile

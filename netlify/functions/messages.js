@@ -99,6 +99,61 @@ async function verifyContactRelationship(supabaseAdmin, userId, contactUserId) {
 }
 
 // ============================================
+// Vacation Auto-Reply
+// ============================================
+
+async function sendVacationAutoReply(supabaseAdmin, receiverId, senderId) {
+    try {
+        // Check if receiver has vacation mode enabled
+        const { data: receiverProfile, error: profileError } = await supabaseAdmin
+            .from('users')
+            .select('vacation_mode, vacation_message, display_name, email')
+            .eq('id', receiverId)
+            .single();
+
+        if (profileError || !receiverProfile?.vacation_mode) {
+            return; // No vacation mode or error
+        }
+
+        // Check if we already sent a vacation reply recently (within 1 hour)
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: recentAutoReply } = await supabaseAdmin
+            .from('messages')
+            .select('id')
+            .eq('sender_id', receiverId)
+            .eq('receiver_id', senderId)
+            .eq('is_vacation_reply', true)
+            .gte('created_at', oneHourAgo)
+            .limit(1);
+
+        if (recentAutoReply && recentAutoReply.length > 0) {
+            return; // Already sent a vacation reply recently
+        }
+
+        const vacationMessage = receiverProfile.vacation_message || 
+            'Je suis en vacances ! Je te réponds dès mon retour 🌴';
+
+        // Send automatic reply
+        const { error: insertError } = await supabaseAdmin
+            .from('messages')
+            .insert({
+                sender_id: receiverId,
+                receiver_id: senderId,
+                content: `🌴 ${vacationMessage}`,
+                is_ping: false,
+                is_vacation_reply: true
+            });
+
+        if (!insertError) {
+            console.log(`Vacation auto-reply sent from ${receiverId} to ${senderId}`);
+        }
+    } catch (err) {
+        // Log but don't fail the main request
+        console.error('Vacation auto-reply error:', err);
+    }
+}
+
+// ============================================
 // Handler
 // ============================================
 
@@ -244,6 +299,9 @@ exports.handler = async (event, context) => {
                 
                 return error('Failed to send message', 500);
             }
+            
+            // Send vacation auto-reply if receiver is in vacation mode (fire and forget)
+            sendVacationAutoReply(supabaseAdmin, contact_id, user.id);
             
             return success({
                 message: {

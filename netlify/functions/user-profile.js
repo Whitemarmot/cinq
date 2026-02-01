@@ -100,12 +100,23 @@ function validateURL(url) {
     }
 }
 
+function validateVacationMessage(message) {
+    if (!message) {
+        return { valid: true, message: 'Je suis en vacances ! Je te réponds dès mon retour 🌴' };
+    }
+    const sanitized = sanitizeText(message, 500, false);
+    if (sanitized.length < 5) {
+        return { valid: false, error: 'Message trop court (min 5 caractères)' };
+    }
+    return { valid: true, message: sanitized };
+}
+
 exports.handler = async (event, context) => {
     // CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return { 
             statusCode: 204, 
-            headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS' }, 
+            headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, PUT, PATCH, DELETE, OPTIONS' }, 
             body: '' 
         };
     }
@@ -239,13 +250,13 @@ exports.handler = async (event, context) => {
     }
 
     // ========================================
-    // PUT - Update Profile
+    // PUT/PATCH - Update Profile
     // ========================================
     
-    if (event.httpMethod === 'PUT') {
+    if (event.httpMethod === 'PUT' || event.httpMethod === 'PATCH') {
         try {
             const body = JSON.parse(event.body || '{}');
-            const { display_name, avatar_url, bio } = body;
+            const { display_name, avatar_url, bio, vacation_mode, vacation_message } = body;
 
             const updates = {};
             
@@ -271,6 +282,20 @@ exports.handler = async (event, context) => {
                     return error(result.error, 400);
                 }
                 updates.bio = result.bio;
+            }
+            
+            // Vacation mode
+            if (vacation_mode !== undefined) {
+                updates.vacation_mode = Boolean(vacation_mode);
+                console.log(`Vacation mode toggled for user ${user.id}: ${updates.vacation_mode}`);
+            }
+            
+            if (vacation_message !== undefined) {
+                const result = validateVacationMessage(vacation_message);
+                if (!result.valid) {
+                    return error(result.error, 400);
+                }
+                updates.vacation_message = result.message;
             }
 
             if (Object.keys(updates).length === 0) {
