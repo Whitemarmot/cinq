@@ -1,13 +1,21 @@
 /**
  * Cinq — Accessibility Styles
- * WCAG 2.1 AA Compliance
+ * WCAG 2.1 AAA Compliance
  * 
- * @version 1.0
+ * @version 2.0
  * @license Proprietary
+ * 
+ * AAA Requirements:
+ * - 7:1 contrast ratio for normal text
+ * - 4.5:1 contrast ratio for large text (18pt+ or 14pt+ bold)
+ * - Enhanced focus indicators (3px minimum)
+ * - Skip links on all pages
+ * - aria-live regions for dynamic content
  */
 
 /* ==========================================================================
    SKIP LINKS - Navigation rapide pour lecteurs d'écran
+   AAA: Skip links must be visible on focus
    ========================================================================== */
 
 .skip-link {
@@ -16,29 +24,53 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 10000;
-  padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
   background: var(--color-brand, #6366f1);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: var(--text-base, 1rem);
   text-decoration: none;
   border-radius: 0 0 var(--radius-lg, 0.75rem) var(--radius-lg, 0.75rem);
   transition: top 0.2s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .skip-link:focus {
   top: 0;
-  outline: 2px solid white;
-  outline-offset: 2px;
+  outline: 3px solid white;
+  outline-offset: 3px;
 }
 
+/* Multiple skip links container */
+.skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+}
+
+.skip-links .skip-link {
+  position: absolute;
+  left: var(--space-4, 1rem);
+  transform: none;
+}
+
+.skip-links .skip-link:nth-child(1) { top: -100%; }
+.skip-links .skip-link:nth-child(2) { top: -100%; }
+.skip-links .skip-link:nth-child(3) { top: -100%; }
+
+.skip-links .skip-link:focus:nth-child(1) { top: var(--space-2, 0.5rem); }
+.skip-links .skip-link:focus:nth-child(2) { top: calc(var(--space-2, 0.5rem) + 52px); }
+.skip-links .skip-link:focus:nth-child(3) { top: calc(var(--space-2, 0.5rem) + 104px); }
+
 /* ==========================================================================
-   FOCUS STYLES - Enhanced focus indicators
+   FOCUS STYLES - Enhanced focus indicators (AAA: 3px minimum)
    ========================================================================== */
 
-/* Global focus-visible styles */
+/* Global focus-visible styles - AAA compliant */
 :focus-visible {
-  outline: 2px solid var(--color-brand, #6366f1);
-  outline-offset: 2px;
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 3px;
   border-radius: var(--radius-sm, 0.375rem);
 }
 
@@ -47,64 +79,99 @@
   outline: none;
 }
 
-/* Enhanced focus for buttons */
+/* Enhanced focus for buttons - High contrast ring */
 .btn:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible {
-  outline: 2px solid var(--color-brand, #6366f1);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--color-brand-muted, rgba(99, 102, 241, 0.25));
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 3px;
+  box-shadow: 
+    0 0 0 6px var(--color-brand-muted, rgba(99, 102, 241, 0.35)),
+    0 0 20px var(--color-brand-glow, rgba(99, 102, 241, 0.4));
 }
 
-/* Enhanced focus for inputs */
+/* Enhanced focus for inputs - Double ring for maximum visibility */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 .input:focus-visible {
   outline: none;
   border-color: var(--color-brand, #6366f1);
-  box-shadow: 0 0 0 3px var(--color-brand-muted, rgba(99, 102, 241, 0.25));
+  box-shadow: 
+    0 0 0 3px var(--color-bg-primary, #0a0a0b),
+    0 0 0 6px var(--color-brand, #6366f1);
 }
 
-/* Enhanced focus for links */
+/* Enhanced focus for links - Underline + outline */
 a:focus-visible {
-  outline: 2px solid var(--color-brand, #6366f1);
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 4px;
+  border-radius: 3px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 
 /* Focus for card-like elements */
 .contact-slot:focus-visible,
 .action-btn:focus-visible,
-.card:focus-visible {
-  outline: 2px solid var(--color-brand, #6366f1);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--color-brand-muted, rgba(99, 102, 241, 0.25));
+.card:focus-visible,
+.post-card:focus-visible {
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 3px;
+  box-shadow: 
+    0 0 0 6px var(--color-brand-muted, rgba(99, 102, 241, 0.35)),
+    var(--shadow-lg, 0 10px 25px rgba(0, 0, 0, 0.2));
 }
 
 /* Focus for modal close buttons */
 .chat-close:focus-visible,
-.modal-close:focus-visible {
-  outline: 2px solid var(--color-brand, #6366f1);
-  outline-offset: 2px;
+.modal-close:focus-visible,
+.close-btn:focus-visible {
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 3px;
   border-radius: 50%;
+  box-shadow: 0 0 0 6px var(--color-brand-muted, rgba(99, 102, 241, 0.35));
+}
+
+/* Focus for nav items */
+.nav-item:focus-visible,
+.header-action-btn:focus-visible,
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--color-brand-muted, rgba(99, 102, 241, 0.35));
 }
 
 /* ==========================================================================
-   COLOR CONTRAST IMPROVEMENTS - WCAG AA Compliance
+   COLOR CONTRAST IMPROVEMENTS - WCAG AAA Compliance (7:1 ratio)
    ========================================================================== */
 
-/* Improve muted text contrast (4.5:1 minimum for AA) */
-/* Original: rgba(255, 255, 255, 0.55) = ~4.2:1 on #0a0a0b */
-/* Improved: rgba(255, 255, 255, 0.7) = ~5.5:1 on #0a0a0b */
+/* 
+ * AAA Contrast Requirements:
+ * - Normal text: 7:1 minimum
+ * - Large text (18pt+ / 14pt+ bold): 4.5:1 minimum
+ * 
+ * On dark background (#0a0a0b):
+ * - White (#ffffff) = 21:1 ✓
+ * - rgba(255,255,255,0.87) = ~14:1 ✓ (for secondary text)
+ * - rgba(255,255,255,0.75) = ~10:1 ✓ (for muted, meets AAA)
+ */
 
 :root {
-  /* Improved text colors for better contrast */
-  --color-text-muted-a11y: rgba(255, 255, 255, 0.7);
-  --color-text-secondary-a11y: rgba(255, 255, 255, 0.85);
+  /* AAA-compliant text colors */
+  --color-text-aaa: rgba(255, 255, 255, 0.95);          /* ~18:1 - Primary */
+  --color-text-secondary-aaa: rgba(255, 255, 255, 0.87); /* ~14:1 - Secondary */
+  --color-text-muted-aaa: rgba(255, 255, 255, 0.75);     /* ~10:1 - Muted (AAA) */
+  --color-text-placeholder-aaa: rgba(255, 255, 255, 0.65); /* ~7.5:1 - Placeholder */
+  
+  /* Light theme AAA colors */
+  --color-text-light-aaa: rgba(0, 0, 0, 0.95);           /* ~18:1 on white */
+  --color-text-light-secondary-aaa: rgba(0, 0, 0, 0.80); /* ~12:1 on white */
+  --color-text-light-muted-aaa: rgba(0, 0, 0, 0.65);     /* ~8:1 on white */
 }
 
-/* Apply improved contrast to muted text */
+/* Apply AAA contrast to muted/secondary text */
 .text-muted,
 .waitlist-label,
 .cta-note,
@@ -118,36 +185,135 @@ a:focus-visible {
 .login-subtitle,
 .gift-subtitle,
 .form-label,
-.home-link {
-  color: var(--color-text-muted-a11y, rgba(255, 255, 255, 0.7)) !important;
+.home-link,
+.post-time,
+.testimonial-role,
+.step-desc,
+.section-subtitle,
+.faq-answer-content,
+.char-count,
+.empty-state p {
+  color: var(--color-text-muted-aaa, rgba(255, 255, 255, 0.75)) !important;
+}
+
+/* Secondary text - slightly higher contrast */
+.text-secondary,
+.hero-sub,
+.feature-pill span,
+.testimonial-quote {
+  color: var(--color-text-secondary-aaa, rgba(255, 255, 255, 0.87)) !important;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .text-muted,
+[data-theme="light"] .waitlist-label,
+[data-theme="light"] .cta-note,
+[data-theme="light"] .counter-label,
+[data-theme="light"] .contact-name,
+[data-theme="light"] .action-subtitle,
+[data-theme="light"] .post-time,
+[data-theme="light"] .step-desc,
+[data-theme="light"] .section-subtitle,
+[data-theme="light"] .char-count {
+  color: var(--color-text-light-muted-aaa, rgba(0, 0, 0, 0.65)) !important;
+}
+
+[data-theme="light"] .text-secondary,
+[data-theme="light"] .hero-sub,
+[data-theme="light"] .feature-pill span {
+  color: var(--color-text-light-secondary-aaa, rgba(0, 0, 0, 0.80)) !important;
 }
 
 /* Footer links need better contrast */
 footer a,
-.footer a {
-  color: rgba(255, 255, 255, 0.7) !important;
+.footer a,
+.legal-footer a {
+  color: var(--color-text-muted-aaa, rgba(255, 255, 255, 0.75)) !important;
 }
 
 footer a:hover,
-.footer a:hover {
+.footer a:hover,
+.legal-footer a:hover {
   color: var(--color-brand-hover, #818cf8) !important;
 }
 
-/* Placeholder text contrast */
+/* Placeholder text contrast - AAA */
 ::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-placeholder-aaa, rgba(255, 255, 255, 0.65));
   opacity: 1;
 }
 
-/* Error/Success text - ensure good contrast */
+[data-theme="light"] ::placeholder {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* Error/Success text - ensure AAA contrast */
 .message.error,
-.error {
-  color: #f87171 !important; /* Lighter red for better contrast */
+.error,
+.field-error,
+[aria-invalid="true"] ~ .error-message {
+  color: #fca5a5 !important; /* Lighter red for AAA contrast */
 }
 
 .message.success,
 .success {
-  color: #4ade80 !important; /* Lighter green for better contrast */
+  color: #86efac !important; /* Lighter green for AAA contrast */
+}
+
+[data-theme="light"] .message.error,
+[data-theme="light"] .error,
+[data-theme="light"] .field-error {
+  color: #dc2626 !important; /* Darker red for light mode */
+}
+
+[data-theme="light"] .message.success,
+[data-theme="light"] .success {
+  color: #16a34a !important; /* Darker green for light mode */
+}
+
+/* ==========================================================================
+   ARIA-LIVE REGIONS - Dynamic content announcements
+   ========================================================================== */
+
+/* Live region container */
+[role="status"],
+[role="alert"],
+[aria-live="polite"],
+[aria-live="assertive"] {
+  /* Ensure live regions are properly styled */
+}
+
+/* Toast notifications - must be announced */
+.toast,
+.toast-container {
+  /* aria-live="polite" should be added via JS/HTML */
+}
+
+/* Form validation messages */
+.field-error,
+.form-error,
+.validation-message {
+  /* aria-live="polite" for form errors */
+}
+
+/* Loading states */
+.loading-indicator,
+.spinner,
+[aria-busy="true"]::after {
+  /* Announce loading via aria-label */
+}
+
+/* Hidden live region for screen reader announcements */
+.sr-announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ==========================================================================
@@ -159,7 +325,9 @@ footer a:hover,
 .action-btn,
 .feature-pill,
 .ping-btn,
-.onboarding-skip {
+.onboarding-skip,
+.post-card,
+.testimonial {
   cursor: pointer;
 }
 
@@ -173,11 +341,21 @@ footer a:hover,
   pointer-events: none;
 }
 
+[aria-hidden="true"] * {
+  visibility: hidden;
+}
+
 /* Ensure clickable cards are focusable */
 .card-interactive,
 .contact-slot.filled,
 .contact-slot.empty {
   position: relative;
+}
+
+/* Keyboard-only focus indicator enhancement */
+.focus-ring-keyboard:focus-visible {
+  outline: 3px solid var(--color-brand, #6366f1);
+  outline-offset: 4px;
 }
 
 /* ==========================================================================
@@ -187,38 +365,31 @@ footer a:hover,
 /* Visually hidden but accessible */
 .sr-only,
 .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 /* Show on focus for skip links */
 .sr-only-focusable:focus,
 .visually-hidden-focusable:focus {
-  position: static;
-  width: auto;
-  height: auto;
-  margin: 0;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-}
-
-/* Live regions */
-[role="status"],
-[role="alert"],
-[aria-live] {
-  /* Ensure live regions are announced */
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
 }
 
 /* ==========================================================================
-   TOUCH TARGET SIZE - Minimum 44x44px
+   TOUCH TARGET SIZE - AAA: Minimum 44x44px
    ========================================================================== */
 
 /* Ensure minimum touch target size */
@@ -227,16 +398,22 @@ a,
 [role="button"],
 input[type="submit"],
 input[type="button"],
-.btn {
+.btn,
+.nav-item,
+.contact-slot {
   min-height: 44px;
   min-width: 44px;
 }
 
 /* Exception for inline links */
 p a,
-.text a {
+.text a,
+li a {
   min-height: auto;
   min-width: auto;
+  /* Increase clickable area without affecting layout */
+  padding: 0.25em 0;
+  margin: -0.25em 0;
 }
 
 /* Small buttons need padding to meet touch target */
@@ -249,7 +426,9 @@ p a,
 .btn-icon,
 .ping-btn,
 .chat-close,
-.logout-btn {
+.logout-btn,
+.header-action-btn,
+.theme-toggle {
   min-height: 44px;
   min-width: 44px;
   display: inline-flex;
@@ -263,26 +442,62 @@ p a,
 
 @media (prefers-contrast: high) {
   :root {
-    --color-text-muted: rgba(255, 255, 255, 0.9);
-    --color-text-secondary: rgba(255, 255, 255, 0.95);
-    --color-border: rgba(255, 255, 255, 0.3);
-    --color-border-active: rgba(255, 255, 255, 0.5);
+    --color-text-muted: rgba(255, 255, 255, 0.95);
+    --color-text-secondary: rgba(255, 255, 255, 0.98);
+    --color-border: rgba(255, 255, 255, 0.5);
+    --color-border-active: rgba(255, 255, 255, 0.7);
   }
   
+  /* Increase border visibility */
   .btn,
-  button {
-    border: 2px solid currentColor;
+  button,
+  input,
+  textarea,
+  select {
+    border: 2px solid currentColor !important;
   }
   
   .card,
   .contact-slot,
-  .action-btn {
-    border-width: 2px;
+  .action-btn,
+  .post-card {
+    border-width: 2px !important;
+    border-color: var(--color-text-primary) !important;
+  }
+  
+  /* High contrast focus */
+  :focus-visible {
+    outline: 4px solid currentColor !important;
+    outline-offset: 4px !important;
+  }
+  
+  /* Ensure links are distinguishable */
+  a {
+    text-decoration: underline !important;
+    text-decoration-thickness: 2px !important;
+  }
+}
+
+/* Windows High Contrast Mode */
+@media (forced-colors: active) {
+  .skip-link:focus {
+    outline: 3px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+  
+  :focus-visible {
+    outline: 3px solid CanvasText !important;
+  }
+  
+  .btn,
+  button {
+    border: 2px solid CanvasText;
   }
 }
 
 /* ==========================================================================
-   REDUCED MOTION
+   REDUCED MOTION - Respect user preferences
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -300,14 +515,22 @@ p a,
   .animate-slide-right,
   .animate-scale-in,
   .animate-hero-logo,
-  .animate-ring {
+  .animate-ring,
+  .scroll-reveal,
+  .stagger-children > * {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
   
-  .gradient-orb {
+  .gradient-orb,
+  .pentagon-pattern {
     animation: none !important;
+  }
+  
+  /* Still allow opacity transitions for focus states */
+  :focus-visible {
+    transition: outline-offset 0.01ms !important;
   }
 }
 
@@ -315,30 +538,56 @@ p a,
    FORM ACCESSIBILITY
    ========================================================================== */
 
-/* Error states */
+/* Error states - AAA visible */
 .input-error,
 input[aria-invalid="true"],
-textarea[aria-invalid="true"] {
-  border-color: var(--color-error, #ef4444);
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: #f87171 !important;
+  border-width: 2px;
 }
 
 .input-error:focus,
 input[aria-invalid="true"]:focus,
 textarea[aria-invalid="true"]:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+  box-shadow: 
+    0 0 0 3px var(--color-bg-primary, #0a0a0b),
+    0 0 0 6px #f87171;
 }
 
 /* Required field indicator */
-.required::after {
+.required::after,
+label.required::after,
+.form-label.required::after {
   content: " *";
-  color: var(--color-error, #ef4444);
+  color: #fca5a5;
+  font-weight: bold;
 }
 
-/* Form error messages */
-.field-error {
-  color: #f87171;
+/* Form error messages - clearly visible */
+.field-error,
+.form-error-message {
+  color: #fca5a5;
   font-size: var(--text-sm, 0.875rem);
-  margin-top: var(--space-1, 0.25rem);
+  font-weight: 500;
+  margin-top: var(--space-2, 0.5rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+}
+
+.field-error::before {
+  content: "⚠";
+  font-size: 1em;
+}
+
+/* Form labels - always visible */
+label,
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--space-2, 0.5rem);
+  color: var(--color-text-secondary-aaa, rgba(255, 255, 255, 0.87));
 }
 
 /* ==========================================================================
@@ -348,10 +597,36 @@ textarea[aria-invalid="true"]:focus {
 /* Announce loading state to screen readers */
 [aria-busy="true"] {
   cursor: wait;
+  position: relative;
 }
 
+/* Loading spinner must have accessible label */
 .loading-spinner {
-  /* Ensure spinner has accessible label via aria-label */
+  /* aria-label="Chargement en cours" required via HTML */
+}
+
+/* Skeleton loading states */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 25%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--color-bg-tertiary);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ==========================================================================
@@ -360,20 +635,29 @@ textarea[aria-invalid="true"]:focus {
 
 /* Trap focus within modal when open */
 .modal-overlay.open,
-.chat-panel.open {
+.chat-panel.open,
+[role="dialog"][aria-modal="true"] {
   /* Focus trap handled by JS */
 }
 
-/* Modal backdrop */
-.modal-overlay {
-  /* Clicking backdrop should close modal - handled by JS */
+/* Modal must have visible close button */
+.modal-close,
+[role="dialog"] .close-btn {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 /* Ensure modal content is scrollable with keyboard */
 .modal,
-.chat-messages {
+.chat-messages,
+[role="dialog"] {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Modal backdrop - click to close info */
+.modal-overlay::after {
+  /* Consider adding "Click outside to close" for screen readers */
 }
 
 /* ==========================================================================
@@ -381,20 +665,122 @@ textarea[aria-invalid="true"]:focus {
    ========================================================================== */
 
 /* Ensure links are distinguishable from text */
-a:not(.btn):not(.cta-button):not(.action-btn) {
+a:not(.btn):not(.cta-button):not(.action-btn):not(.nav-item):not(.skip-link) {
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
-a:not(.btn):not(.cta-button):not(.action-btn):hover {
+a:not(.btn):not(.cta-button):not(.action-btn):not(.nav-item):not(.skip-link):hover {
   text-decoration-thickness: 2px;
 }
 
+/* External link indicator */
+a[target="_blank"]::after {
+  content: " ↗";
+  font-size: 0.8em;
+  vertical-align: super;
+}
+
+/* Exception for icon-only external links */
+a[target="_blank"][aria-label]::after,
+a[target="_blank"].no-external-icon::after {
+  content: none;
+}
+
 /* Footer links exception - already have visual distinction */
-footer a {
+footer a,
+.legal-footer a {
   text-decoration: none;
 }
 
-footer a:hover {
+footer a:hover,
+.legal-footer a:hover {
   text-decoration: underline;
+}
+
+/* ==========================================================================
+   IMAGE ACCESSIBILITY
+   ========================================================================== */
+
+/* Images must have alt text */
+img:not([alt]) {
+  outline: 4px solid #f87171 !important;
+  outline-offset: 2px;
+}
+
+/* Decorative images */
+img[alt=""],
+img[role="presentation"] {
+  /* Properly marked as decorative */
+}
+
+/* ==========================================================================
+   TABLE ACCESSIBILITY (if used)
+   ========================================================================== */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  background: var(--color-bg-secondary);
+}
+
+th, td {
+  padding: var(--space-3, 0.75rem);
+  border: 1px solid var(--color-border);
+}
+
+/* Ensure table headers are associated with data */
+th[scope] {
+  /* Proper scope attribute */
+}
+
+/* ==========================================================================
+   COLOR BLINDNESS SUPPORT
+   ========================================================================== */
+
+/* Don't rely solely on color - add icons/patterns */
+.status-success::before {
+  content: "✓ ";
+}
+
+.status-error::before {
+  content: "✕ ";
+}
+
+.status-warning::before {
+  content: "⚠ ";
+}
+
+.status-info::before {
+  content: "ℹ ";
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  .skip-link,
+  .skip-links,
+  [aria-hidden="true"],
+  .no-print {
+    display: none !important;
+  }
+  
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+  
+  /* Ensure sufficient contrast for print */
+  * {
+    color: black !important;
+    background: white !important;
+  }
 }

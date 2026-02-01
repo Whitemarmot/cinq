@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "lang": "en",
+    "langName": "English"
+  },
+  "common": {
+    "appName": "Cinq",
+    "tagline": "The anti-social network",
+    "subtitle": "5 close ones, no likes",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "retry": "Retry",
+    "or": "or",
+    "and": "and",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "feed": "Feed",
+    "profile": "Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "logout": "Log out",
+    "backToHome": "Back to home"
+  },
+  "auth": {
+    "login": "Log in",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Your 5 are waiting",
+    "loginButton": "Log in",
+    "loginSuccess": "Login successful! Redirecting...",
+    "connected": "Connected!",
+    "register": "Create account",
+    "registerTitle": "Welcome to Cinq",
+    "registerSubtitle": "You received an invitation — it's rare and precious ✨",
+    "registerButton": "Create my account",
+    "accountCreated": "Account created!",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already registered?",
+    "forgotPassword": "Forgot password?",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "welcomeBanner": "Welcome to the circle! Log in to discover your space.",
+    "welcomeSuccess": "Welcome to Cinq! 🎉 Get ready for what's next...",
+    "accountReady": "Your account is ready! Taking you to your space..."
+  },
+  "validation": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email address",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Minimum 8 characters required",
+    "passwordLetter": "At least one letter required",
+    "passwordNumber": "At least one number required",
+    "passwordHint": "Min. 8 characters, 1 letter, 1 number"
+  },
+  "password": {
+    "strength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    }
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Network error. Check your connection.",
+    "server": "Server issue. Try again later.",
+    "unauthorized": "Incorrect email or password. Check your credentials.",
+    "tooManyAttempts": "Too many attempts. Try again in a few minutes.",
+    "emailExists": "This email is already in use. Try logging in.",
+    "loginError": "Login error",
+    "registerError": "Error creating account"
+  },
+  "gift": {
+    "verifying": "Verifying code...",
+    "invalidCode": "Invalid code",
+    "noCode": "No code provided. You need an invitation to join Cinq.",
+    "notFound": "This code doesn't exist. Make sure you copied it correctly.",
+    "alreadyUsed": "This code has already been used.",
+    "expired": "This code has expired.",
+    "invalid": "This code is not valid.",
+    "giftedBy": "Gifted by",
+    "aFriend": "a friend"
+  },
+  "progress": {
+    "step1": "Account",
+    "step2": "Let's go!"
+  },
+  "encouragement": {
+    "emailValid": "Great, valid email!",
+    "passwordStart": "Choose a secure password...",
+    "passwordWeak": "Keep going, you can do better!",
+    "passwordFair": "Not bad! A few more characters?",
+    "passwordGood": "Excellent choice!",
+    "passwordStrong": "Ultra secure password!",
+    "ready": "You're ready! Create your account!"
+  },
+  "a11y": {
+    "skipToLogin": "Skip to login form",
+    "skipToRegister": "Skip to registration form",
+    "skipToContent": "Skip to main content",
+    "toggleTheme": "Toggle light/dark mode",
+    "loginFormLabel": "Login form",
+    "registerFormLabel": "Registration form",
+    "legalLinks": "Legal links",
+    "loginToAccount": "Log in to my account",
+    "createAccount": "Create my Cinq account",
+    "goToLogin": "Log in to existing account"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2025 Cinq"
+  },
+  "app": {
+    "yourSpace": "Your intimate space",
+    "yourFive": "Your 5",
+    "inviteFriend": "Invite a friend",
+    "sendMessage": "Send message",
+    "noMessages": "No messages",
+    "startConversation": "Start a conversation!",
+    "typeMessage": "Type your message...",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "auto": "Auto"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{n} min ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
+  }
+}

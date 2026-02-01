@@ -5,7 +5,7 @@
     <!-- Note: user-scalable=no kept for app-like experience, but consider removing for better a11y -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Cinq — Ton espace intime</title>
+    <title data-i18n-title="app.yourSpace">Cinq — Ton espace intime</title>
     
     <!-- SEO -->
     <meta name="description" content="Cinq — Ton espace intime avec tes 5 proches. L'anti-réseau social sans algorithme, sans likes.">
@@ -6196,6 +6196,96 @@
                     });
                 }
             }
+        });
+    </script>
+    
+    <!-- i18n -->
+    <script src="/js/i18n.js"></script>
+    <script>
+        // Update texts on language change
+        window.addEventListener('i18n:loaded', updateAppTexts);
+        window.addEventListener('i18n:changed', updateAppTexts);
+        
+        function updateAppTexts() {
+            document.title = 'Cinq — ' + i18n.t('app.yourSpace');
+            
+            // Update nav items
+            const navLabels = {
+                'tab-feed': 'nav.feed',
+                'tab-settings': 'nav.settings'
+            };
+            
+            for (const [id, key] of Object.entries(navLabels)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    const label = el.querySelector('.nav-label');
+                    if (label) label.textContent = i18n.t(key);
+                }
+            }
+            
+            // Update theme texts
+            const themeLabel = document.querySelector('.settings-theme .setting-label');
+            if (themeLabel) themeLabel.textContent = i18n.t('theme.dark');
+            
+            // Update logout button
+            const logoutBtn = document.querySelector('.logout-btn .btn-text');
+            if (logoutBtn) logoutBtn.textContent = i18n.t('nav.logout');
+        }
+        
+        // Language switcher in header
+        const langSwitcher = document.createElement('div');
+        langSwitcher.id = 'app-lang-switcher';
+        langSwitcher.innerHTML = `
+            <style>
+                #app-lang-switcher {
+                    position: fixed;
+                    top: var(--space-4);
+                    right: calc(var(--space-4) + 50px);
+                    z-index: 100;
+                    display: flex;
+                    gap: 4px;
+                }
+                #app-lang-switcher .lang-btn {
+                    padding: 4px 8px;
+                    background: var(--color-bg-tertiary);
+                    border: 1px solid var(--color-border);
+                    border-radius: var(--radius-md);
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: 500;
+                    color: var(--color-text-secondary);
+                    transition: all 0.2s;
+                }
+                #app-lang-switcher .lang-btn.active {
+                    background: var(--color-brand-muted);
+                    border-color: var(--color-brand);
+                    color: var(--color-brand);
+                }
+                #app-lang-switcher .lang-btn:hover {
+                    background: var(--color-bg-elevated);
+                    border-color: var(--color-border-active);
+                }
+            </style>
+            <button class="lang-btn" data-lang="fr" aria-label="Français">FR</button>
+            <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+        `;
+        document.body.appendChild(langSwitcher);
+        
+        langSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.i18n) {
+                    i18n.setLanguage(btn.dataset.lang);
+                    langSwitcher.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            });
+        });
+        
+        window.addEventListener('i18n:loaded', () => {
+            const lang = i18n.getLang();
+            langSwitcher.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === lang);
+            });
         });
     </script>
 </body>

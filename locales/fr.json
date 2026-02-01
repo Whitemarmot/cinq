@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "lang": "fr",
+    "langName": "Français"
+  },
+  "common": {
+    "appName": "Cinq",
+    "tagline": "L'anti-réseau social",
+    "subtitle": "5 proches, pas de likes",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Envoyer",
+    "retry": "Réessayer",
+    "or": "ou",
+    "and": "et",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "nav": {
+    "home": "Accueil",
+    "feed": "Fil",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "notifications": "Notifications",
+    "logout": "Déconnexion",
+    "backToHome": "Retour à l'accueil"
+  },
+  "auth": {
+    "login": "Connexion",
+    "loginTitle": "Te revoilà",
+    "loginSubtitle": "Tes 5 t'attendent",
+    "loginButton": "Se connecter",
+    "loginSuccess": "Connexion réussie ! Redirection...",
+    "connected": "Connecté !",
+    "register": "Créer un compte",
+    "registerTitle": "Bienvenue sur Cinq",
+    "registerSubtitle": "Tu as reçu une invitation — c'est rare et précieux ✨",
+    "registerButton": "Créer mon compte",
+    "accountCreated": "Compte créé !",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà inscrit ?",
+    "forgotPassword": "Mot de passe oublié ?",
+    "email": "Email",
+    "emailPlaceholder": "ton@email.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "welcomeBanner": "Bienvenue dans le cercle ! Connecte-toi pour découvrir ton espace.",
+    "welcomeSuccess": "Bienvenue sur Cinq ! 🎉 Prépare-toi pour la suite...",
+    "accountReady": "Ton compte est prêt ! On t'emmène dans ton espace..."
+  },
+  "validation": {
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "Adresse email invalide",
+    "passwordRequired": "Le mot de passe est requis",
+    "passwordMin": "Minimum 8 caractères requis",
+    "passwordLetter": "Au moins une lettre requise",
+    "passwordNumber": "Au moins un chiffre requis",
+    "passwordHint": "Min. 8 caractères, 1 lettre, 1 chiffre"
+  },
+  "password": {
+    "strength": {
+      "weak": "Faible",
+      "fair": "Moyen",
+      "good": "Bon",
+      "strong": "Fort"
+    }
+  },
+  "errors": {
+    "generic": "Une erreur s'est produite",
+    "network": "Erreur réseau. Vérifie ta connexion.",
+    "server": "Problème de serveur. Réessaie plus tard.",
+    "unauthorized": "Email ou mot de passe incorrect. Vérifie tes identifiants.",
+    "tooManyAttempts": "Trop de tentatives. Réessaie dans quelques minutes.",
+    "emailExists": "Cette adresse email est déjà utilisée. Essaie de te connecter.",
+    "loginError": "Erreur de connexion",
+    "registerError": "Erreur lors de la création du compte"
+  },
+  "gift": {
+    "verifying": "Vérification du code...",
+    "invalidCode": "Code invalide",
+    "noCode": "Aucun code fourni. Tu as besoin d'une invitation pour rejoindre Cinq.",
+    "notFound": "Ce code n'existe pas. Vérifie que tu l'as bien copié.",
+    "alreadyUsed": "Ce code a déjà été utilisé.",
+    "expired": "Ce code a expiré.",
+    "invalid": "Ce code n'est pas valide.",
+    "giftedBy": "Offert par",
+    "aFriend": "un ami"
+  },
+  "progress": {
+    "step1": "Compte",
+    "step2": "C'est parti !"
+  },
+  "encouragement": {
+    "emailValid": "Super, email valide !",
+    "passwordStart": "Choisis un mot de passe sécurisé...",
+    "passwordWeak": "Continue, tu peux faire mieux !",
+    "passwordFair": "Pas mal ! Un peu plus de caractères ?",
+    "passwordGood": "Excellent choix !",
+    "passwordStrong": "Mot de passe ultra sécurisé !",
+    "ready": "Tu es prêt(e) ! Crée ton compte !"
+  },
+  "a11y": {
+    "skipToLogin": "Aller au formulaire de connexion",
+    "skipToRegister": "Aller au formulaire d'inscription",
+    "skipToContent": "Aller au contenu principal",
+    "toggleTheme": "Basculer mode clair/sombre",
+    "loginFormLabel": "Formulaire de connexion",
+    "registerFormLabel": "Formulaire d'inscription",
+    "legalLinks": "Liens légaux",
+    "loginToAccount": "Se connecter à mon compte",
+    "createAccount": "Créer mon compte Cinq",
+    "goToLogin": "Se connecter à un compte existant"
+  },
+  "footer": {
+    "privacy": "Confidentialité",
+    "terms": "CGU",
+    "copyright": "© 2025 Cinq"
+  },
+  "app": {
+    "yourSpace": "Ton espace intime",
+    "yourFive": "Tes 5",
+    "inviteFriend": "Inviter un ami",
+    "sendMessage": "Envoyer un message",
+    "noMessages": "Aucun message",
+    "startConversation": "Commence une conversation !",
+    "typeMessage": "Écris ton message...",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "theme": {
+    "dark": "Sombre",
+    "light": "Clair",
+    "auto": "Auto"
+  },
+  "time": {
+    "justNow": "À l'instant",
+    "minutesAgo": "Il y a {n} min",
+    "hoursAgo": "Il y a {n}h",
+    "daysAgo": "Il y a {n}j"
+  }
+}

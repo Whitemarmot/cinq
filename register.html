@@ -807,8 +807,15 @@
     </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;">
-    <!-- Skip to content link -->
-    <a href="#register-form" class="skip-link">Aller au formulaire d'inscription</a>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#register-form" class="skip-link">Aller au formulaire d'inscription</a>
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+    </nav>
+    
+    <!-- Live region for form validation -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
+    <div id="form-errors" class="sr-announce" aria-live="assertive" aria-atomic="true"></div>
     
     <div class="noise-overlay" aria-hidden="true"></div>
     

@@ -1350,8 +1350,15 @@
     </style>
 </head>
 <body>
-    <!-- Skip to content -->
-    <a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Aller au contenu principal</a>
+    <!-- Skip Links - WCAG AAA Compliant -->
+    <nav class="skip-links" aria-label="Liens d'évitement">
+        <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+        <a href="#how-it-works" class="skip-link">Aller à Comment ça marche</a>
+        <a href="#footer" class="skip-link">Aller au pied de page</a>
+    </nav>
+    
+    <!-- Live region for dynamic announcements -->
+    <div id="sr-announce" class="sr-announce" aria-live="polite" aria-atomic="true"></div>
     
     <!-- Background elements -->
     <div class="noise-overlay" aria-hidden="true"></div>
@@ -1652,7 +1659,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="legal-footer" role="contentinfo">
+    <footer id="footer" class="legal-footer" role="contentinfo">
         <nav aria-label="Liens légaux">
             <a href="/privacy.html">Confidentialité</a>
             <span aria-hidden="true">·</span>
